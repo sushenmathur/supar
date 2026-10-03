@@ -1896,7 +1896,7 @@ views:
                 .filter(d => states[d] && states[d].state === 'on').length;
               const motion = states['binary_sensor.patiopresencesensor_occupancy']
                 && states['binary_sensor.patiopresencesensor_occupancy'].state === 'on';
-              const bits = ['6 cameras'];
+              const bits = ['7 cameras'];
               bits.push(doors ? `<span style="color:var(--red-color)">${doors} door${doors > 1 ? 's' : ''} open</span>` : 'all doors closed');
               if (motion) bits.push('<span style="color:var(--amber-color)">motion on patio</span>');
               return bits.join(' · ');
@@ -2034,27 +2034,18 @@ views:
                 card_mod:
                   style: |
                     ha-card { border-radius: 16px; overflow: hidden; }
-              - type: custom:button-card
-                name: All Devices
-                icon: mdi:cctv
+              - type: picture-entity
+                entity: camera.garage_live_view
+                camera_image: camera.garage_live_view
+                camera_view: auto
+                aspect_ratio: '4:3'
+                fit_mode: cover
+                name: Garage
+                show_name: true
                 show_state: false
-                tap_action:
-                  action: navigate
-                  navigation_path: /config/devices/dashboard
-                styles:
-                  card:
-                    - aspect-ratio: 4 / 3
-                    - border-radius: 16px
-                    - box-shadow: none
-                    - border: 1px dashed rgba(var(--rgb-primary-text-color),0.18)
-                    - background: rgba(var(--rgb-primary-text-color),0.03)
-                  icon:
-                    - width: 26px
-                    - color: var(--secondary-text-color)
-                  name:
-                    - font-size: 11px
-                    - font-weight: 600
-                    - color: var(--secondary-text-color)
+                card_mod:
+                  style: |
+                    ha-card { border-radius: 16px; overflow: hidden; }
 
       # Navbar (unchanged)
       - type: grid
