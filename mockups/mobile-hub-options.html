@@ -1,0 +1,582 @@
+<title>Supar Mobile Hub Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=block">
+<style>
+/* Layout: page header, a shared tab picker, then three phone mockups side by side (stacked on phones), each with its notes underneath. */
+:root{
+  --bg:#f2f3f1; --surface:#ffffff; --fg:#151a1c; --muted:#5b676b; --line:#dbe0df;
+  --accent:#d9661f; --accent-soft:#fbe6d6;
+  --f-display:'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
+  --f-body:'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+  /* phone screen: deliberately always dark, like the HA dark theme */
+  --p-bg:#0a0f11; --p-bg2:#101a1d; --p-card:rgba(255,255,255,.055); --p-card2:rgba(255,255,255,.09);
+  --p-line:rgba(255,255,255,.11); --p-fg:#eef2f2; --p-mute:#8b979a;
+  --p-on:#ffa94d; --p-green:#30d158; --p-red:#ff5a4f; --p-blue:#4c8dff; --p-amber:#ffc53d;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1113; --surface:#151b1e; --fg:#e7ecec; --muted:#95a2a5; --line:#253135;
+  --accent:#ff9a56; --accent-soft:#3a2416; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1113; --surface:#151b1e; --fg:#e7ecec; --muted:#95a2a5; --line:#253135;
+  --accent:#ff9a56; --accent-soft:#3a2416; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+header.page h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,44px);letter-spacing:-.02em;line-height:1.05;margin:0 0 10px;text-wrap:balance}
+header.page p{margin:0;color:var(--muted);max-width:66ch}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.picker{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:26px 0 22px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.picker .lbl{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.picker button{font:600 13.5px var(--f-body);border:1px solid var(--line);background:transparent;color:var(--fg);padding:6px 12px;border-radius:999px;cursor:pointer}
+.picker button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.picker button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:28px;align-items:start}
+.opt{min-width:0;display:flex;flex-direction:column;gap:14px}
+.opt-head{display:flex;align-items:baseline;gap:10px}
+.opt-head .letter{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--accent);line-height:1}
+.opt-head h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0;letter-spacing:-.01em}
+.notes{display:flex;flex-direction:column;gap:10px;font-size:14px}
+.notes p{margin:0;color:var(--muted)}
+.notes dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:13.5px}
+.notes dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.notes dd{margin:0}
+.meter{display:inline-flex;gap:3px;vertical-align:middle}
+.meter i{width:14px;height:6px;border-radius:2px;background:var(--line)}
+.meter i.f{background:var(--accent)}
+section.cov{margin-top:44px;padding-top:24px;border-top:1px solid var(--line)}
+section.cov h3{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0 0 6px}
+section.cov > p{margin:0 0 16px;color:var(--muted);max-width:70ch}
+.covgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.covgrid div{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface);min-width:0}
+.covgrid h4{margin:0 0 6px;font-size:13px;font-family:var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.covgrid ul{margin:0;padding-left:16px;font-size:13px;color:var(--muted)}
+.covgrid code{font-family:var(--f-mono);font-size:11.5px;color:var(--fg);word-break:break-all}
+.foot{margin-top:28px;font-size:13px;color:var(--muted)}
+
+/* ---------- phone frame ---------- */
+.frame{position:relative;width:360px;max-width:100%;margin:0 auto;border-radius:44px;padding:10px;background:#1b2124;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 24px 50px -20px rgba(0,0,0,.45)}
+.ph{position:relative;height:740px;border-radius:35px;overflow:hidden;background:radial-gradient(120% 60% at 0% 0%,#14262a 0%,transparent 60%),radial-gradient(90% 50% at 100% 30%,#1d1a26 0%,transparent 60%),var(--p-bg);color:var(--p-fg);font-family:var(--f-body);font-size:13px;line-height:1.3}
+.ph .scr{position:absolute;inset:0;overflow-y:auto;padding:38px 12px 96px;scrollbar-width:none}
+.ph .scr::-webkit-scrollbar{display:none}
+.ph .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:96px;height:26px;border-radius:20px;background:#000;z-index:5}
+.ms{font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:18px;line-height:1;display:inline-block;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 1,'wght' 450,'GRAD' 0,'opsz' 24;vertical-align:middle}
+.ph .mute{color:var(--p-mute)}
+.ph .c-green{color:var(--p-green)} .ph .c-red{color:var(--p-red)} .ph .c-blue{color:var(--p-blue)} .ph .c-amber{color:var(--p-amber)} .ph .c-on{color:var(--p-on)} .ph .c-mute{color:var(--p-mute)}
+.ph .bg-green{background:rgba(48,209,88,.16)} .ph .bg-red{background:rgba(255,90,79,.17)} .ph .bg-blue{background:rgba(76,141,255,.17)} .ph .bg-amber{background:rgba(255,197,61,.16)} .ph .bg-on{background:rgba(255,169,77,.18)} .ph .bg-mute{background:rgba(255,255,255,.07)}
+.ph .stack{display:flex;flex-direction:column;gap:10px}
+.ph .card{background:var(--p-card);border:1px solid var(--p-line);border-radius:16px}
+.ph .row{display:flex;align-items:center;gap:8px;min-width:0}
+.ph .grow{flex:1;min-width:0}
+.ph .ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph .scroll-x{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -12px;padding:0 12px}
+.ph .scroll-x::-webkit-scrollbar{display:none}
+.ph .alert{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:12px;background:linear-gradient(90deg,rgba(255,90,79,.24),rgba(255,90,79,.08));border:1px solid rgba(255,90,79,.35);font-weight:600;font-size:12.5px}
+.ph .alert small{margin-left:auto;font-weight:500;color:var(--p-mute);font-size:11px}
+.ph .cond{font-size:9px;font-family:var(--f-mono);color:var(--p-mute);letter-spacing:.04em}
+.ph .cam{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(180deg,#30424a 0%,#1f2b2f 55%,#3a3f33 56%,#2a2e25 100%)}
+.ph .cam::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(255,255,255,.035) 22px 24px)}
+.ph .cam .tag{position:absolute;left:6px;bottom:5px;font-size:10.5px;font-weight:600;z-index:1;text-shadow:0 1px 2px #000}
+.ph .cam .live{position:absolute;right:6px;top:5px;font:500 8.5px var(--f-mono);background:var(--p-red);padding:1px 4px;border-radius:4px;z-index:1}
+.ph .cam.k2{background:linear-gradient(180deg,#3b3446 0%,#2a2633 60%,#463d35 61%,#2c2621 100%)}
+.ph .cam.k3{background:linear-gradient(180deg,#2c3c32 0%,#223026 60%,#454037 61%,#2a2720 100%)}
+.ph .sw{width:30px;height:18px;border-radius:10px;background:rgba(255,255,255,.18);position:relative;flex:none}
+.ph .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s}
+.ph .sw.on{background:var(--p-green)} .ph .sw.on::after{left:14px}
+.ph .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none;position:relative}
+.ph .av .dot{position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--p-bg)}
+.ph button{all:unset;cursor:pointer}
+.ph button:focus-visible{outline:2px solid var(--p-on);outline-offset:2px;border-radius:8px}
+
+/* navbar */
+.ph .nav{position:absolute;left:12px;right:12px;bottom:16px;height:58px;border-radius:26px;background:rgba(255,255,255,.07);backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%);border:1px solid rgba(255,255,255,.14);display:grid;grid-template-columns:repeat(6,1fr);align-items:center;z-index:6;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.ph .nav div{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--p-mute)}
+.ph .nav div .ms{font-size:21px}
+.ph .nav div.on{color:#fff}
+.ph .nav div.on .ms{color:var(--p-on)}
+
+/* shared bits: Tesla + solar + cars */
+.ph .car-svg{width:100%;height:auto;display:block}
+.ph .flow{width:100%;height:auto;display:block}
+.ph .flow text{font-family:var(--f-body)}
+.ph .acts{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center}
+.ph .acts div{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--p-mute)}
+.ph .acts .ms{font-size:20px;color:#fff}
+.ph .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.ph .bar i{display:block;height:100%;background:var(--p-green);border-radius:3px}
+.ph .kv{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--p-line);font-size:12.5px}
+.ph .kv:last-child{border-bottom:0}
+.ph .kv span:first-child{display:flex;align-items:center;gap:6px}
+.ph .kv span:last-child{color:var(--p-mute);font-variant-numeric:tabular-nums}
+.ph .num{font-variant-numeric:tabular-nums}
+
+/* ================= OPTION A: Glass Compact ================= */
+.A .hd h1{margin:0;font-size:19px;font-weight:800;letter-spacing:-.3px;background:linear-gradient(90deg,#ff9a56,#ffd56b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#ffb36b}
+.A .hd p{margin:2px 0 0;font-size:11.5px;color:var(--p-mute)}
+.A .hd p b{color:var(--p-fg);font-weight:600}
+.A .chip{flex:none;display:flex;align-items:center;gap:5px;padding:5px 10px 5px 6px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:600;white-space:nowrap}
+.A .chip .ms{font-size:15px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.A .chip small{font-weight:500;color:var(--p-mute);font-size:10.5px}
+.A .st{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--p-mute);margin:4px 2px -4px}
+.A .g2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.A .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.A .tile{display:flex;align-items:center;gap:8px;padding:8px;height:50px;box-sizing:border-box;border-radius:14px;background:var(--p-card);border:1px solid var(--p-line);position:relative;overflow:hidden;min-width:0}
+.A .tile .ib{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none}
+.A .tile .t{font-size:12px;font-weight:600}
+.A .tile .s{font-size:10.5px;color:var(--p-mute)}
+.A .tile.ring{border:1.5px solid rgba(255,255,255,.3);box-shadow:0 0 10px rgba(255,255,255,.1)}
+.A .tile .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,rgba(255,169,77,.28),rgba(255,169,77,.12));z-index:0}
+.A .tile > *:not(.fill){position:relative;z-index:1}
+.A .g3 .tile{flex-direction:column;align-items:flex-start;height:66px;gap:4px;padding:8px}
+.A .g3 .tile .ib{width:24px;height:24px;border-radius:8px}
+.A .g3 .tile .ib .ms{font-size:15px}
+.A .fam{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.A .cal{padding:4px 10px}
+.A .ev{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--p-line);font-size:12px}
+.A .ev:last-child{border-bottom:0}
+.A .ev .tm{font:500 10.5px var(--f-mono);color:var(--p-on);width:44px;flex:none}
+.A .ev .w{font-size:11px;color:var(--p-mute);display:flex;align-items:center;gap:2px}
+.A .ev .w .ms{font-size:13px}
+.A .tabs{display:flex;justify-content:space-between;padding:4px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--p-line);position:sticky;top:-38px;z-index:3;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.A .tabs button{display:flex;align-items:center;gap:4px;padding:6px 8px;border-radius:12px;font-size:11px;font-weight:700;color:var(--p-mute);position:relative}
+.A .tabs button .ms{font-size:18px}
+.A .tabs button[aria-selected="true"]{background:var(--p-on);color:#1a0e02}
+.A .tabs button .bd{position:absolute;top:2px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--p-on)}
+.A .tabs button[aria-selected="true"] .bd{display:none}
+.A .chips2{display:flex;gap:6px;flex-wrap:wrap}
+.A .chips2 span{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 9px;border-radius:999px;background:var(--p-card2)}
+.A .chips2 .ms{font-size:14px}
+.A .media{padding:8px;display:flex;flex-direction:column;gap:6px;border-radius:14px;background:var(--p-card);border:1px solid var(--p-line);min-width:0}
+.A .media .art{width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center}
+.A .media .ctl{display:flex;justify-content:space-around;color:var(--p-fg)}
+.A .media .ctl .ms{font-size:18px}
+.A .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.A .app{height:40px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;background:var(--p-card);border:1px solid var(--p-line);font-size:12px;font-weight:600}
+.A .lnk{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:12px;background:var(--p-card);border:1px solid var(--p-line);font-size:12px;font-weight:600}
+
+/* ================= OPTION B: Control Grid ================= */
+.B .top{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.B .hello{font-size:11px;color:var(--p-mute);font-weight:600;letter-spacing:.02em}
+.B .name{font-family:var(--f-display);font-weight:800;font-size:24px;letter-spacing:-.02em;line-height:1}
+.B .avs{display:flex;gap:10px}
+.B .avs .p{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9.5px;color:var(--p-mute)}
+.B .wx{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:var(--p-card);border:1px solid var(--p-line)}
+.B .wx .big{font-family:var(--f-display);font-weight:600;font-size:26px;line-height:1;display:flex;align-items:center;gap:4px}
+.B .wx .big .ms{font-size:24px;color:var(--p-amber)}
+.B .wx .meta{flex:1;min-width:0;font-size:11px;color:var(--p-mute);line-height:1.35}
+.B .wx .meta b{color:var(--p-fg);font-weight:600}
+.B .g5{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center}
+.B .g5 > div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.B .g5 .rb{width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+.B .g5 .rb .ms{font-size:20px}
+.B .g5 .l{font-size:9.5px;font-weight:600;max-width:100%}
+.B .g5 .v{font-size:9px;color:var(--p-mute);max-width:100%}
+.B .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.B .sq{aspect-ratio:1/1;border-radius:18px;background:var(--p-card);border:1px solid var(--p-line);padding:8px;display:flex;flex-direction:column;justify-content:space-between;min-width:0;box-sizing:border-box;position:relative;overflow:hidden}
+.B .sq .ms{font-size:21px}
+.B .sq .t{font-size:10.5px;font-weight:700;line-height:1.15}
+.B .sq .s{font-size:9.5px;color:var(--p-mute)}
+.B .sq.on{background:rgba(255,169,77,.95);border-color:transparent;color:#1d1002}
+.B .sq.on .s{color:rgba(29,16,2,.7)}
+.B .sq.alert-on{background:rgba(255,90,79,.9);color:#fff;border-color:transparent}
+.B .sq.alert-on .s{color:rgba(255,255,255,.8)}
+.B .sq .lvl{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.14)}
+.B .sq > *:not(.lvl):not(.camfill){position:relative;z-index:1}
+.B .sq.camsq{padding:0}
+.B .sq.camsq .cam{position:absolute;inset:0;aspect-ratio:auto;border-radius:0}
+.B .sq.wide{grid-column:span 2;aspect-ratio:auto}
+.B .cal{padding:8px 10px;display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:11.5px}
+.B .cal .tm{font:500 10px var(--f-mono);color:var(--p-on)}
+.B .cal .w{font-size:10.5px;color:var(--p-mute)}
+.B .cal .w .ms{font-size:13px}
+.B .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;position:sticky;top:-38px;z-index:3;padding:6px 0;background:linear-gradient(var(--p-bg) 70%,transparent);margin:0 -12px;padding-left:12px;padding-right:12px}
+.B .tabs::-webkit-scrollbar{display:none}
+.B .tabs button{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--p-card);border:1px solid var(--p-line);color:var(--p-mute);position:relative}
+.B .tabs button .ms{font-size:19px}
+.B .tabs button[aria-selected="true"]{background:#fff;color:#111;border-color:#fff}
+.B .tabs button .bd{position:absolute;top:-2px;right:-2px;min-width:14px;height:14px;border-radius:7px;background:var(--p-on);color:#1d1002;font-size:8.5px;font-weight:800;display:grid;place-items:center}
+.B .tabname{font-family:var(--f-display);font-weight:600;font-size:16px;margin:2px 2px -2px;display:flex;justify-content:space-between;align-items:baseline}
+.B .tabname small{font:500 11px var(--f-body);color:var(--p-on)}
+.B .g2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.B .chipsq{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.B .pill{display:flex;align-items:center;justify-content:center;gap:4px;height:34px;border-radius:17px;background:var(--p-card2);font-size:10.5px;font-weight:700}
+.B .pill .ms{font-size:15px}
+.B .media{border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.B .media .art{height:46px;border-radius:12px;display:grid;place-items:center}
+.B .media .art .ms{font-size:24px}
+.B .media .ctl{display:flex;justify-content:space-between}
+
+/* ================= OPTION C: Dense List ================= */
+.C .hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.C .hdr h1{margin:0;font-size:17px;font-weight:800;letter-spacing:-.2px}
+.C .hdr h1 span{color:var(--p-on)}
+.C .hdr small{display:block;font-size:11px;color:var(--p-mute);font-weight:500;margin-top:1px}
+.C .hdr .wx{text-align:right;font-size:20px;font-weight:700;line-height:1;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.C .hdr .wx .ms{font-size:20px;color:var(--p-amber)}
+.C .hdr .wx small{font-size:10px}
+.C .status{display:flex;flex-wrap:wrap;gap:4px}
+.C .status span{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;padding:3px 7px 3px 5px;border-radius:7px;background:var(--p-card)}
+.C .status .ms{font-size:13px}
+.C .grp{background:var(--p-card);border:1px solid var(--p-line);border-radius:14px;overflow:hidden}
+.C .gt{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--p-mute);padding:8px 12px 2px}
+.C .gt a{color:var(--p-on);text-transform:none;letter-spacing:0;font-size:11px;font-weight:600}
+.C .li{display:flex;align-items:center;gap:9px;padding:0 12px;height:38px;border-bottom:1px solid var(--p-line);min-width:0}
+.C .li:last-child{border-bottom:0}
+.C .li .ib{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none}
+.C .li .ib .ms{font-size:15px}
+.C .li .t{font-size:12.5px;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.C .li .v{font-size:11.5px;color:var(--p-mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.C .li .chev{font-size:16px;color:var(--p-mute)}
+.C .li .mini{width:44px;height:4px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;flex:none}
+.C .li .mini i{display:block;height:100%;background:var(--p-on)}
+.C .li .tm{font:500 10.5px var(--f-mono);color:var(--p-on);width:46px;flex:none}
+.C .li .btn{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;background:var(--p-card2);color:var(--p-fg)}
+.C .two{display:grid;grid-template-columns:1fr 1fr}
+.C .two .li:nth-child(odd){border-right:1px solid var(--p-line)}
+.C .tabs{display:flex;gap:2px;padding:3px;border-radius:11px;background:rgba(118,118,128,.24);position:sticky;top:-38px;z-index:3;overflow-x:auto;scrollbar-width:none}
+.C .tabs::-webkit-scrollbar{display:none}
+.C .tabs button{flex:1 0 auto;text-align:center;font-size:10.5px;font-weight:600;padding:5px 6px;border-radius:8px;color:var(--p-fg);white-space:nowrap}
+.C .tabs button[aria-selected="true"]{background:#636366;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.C .tabs button .bd{display:inline-block;margin-left:3px;font-size:9px;color:var(--p-on);font-weight:800}
+.C .camrow{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+.C .camrow .cam{border-radius:9px}
+.C .chiprow{display:flex;gap:5px;padding:8px 10px;flex-wrap:wrap}
+.C .chiprow span{display:flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:4px 8px;border-radius:7px;background:var(--p-card2)}
+.C .chiprow .ms{font-size:13px}
+
+@media (prefers-reduced-motion: reduce){.ph .sw::after{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="page">
+    <div class="eyebrow">Home Assistant · mobile-hub view</div>
+    <h1>Three compact layouts for your Home view</h1>
+    <p>Every entity on today's Home view is in all three options: badges, greeting and weather, alerts, family, calendar, security, all seven tabs and the navbar. Tap a tab inside any phone, or use the picker to switch all three at once. States shown are examples, not your live values.</p>
+  </header>
+
+  <div class="picker" role="group" aria-label="Show tab in all phones">
+    <span class="lbl">Show tab</span>
+    <span id="picker" style="display:contents"></span>
+  </div>
+
+  <div class="opts">
+    <article class="opt">
+      <div class="opt-head"><span class="letter">A</span><h2>Glass Compact</h2></div>
+      <div class="frame"><div class="ph A" data-opt="A"></div></div>
+      <div class="notes">
+        <p>Closest to what you have now. Keeps the glass style, gradient greeting and icon tabs, but tiles drop to 50px, the header shrinks to three lines and the five badges become one swipeable chip row.</p>
+        <dl>
+          <dt>Best for</dt><dd>A tidy-up without relearning where things are</dd>
+          <dt>Density</dt><dd><span class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></span></dd>
+          <dt>Cards</dt><dd>What you already run: mushroom, tile, button-card, simple-tabs, card-mod, navbar-card</dd>
+          <dt>Effort</dt><dd>Low. Mostly card_mod and grid changes</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">B</span><h2>Control Grid</h2></div>
+      <div class="frame"><div class="ph B" data-opt="B"></div></div>
+      <div class="notes">
+        <p>An iOS Control Centre feel. Four square buttons per row, one tap per device, lit orange when on. Family avatars move into the header and the room and car badges become a row of round status buttons.</p>
+        <dl>
+          <dt>Best for</dt><dd>Fast one-thumb control of lights, doors and scenes</dd>
+          <dt>Density</dt><dd><span class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i></span></dd>
+          <dt>Cards</dt><dd>button-card templates (already installed) for the squares, simple-tabs with icon-only buttons</dd>
+          <dt>Effort</dt><dd>Medium. One button-card template reused everywhere</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">C</span><h2>Dense List</h2></div>
+      <div class="frame"><div class="ph C" data-opt="C"></div></div>
+      <div class="notes">
+        <p>A Settings-app list. 38px rows with the value and switch on the right, grouped into inset panels. Shows the most states per screen and reads well at a glance, at the cost of smaller touch targets.</p>
+        <dl>
+          <dt>Best for</dt><dd>Checking what's on, open or running in one look</dd>
+          <dt>Density</dt><dd><span class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></span></dd>
+          <dt>Cards</dt><dd>Core entities card plus mushroom template rows, styled with card-mod; text segmented tabs</dd>
+          <dt>Effort</dt><dd>Medium. Many cards collapse into a few lists</dd>
+        </dl>
+      </div>
+    </article>
+  </div>
+
+  <section class="cov">
+    <h3>What every option keeps</h3>
+    <p>The full list from your current Home view. Conditional items (bins badge, alert ticker, calendar) still only appear when their conditions are met.</p>
+    <div class="covgrid" id="cov"></div>
+  </section>
+
+  <p class="foot">Pick a letter, or mix parts (for example A's header with C's lists), and I'll write the YAML for the mobile-hub view.</p>
+</div>
+
+<script>
+const ic=(n,c='')=>`<span class="ms ${c}">${n}</span>`;
+
+const D={
+  greetPart:'Good afternoon', user:'Sushen',
+  date:'Sat 3 Oct', dateLong:'Saturday the 3 October 2026',
+  wx:{i:'partly_cloudy_day',cond:'Partly cloudy',t:24,feels:25,hum:62}, eta:'22 mins',
+  badges:[
+    {i:'directions_car',n:'Kia',s:'Home',c:'mute'},
+    {i:'electric_car',n:'Tesla',s:'Home',c:'blue'},
+    {i:'delete',n:'Bins',s:'🔴 🟡 out',c:'amber',cond:1},
+    {i:'toys',n:'Shanaya Room',s:'Clear',c:'green'},
+    {i:'bed',n:'Samar Room',s:'Occupied',c:'red'}],
+  alert:{e:'🚪',m:'Laundry Door Open',more:'1 of 2'},
+  people:[{n:'Sushen',s:'Work',ini:'S',bg:'#2f6f8f',dot:'var(--p-amber)'},{n:'Paro',s:'Home',ini:'P',bg:'#8f3f6a',dot:'var(--p-green)'}],
+  events:[{t:'9:30',n:'Swimming lesson',w:'partly_cloudy_day',tp:'22°'},{t:'13:00',n:'GP check-up',w:'sunny',tp:'25°'},{t:'18:30',n:'Dinner with friends',w:'clear_night',tp:'19°'}],
+  security:[
+    {i:'garage',n:'Garage Door',s:'Closed',c:'mute',k:'toggle'},
+    {i:'lock',n:'Front Door',s:'Locked',c:'mute',k:'toggle'},
+    {i:'shield_lock',n:'Alarm',s:'Armed home',c:'green'},
+    {i:'videocam',n:'Driveway',s:'Live',k:'cam'}]
+};
+
+const TABS=[
+  {id:'fav',t:'Favourites',i:'favorite',g:[
+    {L:'chips',items:[{i:'record_voice_over',n:'Say TTS'},{i:'call',n:'Attention Paro'},{i:'phonelink_ring',n:'Lost Phone'}]},
+    {L:'grid',items:[{i:'bedtime',n:'Good Night',s:'Scene',c:'blue'},{i:'wb_twilight',n:'Good Morning',s:'Scene',c:'amber'}]},
+    {L:'grid3',items:[{i:'garage',n:'Garage Door',s:'Closed',c:'mute',tg:0},{i:'light_group',n:'Pendant Lights',s:'80%',c:'on',on:1,b:80,tg:1},{i:'flood_light',n:'Driveway Light',s:'Off',c:'mute',tg:0}]},
+    {L:'media',items:[{i:'tv',n:'TV',s:'Netflix · Playing',c:'red'},{i:'speaker',n:'Kitchen Speaker',s:'Spotify · Paused',c:'green'}]},
+    {L:'apps',items:[{n:'Netflix',col:'#E50914',l:'N'},{n:'YouTube',col:'#FF0000',l:'▶'},{n:'Stremio',col:'#61D3E4',l:'S'}]}]},
+  {id:'lights',t:'Lights',i:'lightbulb',badge:3,link:'All Lights',g:[
+    {L:'grid3',items:[
+      {i:'light_group',n:'Pendant Lights',s:'80%',on:1,b:80,c:'on',tg:1},
+      {i:'wb_incandescent',n:'Kitchen Downlights',s:'60%',on:1,b:60,c:'on',tg:1},
+      {i:'lightbulb',n:'Sonoff Light',s:'Off',c:'mute',tg:0},
+      {i:'wb_incandescent',n:'Hallway',s:'Off',c:'mute',tg:0},
+      {i:'wb_incandescent',n:'Dining',s:'40%',on:1,b:40,c:'on',tg:1},
+      {i:'wb_incandescent',n:'Corridor',s:'Off',c:'mute',tg:0}]}]},
+  {id:'kids',t:'Kids',i:'child_care',g:[
+    {L:'grid',items:[
+      {i:'lightbulb',n:'Samar Cam Light',s:'Off',c:'mute',tg:0},
+      {i:'graphic_eq',n:'White Noise',s:'Playing',c:'blue',on:1},
+      {i:'thermostat',n:'Samar Room',s:'21.4 °C',c:'amber'},
+      {i:'thermostat',n:'Shanaya Room',s:'22.1 °C',c:'amber'}]},
+    {L:'cams',items:[{n:'Samar Room',k:'k2'},{n:'Shanaya Room',k:'k2'}]}]},
+  {id:'tesla',t:'Tesla',i:'electric_car',g:[{L:'tesla'}]},
+  {id:'garage',t:'Garage',i:'garage',g:[
+    {L:'grid',items:[{i:'lightbulb',n:'Garage Light',s:'Off',c:'mute',tg:0},{i:'toggle_on',n:'Keep Garage Door Open',s:'Off',c:'mute',tg:0}]},
+    {L:'cars'},
+    {L:'cams',items:[{n:'Garage',k:'k3'}],one:1}]},
+  {id:'solar',t:'Solar',i:'solar_power',g:[{L:'solar'}]},
+  {id:'vac',t:'Vacuum',i:'mop',g:[
+    {L:'vac'},
+    {L:'grid',items:[
+      {i:'countertops',n:'Media & Kitchen',s:'Run',c:'mute'},
+      {i:'water_drop',n:'Mop Tiled Area',s:'Run',c:'mute'},
+      {i:'tv',n:'Media Clean',s:'Run',c:'mute'},
+      {i:'coffee_maker',n:'Coffee Station',s:'Run',c:'mute'},
+      {i:'kitchen',n:'Kitchen Clean',s:'Run',c:'mute'}]}]}
+];
+
+const NAV=[['home','Home'],['videocam','Cameras'],['music_note','Media'],['thermostat','Climate'],['devices','Devices'],['more_horiz','More']];
+const nav=()=>`<div class="nav">${NAV.map((n,i)=>`<div class="${i?'':'on'}">${ic(n[0])}<span>${n[1]}</span></div>`).join('')}</div>`;
+
+/* ---------- shared illustrations ---------- */
+const carSVG=(h=70)=>`<svg class="car-svg" viewBox="0 0 300 ${h}" aria-hidden="true">
+  <defs><linearGradient id="cg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e9eef0"/><stop offset="1" stop-color="#8d989c"/></linearGradient></defs>
+  <ellipse cx="150" cy="${h-6}" rx="120" ry="5" fill="rgba(48,209,88,.45)"/>
+  <path d="M28 ${h-18} C30 ${h-34} 48 ${h-38} 80 ${h-41} L110 ${h-58} C130 ${h-66} 185 ${h-66} 205 ${h-56} L238 ${h-40} C262 ${h-38} 274 ${h-32} 274 ${h-20} L272 ${h-14} L30 ${h-14} Z" fill="url(#cg)"/>
+  <path d="M116 ${h-54} C134 ${h-61} 180 ${h-61} 198 ${h-53} L222 ${h-41} L96 ${h-41} Z" fill="#1d2a30"/>
+  <circle cx="86" cy="${h-14}" r="13" fill="#15191b"/><circle cx="86" cy="${h-14}" r="6" fill="#5c666a"/>
+  <circle cx="222" cy="${h-14}" r="13" fill="#15191b"/><circle cx="222" cy="${h-14}" r="6" fill="#5c666a"/>
+</svg>`;
+
+const flowSVG=()=>`<svg class="flow" viewBox="0 0 300 170" aria-label="Power flow">
+  <g fill="none" stroke-width="2">
+    <path d="M150 42 V80" stroke="#ffc53d"/><path d="M150 42 Q150 85 60 85" stroke="#ffc53d" stroke-dasharray="3 4"/>
+    <path d="M150 42 Q150 85 240 85" stroke="#ffc53d"/>
+    <path d="M240 108 V128" stroke="#4c8dff"/><path d="M240 108 Q240 128 196 140" stroke="#30d158"/>
+  </g>
+  <g font-size="10" text-anchor="middle" fill="#eef2f2">
+    <circle cx="150" cy="24" r="19" fill="rgba(255,197,61,.12)" stroke="#ffc53d"/><text x="150" y="22" font-weight="700">4.2</text><text x="150" y="33" font-size="8" fill="#8b979a">kW</text><text x="150" y="58" font-size="9" fill="#8b979a">Solar</text>
+    <circle cx="44" cy="96" r="19" fill="rgba(178,128,255,.12)" stroke="#b280ff"/><text x="44" y="94" font-weight="700">1.1</text><text x="44" y="105" font-size="8" fill="#8b979a">kW ↑</text><text x="44" y="130" font-size="9" fill="#8b979a">Grid · export</text>
+    <circle cx="256" cy="96" r="19" fill="rgba(76,141,255,.12)" stroke="#4c8dff"/><text x="256" y="94" font-weight="700">2.3</text><text x="256" y="105" font-size="8" fill="#8b979a">kW</text><text x="214" y="99" font-size="9" fill="#8b979a">Home</text>
+    <circle cx="184" cy="148" r="15" fill="rgba(48,209,88,.12)" stroke="#30d158"/><text x="184" y="151" font-weight="700" font-size="9">0.8</text><text x="184" y="168" font-size="8.5" fill="#8b979a">Tesla</text>
+    <circle cx="256" cy="148" r="15" fill="rgba(255,255,255,.05)" stroke="#5a6568"/><text x="256" y="151" font-size="9" fill="#8b979a">0 W</text><text x="256" y="168" font-size="8.5" fill="#8b979a">Kia</text>
+  </g></svg>`;
+
+const SOLAR={tariff:'Peak',rate:'$0.32/kWh',chips:[['bolt','Use','$3.12','red'],['solar_power','Sold','$1.84','green'],['payments','Bill','$142.60','mute'],['schedule','Est','$236.00','blue']]};
+const TESLA={bat:78,range:352,shift:'Parked',climate:'22 °C',eta:'1hr 20min',loc:'Home',limit:80,amps:16,
+  acts:[['trip','Trunk'],['mode_fan','Climate'],['ev_charger','Port'],['lock','Lock'],['directions_car','Frunk']]};
+
+/* ---------- Option A renderers ---------- */
+const A={
+ home(){return `
+  <div class="hd"><h1>${D.greetPart}, ${D.user}</h1>
+   <p><b>${D.date}</b> · ${ic(D.wx.i,'c-amber')} <b>${D.wx.cond}, ${D.wx.t}°C</b> · feels ${D.wx.feels}° · ${D.wx.hum}%</p>
+   <p>🚗 ${D.eta} to get home</p></div>
+  <div class="scroll-x">${D.badges.map(b=>`<div class="chip">${ic(b.i,'c-'+b.c+' bg-'+b.c)}<span>${b.n}</span><small>${b.s}</small></div>`).join('')}</div>
+  <div class="alert">${D.alert.e} ${D.alert.m}<small>${D.alert.more} · swipe to snooze</small></div>
+  <div class="st">Family & today</div>
+  <div class="fam">${D.people.map(p=>`<div class="tile"><div class="av" style="background:${p.bg}">${p.ini}<i class="dot" style="background:${p.dot}"></i></div><div class="grow"><div class="t">${p.n}</div><div class="s">${p.s}</div></div></div>`).join('')}</div>
+  <div class="card cal">${D.events.map(e=>`<div class="ev"><span class="tm">${e.t}</span><span class="grow ell">${e.n}</span><span class="w">${ic(e.w)}${e.tp}</span></div>`).join('')}</div>
+  <div class="st">Security</div>
+  <div class="g2">${D.security.map(s=>s.k==='cam'
+     ?`<div class="tile" style="padding:0"><div class="cam" style="position:absolute;inset:0;aspect-ratio:auto;border-radius:0"><span class="tag">${s.n}</span><span class="live">LIVE</span></div></div>`
+     :`<div class="tile${s.k?' ring':''}"><div class="ib bg-${s.c}">${ic(s.i,'c-'+s.c)}</div><div class="grow"><div class="t ell">${s.n}</div><div class="s">${s.s}</div></div></div>`).join('')}</div>`;},
+ tabs(cur){return `<div class="tabs" role="tablist">${TABS.map(t=>`<button role="tab" data-tab="${t.id}" aria-selected="${t.id===cur}" aria-label="${t.t}">${ic(t.i)}${t.id===cur?`<span>${t.t}</span>`:''}${t.badge?'<i class="bd"></i>':''}</button>`).join('')}</div>`;},
+ tile(x,cls=''){return `<div class="tile ${cls}">${x.b?`<i class="fill" style="width:${x.b}%"></i>`:''}<div class="ib bg-${x.c}">${ic(x.i,'c-'+x.c)}</div><div class="grow"><div class="t ell">${x.n}</div><div class="s">${x.s}</div></div></div>`;},
+ group(g,tab){
+  switch(g.L){
+   case 'chips':return `<div class="chips2">${g.items.map(c=>`<span>${ic(c.i,'c-on')}${c.n}</span>`).join('')}</div>`;
+   case 'grid':return `<div class="g2">${g.items.map(x=>A.tile(x)).join('')}</div>`;
+   case 'grid3':return `${tab.link?`<div class="lnk"><span>${ic('lightbulb_circle','c-on')} ${tab.link}</span>${ic('chevron_right','mute')}</div>`:''}<div class="g3">${g.items.map(x=>A.tile(x)).join('')}</div>`;
+   case 'media':return `<div class="g2">${g.items.map(m=>`<div class="media"><div class="row"><div class="art bg-${m.c}">${ic(m.i,'c-'+m.c)}</div><div class="grow"><div style="font-weight:600;font-size:12px" class="ell">${m.n}</div><div class="mute ell" style="font-size:10.5px">${m.s}</div></div></div><div class="ctl">${ic('skip_previous')}${ic(m.s.includes('Playing')?'pause':'play_arrow')}${ic('skip_next')}</div></div>`).join('')}</div>`;
+   case 'apps':return `<div class="apps">${g.items.map(a=>`<div class="app"><b style="color:${a.col}">${a.l}</b>${a.n}</div>`).join('')}</div>`;
+   case 'cams':return `<div class="${g.one?'':'g2'}">${g.items.map(c=>`<div class="cam ${c.k}"><span class="tag">${c.n}</span><span class="live">LIVE</span></div>`).join('')}</div>`;
+   case 'tesla':return teslaCard('A');
+   case 'cars':return carsBlock('A');
+   case 'solar':return solarBlock('A');
+   case 'vac':return vacBlock('A');
+  }}
+};
+
+/* ---------- Option B renderers ---------- */
+const B={
+ home(){return `
+  <div class="top"><div><div class="hello">${D.greetPart}</div><div class="name">${D.user}</div></div>
+   <div class="avs">${D.people.map(p=>`<div class="p"><div class="av" style="background:${p.bg}">${p.ini}<i class="dot" style="background:${p.dot}"></i></div>${p.s}</div>`).join('')}</div></div>
+  <div class="wx"><div class="big">${ic(D.wx.i)}${D.wx.t}°</div><div class="meta"><b>${D.wx.cond}</b> · feels ${D.wx.feels}° · ${D.wx.hum}%<br>${D.date} · 🚗 ${D.eta} to home</div></div>
+  <div class="alert">${D.alert.e} ${D.alert.m}<small>${D.alert.more}</small></div>
+  <div class="g5">${D.badges.map(b=>`<div><div class="rb bg-${b.c}">${ic(b.i,'c-'+b.c)}</div><div class="l ell">${b.n.replace(' Room','')}</div><div class="v ell">${b.s}</div></div>`).join('')}</div>
+  <div class="g4">${D.security.map(s=>s.k==='cam'
+     ?`<div class="sq camsq"><div class="cam"><span class="tag">${s.n}</span><span class="live">LIVE</span></div></div>`
+     :`<div class="sq">${ic(s.i,'c-'+s.c)}<div><div class="t">${s.n}</div><div class="s">${s.s}</div></div></div>`).join('')}</div>
+  <div class="card cal">${D.events.map(e=>`<span class="tm">${e.t}</span><span class="ell">${e.n}</span><span class="w">${ic(e.w)} ${e.tp}</span>`).join('')}</div>`;},
+ tabs(cur){const t=TABS.find(x=>x.id===cur);return `<div class="tabs" role="tablist">${TABS.map(t=>`<button role="tab" data-tab="${t.id}" aria-selected="${t.id===cur}" aria-label="${t.t}">${ic(t.i)}${t.badge?`<i class="bd">${t.badge}</i>`:''}</button>`).join('')}</div>
+  <div class="tabname">${t.t}${t.link?`<small>${t.link} ›</small>`:''}</div>`;},
+ sq(x){return `<div class="sq${x.on?' on':''}">${x.b?`<i class="lvl" style="height:${100-x.b}%;top:0;bottom:auto"></i>`:''}${ic(x.i,x.on?'':'c-'+x.c)}<div><div class="t">${x.n}</div><div class="s">${x.s}</div></div></div>`;},
+ group(g){
+  switch(g.L){
+   case 'chips':return `<div class="chipsq">${g.items.map(c=>`<div class="pill">${ic(c.i,'c-on')}${c.n}</div>`).join('')}</div>`;
+   case 'grid':case 'grid3':return `<div class="g4">${g.items.map(B.sq).join('')}</div>`;
+   case 'media':return `<div class="g2">${g.items.map(m=>`<div class="card media"><div class="art bg-${m.c}">${ic(m.i,'c-'+m.c)}</div><div style="font-weight:700;font-size:11.5px" class="ell">${m.n}</div><div class="mute ell" style="font-size:10px">${m.s}</div><div class="ctl">${ic('skip_previous')}${ic(m.s.includes('Playing')?'pause':'play_arrow')}${ic('skip_next')}</div></div>`).join('')}</div>`;
+   case 'apps':return `<div class="g4">${g.items.map(a=>`<div class="sq" style="align-items:center;justify-content:center;gap:4px"><b style="color:${a.col};font-size:20px">${a.l}</b><div class="t">${a.n}</div></div>`).join('')}</div>`;
+   case 'cams':return `<div class="${g.one?'':'g2'}">${g.items.map(c=>`<div class="cam ${c.k}"><span class="tag">${c.n}</span><span class="live">LIVE</span></div>`).join('')}</div>`;
+   case 'tesla':return teslaCard('B');
+   case 'cars':return carsBlock('B');
+   case 'solar':return solarBlock('B');
+   case 'vac':return vacBlock('B');
+  }}
+};
+
+/* ---------- Option C renderers ---------- */
+const C={
+ home(){return `
+  <div class="hdr"><div><h1>${D.greetPart}, <span>${D.user}</span></h1><small>${D.date} · 🚗 ${D.eta} to get home</small></div>
+   <div class="wx">${ic(D.wx.i)}<span>${D.wx.t}°</span><small class="mute">feels ${D.wx.feels}° · ${D.wx.hum}%</small></div></div>
+  <div class="status">${D.badges.map(b=>`<span>${ic(b.i,'c-'+b.c)}${b.n} <b class="c-${b.c==='mute'?'mute':b.c}" style="font-weight:600">${b.s}</b></span>`).join('')}</div>
+  <div class="alert">${D.alert.e} ${D.alert.m}<small>${D.alert.more}</small></div>
+  <div class="grp"><div class="gt">Security</div>
+   ${D.security.filter(s=>s.k!=='cam').map(s=>C.li({...s,tg:s.k==='toggle'?0:undefined})).join('')}
+   <div class="camrow" style="grid-template-columns:1fr;padding:6px 8px 8px"><div class="cam" style="aspect-ratio:21/8"><span class="tag">Driveway</span><span class="live">LIVE</span></div></div></div>
+  <div class="grp"><div class="gt">Family & today</div>
+   <div class="two">${D.people.map(p=>`<div class="li"><div class="av" style="width:24px;height:24px;font-size:11px;background:${p.bg}">${p.ini}<i class="dot" style="background:${p.dot};width:8px;height:8px"></i></div><span class="t">${p.n}</span><span class="v">${p.s}</span></div>`).join('')}</div>
+   ${D.events.map(e=>`<div class="li" style="border-top:1px solid var(--p-line);border-bottom:0"><span class="tm">${e.t}</span><span class="t">${e.n}</span><span class="v">${ic(e.w)} ${e.tp}</span></div>`).join('')}</div>`;},
+ tabs(cur){return `<div class="tabs" role="tablist">${TABS.map(t=>`<button role="tab" data-tab="${t.id}" aria-selected="${t.id===cur}">${t.t}${t.badge?`<i class="bd">${t.badge}</i>`:''}</button>`).join('')}</div>`;},
+ li(x){const trail=x.tg!==undefined?`<i class="sw${x.tg?' on':''}"></i>`:x.s==='Run'?`<span class="btn">Run</span>`:`<span class="v">${x.s}</span>`;
+  return `<div class="li"><div class="ib bg-${x.c}">${ic(x.i,'c-'+x.c)}</div><span class="t">${x.n}</span>${x.b?`<span class="mini"><i style="width:${x.b}%"></i></span><span class="v">${x.s}</span>`:(x.tg!==undefined&&x.s!=='Off'&&x.s!=='Closed'&&x.s!=='Locked'?`<span class="v">${x.s}</span>`:'')}${x.tg!==undefined&&(x.s==='Closed'||x.s==='Locked')?`<span class="v">${x.s}</span>`:''}${trail}</div>`;},
+ group(g,tab){
+  switch(g.L){
+   case 'chips':return `<div class="grp"><div class="chiprow">${g.items.map(c=>`<span>${ic(c.i,'c-on')}${c.n}</span>`).join('')}</div></div>`;
+   case 'grid':case 'grid3':return `<div class="grp">${tab.link?`<div class="gt">${g.items.filter(i=>i.on).length} on<a>${tab.link} ›</a></div>`:''}${g.items.map(C.li).join('')}</div>`;
+   case 'media':return `<div class="grp">${g.items.map(m=>`<div class="li"><div class="ib bg-${m.c}">${ic(m.i,'c-'+m.c)}</div><span class="t">${m.n}</span><span class="v">${m.s}</span>${ic(m.s.includes('Playing')?'pause_circle':'play_circle','c-on')}</div>`).join('')}</div>`;
+   case 'apps':return `<div class="grp"><div class="two" style="grid-template-columns:repeat(3,1fr)">${g.items.map(a=>`<div class="li" style="justify-content:center;border-right:1px solid var(--p-line)"><b style="color:${a.col}">${a.l}</b><span style="font-size:12px;font-weight:600">${a.n}</span></div>`).join('')}</div></div>`;
+   case 'cams':return `<div class="grp"><div class="camrow"${g.one?' style="grid-template-columns:1fr"':''}>${g.items.map(c=>`<div class="cam ${c.k}"${g.one?' style="aspect-ratio:21/8"':''}><span class="tag">${c.n}</span><span class="live">LIVE</span></div>`).join('')}</div></div>`;
+   case 'tesla':return teslaCard('C');
+   case 'cars':return carsBlock('C');
+   case 'solar':return solarBlock('C');
+   case 'vac':return vacBlock('C');
+  }}
+};
+
+/* ---------- special blocks ---------- */
+function teslaCard(o){
+  const T=TESLA;
+  const charge=`<div class="card" style="padding:10px;background:#16181a">
+     <div class="row" style="font-size:12px;font-weight:600"><span>Limit ${T.limit}%</span><span class="mute">·</span><span class="c-green">Charging</span><span class="grow"></span><span class="mute num">${ic('remove')} ${T.amps} A ${ic('add')}</span></div>
+     <div class="bar" style="margin-top:8px"><i style="width:${T.limit}%"></i></div>
+     <div class="row" style="margin-top:9px;justify-content:space-around;font-size:11.5px;font-weight:600;color:var(--p-blue)"><span>Stop Charging</span><span class="mute">|</span><span>Lock Charge Port</span></div></div>`;
+  if(o==='C'){
+    return `<div class="grp"><div class="li" style="height:46px"><div class="ib bg-green" style="width:30px;height:30px">${ic('electric_car','c-green')}</div><span class="t" style="font-weight:700;font-size:14px">Bluey</span><span class="v" style="color:var(--p-green);font-weight:700">${ic('battery_charging_full')} ${T.bat}%</span><span class="v">${T.shift}</span></div>
+      <div class="acts" style="padding:8px 4px;border-bottom:1px solid var(--p-line)">${T.acts.map(a=>`<div>${ic(a[0])}${a[1]}</div>`).join('')}</div>
+      ${[['tune','Charge limit',T.limit+'%','green'],['bolt','Current',T.amps+' A','amber']].map(r=>C.li({i:r[0],n:r[1],s:r[2],c:r[3]})).join('')}
+      <div class="li"><div class="ib bg-green">${ic('power','c-green')}</div><span class="t">Charging</span><span class="btn">Stop</span><span class="btn">Lock port</span></div>
+      ${[['thermostat','Climate',T.climate,'blue'],['battery_5_bar','Range',T.range+' km','green'],['schedule','Charge ETA',T.eta,'blue'],['location_on','Location',T.loc,'amber']].map(r=>C.li({i:r[0],n:r[1],s:r[2],c:r[3]})).join('')}</div>`;
+  }
+  const info=[['thermostat','Climate',T.climate,'blue'],['battery_5_bar','Range',T.range+' km','green'],['schedule','Charge ETA',T.eta,'blue'],['location_on','Location',T.loc,'amber']];
+  return `<div class="card" style="padding:12px;border-radius:22px;background:#0b1113;display:flex;flex-direction:column;gap:8px">
+    <div class="row" style="align-items:flex-start"><div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1">Bluey</div>
+      <div class="row" style="margin-top:4px;font-size:13px">${ic('battery_charging_full','c-green')}<b>${T.bat}%</b><span class="mute">· ${T.shift}</span></div></div>
+      <div class="grow" style="max-width:${o==='B'?'150px':'170px'};margin-left:auto">${carSVG()}</div></div>
+    <div class="acts">${T.acts.map(a=>`<div>${o==='B'?`<span style="width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--p-card2)">${ic(a[0])}</span>`:ic(a[0])}${a[1]}</div>`).join('')}</div>
+    ${charge}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${info.map(r=>`<div class="card" style="padding:7px 9px;border-radius:12px;background:#16181a"><div class="row mute" style="font-size:10.5px">${ic(r[0],'c-'+r[3])}${r[1]}</div><div style="font-weight:700;font-size:13px;margin-top:2px" class="num">${r[2]}</div></div>`).join('')}</div></div>`;
+}
+
+function carsBlock(o){
+  const cars=[{n:'Bluey',b:78,meta:'352 km · Home',sw:1,sl:'⚡ Charging',hue:'green'},{n:'Sorento',b:64,meta:'Home',sw:0,sl:'Tap to start charging',hue:'mute'}];
+  if(o==='C') return `<div class="grp">${cars.map(c=>`<div class="li" style="height:44px"><div class="ib bg-green" style="width:28px;height:28px">${ic(c.n==='Bluey'?'electric_car':'directions_car','c-green')}</div><span class="t"><b>${c.n}</b> <span class="mute" style="font-size:11px">${c.meta}</span></span><span class="v" style="color:#8BC34A;font-weight:700">${c.b}%</span></div><div class="li"><div class="ib bg-${c.hue}">${ic('ev_station','c-'+c.hue)}</div><span class="t">${c.n} charging</span><span class="v">${c.sw?'Charging':''}</span><i class="sw${c.sw?' on':''}"></i></div>`).join('')}</div>`;
+  if(o==='B') return `<div class="g4">${cars.map(c=>`<div class="sq wide" style="flex-direction:row;align-items:center;gap:8px;padding:10px"><div style="width:52px;flex:none">${carSVG()}</div><div class="grow"><div class="t">${c.n}</div><div style="font-size:18px;font-weight:800;color:#8BC34A" class="num">${c.b}%</div><div class="s ell">${c.meta}</div></div></div>`).join('')}${cars.map(c=>`<div class="sq wide${c.sw?' on':''}" style="flex-direction:row;align-items:center;gap:6px;padding:8px 10px">${ic('ev_station')}<div class="grow"><div class="t">${c.n}</div><div class="s ell">${c.sl}</div></div></div>`).join('')}</div>`;
+  return `<div class="stack" style="gap:7px">${cars.map(c=>`<div class="tile" style="height:62px"><div style="width:64px;flex:none">${carSVG()}</div><div class="grow"><div class="t" style="font-size:13px">${c.n}</div><div class="num"><b style="font-size:17px;color:#8BC34A">${c.b}%</b> <span class="s">· ${c.meta}</span></div></div></div>`).join('')}
+    <div class="g2">${cars.map(c=>A.tile({i:'ev_station',n:c.n,s:c.sl,c:c.hue})).join('')}</div></div>`;
+}
+
+function solarBlock(o){
+  const S=SOLAR;
+  const head=`<div class="row" style="justify-content:space-between"><div class="row" style="font-weight:700;font-size:14px">${ic('solar_power','c-amber')} Energy</div><div class="row" style="gap:5px;font-size:10.5px;font-weight:600"><span style="padding:3px 7px;border-radius:7px" class="bg-red c-red">${ic('electric_meter')} ${S.tariff}</span><span style="padding:3px 7px;border-radius:7px" class="bg-mute">${S.rate}</span></div></div>`;
+  if(o==='C') return `<div class="grp"><div class="li">${ic('solar_power','c-amber')}<span class="t" style="font-weight:700">Energy</span><span class="v c-red">${S.tariff}</span><span class="v">${S.rate}</span></div>
+     ${S.chips.map(c=>C.li({i:c[0],n:c[1]==='Use'?'Used today':c[1]==='Sold'?'Sold today':c[1]==='Bill'?'Bill to date':'Estimated bill',s:c[2],c:c[3]})).join('')}</div>
+     <div class="grp"><div class="gt">Power flow now</div>${[['solar_power','Solar','4.2 kW','amber'],['electric_meter','Grid','Exporting 1.1 kW','mute'],['home','Home','2.3 kW','blue'],['electric_car','Tesla charger','0.8 kW','green'],['directions_car','Kia charger','0 W','mute']].map(r=>C.li({i:r[0],n:r[1],s:r[2],c:r[3]})).join('')}</div>`;
+  const chips=`<div style="display:grid;grid-template-columns:${o==='B'?'repeat(4,1fr)':'1fr 1fr'};gap:6px">${S.chips.map(c=>`<div style="padding:${o==='B'?'7px 4px':'6px 9px'};border-radius:${o==='B'?'14px':'18px'};font-size:11px;font-weight:600;${o==='B'?'text-align:center;':''}" class="bg-${c[3]} c-${c[3]==='mute'?'':c[3]}">${o==='B'?`${ic(c[0])}<div style="font-size:9.5px;opacity:.8">${c[1]}</div><div class="num">${c[2]}</div>`:`${ic(c[0])} ${c[1]}: <span class="num">${c[2]}</span>`}</div>`).join('')}</div>`;
+  return `<div class="card" style="padding:10px;display:flex;flex-direction:column;gap:8px">${head}${chips}${flowSVG()}</div>`;
+}
+
+function vacBlock(o){
+  const cmds=[['power_settings_new','On/Off'],['play_arrow','Start'],['stop','Stop'],['home','Dock']];
+  if(o==='C') return `<div class="grp"><div class="li" style="height:44px"><div class="ib bg-green" style="width:28px;height:28px">${ic('mop','c-green')}</div><span class="t" style="font-weight:700">Robbie</span><span class="v">Docked · 100%</span></div><div class="acts" style="grid-template-columns:repeat(4,1fr);padding:8px 4px">${cmds.map(c=>`<div>${ic(c[0])}${c[1]}</div>`).join('')}</div></div>`;
+  return `<div class="card" style="padding:10px;display:flex;align-items:center;gap:10px"><div style="width:38px;height:38px;border-radius:12px;display:grid;place-items:center" class="bg-green">${ic('mop','c-green')}</div><div class="grow"><div style="font-weight:700">Robbie</div><div class="mute" style="font-size:11px">Docked · 100%</div></div>${cmds.map(c=>`<span style="width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--p-card2)">${ic(c[0])}</span>`).join('')}</div>`;
+}
+
+/* ---------- mount ---------- */
+const R={A,B,C};
+const phones=[...document.querySelectorAll('.ph')];
+const state={A:'fav',B:'fav',C:'fav'};
+function render(ph){
+  const o=ph.dataset.opt, r=R[o], tab=TABS.find(t=>t.id===state[o]);
+  const prev=ph.querySelector('.scr'); const top=prev?prev.scrollTop:0;
+  ph.innerHTML=`<div class="notch"></div><div class="scr"><div class="stack">${r.home()}${r.tabs(state[o])}${tab.g.map(g=>r.group(g,tab)).join('')}</div></div>${nav()}`;
+  ph.querySelector('.scr').scrollTop=top;
+}
+phones.forEach(ph=>{
+  render(ph);
+  ph.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;state[ph.dataset.opt]=b.dataset.tab;render(ph);syncPicker();});
+});
+const picker=document.getElementById('picker');
+picker.innerHTML=TABS.map(t=>`<button type="button" data-all="${t.id}" aria-pressed="${t.id==='fav'}">${t.t}</button>`).join('');
+function syncPicker(){const v=state.A===state.B&&state.B===state.C?state.A:null;picker.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.all===v)));}
+picker.addEventListener('click',e=>{const b=e.target.closest('[data-all]');if(!b)return;['A','B','C'].forEach(k=>state[k]=b.dataset.all);phones.forEach(ph=>{render(ph);const s=ph.querySelector('.tabs');const scr=ph.querySelector('.scr');if(s&&scr)scr.scrollTop=Math.max(0,s.offsetTop-40);});syncPicker();});
+
+/* coverage list */
+const COV=[
+ ['Header',['Greeting + user','Date','Weather: <code>weather.north_lakes_weather</code>, <code>weather.forecast_home_2</code>','Feels like: <code>sensor.home_apparent_temperature</code>','ETA home: <code>sensor.sushen_eta_home_2</code> / <code>sensor.paro_eta_home_2</code>']],
+ ['Badges',['<code>device_tracker.kia_gps_location</code>','<code>device_tracker.bluey_location</code>','Bins (conditional): general, recycle, garden','<code>binary_sensor.shanaya_room_occupancy_status</code>','<code>binary_sensor.samar_room_occupancy_new</code>']],
+ ['Alerts & family',['Alert ticker: garage, front, security screen, patio, laundry, side door, Roborock tank','<code>person.sushenmathur</code>, <code>person.paro</code>','<code>calendar.supar_family</code> (3 events)']],
+ ['Security',['<code>cover.garage_door_v2</code>','<code>input_boolean.front_door</code>','<code>alarm_control_panel.home_alarm</code>','<code>camera.driveway_live_view</code>']],
+ ['Favourites tab',['TTS, Attention Paro, Lost Phone scripts','Good Night / Good Morning scenes','Garage door, pendant lights, driveway light','<code>media_player.tv</code>, <code>media_player.kitchen_speaker</code>','Netflix, YouTube, Stremio sources']],
+ ['Lights tab',['All Lights shortcut','Kitchen pendants, kitchen downlights, <code>light.sonoff_1000dbd8b7</code>','Hallway, dining, corridor']],
+ ['Kids tab',['<code>light.aarlo_samar_cam</code>, white noise player','Samar and Shanaya room temperatures','Samar and Shanaya cameras']],
+ ['Tesla tab',['Battery / range toggle, shift state','Trunk, climate, port, lock, frunk','Charge limit, amps, start/stop, port lock (when cable in)','Climate temp, range, charge ETA, location']],
+ ['Garage tab',['Garage light, keep door open','Bluey and Sorento summaries','<code>switch.bluey_charge</code>, <code>switch.kia_charger</code>','<code>camera.garage_live_view</code>']],
+ ['Solar & Vacuum',['Tariff, current rate, use / sold / bill / estimate','Power flow: solar, grid, home, Kia, Tesla','<code>vacuum.robbie</code> + 4 commands','5 room-clean buttons']],
+ ['Navbar',['Home, Cameras, Media, Climate, Devices, More popup']]
+];
+document.getElementById('cov').innerHTML=COV.map(c=>`<div><h4>${c[0]}</h4><ul>${c[1].map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('');
+</script>
