@@ -1,0 +1,9 @@
+.pw-flow{stroke-dasharray:3 7;animation:pwdash 1s linear infinite}
+.pw-rev{animation-direction:reverse}
+.pw-glow{animation:pwglow 2.8s ease-in-out infinite alternate}
+.pw-pulse{animation:pwpulse 1.6s ease-in-out infinite}
+.pw-window{filter:drop-shadow(0 0 4px rgba(255,210,122,.8))}
+@keyframes pwdash{to{stroke-dashoffset:-20}}
+@keyframes pwglow{from{opacity:.75}to{opacity:1}}
+@keyframes pwpulse{0%,100%{opacity:.25}50%{opacity:.75}}
+@media (prefers-reduced-motion: reduce){.pw-flow,.pw-glow,.pw-pulse{animation:none}}

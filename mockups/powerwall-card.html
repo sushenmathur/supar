@@ -1,0 +1,212 @@
+<title>Supar Powerwall Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=block">
+<style>
+/* Layout: header + scenario switch, one phone showing the Solar tab with the new card, notes beside it (stacked on phones). */
+:root{--bg:#f2f3f1;--surface:#fff;--fg:#151a1c;--muted:#5b676b;--line:#dbe0df;--accent:#d9661f;
+  --f-display:'Bricolage Grotesque','Figtree',system-ui,sans-serif;--f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;--f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --p-bg:#111315;--p-line:rgba(255,255,255,.1);--p-fg:#eef1f1;--p-mute:#8e999c;--p-on:#f2a54a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,42px);letter-spacing:-.02em;line-height:1.05;margin:0 0 10px;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:68ch}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0}
+.ctl .lbl{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.ctl button{font:600 13.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 14px;border-radius:999px;cursor:pointer}
+.ctl button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.ctl button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lay{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:36px;align-items:start}
+@media (max-width:760px){.lay{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.side h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0}
+.side p{margin:0;color:var(--muted)}
+.side dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:14px}
+.side dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.side dd{margin:0}
+.side code{font-family:var(--f-mono);font-size:12px;word-break:break-all}
+.meas{font:500 12.5px var(--f-mono);color:var(--muted)}
+.meas b{color:var(--fg)}
+.frame{position:relative;width:360px;max-width:100%;margin:0 auto;border-radius:44px;padding:10px;background:#1b2124;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 24px 50px -20px rgba(0,0,0,.45)}
+.ph{position:relative;height:720px;border-radius:35px;overflow:hidden;background:var(--p-bg);color:var(--p-fg);font-family:var(--f-body);font-size:13px;line-height:1.3}
+.scr{position:absolute;inset:0;overflow-y:auto;padding:40px 12px 96px;scrollbar-width:none;display:flex;flex-direction:column;gap:10px}
+.scr::-webkit-scrollbar{display:none}
+.notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:96px;height:26px;border-radius:20px;background:#000;z-index:30}
+.ms{width:1em;overflow:hidden;flex:none;font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:18px;line-height:1;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 1,'wght' 450,'GRAD' 0,'opsz' 24;vertical-align:middle}
+.tabs{display:flex;gap:6px;overflow:hidden}
+.tabs span{flex:none;width:44px;height:40px;border-radius:20px;display:grid;place-items:center;border:1px solid var(--p-line);color:var(--p-mute)}
+.tabs span.on{width:auto;padding:0 14px;gap:6px;display:flex;align-items:center;background:var(--p-on);color:#1d1002;font-weight:700;border-color:transparent}
+.ehead{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:600}
+.ehead .r{margin-left:auto;font-size:12px;color:var(--p-mute);font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stats div{border-radius:14px;padding:7px 2px;text-align:center;font-size:10px}
+.stats b{display:block;font-size:12.5px}
+.pwcard{background:#0b0f12;border-radius:22px;padding:8px 6px 6px;outline:1.5px dashed rgba(242,165,74,.5);outline-offset:3px;overflow:hidden}
+.nav{position:absolute;left:12px;right:12px;bottom:16px;height:58px;border-radius:26px;background:rgba(255,255,255,.07);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.14);display:grid;grid-template-columns:repeat(6,1fr);align-items:center;z-index:5}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--p-mute)}
+.nav div .ms{font-size:21px}.nav div.on{color:#fff}.nav div.on .ms{color:var(--p-on)}
+.pw-flow{stroke-dasharray:3 7;animation:pwdash 1s linear infinite}
+.pw-rev{animation-direction:reverse}
+.pw-glow{animation:pwglow 2.8s ease-in-out infinite alternate}
+.pw-pulse{animation:pwpulse 1.6s ease-in-out infinite}
+.pw-window{filter:drop-shadow(0 0 4px rgba(255,210,122,.8))}
+@keyframes pwdash{to{stroke-dashoffset:-20}}
+@keyframes pwglow{from{opacity:.75}to{opacity:1}}
+@keyframes pwpulse{0%,100%{opacity:.25}50%{opacity:.75}}
+@media (prefers-reduced-motion: reduce){.pw-flow,.pw-glow,.pw-pulse{animation:none}}
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Home Assistant · Solar tab</div>
+    <h1>Powerwall-style power flow</h1>
+    <p>An illustrated house in the style of the Tesla app: panels on the roof glow while the sun is up, windows light when the house is drawing power, the grid pylon sits on the left, and the Tesla and Kia are parked out front with a charge glow. Animated lines show which way the power is moving. Switch the time of day to see it change.</p>
+  </header>
+  <div class="ctl" role="group" aria-label="Scenario">
+    <span class="lbl">Show</span>
+    <button type="button" data-s="day" aria-pressed="true">Midday</button>
+    <button type="button" data-s="eve" aria-pressed="false">Evening · Kia charging</button>
+    <button type="button" data-s="night" aria-pressed="false">Night (your screenshot)</button>
+  </div>
+  <div class="lay">
+    <div class="frame"><div class="ph" id="ph"></div></div>
+    <div class="side">
+      <h2>How it fits</h2>
+      <p class="meas">Card height at phone width: <b id="h">–</b> px, down from about 380 px today.</p>
+      <dl>
+        <dt>Top left</dt><dd>Solar output, with a line into the roof panels</dd>
+        <dt>Top right</dt><dd>House use (excluding the car chargers, same as now)</dd>
+        <dt>Bottom left</dt><dd>Grid, purple when importing, lilac and reversed when exporting</dd>
+        <dt>Bottom right</dt><dd>Both car chargers combined, and which car is charging</dd>
+        <dt>Top centre</dt><dd>Share of the house running on solar right now</dd>
+        <dt>Tap</dt><dd>Opens your Energy dashboard, like the old card</dd>
+        <dt>Needs</dt><dd>Nothing new. One button-card, your existing sensors</dd>
+        <dt>Sensors</dt><dd><code>sensor.sh50rs_a21c2106894_mppt_total_power</code>, <code>…_purchased_power</code>, <code>…_total_export_active_power</code>, <code>sensor.bluey_charger_power</code>, <code>sensor.kia_charger_power</code></dd>
+      </dl>
+      <p>Values are examples. W and kW sensors are both handled.</p>
+    </div>
+  </div>
+</div>
+<script>
+function render(s){
+const fmt = v => v >= 1000 ? (v / 1000).toFixed(1) + ' kW' : Math.round(v) + ' W';
+const { solar, imp, exp, tesla, kia } = s;
+const home = Math.max(0, solar + imp - exp - tesla - kia);
+const load = home + tesla + kia;
+const selfPct = load > 0 ? Math.round(Math.min(1, solar / load) * 100) : (solar > 0 ? 100 : 0);
+const day = solar > 0;
+const C = { solar: '#ffb020', grid: '#a67cff', exp: '#c9a6ff', home: '#4c8dff', ev: '#30d158', kia: '#2bd4c0', mute: '#8e999c' };
+const P = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const pt = p => p[0].toFixed(1) + ',' + p[1].toFixed(1);
+const dur = w => Math.max(0.45, 2.4 - (w / 1000) * 0.45).toFixed(2) + 's';
+
+/* house geometry: front gable A-B-Cc-D-E, side wall E-D-F-G, roof plane Cc-H-F-D */
+const A = [112, 192], B = [112, 128], Cc = [152, 98], D = [192, 128], E = [192, 192], F = [268, 114], G = [268, 178], H = [228, 84];
+const roof = (u, v) => P(P(Cc, H, u), P(D, F, u), v);
+const side = (u, v) => P(P(E, G, u), P(D, F, u), v);
+
+let panels = '';
+for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) {
+  const u0 = 0.1 + i * 0.2 + 0.015, u1 = 0.1 + (i + 1) * 0.2 - 0.015;
+  const v0 = 0.14 + j * 0.36 + 0.03, v1 = 0.14 + (j + 1) * 0.36 - 0.03;
+  panels += `<polygon points="${pt(roof(u0, v0))} ${pt(roof(u1, v0))} ${pt(roof(u1, v1))} ${pt(roof(u0, v1))}"
+    fill="${day ? '#2c4268' : '#192131'}" stroke="${day ? C.solar : '#344055'}" stroke-width="0.7" ${day ? 'class="pw-glow"' : ''}/>`;
+}
+
+const garage = [side(0.38, 0), side(0.38, 0.62), side(0.86, 0.62), side(0.86, 0)];
+let slats = '';
+for (let k = 1; k < 5; k++) slats += `<line x1="${side(0.38, k * 0.124)[0]}" y1="${side(0.38, k * 0.124)[1]}" x2="${side(0.86, k * 0.124)[0]}" y2="${side(0.86, k * 0.124)[1]}" stroke="#0e1418" stroke-width="0.6"/>`;
+
+const lit = home > 0;
+const car = (x, y, body, on, col) => `
+  ${on ? `<ellipse cx="${x + 22}" cy="${y + 16}" rx="26" ry="4" fill="${col}" class="pw-pulse"/>` : ''}
+  <path d="M${x} ${y + 12} C${x + 1} ${y + 7} ${x + 6} ${y + 6} ${x + 12} ${y + 5} L${x + 17} ${y + 1} C${x + 21} ${y - 1} ${x + 31} ${y - 1} ${x + 34} ${y + 1} L${x + 39} ${y + 5} C${x + 43} ${y + 6} ${x + 44} ${y + 8} ${x + 44} ${y + 11} L${x + 44} ${y + 13} L${x} ${y + 13} Z" fill="${body}"/>
+  <path d="M${x + 18} ${y + 2} L${x + 33} ${y + 2} L${x + 37} ${y + 5.5} L${x + 14} ${y + 5.5} Z" fill="#1d2a30"/>
+  <circle cx="${x + 10}" cy="${y + 13}" r="3.4" fill="#0c0f11"/><circle cx="${x + 35}" cy="${y + 13}" r="3.4" fill="#0c0f11"/>
+  ${on ? `<path d="M${x + 22} ${y - 9} l-3 6 h3 l-2 5 l5 -7 h-3 l2 -4 z" fill="${col}"/>` : ''}`;
+
+const flow = (d, col, w, rev) => w > 0
+  ? `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linecap="round" class="pw-flow${rev ? ' pw-rev' : ''}" style="animation-duration:${dur(w)}"/>`
+  : `<path d="${d}" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1.4"/>`;
+
+const roofMid = roof(0.5, 0.5);
+const gridCol = exp > 0 ? C.exp : C.grid;
+const label = (x, y, anchor, cap, val, col, sub, subCol) => `
+  <text x="${x}" y="${y}" text-anchor="${anchor}" font-size="9.5" font-weight="700" letter-spacing="1.2" fill="${C.mute}">${cap}</text>
+  <text x="${x}" y="${y + 20}" text-anchor="${anchor}" font-size="19" font-weight="700" fill="#ffffff">${val}</text>
+  ${sub ? `<text x="${x}" y="${y + 34}" text-anchor="${anchor}" font-size="10" font-weight="600" fill="${subCol || col}">${sub}</text>` : ''}`;
+
+const stars = day ? '' : [[60, 96], [96, 70], [250, 40], [286, 96], [200, 22], [128, 30], [304, 140]]
+  .map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 3 ? 0.8 : 1.2}" fill="#fff" opacity="${0.35 + (i % 3) * 0.15}"/>`).join('');
+
+const evSub = tesla > 0 && kia > 0 ? 'Both charging' : tesla > 0 ? 'Tesla charging' : kia > 0 ? 'Kia charging' : 'Not charging';
+const chipTxt = day ? `${selfPct}% solar` : (imp > 0 ? 'On grid' : 'Idle');
+const chipCol = day ? C.solar : C.grid;
+
+return `
+<svg viewBox="0 0 320 258" width="100%" style="display:block" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <defs>
+    <radialGradient id="pwsky" cx="${day ? '20%' : '80%'}" cy="0%" r="90%">
+      <stop offset="0" stop-color="${day ? 'rgba(255,176,32,0.22)' : 'rgba(80,110,200,0.18)'}"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+    <linearGradient id="pwwall" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e9edef"/><stop offset="1" stop-color="#b9c2c6"/></linearGradient>
+    <linearGradient id="pwside" x1="0" x2="1"><stop offset="0" stop-color="#9aa5aa"/><stop offset="1" stop-color="#7d888d"/></linearGradient>
+  </defs>
+  <rect width="320" height="258" fill="url(#pwsky)"/>
+  ${stars}
+  ${day ? '' : '<path d="M222 30 a9 9 0 1 0 7 13 a7 7 0 1 1 -7 -13z" fill="#cfd8ff" opacity="0.8"/>'}
+
+  <rect x="${160 - 34}" y="6" width="68" height="18" rx="9" fill="${chipCol}" fill-opacity="0.16"/>
+  <text x="160" y="18.5" text-anchor="middle" font-size="10" font-weight="700" fill="${chipCol}">${chipTxt}</text>
+
+  <ellipse cx="190" cy="206" rx="118" ry="13" fill="#ffffff" fill-opacity="0.035"/>
+
+  <g stroke="#5f6b72" stroke-width="1.3" fill="none" stroke-linecap="round">
+    <path d="M43 118 L32 196 M43 118 L54 196 M36 134 L50 134 M30 148 L56 148 M34 166 L52 166 M33 148 L50 166 M53 148 L36 166"/>
+  </g>
+  <circle cx="30" cy="148" r="1.6" fill="${gridCol}"/><circle cx="56" cy="148" r="1.6" fill="${gridCol}"/>
+
+  ${flow(`M56 150 C80 150 92 168 112 168`, gridCol, imp || exp, exp > 0)}
+  ${flow(`M104 44 C140 44 170 60 ${pt(roofMid)}`, C.solar, solar, false)}
+  ${flow(`M240 130 C262 112 270 84 262 58`, C.home, home, false)}
+
+  <polygon points="${pt(E)} ${pt(D)} ${pt(F)} ${pt(G)}" fill="url(#pwside)"/>
+  <polygon points="${garage.map(pt).join(' ')}" fill="#2a3338"/>${slats}
+  <polygon points="${pt(A)} ${pt(B)} ${pt(Cc)} ${pt(D)} ${pt(E)}" fill="url(#pwwall)"/>
+  <polygon points="${pt(Cc)} ${pt(H)} ${pt(F)} ${pt(D)}" fill="#3a4247"/>
+  ${panels}
+  <polyline points="${pt([106, 131])} ${pt(Cc)} ${pt([198, 131])}" fill="none" stroke="#2b3236" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="128" y="142" width="22" height="18" rx="1.5" fill="${lit ? '#ffd27a' : '#2a3338'}" ${lit ? 'class="pw-window"' : ''}/>
+  <rect x="158" y="150" width="16" height="42" rx="1.5" fill="#4a5459"/>
+  <line x1="139" y1="142" x2="139" y2="160" stroke="#b9c2c6" stroke-width="1"/>
+
+  ${car(204, 196, '#e6eaec', tesla > 0, C.ev)}
+  ${car(118, 200, '#7d8a90', kia > 0, C.kia)}
+
+  ${label(14, 30, 'start', 'SOLAR', fmt(solar), C.solar, day ? 'Generating' : 'Night', day ? C.solar : C.mute)}
+  ${label(306, 30, 'end', 'HOME', fmt(home), C.home, lit ? 'Using' : 'Idle')}
+  ${label(14, 222, 'start', 'GRID', fmt(exp || imp), gridCol, exp > 0 ? 'Exporting' : imp > 0 ? 'Importing' : 'Idle', exp || imp ? gridCol : C.mute)}
+  ${label(306, 222, 'end', 'VEHICLES', fmt(tesla + kia), C.ev, evSub, tesla || kia ? C.ev : C.mute)}
+</svg>`;
+
+}
+const ic=n=>`<span class="ms">${n}</span>`;
+const SC={day:{solar:4200,imp:0,exp:400,tesla:2200,kia:0},eve:{solar:600,imp:2700,exp:0,tesla:0,kia:1800},night:{solar:0,imp:590,exp:0,tesla:0,kia:0}};
+const ST={day:['$1.12','$0.88'],eve:['$3.40','$0.95'],night:['$5.01','$0.21']};
+function draw(k){
+  const ph=document.getElementById('ph');
+  ph.innerHTML=`<div class="notch"></div><div class="scr">
+   <div class="tabs"><span>${ic('child_care')}</span><span>${ic('electric_car')}</span><span>${ic('garage')}</span><span class="on">${ic('solar_power')}Solar</span><span>${ic('mop')}</span></div>
+   <div class="ehead">${ic('solar_power')}Energy<span class="r">${k==='night'?'shoulder':'peak'} · $0.32/kWh</span></div>
+   <div class="stats"><div style="background:rgba(255,90,79,.15);color:#ff6b61"><div>Use</div><b>${ST[k][0]}</b></div><div style="background:rgba(48,209,88,.13);color:#5fd27a"><div>Sold</div><b>${ST[k][1]}</b></div><div style="background:rgba(255,255,255,.08)"><div>Bill</div><b>$92.56</b></div><div style="background:rgba(76,141,255,.15);color:#6ea4ff"><div>Est</div><b>$159.41</b></div></div>
+   <div class="pwcard" id="card">${render(SC[k])}</div>
+  </div><div class="nav">${[['home','Home'],['videocam','Cameras'],['music_note','Media'],['thermostat','Climate'],['devices','Devices'],['more_horiz','More']].map((n,i)=>`<div class="${i?'':'on'}">${ic(n[0])}<span>${n[1]}</span></div>`).join('')}</div>`;
+  requestAnimationFrame(()=>{document.getElementById('h').textContent=Math.round(document.getElementById('card').getBoundingClientRect().height);});
+}
+document.querySelector('.ctl').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;document.querySelectorAll('[data-s]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw(b.dataset.s);});
+draw('day');
+</script>
