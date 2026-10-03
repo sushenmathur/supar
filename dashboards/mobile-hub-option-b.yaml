@@ -1,7 +1,12 @@
 # ==========================================================================
 # Mobile Hub – Option B "Control Grid"
 #
-# HOW TO INSTALL (Dashboard > ⋮ > Edit > ⋮ > Raw configuration editor)
+# EASIEST: use mobile-hub-full.yaml instead (whole dashboard, paste over all).
+#
+# MANUAL INSTALL (Dashboard > ⋮ > Edit > ⋮ > Raw configuration editor)
+#   Do NOT paste this file over the whole config: it holds only the Home
+#   view, so the Cameras/Media/Climate/Devices views (and the navbar
+#   targets) would be deleted.
 #   1. Paste the whole `button_card_templates:` block at the very top of the
 #      raw config, ABOVE `views:` (if you already have button_card_templates,
 #      merge these keys into it).
@@ -1529,8 +1534,7 @@ views:
       # -------------------------------------------------------------------
       - type: grid
         cards:
-          - type: custom:navbar-card
-            mobile:
+          - mobile:
               mode: floating
               show_labels: true
               show_popup_label_backgrounds: false
@@ -1573,7 +1577,7 @@ views:
                       service_data: {}
                 tap_action:
                   action: open-popup
-            styles: |
+            styles: |+
               .navbar-card.mobile.floating {
                 background: rgba(255, 255, 255, 0.05) !important;
                 backdrop-filter: blur(25px) saturate(180%);
@@ -1583,12 +1587,8 @@ views:
                 box-shadow:
                   0 8px 32px rgba(0, 0, 0, 0.2),
                   inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
-                bottom: 24px !important;
-                margin: 0 16px !important;
-                min-height: 64px !important;
-                padding: 8px 0 !important;
-                overflow: visible !important;
               }
+
               .button.active {
                 background: rgba(255, 255, 255, 0.15) !important;
                 backdrop-filter: blur(8px);
@@ -1599,8 +1599,14 @@ views:
                 min-height: 56px !important;
                 margin: 0 auto !important;
               }
-              .route { overflow: visible !important; }
-              .icon.active { color: #ffffff; }
+
+              .route {
+                overflow: visible !important;
+              }
+              .icon.active {
+                color: #ffffff;
+              }
+
               .navbar-popup {
                 background: rgba(20, 20, 20, 0.3) !important;
                 backdrop-filter: blur(25px) saturate(180%);
@@ -1608,13 +1614,32 @@ views:
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 24px !important;
               }
+
               .popup-item .button {
                 background: rgba(255, 255, 255, 0.05) !important;
                 backdrop-filter: blur(6px);
+
               }
-              .navbar.mobile.floating { bottom: 0 !important; }
-              .icon { --navbar-route-icon-size: 22px; }
+
+              .navbar-card.mobile.floating {
+                bottom: 24px !important;
+                margin: 0 16px !important;
+                min-height: 64px !important;
+                padding: 8px 0 !important;
+                overflow: visible !important;
+              }
+
+              .navbar.mobile.floating {
+                bottom: 0 !important;
+              }
+
+              .icon {
+                --navbar-route-icon-size: 22px;
+              }
+
               .button {
                 min-width: 52px !important;
                 min-height: 52px !important;
               }
+
+            type: custom:navbar-card
