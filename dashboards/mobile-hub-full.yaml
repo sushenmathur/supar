@@ -2565,26 +2565,106 @@ views:
                 tap_action:
                   action: toggle
 
-          # LG remote (unchanged)
-          - type: custom:lg-remote-control
+          # TV Remote launcher: opens the Bubble Card pop-up (#tv-remote)
+          - type: custom:button-card
             entity: media_player.tv
-            name: Media Tv
-            mac: b8:16:5F:77:FB:64
-            color_buttons: true
-            dimensions:
-              scale: '0.7'
-            grid_options:
-              columns: full
-              rows: auto
-            sources:
-              - icon: mdi:netflix
-                name: Netflix
-              - icon: amazon
-                name: Prime Video
-              - icon: mdi:play-box
-                name: Stremio
-              - icon: mdi:youtube-tv
-                name: YouTube
+            name: TV Remote
+            icon: mdi:remote-tv
+            show_state: true
+            tap_action:
+              action: navigate
+              navigation_path: '#tv-remote'
+            hold_action:
+              action: more-info
+            state_display: |
+              [[[
+                if (entity.state === 'off' || entity.state === 'unavailable') return 'Media TV · Off';
+                return 'Media TV · ' + (entity.attributes.source || entity.state);
+              ]]]
+            custom_fields:
+              quick: |
+                [[[
+                  const hass = "document.querySelector('home-assistant').hass";
+                  const muted = entity.attributes.is_volume_muted === true;
+                  const b = (icon, js, color) => `
+                    <div onclick="event.stopPropagation(); ${js}"
+                      style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+                      background:rgba(var(--rgb-primary-text-color),0.09)">
+                      <ha-icon icon="${icon}" style="--mdc-icon-size:19px;color:${color || 'var(--primary-text-color)'}"></ha-icon>
+                    </div>`;
+                  return `<div style="display:flex;gap:6px">
+                    ${b('mdi:power', `${hass}.callService('script','media_tv_power',{})`, 'var(--red-color)')}
+                    ${b(muted ? 'mdi:volume-off' : 'mdi:volume-mute', `${hass}.callService('media_player','volume_mute',{entity_id:'media_player.tv',is_volume_muted:${!muted}})`, muted ? 'var(--amber-color)' : null)}
+                    ${b('mdi:volume-minus', `${hass}.callService('media_player','volume_down',{entity_id:'media_player.tv'})`)}
+                    ${b('mdi:volume-plus', `${hass}.callService('media_player','volume_up',{entity_id:'media_player.tv'})`)}
+                  </div>`;
+                ]]]
+            styles:
+              card:
+                - padding: 10px 12px
+                - border-radius: 18px
+                - box-shadow: none
+                - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
+                - background: rgba(var(--rgb-primary-text-color),0.05)
+              grid:
+                - grid-template-areas: '"i n quick" "i s quick"'
+                - grid-template-columns: 40px 1fr auto
+                - column-gap: 10px
+              img_cell:
+                - width: 38px
+                - height: 38px
+                - border-radius: 12px
+                - background: rgba(242, 165, 74, 0.18)
+              icon:
+                - width: 22px
+                - color: '#f2a54a'
+              name:
+                - justify-self: start
+                - font-size: 13px
+                - font-weight: 700
+              state:
+                - justify-self: start
+                - font-size: 11px
+                - opacity: 0.7
+                - white-space: nowrap
+                - overflow: hidden
+                - text-overflow: ellipsis
+                - max-width: 100%
+
+      # TV Remote pop-up (Bubble Card). Opened by the launcher above.
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#tv-remote'
+                name: Media TV
+                icon: mdi:remote-tv
+                entity: media_player.tv
+                show_header: true
+                button_type: name
+                close_by_clicking_outside: true
+                bg_opacity: 88
+                bg_blur: 14
+                shadow_opacity: 0
+                margin_top_mobile: 60px
+              - type: custom:lg-remote-control
+                entity: media_player.tv
+                name: Media Tv
+                mac: b8:16:5F:77:FB:64
+                color_buttons: true
+                dimensions:
+                  scale: '0.85'
+                sources:
+                  - icon: mdi:netflix
+                    name: Netflix
+                  - icon: amazon
+                    name: Prime Video
+                  - icon: mdi:play-box
+                    name: Stremio
+                  - icon: mdi:youtube-tv
+                    name: YouTube
 
       - type: grid
         cards:
