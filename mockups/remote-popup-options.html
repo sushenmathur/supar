@@ -1,0 +1,226 @@
+<title>Supar TV Remote Pop-up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=block">
+<style>
+/* Layout: header, three phones (Devices page with the remote button; tap it to open the pop-up), notes under each. */
+:root{
+  --bg:#f2f3f1; --surface:#fff; --fg:#151a1c; --muted:#5b676b; --line:#dbe0df; --accent:#d9661f;
+  --f-display:'Bricolage Grotesque','Figtree',system-ui,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --p-bg:#111315; --p-card:rgba(255,255,255,.06); --p-card2:rgba(255,255,255,.1); --p-line:rgba(255,255,255,.1);
+  --p-fg:#eef1f1; --p-mute:#8e999c; --p-on:#f2a54a; --p-green:#30d158; --p-red:#ff5a4f; --p-blue:#4c8dff; --p-purple:#9b6bff; --p-amber:#ffc53d;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,42px);letter-spacing:-.02em;line-height:1.05;margin:0 0 10px;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:68ch}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:28px;margin-top:28px;align-items:start}
+.opt{min-width:0;display:flex;flex-direction:column;gap:14px}
+.opt-head{display:flex;align-items:baseline;gap:10px}
+.opt-head .letter{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--accent);line-height:1}
+.opt-head h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0}
+.notes{display:flex;flex-direction:column;gap:10px;font-size:14px}
+.notes p{margin:0;color:var(--muted)}
+.notes dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:13.5px}
+.notes dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.notes dd{margin:0}
+.tag{display:inline-block;font:600 11px var(--f-mono);padding:1px 7px;border-radius:6px;border:1px solid var(--line)}
+.tag.ok{color:#1f8a46;border-color:#1f8a4655}
+.tag.need{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin-top:-4px}
+.foot{margin-top:30px;font-size:13px;color:var(--muted)}
+
+/* phone */
+.frame{position:relative;width:360px;max-width:100%;margin:0 auto;border-radius:44px;padding:10px;background:#1b2124;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 24px 50px -20px rgba(0,0,0,.45)}
+.ph{position:relative;height:720px;border-radius:35px;overflow:hidden;background:var(--p-bg);color:var(--p-fg);font-family:var(--f-body);font-size:13px;line-height:1.3}
+.ph .scr{position:absolute;inset:0;overflow-y:auto;padding:40px 12px 96px;scrollbar-width:none}
+.ph .scr::-webkit-scrollbar{display:none}
+.notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:96px;height:26px;border-radius:20px;background:#000;z-index:30}
+.ms{font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:18px;line-height:1;display:inline-block;white-space:nowrap;letter-spacing:normal;text-transform:none;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 1,'wght' 450,'GRAD' 0,'opsz' 24;vertical-align:middle}
+.ph button{all:unset;cursor:pointer;box-sizing:border-box}
+.ph button:focus-visible{outline:2px solid var(--p-on);outline-offset:2px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.title .sub{font-size:11px;font-weight:600;color:var(--p-mute)}
+.title .sub b{color:var(--p-amber);font-weight:600}
+.title h3{margin:0;font-family:var(--f-body);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.05;background:linear-gradient(90deg,#ff8a3d,#e9a400);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#ff8a3d}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:var(--p-card);border:1px solid var(--p-line);border-radius:18px}
+.phone{display:grid;grid-template-columns:28px 1fr auto;gap:0 8px;align-items:center;padding:10px}
+.phone .n{font-size:11.5px;font-weight:700}
+.phone .v{font-size:18px;font-weight:800;line-height:1.1}
+.phone .l{font-size:9.5px;color:var(--p-mute)}
+.ping{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 8px;border-radius:12px;font-size:9.5px;font-weight:700}
+.wide{display:flex;align-items:center;gap:8px;height:64px;padding:0 12px;box-sizing:border-box}
+.wide .t{font-size:12px;font-weight:700}
+.wide .s{font-size:11px;opacity:.75}
+.wide.on{background:rgba(242,165,74,.95);border-color:transparent;color:#1d1002}
+/* the remote launcher button */
+.launch{display:flex;align-items:center;gap:10px;padding:10px 12px;width:100%}
+.launch .ib{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(242,165,74,.18);color:var(--p-on)}
+.launch .ib .ms{font-size:22px}
+.launch .t{font-size:13px;font-weight:700}
+.launch .s{font-size:11px;color:var(--p-mute)}
+.launch .quick{margin-left:auto;display:flex;gap:6px}
+.launch .quick span{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--p-card2)}
+.launch .quick span .ms{font-size:18px}
+.launch .quick span.pw{color:var(--p-red)}
+.launch.open{background:rgba(242,165,74,.12);border-color:rgba(242,165,74,.45)}
+.launch .chev{transition:transform .2s}
+.launch.open .chev{transform:rotate(180deg)}
+.nav{position:absolute;left:12px;right:12px;bottom:16px;height:58px;border-radius:26px;background:rgba(255,255,255,.07);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.14);display:grid;grid-template-columns:repeat(6,1fr);align-items:center;z-index:5}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--p-mute)}
+.nav div .ms{font-size:21px}
+.nav div.on{color:#fff}.nav div.on .ms{color:var(--p-on)}
+
+/* remote body */
+.remote{display:flex;flex-direction:column;align-items:center;gap:12px;padding:4px 0}
+.rrow{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:260px}
+.rb{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--p-card2);color:var(--p-fg)}
+.rb .ms{font-size:20px}
+.rb.pw{background:rgba(255,90,79,.2);color:var(--p-red)}
+.rb.sm{width:40px;height:32px;border-radius:12px;font:700 10px var(--f-body)}
+.dpad{position:relative;width:176px;height:176px;border-radius:50%;background:var(--p-card2)}
+.dpad .ms{position:absolute;font-size:26px;color:var(--p-fg)}
+.dpad .u{top:10px;left:50%;transform:translateX(-50%)}.dpad .d{bottom:10px;left:50%;transform:translateX(-50%)}
+.dpad .l{left:10px;top:50%;transform:translateY(-50%)}.dpad .r{right:10px;top:50%;transform:translateY(-50%)}
+.dpad .ok{position:absolute;inset:50px;border-radius:50%;background:var(--p-bg);border:2px solid var(--p-line);display:grid;place-items:center;font-weight:700;font-size:13px}
+.rocker{width:48px;border-radius:24px;background:var(--p-card2);display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:6px;font-size:9.5px;color:var(--p-mute);font-weight:700}
+.rocker .ms{font-size:20px;color:var(--p-fg)}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:260px}
+.apps span{height:30px;border-radius:10px;background:var(--p-card2);display:grid;place-items:center;font-weight:800;font-size:11px}
+.colors{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:260px}
+.colors i{height:12px;border-radius:6px}
+
+/* Option A: bottom sheet */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:86%;background:#1a1d20;border-radius:26px 26px 0 0;transform:translateY(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:21;padding:10px 14px 18px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;box-shadow:0 -10px 30px rgba(0,0,0,.4)}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);align-self:center}
+.sheet .hd{display:flex;align-items:center;gap:8px}
+.sheet .hd .t{font-weight:800;font-size:16px}
+.sheet .hd .s{font-size:11px;color:var(--p-mute)}
+.sheet .hd .x{margin-left:auto;width:30px;height:30px;border-radius:50%;background:var(--p-card2);display:grid;place-items:center}
+.ph.A.open .scrim{opacity:1;pointer-events:auto}
+.ph.A.open .sheet{transform:none}
+
+/* Option B: centred dialog */
+.dialog{position:absolute;left:14px;right:14px;top:50%;transform:translateY(-46%) scale(.94);opacity:0;pointer-events:none;transition:all .22s;z-index:21;background:#1a1d20;border-radius:24px;padding:12px 14px 16px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--p-line)}
+.dialog .hd{display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--p-line)}
+.dialog .hd .t{font-weight:700;font-size:15px}
+.dialog .hd .x{margin-right:2px}
+.ph.B.open .scrim{opacity:1;pointer-events:auto}
+.ph.B.open .dialog{opacity:1;pointer-events:auto;transform:translateY(-50%) scale(1)}
+.ph.B .dialog .remote{gap:9px}
+.ph.B .dialog .dpad{width:150px;height:150px}
+.ph.B .dialog .dpad .ok{inset:42px}
+
+/* Option C: inline expand */
+.expand{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s}
+.expand > div{overflow:hidden}
+.ph.C.open .expand{grid-template-rows:1fr}
+.expand .inner{padding:12px 6px 6px;margin-top:-4px}
+@media (prefers-reduced-motion: reduce){.sheet,.dialog,.scrim,.expand,.launch .chev{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Home Assistant · devices-mobile view</div>
+    <h1>Remote behind a button</h1>
+    <p>The LG remote moves off the Devices page and sits behind one "TV Remote" button. The button also has power, mute and volume, so most of the time you won't need to open the remote at all. Tap the button in each phone to see how it opens.</p>
+  </header>
+
+  <div class="opts">
+    <article class="opt">
+      <div class="opt-head"><span class="letter">A</span><h2>Bottom sheet</h2></div>
+      <div class="frame"><div class="ph A" data-opt="A"></div></div>
+      <div class="hint">Tap the remote button, then the dimmed area or ✕ to close</div>
+      <div class="notes">
+        <p>The remote slides up from the bottom and covers most of the screen, like a native iPhone sheet. You can swipe it down to close it, and the back button closes it too. Big targets, one-thumb reach.</p>
+        <dl>
+          <dt>Needs</dt><dd><span class="tag need">Bubble Card</span> from HACS (pop-up card)</dd>
+          <dt>Feel</dt><dd>Most app-like of the three</dd>
+          <dt>Remote size</dt><dd>Full size, scale 0.85</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">B</span><h2>Centre dialog</h2></div>
+      <div class="frame"><div class="ph B" data-opt="B"></div></div>
+      <div class="hint">Tap the remote button, then the dimmed area or ✕ to close</div>
+      <div class="notes">
+        <p>A floating window in the middle of the screen, the same style as Home Assistant's own more-info dialogs. Slightly smaller remote, and it still looks like HA.</p>
+        <dl>
+          <dt>Needs</dt><dd><span class="tag need">browser_mod</span> from HACS (integration, then restart)</dd>
+          <dt>Feel</dt><dd>Familiar HA dialog</dd>
+          <dt>Remote size</dt><dd>Compact, scale 0.7</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">C</span><h2>Expand in place</h2></div>
+      <div class="frame"><div class="ph C" data-opt="C"></div></div>
+      <div class="hint">Tap the remote button to open and close</div>
+      <div class="notes">
+        <p>Not a true pop-up. The remote unfolds under the button and pushes the page down; tap again to fold it away. It remembers open or closed across devices, because the state lives in a helper.</p>
+        <dl>
+          <dt>Needs</dt><dd><span class="tag ok">Nothing new</span>, one helper (<code>input_boolean.show_tv_remote</code>)</dd>
+          <dt>Feel</dt><dd>Simple, no overlay</dd>
+          <dt>Remote size</dt><dd>Compact, scale 0.7</dd>
+        </dl>
+      </div>
+    </article>
+  </div>
+
+  <p class="foot">States shown are examples. Pick A, B or C and I'll add it to the full dashboard YAML. If you already have Bubble Card or browser_mod installed, let me know.</p>
+</div>
+
+<script>
+const ic=n=>`<span class="ms">${n}</span>`;
+const remote=()=>`<div class="remote">
+  <div class="rrow"><span class="rb pw">${ic('power_settings_new')}</span><span class="rb sm">123</span><span class="rb">${ic('input')}</span></div>
+  <div class="dpad">${ic('keyboard_arrow_up').replace('ms','ms u')}${ic('keyboard_arrow_down').replace('ms','ms d')}${ic('keyboard_arrow_left').replace('ms','ms l')}${ic('keyboard_arrow_right').replace('ms','ms r')}<div class="ok">OK</div></div>
+  <div class="rrow"><span class="rb">${ic('undo')}</span><span class="rb">${ic('home')}</span><span class="rb sm">EXIT</span></div>
+  <div class="rrow" style="max-width:220px"><div class="rocker">${ic('add')}VOL${ic('remove')}</div><span class="rb">${ic('volume_off')}</span><div class="rocker">${ic('keyboard_arrow_up')}CH${ic('keyboard_arrow_down')}</div></div>
+  <div class="apps"><span style="color:#E50914">N</span><span style="color:#00A8E1;font-size:9px">prime</span><span style="color:#61D3E4">S</span><span style="color:#FF0000">▶</span></div>
+  <div class="colors"><i style="background:#e5383b"></i><i style="background:#2a9d4b"></i><i style="background:#f2c53d"></i><i style="background:#3a6df0"></i></div>
+</div>`;
+const page=(o)=>`
+  <div class="title"><div class="sub">2 phones · <b>Media TV on</b> · Bedroom TV off</div><h3>Devices</h3></div>
+  <div class="g2">
+    <div class="card phone"><span class="ms" style="color:var(--p-green);font-size:24px">battery_5_bar</span><div><div class="n">Sushen iPhone</div><div class="v">92%</div><div class="l">Home</div></div><div class="ping" style="background:rgba(155,107,255,.16);color:var(--p-purple)">${ic('notifications_active')}Ping</div></div>
+    <div class="card phone"><span class="ms" style="color:var(--p-amber);font-size:24px">battery_3_bar</span><div><div class="n">Paro iPhone</div><div class="v">57%</div><div class="l">Work · 12 km</div></div><div class="ping" style="background:rgba(76,141,255,.16);color:var(--p-blue)">${ic('notifications_active')}Ping</div></div>
+  </div>
+  <div class="g2">
+    <div class="card wide on">${ic('tv')}<div><div class="t">Media TV</div><div class="s">Netflix</div></div></div>
+    <div class="card wide">${ic('tv_gen')}<div><div class="t">Bedroom TV</div><div class="s">Off</div></div></div>
+  </div>
+  <button class="card launch" data-toggle aria-expanded="false" aria-label="Open TV remote">
+    <span class="ib">${ic('settings_remote')}</span>
+    <span><div class="t">TV Remote</div><div class="s">Media TV · Netflix</div></span>
+    <span class="quick"><span class="pw">${ic('power_settings_new')}</span><span>${ic('volume_off')}</span><span>${ic('volume_down')}</span><span>${ic('volume_up')}</span></span>
+    ${o==='C'?`<span class="ms chev" style="color:var(--p-mute)">expand_more</span>`:''}
+  </button>
+  ${o==='C'?`<div class="expand"><div><div class="card inner">${remote()}</div></div></div>`:''}
+`;
+const nav=()=>`<div class="nav">${[['home','Home'],['videocam','Cameras'],['music_note','Media'],['thermostat','Climate'],['devices','Devices'],['more_horiz','More']].map((n,i)=>`<div class="${i===4?'on':''}">${ic(n[0])}<span>${n[1]}</span></div>`).join('')}</div>`;
+document.querySelectorAll('.ph').forEach(ph=>{
+  const o=ph.dataset.opt;
+  ph.innerHTML=`<div class="notch"></div><div class="scr"><div class="stack">${page(o)}</div></div>${nav()}
+   ${o!=='C'?'<div class="scrim" data-close></div>':''}
+   ${o==='A'?`<div class="sheet" role="dialog" aria-label="TV remote"><div class="grab"></div><div class="hd"><span class="ms" style="color:var(--p-on);font-size:22px">settings_remote</span><div><div class="t">Media TV</div><div class="s">LG webOS · Netflix</div></div><button class="x" data-close aria-label="Close">${ic('close')}</button></div>${remote()}</div>`:''}
+   ${o==='B'?`<div class="dialog" role="dialog" aria-label="TV remote"><div class="hd"><button class="x" data-close aria-label="Close">${ic('close')}</button><span class="t">Media TV remote</span></div>${remote()}</div>`:''}`;
+  ph.addEventListener('click',e=>{
+    if(e.target.closest('[data-toggle]')){const open=!ph.classList.contains('open');ph.classList.toggle('open',open);ph.querySelector('[data-toggle]').setAttribute('aria-expanded',open);ph.querySelector('[data-toggle]').classList.toggle('open',open);}
+    else if(e.target.closest('[data-close]')){ph.classList.remove('open');ph.querySelector('[data-toggle]').setAttribute('aria-expanded','false');ph.querySelector('[data-toggle]').classList.remove('open');}
+  });
+});
+// start each phone opened so the first view shows the pop-up
+document.querySelectorAll('.ph').forEach(ph=>{ph.classList.add('open');const b=ph.querySelector('[data-toggle]');b.classList.add('open');b.setAttribute('aria-expanded','true');});
+</script>
