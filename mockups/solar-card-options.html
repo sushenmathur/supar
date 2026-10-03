@@ -1,0 +1,277 @@
+<title>Supar Solar Card Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=block">
+<style>
+/* Layout: header + Day/Night switch, three phones showing the Solar tab, notes and measured card height under each. */
+:root{
+  --bg:#f2f3f1; --surface:#fff; --fg:#151a1c; --muted:#5b676b; --line:#dbe0df; --accent:#d9661f;
+  --f-display:'Bricolage Grotesque','Figtree',system-ui,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  /* phone: HA dark */
+  --p-bg:#111315; --p-card:rgba(255,255,255,.055); --p-card2:rgba(255,255,255,.09); --p-line:rgba(255,255,255,.1);
+  --p-fg:#eef1f1; --p-mute:#8e999c; --p-on:#f2a54a;
+  --solar:#ffb020; --grid:#a67cff; --home:#4c8dff; --ev:#30d158; --ev2:#2bb5a6; --export:#c39bff; --red:#ff5a4f;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,42px);letter-spacing:-.02em;line-height:1.05;margin:0 0 10px;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:70ch}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:24px 0 4px}
+.ctl .lbl{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.ctl button{font:600 13.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 14px;border-radius:999px;cursor:pointer}
+.ctl button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.ctl button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:28px;margin-top:22px;align-items:start}
+.opt{min-width:0;display:flex;flex-direction:column;gap:14px}
+.opt-head{display:flex;align-items:baseline;gap:10px}
+.opt-head .letter{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--accent);line-height:1}
+.opt-head h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0}
+.meas{display:flex;justify-content:center;gap:8px;font:500 12px var(--f-mono);color:var(--muted)}
+.meas b{color:var(--fg);font-weight:600}
+.notes{display:flex;flex-direction:column;gap:10px;font-size:14px}
+.notes p{margin:0;color:var(--muted)}
+.notes dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:13.5px}
+.notes dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.notes dd{margin:0}
+.tag{display:inline-block;font:600 11px var(--f-mono);padding:1px 7px;border-radius:6px;border:1px solid var(--line)}
+.tag.ok{color:#1f8a46;border-color:#1f8a4655}
+.foot{margin-top:30px;font-size:13px;color:var(--muted);max-width:75ch}
+
+/* phone */
+.frame{position:relative;width:360px;max-width:100%;margin:0 auto;border-radius:44px;padding:10px;background:#1b2124;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 24px 50px -20px rgba(0,0,0,.45)}
+.ph{position:relative;height:720px;border-radius:35px;overflow:hidden;background:var(--p-bg);color:var(--p-fg);font-family:var(--f-body);font-size:13px;line-height:1.3}
+.ph .scr{position:absolute;inset:0;overflow-y:auto;padding:40px 12px 96px;scrollbar-width:none;display:flex;flex-direction:column;gap:10px}
+.ph .scr::-webkit-scrollbar{display:none}
+.notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:96px;height:26px;border-radius:20px;background:#000;z-index:30}
+.ms{width:1em;overflow:hidden;flex:none;font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:18px;line-height:1;display:inline-block;white-space:nowrap;letter-spacing:normal;text-transform:none;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 1,'wght' 450,'GRAD' 0,'opsz' 24;vertical-align:middle}
+.num{font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;overflow:hidden}
+.tabs span{flex:none;width:44px;height:40px;border-radius:20px;display:grid;place-items:center;border:1px solid var(--p-line);color:var(--p-mute)}
+.tabs span.on .ms{width:1em}.tabs span.on{width:auto;padding:0 14px;gap:6px;display:flex;align-items:center;background:var(--p-on);color:#1d1002;font-weight:700;border-color:transparent}
+.ehead{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:600}
+.ehead .r{margin-left:auto;font-size:12px;color:var(--p-mute);font-weight:500;display:flex;gap:8px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stats div{border-radius:14px;padding:7px 2px;text-align:center;font-size:10px}
+.stats b{display:block;font-size:12.5px}
+.ccard{background:var(--p-card);border:1px solid var(--p-line);border-radius:18px;position:relative}
+.ccard.measure{outline:1.5px dashed rgba(242,165,74,.55);outline-offset:3px}
+.nav{position:absolute;left:12px;right:12px;bottom:16px;height:58px;border-radius:26px;background:rgba(255,255,255,.07);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.14);display:grid;grid-template-columns:repeat(6,1fr);align-items:center;z-index:5}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--p-mute)}
+.nav div .ms{font-size:21px}
+.nav div.on{color:#fff}.nav div.on .ms{color:var(--p-on)}
+
+/* ---------- A: compact flow diagram ---------- */
+.flowA{padding:6px 8px 10px}
+.flowA svg{display:block;width:100%;height:auto;overflow:visible}
+.flowA text{font-family:var(--f-body)}
+
+/* ---------- B: energy bars ---------- */
+.barsB{padding:12px}
+.barsB .top{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.barsB .big{font-size:26px;font-weight:800;line-height:1;letter-spacing:-.5px}
+.barsB .big small{font-size:13px;font-weight:600;color:var(--p-mute);margin-left:2px}
+.barsB .cap{font-size:10.5px;color:var(--p-mute);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.barsB .pill{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px}
+.barsB .lane{margin-top:10px}
+.barsB .lane .lh{display:flex;justify-content:space-between;font-size:10px;color:var(--p-mute);margin-bottom:4px;font-weight:600}
+.barsB .bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.07);gap:2px}
+.barsB .bar i{display:block;height:100%;transition:flex-grow .4s}
+.barsB .leg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.barsB .leg > div{display:flex;align-items:center;gap:6px;padding:6px 7px;border-radius:10px;background:rgba(255,255,255,.04);min-width:0}
+.barsB .leg .ms{font-size:16px}
+.barsB .leg .t{font-size:9.5px;color:var(--p-mute);line-height:1.1}
+.barsB .leg .v{font-size:12px;font-weight:700;line-height:1.15}
+.barsB .leg > .off{opacity:.45}
+
+/* ---------- C: flow strip ---------- */
+.stripC{padding:12px 10px 10px}
+.stripC .row{display:grid;grid-template-columns:64px 1fr 72px 1fr 64px;align-items:center}
+.stripC .node{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.stripC .ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center}
+.stripC .ico .ms{font-size:24px}
+.stripC .home .ico{width:56px;height:56px;border-radius:18px}
+.stripC .home .ico .ms{font-size:30px}
+.stripC .v{font-size:13px;font-weight:800;line-height:1}
+.stripC .l{font-size:9.5px;color:var(--p-mute);font-weight:600}
+.stripC .wire{position:relative;height:4px;border-radius:2px;background:rgba(255,255,255,.08);margin:0 4px;overflow:hidden}
+.stripC .wire i{position:absolute;top:0;bottom:0;width:30%;border-radius:2px;animation:run 1.4s linear infinite}
+.stripC .wire.rev i{animation-direction:reverse}
+.stripC .wire.idle i{display:none}
+@keyframes run{from{left:-30%}to{left:100%}}
+.stripC .evs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.stripC .ev{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:12px;background:rgba(255,255,255,.04)}
+.stripC .ev .ms{font-size:18px}
+.stripC .ev .t{font-size:11px;font-weight:700}
+.stripC .ev .s{font-size:10px;color:var(--p-mute)}
+.stripC .ev .p{margin-left:auto;font-size:12px;font-weight:800}
+.stripC .self{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:10.5px;color:var(--p-mute)}
+.stripC .self .bar{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.stripC .self .bar i{display:block;height:100%;background:var(--solar);border-radius:3px}
+@media (prefers-reduced-motion: reduce){.stripC .wire i{animation:none;left:35%}.barsB .bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Home Assistant · Solar tab</div>
+    <h1>Three compact power-flow cards</h1>
+    <p>Each phone shows the Solar tab with your Energy heading and the Use / Sold / Bill / Est tiles unchanged. Only the power card changes. The dashed outline marks the card, and the figure under each phone is its measured height at phone width. Your current Home Solar Map card is about 380&nbsp;px tall.</p>
+  </header>
+
+  <div class="ctl" role="group" aria-label="Time of day">
+    <span class="lbl">Show</span>
+    <button type="button" data-mode="day" aria-pressed="true">Midday · solar + Tesla charging</button>
+    <button type="button" data-mode="night" aria-pressed="false">Night · grid only (your screenshot)</button>
+  </div>
+
+  <div class="opts">
+    <article class="opt">
+      <div class="opt-head"><span class="letter">A</span><h2>Flow Plus, compact</h2></div>
+      <div class="frame"><div class="ph" data-opt="A"></div></div>
+      <div class="meas">Card height <b data-h="A">–</b> px</div>
+      <div class="notes">
+        <p>The same Power Flow Card Plus you run today, with the title and footer link removed, smaller circles, and Tesla and Kia as two small circles under Home. Animated dots show direction. Familiar, just tighter.</p>
+        <dl>
+          <dt>Needs</dt><dd><span class="tag ok">Nothing new</span> (power-flow-card-plus + card-mod)</dd>
+          <dt>Style</dt><dd>Classic HA energy flow diagram</dd>
+          <dt>Caveat</dt><dd>The card's circle sizes are fixed by the plugin, so card-mod shrink is limited; real height may land about 20 px taller</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">B</span><h2>Energy Bars</h2></div>
+      <div class="frame"><div class="ph" data-opt="B"></div></div>
+      <div class="meas">Card height <b data-h="B">–</b> px</div>
+      <div class="notes">
+        <p>Big "Home using" figure, then two stacked bars: where the power comes from (solar, grid) and where it goes (home, Tesla, Kia, export). Six small figures underneath. Reads in one glance, like the Tesla and Apple Home energy screens.</p>
+        <dl>
+          <dt>Needs</dt><dd><span class="tag ok">Nothing new</span> (button-card)</dd>
+          <dt>Style</dt><dd>Modern, data first</dd>
+          <dt>Sizing</dt><dd>Fixed height, fully controlled</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">C</span><h2>Flow Strip</h2></div>
+      <div class="frame"><div class="ph" data-opt="C"></div></div>
+      <div class="meas">Card height <b data-h="C">–</b> px</div>
+      <div class="notes">
+        <p>Grid, Home and Solar in one row with animated wires between them, Tesla and Kia chargers as two pills underneath, and a self-powered bar showing how much of the house runs on solar right now.</p>
+        <dl>
+          <dt>Needs</dt><dd><span class="tag ok">Nothing new</span> (button-card)</dd>
+          <dt>Style</dt><dd>Tesla app power-flow feel, horizontal</dd>
+          <dt>Sizing</dt><dd>Fixed height, fully controlled</dd>
+        </dl>
+      </div>
+    </article>
+  </div>
+
+  <p class="foot">Values are examples. Midday: 4.2 kW solar, 1.6 kW house, 2.2 kW into the Tesla, 0.4 kW exported. Night: 590 W from the grid, matching your screenshot. All three use your existing sensors: Sungrow MPPT total, purchased power, export power, and the Kia and Tesla charger power. Pick A, B or C and I'll write the YAML for the Solar tab.</p>
+</div>
+
+<script>
+const ic=(n,s='')=>`<span class="ms" style="${s}">${n}</span>`;
+const DATA={
+  day:{solar:4200,imp:0,exp:400,tesla:2200,kia:0,rate:'peak',price:'0.32',stats:['$1.12','$0.88','$92.56','$159.41']},
+  night:{solar:0,imp:590,exp:0,tesla:0,kia:0,rate:'shoulder',price:'0.32',stats:['$5.01','$0.21','$92.56','$159.41']}
+};
+let mode='day';
+const kw=w=>w>=1000?(w/1000).toFixed(1)+' kW':Math.round(w)+' W';
+const home=d=>Math.max(0,d.solar+d.imp-d.exp-d.tesla-d.kia);
+
+function chrome(d){return `
+  <div class="tabs"><span>${ic('child_care')}</span><span>${ic('electric_car')}</span><span>${ic('garage')}</span><span class="on">${ic('solar_power')}Solar</span><span>${ic('mop')}</span></div>
+  <div class="ehead">${ic('solar_power','color:var(--solar)')}Energy ${ic('chevron_right','color:var(--p-mute)')}<span class="r"><span>${ic('electric_meter','font-size:15px')} ${d.rate}</span><span>$${d.price}/kWh</span></span></div>
+  <div class="stats">
+    <div style="background:rgba(255,90,79,.15);color:#ff6b61">${ic('bolt','font-size:15px')}<div>Use</div><b class="num">${d.stats[0]}</b></div>
+    <div style="background:rgba(48,209,88,.13);color:#5fd27a">${ic('solar_power','font-size:15px')}<div>Sold</div><b class="num">${d.stats[1]}</b></div>
+    <div style="background:rgba(255,255,255,.08)">${ic('payments','font-size:15px')}<div>Bill</div><b class="num">${d.stats[2]}</b></div>
+    <div style="background:rgba(76,141,255,.15);color:#6ea4ff">${ic('schedule','font-size:15px')}<div>Est</div><b class="num">${d.stats[3]}</b></div>
+  </div>`;}
+
+/* A: compact flow diagram (power-flow-card-plus layout, tightened) */
+function cardA(d){
+  const h=home(d), W=316, active=v=>v>0;
+  const node=(cx,cy,r,col,icon,val,label,sub)=>`
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(255,255,255,.02)" stroke="${col}" stroke-width="2.5"/>
+    <foreignObject x="${cx-r}" y="${cy-r}" width="${r*2}" height="${r*2}"><div xmlns="http://www.w3.org/1999/xhtml" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#eef1f1">
+      <span class="ms" style="font-size:${r>26?20:16}px;color:${col}">${icon}</span>
+      <span style="font-size:${r>26?12:10.5}px;font-weight:700" class="num">${val}</span>${sub?`<span style="font-size:9.5px;color:${col}" class="num">${sub}</span>`:''}</div></foreignObject>
+    <text x="${cx}" y="${cy+r+13}" text-anchor="middle" font-size="10.5" fill="#8e999c">${label}</text>`;
+  const line=(p,col,on,dur)=>`<path d="${p}" fill="none" stroke="${col}" stroke-width="1.6" opacity="${on?1:.18}"/>${on?`<circle r="3" fill="${col}"><animateMotion dur="${dur}s" repeatCount="indefinite" path="${p}"/></circle>`:''}`;
+  const S=[158,34], G=[40,118], Hh=[276,118], T=[230,198], K=[300,198];
+  return `<div class="ccard flowA measure"><svg viewBox="0 0 ${W} 232" aria-label="Power flow">
+    ${line(`M${S[0]} ${S[1]+30} Q${S[0]} ${Hh[1]} ${Hh[0]-32} ${Hh[1]}`,'var(--solar)',active(d.solar),1.6)}
+    ${line(`M${S[0]} ${S[1]+30} Q${S[0]} ${G[1]} ${G[0]+32} ${G[1]}`,'var(--export)',active(d.exp),2.2)}
+    ${line(`M${G[0]+32} ${G[1]} L${Hh[0]-32} ${Hh[1]}`,'var(--grid)',active(d.imp),1.8)}
+    ${line(`M${Hh[0]-10} ${Hh[1]+30} L${T[0]} ${T[1]-20}`,'var(--ev)',active(d.tesla),1.2)}
+    ${line(`M${Hh[0]+10} ${Hh[1]+30} L${K[0]-4} ${K[1]-20}`,'var(--ev2)',active(d.kia),1.2)}
+    ${node(S[0],S[1],30,'var(--solar)','solar_power',kw(d.solar),'Solar')}
+    ${node(G[0],G[1],30,'var(--grid)','electrical_services',d.exp?('→ '+kw(d.exp)):('← '+kw(d.imp)),'Grid',d.exp?'export':'import')}
+    ${node(Hh[0],Hh[1],30,'var(--home)','home',kw(h),'Home')}
+    ${node(T[0],T[1],20,'var(--ev)','electric_car',kw(d.tesla),'Tesla')}
+    ${node(K[0],K[1],20,'var(--ev2)','directions_car',kw(d.kia),'Kia')}
+  </svg></div>`;
+}
+
+/* B: energy bars */
+function cardB(d){
+  const h=home(d), src=d.solar+d.imp||1, use=h+d.tesla+d.kia+d.exp||1;
+  const seg=(v,tot,col)=>`<i style="flex-grow:${v/tot};background:${col}${v?'':';display:none'}"></i>`;
+  const leg=(icon,col,t,v)=>`<div class="${v?'':'off'}">${ic(icon,'color:'+col)}<span><div class="t">${t}</div><div class="v num">${kw(v)}</div></span></div>`;
+  const self=Math.round(Math.min(1,d.solar/Math.max(1,h+d.tesla+d.kia))*100);
+  return `<div class="ccard barsB measure">
+    <div class="top"><div><div class="cap">Home using</div><div class="big num">${kw(h+d.tesla+d.kia).replace(/ (k?W)/,'<small>$1</small>')}</div></div>
+      <div class="pill" style="background:${d.solar?'rgba(255,176,32,.15)':'rgba(166,124,255,.15)'};color:${d.solar?'var(--solar)':'var(--grid)'}">${ic(d.solar?'wb_sunny':'nights_stay','font-size:14px')}${d.solar?self+'% solar':'100% grid'}</div></div>
+    <div class="lane"><div class="lh"><span>Coming from</span><span class="num">${kw(d.solar+d.imp)}</span></div><div class="bar">${seg(d.solar,src,'var(--solar)')}${seg(d.imp,src,'var(--grid)')}</div></div>
+    <div class="lane"><div class="lh"><span>Going to</span><span class="num">${kw(h+d.tesla+d.kia+d.exp)}</span></div><div class="bar">${seg(h,use,'var(--home)')}${seg(d.tesla,use,'var(--ev)')}${seg(d.kia,use,'var(--ev2)')}${seg(d.exp,use,'var(--export)')}</div></div>
+    <div class="leg">${leg('solar_power','var(--solar)','Solar',d.solar)}${leg('electrical_services','var(--grid)','Grid in',d.imp)}${leg('upload','var(--export)','Export',d.exp)}
+      ${leg('home','var(--home)','House',h)}${leg('electric_car','var(--ev)','Tesla',d.tesla)}${leg('directions_car','var(--ev2)','Kia',d.kia)}</div>
+  </div>`;
+}
+
+/* C: flow strip */
+function cardC(d){
+  const h=home(d), load=h+d.tesla+d.kia;
+  const self=load?Math.round(Math.min(1,d.solar/load)*100):0;
+  const gridDir=d.exp?'rev':(d.imp?'':'idle');
+  const gridCol=d.exp?'var(--export)':'var(--grid)';
+  return `<div class="ccard stripC measure">
+    <div class="row">
+      <div class="node"><div class="ico" style="background:rgba(166,124,255,.14)">${ic('electrical_services','color:var(--grid)')}</div><div class="v num">${kw(d.exp||d.imp)}</div><div class="l">${d.exp?'Exporting':d.imp?'From grid':'Grid idle'}</div></div>
+      <div class="wire ${gridDir}"><i style="background:${gridCol}"></i></div>
+      <div class="node home"><div class="ico" style="background:rgba(76,141,255,.16)">${ic('home','color:var(--home)')}</div><div class="v num">${kw(load)}</div><div class="l">Home</div></div>
+      <div class="wire rev ${d.solar?'':'idle'}"><i style="background:var(--solar)"></i></div>
+      <div class="node"><div class="ico" style="background:rgba(255,176,32,.14)">${ic(d.solar?'solar_power':'nights_stay','color:var(--solar)')}</div><div class="v num">${kw(d.solar)}</div><div class="l">Solar</div></div>
+    </div>
+    <div class="evs">
+      <div class="ev">${ic('electric_car','color:'+(d.tesla?'var(--ev)':'var(--p-mute)'))}<span><div class="t">Tesla</div><div class="s">${d.tesla?'Charging':'Not charging'}</div></span><span class="p num" style="color:${d.tesla?'var(--ev)':'var(--p-mute)'}">${kw(d.tesla)}</span></div>
+      <div class="ev">${ic('directions_car','color:'+(d.kia?'var(--ev2)':'var(--p-mute)'))}<span><div class="t">Kia</div><div class="s">${d.kia?'Charging':'Not charging'}</div></span><span class="p num" style="color:${d.kia?'var(--ev2)':'var(--p-mute)'}">${kw(d.kia)}</span></div>
+    </div>
+    <div class="self">${ic('wb_sunny','font-size:14px;color:var(--solar)')}<span>Self-powered</span><span class="bar"><i style="width:${self}%"></i></span><b class="num" style="color:var(--p-fg)">${self}%</b></div>
+  </div>`;
+}
+
+const nav=()=>`<div class="nav">${[['home','Home'],['videocam','Cameras'],['music_note','Media'],['thermostat','Climate'],['devices','Devices'],['more_horiz','More']].map((n,i)=>`<div class="${i?'':'on'}">${ic(n[0])}<span>${n[1]}</span></div>`).join('')}</div>`;
+const R={A:cardA,B:cardB,C:cardC};
+function render(){
+  const d=DATA[mode];
+  document.querySelectorAll('.ph').forEach(ph=>{
+    const o=ph.dataset.opt;
+    ph.innerHTML=`<div class="notch"></div><div class="scr">${chrome(d)}${R[o](d)}</div>${nav()}`;
+  });
+  requestAnimationFrame(()=>document.querySelectorAll('.ph').forEach(ph=>{
+    const c=ph.querySelector('.measure');document.querySelector(`[data-h="${ph.dataset.opt}"]`).textContent=c?Math.round(c.getBoundingClientRect().height):'–';
+  }));
+}
+document.querySelector('.ctl').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(!b)return;mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render();});
+render();
+document.fonts&&document.fonts.ready.then(render);
+</script>
