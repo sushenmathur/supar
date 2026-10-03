@@ -1,0 +1,301 @@
+title: Devices
+path: devices-mobile
+icon: mdi:devices
+type: sections
+subview: true
+show_icon_and_title: true
+max_columns: 1
+dense_section_placement: true
+badges: []
+cards: []
+
+header:
+  card:
+    type: custom:button-card
+    template: b_title
+    triggers_update:
+      - sensor.sushen_phone_battery
+      - sensor.paro_phone_battery
+      - media_player.tv
+      - switch.bedroom_tv
+    variables:
+      title: Devices
+      sub: |
+        [[[
+          const on = e => states[e] && !['off', 'unavailable', 'standby'].includes(states[e].state);
+          const tv = on('media_player.tv') ? '<span style="color:var(--amber-color)">Media TV on</span>' : 'Media TV off';
+          const bed = on('switch.bedroom_tv') ? '<span style="color:var(--amber-color)">Bedroom TV on</span>' : 'Bedroom TV off';
+          return `2 phones · ${tv} · ${bed}`;
+        ]]]
+
+sections:
+  - type: grid
+    cards:
+      # Phones: battery + iCloud3 info + Ping (replaces the two ping badges)
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card
+            template: b_phone
+            entity: sensor.sushen_phone_battery
+            name: Sushen iPhone
+            triggers_update:
+              - sensor.sushen_phone_badge
+            variables:
+              device: b4c6338c2f8906f56d55bb1d873be555
+              info: sensor.sushen_phone_badge
+              tint: '#9b6bff'
+          - type: custom:button-card
+            template: b_phone
+            entity: sensor.paro_phone_battery
+            name: Paro iPhone
+            triggers_update:
+              - sensor.paro_phone_info
+            variables:
+              device: 1ff71fcd1fb9dfa21717952630c8f773
+              info: sensor.paro_phone_info
+              tint: '#3a8dff'
+
+      # TVs
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card
+            template: b_wide
+            entity: media_player.tv
+            name: Media TV
+            icon: mdi:television
+            show_entity_picture: false
+            state_display: |
+              [[[ return entity.state === 'off' ? 'Off · tap for power' : (entity.attributes.source || entity.state); ]]]
+            tap_action:
+              action: perform-action
+              perform_action: script.media_tv_power
+            hold_action:
+              action: more-info
+          - type: custom:button-card
+            template: b_wide
+            entity: switch.bedroom_tv
+            name: Bedroom TV
+            icon: mdi:television-classic
+            tap_action:
+              action: toggle
+
+      # TV Remote launcher: opens the Bubble Card pop-up (#tv-remote)
+      - type: custom:button-card
+        entity: media_player.tv
+        name: TV Remote
+        icon: mdi:remote-tv
+        show_state: true
+        tap_action:
+          action: navigate
+          navigation_path: '#tv-remote'
+        hold_action:
+          action: more-info
+        state_display: |
+          [[[
+            if (entity.state === 'off' || entity.state === 'unavailable') return 'Media TV · Off';
+            return 'Media TV · ' + (entity.attributes.source || entity.state);
+          ]]]
+        custom_fields:
+          quick: |
+            [[[
+              const hass = "document.querySelector('home-assistant').hass";
+              const muted = entity.attributes.is_volume_muted === true;
+              const b = (icon, js, color) => `
+                <div onclick="event.stopPropagation(); ${js}"
+                  style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+                  background:rgba(var(--rgb-primary-text-color),0.09)">
+                  <ha-icon icon="${icon}" style="--mdc-icon-size:19px;color:${color || 'var(--primary-text-color)'}"></ha-icon>
+                </div>`;
+              return `<div style="display:flex;gap:6px">
+                ${b('mdi:power', `${hass}.callService('script','media_tv_power',{})`, 'var(--red-color)')}
+                ${b(muted ? 'mdi:volume-off' : 'mdi:volume-mute', `${hass}.callService('media_player','volume_mute',{entity_id:'media_player.tv',is_volume_muted:${!muted}})`, muted ? 'var(--amber-color)' : null)}
+                ${b('mdi:volume-minus', `${hass}.callService('media_player','volume_down',{entity_id:'media_player.tv'})`)}
+                ${b('mdi:volume-plus', `${hass}.callService('media_player','volume_up',{entity_id:'media_player.tv'})`)}
+              </div>`;
+            ]]]
+        styles:
+          card:
+            - padding: 10px 12px
+            - border-radius: 18px
+            - box-shadow: none
+            - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
+            - background: rgba(var(--rgb-primary-text-color),0.05)
+          grid:
+            - grid-template-areas: '"i n quick" "i s quick"'
+            - grid-template-columns: 40px 1fr auto
+            - column-gap: 10px
+          img_cell:
+            - width: 38px
+            - height: 38px
+            - border-radius: 12px
+            - background: rgba(242, 165, 74, 0.18)
+          icon:
+            - width: 22px
+            - color: '#f2a54a'
+          name:
+            - justify-self: start
+            - font-size: 13px
+            - font-weight: 700
+          state:
+            - justify-self: start
+            - font-size: 11px
+            - opacity: 0.7
+            - white-space: nowrap
+            - overflow: hidden
+            - text-overflow: ellipsis
+            - max-width: 100%
+
+  # TV Remote pop-up (Bubble Card). Opened by the launcher above.
+  - type: grid
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#tv-remote'
+            name: Media TV
+            icon: mdi:remote-tv
+            entity: media_player.tv
+            show_header: true
+            button_type: name
+            close_by_clicking_outside: true
+            bg_opacity: 88
+            bg_blur: 14
+            shadow_opacity: 0
+            margin_top_mobile: 60px
+          - type: custom:lg-remote-control
+            entity: media_player.tv
+            name: Media Tv
+            mac: b8:16:5F:77:FB:64
+            color_buttons: true
+            dimensions:
+              scale: '0.85'
+            sources:
+              - icon: mdi:netflix
+                name: Netflix
+              - icon: amazon
+                name: Prime Video
+              - icon: mdi:play-box
+                name: Stremio
+              - icon: mdi:youtube-tv
+                name: YouTube
+
+  - type: grid
+    cards:
+      - mobile:
+          mode: floating
+          show_labels: true
+          show_popup_label_backgrounds: false
+        routes:
+          - icon: mdi:home-assistant
+            icon_color: null
+            icon_selected: ''
+            label: Home
+            url: /mobile-hub/mobile-hub
+          - hold_action:
+              action: navigate
+              navigation_path: /config/devices/dashboard
+            icon: mdi:webcam
+            icon_color: null
+            label: Cameras
+            url: /mobile-hub/mobile-cameras
+          - icon: mdi:music
+            icon_color: null
+            label: Media
+            url: /mobile-hub/media
+          - icon: mdi:home-thermometer
+            icon_color: null
+            label: Climate
+            url: /mobile-hub/hvac-mobile
+          - icon: mdi:devices
+            icon_color: Orange
+            icon_selected: ''
+            label: Devices
+            url: /mobile-hub/devices-mobile
+          - icon: mdi:dots-horizontal
+            icon_color: null
+            label: More
+            popup:
+              - icon: mdi:cog
+                url: /config/dashboard
+              - icon: mdi:hammer
+                url: /developer-tools/yaml
+              - icon: mdi:power
+                tap_action:
+                  action: call-service
+                  confirmation:
+                    text: Are you sure you want to restart Home Assistant?
+                  service: homeassistant.restart
+                  service_data: {}
+            tap_action:
+              action: open-popup
+        styles: |+
+          .navbar-card.mobile.floating {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 28px !important;
+            box-shadow:
+              0 8px 32px rgba(0, 0, 0, 0.2),
+              inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+          }
+
+          .button.active {
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(8px);
+            border-radius: 25px !important;
+            width: 50px !important;
+            height: 56px !important;
+            min-width: 40px !important;
+            min-height: 56px !important;
+            margin: 0 auto !important;
+          }
+
+          .route {
+            overflow: visible !important;
+          }
+          .icon.active {
+            color: #ffffff;
+          }
+
+          .navbar-popup {
+            background: rgba(20, 20, 20, 0.3) !important;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px !important;
+          }
+
+          .popup-item .button {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(6px);
+
+          }
+
+          .navbar-card.mobile.floating {
+            bottom: 24px !important;
+            margin: 0 16px !important;
+            min-height: 64px !important;
+            padding: 8px 0 !important;
+            overflow: visible !important;
+          }
+
+          .navbar.mobile.floating {
+            bottom: 0 !important;
+          }
+
+          .icon {
+            --navbar-route-icon-size: 22px;
+          }
+
+          .button {
+            min-width: 52px !important;
+            min-height: 52px !important;
+          }
+
+        type: custom:navbar-card
