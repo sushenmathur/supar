@@ -33,9 +33,9 @@ button_card_templates:
         - border-radius: 18px
         - box-shadow: none
         - border: |
-            [[[ return variables.active ? '1px solid transparent' : '1px solid rgba(255,255,255,0.11)'; ]]]
+            [[[ return variables.active ? '1px solid transparent' : '1px solid rgba(var(--rgb-primary-text-color),0.1)'; ]]]
         - background: |
-            [[[ return variables.active ? variables.on_color : 'rgba(255,255,255,0.055)'; ]]]
+            [[[ return variables.active ? variables.on_color : 'rgba(var(--rgb-primary-text-color),0.05)'; ]]]
         - color: |
             [[[ return variables.active ? variables.on_text : 'var(--primary-text-color)'; ]]]
         - transition: transform 0.12s ease
@@ -84,7 +84,7 @@ button_card_templates:
       card:
         - background: |
             [[[
-              if (entity.state !== 'on') return 'rgba(255,255,255,0.055)';
+              if (entity.state !== 'on') return 'rgba(var(--rgb-primary-text-color),0.05)';
               const b = entity.attributes.brightness;
               const p = b ? Math.round(b / 2.55) : 100;
               return `linear-gradient(to top, rgba(255,169,77,0.95) ${p}%, rgba(255,169,77,0.45) ${p}%)`;
@@ -245,6 +245,243 @@ button_card_templates:
         - margin-top: 2px
 
 
+  # ---- Page title for sub-views (Cameras / Climate / Devices) -------------
+  b_title:
+    show_icon: false
+    show_name: false
+    show_state: false
+    tap_action:
+      action: none
+    variables:
+      title: ''
+      sub: ''
+    custom_fields:
+      title: |
+        [[[
+          return `
+            <div style="font-size:11px;font-weight:600;color:var(--secondary-text-color);letter-spacing:.02em">${variables.sub}</div>
+            <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.05;
+              background:linear-gradient(90deg,#ff8a3d,#e9a400);-webkit-background-clip:text;
+              background-clip:text;-webkit-text-fill-color:transparent">${variables.title}</div>`;
+        ]]]
+    styles:
+      card:
+        - background: none
+        - box-shadow: none
+        - border: none
+        - padding: 4px 4px 0
+      grid:
+        - grid-template-areas: '"title"'
+      custom_fields:
+        title:
+          - justify-self: start
+          - text-align: left
+
+  # ---- Wide control (icon left, two lines of text) ------------------------
+  b_wide:
+    template: b_sq
+    styles:
+      card:
+        - aspect-ratio: auto
+        - height: 64px
+      grid:
+        - grid-template-areas: '"i n" "i s"'
+        - grid-template-columns: 36px 1fr
+        - grid-template-rows: 1fr 1fr
+        - column-gap: 6px
+      img_cell:
+        - align-items: center
+        - justify-content: center
+      name:
+        - align-self: end
+      state:
+        - align-self: start
+
+  # ---- Room temperature round button (Climate) ----------------------------
+  b_round_temp:
+    template: b_round
+    icon: mdi:thermometer
+    variables:
+      tint: |
+        [[[
+          const t = parseFloat(entity.state);
+          if (isNaN(t)) return 'var(--secondary-text-color)';
+          return t < 20 ? 'var(--blue-color)' : t <= 25 ? 'var(--green-color)' : t <= 28 ? 'var(--amber-color)' : 'var(--red-color)';
+        ]]]
+
+  # ---- Air conditioner card: mode colour, -/+ target, mode buttons --------
+  b_ac:
+    show_icon: true
+    show_name: true
+    show_state: true
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+    variables:
+      modes:
+        - 'off'
+        - cool
+        - heat
+        - auto
+      mode_color: |
+        [[[
+          const c = { cool: '#4c8dff', heat: '#ff7a45', auto: '#30b158', heat_cool: '#30b158', dry: '#2bb5a6', fan_only: '#8a9599' };
+          return c[entity.state] || 'var(--secondary-text-color)';
+        ]]]
+    state_display: |
+      [[[
+        const cur = entity.attributes.current_temperature;
+        const m = entity.state === 'off' ? 'Off'
+          : entity.state.replace('_', ' ').replace(/^./, c => c.toUpperCase());
+        return cur != null ? `${m} · now ${cur}°` : m;
+      ]]]
+    custom_fields:
+      temp: |
+        [[[
+          const a = entity.attributes;
+          const t = a.temperature;
+          if (t == null) return '';
+          const step = a.target_temp_step || 1;
+          const min = a.min_temp != null ? a.min_temp : 16;
+          const max = a.max_temp != null ? a.max_temp : 30;
+          const off = entity.state === 'off';
+          const call = v => `event.stopPropagation(); document.querySelector('home-assistant').hass.callService('climate','set_temperature',{entity_id:'${entity.entity_id}',temperature:${v}})`;
+          const btn = (icon, v) => `
+            <div onclick="${call(v)}" style="width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+              background:rgba(var(--rgb-primary-text-color),0.08)">
+              <ha-icon icon="${icon}" style="--mdc-icon-size:18px;color:var(--primary-text-color)"></ha-icon>
+            </div>`;
+          return `
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              ${btn('mdi:minus', +Math.max(min, t - step).toFixed(1))}
+              <div style="font-size:24px;font-weight:700;color:var(--primary-text-color);opacity:${off ? 0.5 : 1}">${t}°</div>
+              ${btn('mdi:plus', +Math.min(max, t + step).toFixed(1))}
+            </div>`;
+        ]]]
+      modes: |
+        [[[
+          const icons = { off: 'mdi:power', cool: 'mdi:snowflake', heat: 'mdi:fire', auto: 'mdi:thermostat-auto',
+                          heat_cool: 'mdi:sun-snowflake-variant', dry: 'mdi:water-percent', fan_only: 'mdi:fan' };
+          const cols = { off: '#8a9599', cool: '#4c8dff', heat: '#ff7a45', auto: '#30b158', heat_cool: '#30b158', dry: '#2bb5a6', fan_only: '#8a9599' };
+          const avail = entity.attributes.hvac_modes || variables.modes;
+          const modes = variables.modes.filter(m => avail.includes(m));
+          return `<div style="display:flex;gap:4px">${modes.map(m => {
+            const on = entity.state === m;
+            return `<div onclick="event.stopPropagation(); document.querySelector('home-assistant').hass.callService('climate','set_hvac_mode',{entity_id:'${entity.entity_id}',hvac_mode:'${m}'})"
+              style="flex:1;height:28px;border-radius:10px;display:grid;place-items:center;cursor:pointer;
+              background:${on ? cols[m] : 'rgba(var(--rgb-primary-text-color),0.06)'}">
+              <ha-icon icon="${icons[m] || 'mdi:help'}" style="--mdc-icon-size:16px;color:${on ? '#fff' : 'var(--secondary-text-color)'}"></ha-icon>
+            </div>`;
+          }).join('')}</div>`;
+        ]]]
+    styles:
+      card:
+        - padding: 10px
+        - border-radius: 18px
+        - box-shadow: none
+        - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
+        - background: |
+            [[[
+              return entity.state === 'off'
+                ? 'rgba(var(--rgb-primary-text-color),0.05)'
+                : `color-mix(in srgb, ${variables.mode_color} 14%, transparent)`;
+            ]]]
+      grid:
+        - grid-template-areas: '"i n" "i s" "temp temp" "modes modes"'
+        - grid-template-columns: 34px 1fr
+        - grid-template-rows: min-content min-content auto auto
+        - column-gap: 8px
+      img_cell:
+        - width: 32px
+        - height: 32px
+        - border-radius: 50%
+        - background: |
+            [[[ return `color-mix(in srgb, ${variables.mode_color} 20%, transparent)`; ]]]
+      icon:
+        - width: 18px
+        - color: '[[[ return variables.mode_color; ]]]'
+      name:
+        - justify-self: start
+        - font-size: 12px
+        - font-weight: 700
+        - white-space: nowrap
+        - overflow: hidden
+        - text-overflow: ellipsis
+        - max-width: 100%
+      state:
+        - justify-self: start
+        - font-size: 10px
+        - opacity: 0.7
+      custom_fields:
+        temp:
+          - margin-top: 10px
+        modes:
+          - margin-top: 8px
+
+  # ---- Phone card: battery, location info, Ping button --------------------
+  b_phone:
+    show_icon: true
+    show_name: true
+    show_state: true
+    show_label: true
+    tap_action:
+      action: more-info
+    variables:
+      device: ''
+      info: ''
+      tint: var(--primary-color)
+    state_display: |
+      [[[ return isNaN(parseFloat(entity.state)) ? entity.state : Math.round(entity.state) + '%'; ]]]
+    label: |
+      [[[ return variables.info && states[variables.info] ? states[variables.info].state : ''; ]]]
+    custom_fields:
+      ping: |
+        [[[
+          return `
+            <div onclick="event.stopPropagation(); document.querySelector('home-assistant').hass.callService('icloud3','find_iphone_alert',{device_name:'${variables.device}'})"
+              style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 8px;border-radius:12px;cursor:pointer;
+              background:color-mix(in srgb, ${variables.tint} 16%, transparent);color:${variables.tint};font-size:9.5px;font-weight:700">
+              <ha-icon icon="mdi:bell-ring-outline" style="--mdc-icon-size:18px"></ha-icon>Ping
+            </div>`;
+        ]]]
+    styles:
+      card:
+        - padding: 10px
+        - border-radius: 18px
+        - box-shadow: none
+        - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
+        - background: rgba(var(--rgb-primary-text-color),0.05)
+      grid:
+        - grid-template-areas: '"i n ping" "i s ping" "i l ping"'
+        - grid-template-columns: 30px 1fr auto
+        - column-gap: 8px
+      icon:
+        - width: 24px
+        - color: |
+            [[[
+              const b = parseFloat(entity.state);
+              return isNaN(b) ? 'var(--secondary-text-color)' : b < 20 ? 'var(--red-color)' : b < 50 ? 'var(--amber-color)' : 'var(--green-color)';
+            ]]]
+      name:
+        - justify-self: start
+        - font-size: 11.5px
+        - font-weight: 700
+      state:
+        - justify-self: start
+        - font-size: 18px
+        - font-weight: 800
+        - line-height: 1.1
+      label:
+        - justify-self: start
+        - font-size: 9.5px
+        - opacity: 0.65
+        - white-space: nowrap
+        - overflow: hidden
+        - text-overflow: ellipsis
+        - max-width: 100%
+
+
 views:
   - title: Mobile Dashboard
     path: mobile-hub
@@ -282,7 +519,7 @@ views:
               return `
                 <div style="font-size:11px;font-weight:600;color:var(--secondary-text-color);letter-spacing:.02em">${g}</div>
                 <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.05;
-                  background:linear-gradient(90deg,#ff9a56,#ffd56b);-webkit-background-clip:text;
+                  background:linear-gradient(90deg,#ff8a3d,#e9a400);-webkit-background-clip:text;
                   background-clip:text;-webkit-text-fill-color:transparent">${user.name}</div>`;
             ]]]
           sushen:
@@ -323,7 +560,7 @@ views:
 
               return `
                 <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:16px;
-                  background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.11);text-align:left">
+                  background:rgba(var(--rgb-primary-text-color),0.05);border:1px solid rgba(var(--rgb-primary-text-color),0.1);text-align:left">
                   <div style="display:flex;align-items:center;gap:4px;font-size:26px;font-weight:600;line-height:1;white-space:nowrap">
                     <ha-icon icon="${icon}" style="--mdc-icon-size:24px;color:#ffc53d"></ha-icon>${w.temperature ?? '–'}°
                   </div>
@@ -1645,18 +1882,15 @@ views:
     header:
       card:
         type: custom:button-card
-        show_icon: false
-        show_name: false
-        show_state: false
-        tap_action:
-          action: none
+        template: b_title
         triggers_update:
           - binary_sensor.patiopresencesensor_occupancy
           - binary_sensor.side_door_contact
           - binary_sensor.laundrydoorsensor_contact
           - binary_sensor.patio_door
-        custom_fields:
-          title: |
+        variables:
+          title: Cameras
+          sub: |
             [[[
               const doors = ['binary_sensor.side_door_contact','binary_sensor.laundrydoorsensor_contact','binary_sensor.patio_door']
                 .filter(d => states[d] && states[d].state === 'on').length;
@@ -1665,24 +1899,8 @@ views:
               const bits = ['6 cameras'];
               bits.push(doors ? `<span style="color:var(--red-color)">${doors} door${doors > 1 ? 's' : ''} open</span>` : 'all doors closed');
               if (motion) bits.push('<span style="color:var(--amber-color)">motion on patio</span>');
-              return `
-                <div style="font-size:11px;font-weight:600;color:var(--secondary-text-color);letter-spacing:.02em">${bits.join(' · ')}</div>
-                <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.05;
-                  background:linear-gradient(90deg,#ff9a56,#ffd56b);-webkit-background-clip:text;
-                  background-clip:text;-webkit-text-fill-color:transparent">Cameras</div>`;
+              return bits.join(' · ');
             ]]]
-        styles:
-          card:
-            - background: none
-            - box-shadow: none
-            - border: none
-            - padding: 4px 4px 0
-          grid:
-            - grid-template-areas: '"title"'
-          custom_fields:
-            title:
-              - justify-self: start
-              - text-align: left
 
     sections:
 
@@ -1828,8 +2046,8 @@ views:
                     - aspect-ratio: 4 / 3
                     - border-radius: 16px
                     - box-shadow: none
-                    - border: 1px dashed rgba(255,255,255,0.18)
-                    - background: rgba(255,255,255,0.03)
+                    - border: 1px dashed rgba(var(--rgb-primary-text-color),0.18)
+                    - background: rgba(var(--rgb-primary-text-color),0.03)
                   icon:
                     - width: 26px
                     - color: var(--secondary-text-color)
@@ -2256,107 +2474,102 @@ views:
     subview: true
     title: Media
     type: sections
-  - badges:
-      - color: purple
-        content: Ping Sushen Phone
-        entity: sensor.sushen_phone_badge
-        icon: mdi:cellphone
-        tap_action:
-          action: perform-action
-          data:
-            device_name: b4c6338c2f8906f56d55bb1d873be555
-          perform_action: icloud3.find_iphone_alert
-          target: {}
-        type: custom:mushroom-template-badge
-      - color: blue
-        content: Ping Paro Phone
-        entity: sensor.paro_phone_info
-        icon: mdi:cellphone
-        tap_action:
-          action: perform-action
-          data:
-            device_name: 1ff71fcd1fb9dfa21717952630c8f773
-          perform_action: icloud3.find_iphone_alert
-          target: {}
-        type: custom:mushroom-template-badge
-    cards: []
-    icon: mdi:devices
-    max_columns: 1
+  - title: Devices
     path: devices-mobile
+    icon: mdi:devices
+    type: sections
+    subview: true
+    show_icon_and_title: true
+    max_columns: 1
+    dense_section_placement: true
+    badges: []
+    cards: []
+
+    header:
+      card:
+        type: custom:button-card
+        template: b_title
+        triggers_update:
+          - sensor.sushen_phone_battery
+          - sensor.paro_phone_battery
+          - media_player.tv
+          - switch.bedroom_tv
+        variables:
+          title: Devices
+          sub: |
+            [[[
+              const on = e => states[e] && !['off', 'unavailable', 'standby'].includes(states[e].state);
+              const tv = on('media_player.tv') ? '<span style="color:var(--amber-color)">Media TV on</span>' : 'Media TV off';
+              const bed = on('switch.bedroom_tv') ? '<span style="color:var(--amber-color)">Bedroom TV on</span>' : 'Bedroom TV off';
+              return `2 phones · ${tv} · ${bed}`;
+            ]]]
+
     sections:
-      - cards:
-          - heading: Phones
-            heading_style: title
-            icon: cil:iphone-modern
-            type: heading
-          - cards:
-              - cards:
-                  - entity: sensor.sushen_phone_battery
-                    features_position: bottom
-                    name: Sushen iPhone
-                    type: tile
-                    vertical: false
-                grid_options:
-                  columns: 4
-                  rows: auto
-                type: vertical-stack
-              - cards:
-                  - entity: sensor.paro_phone_battery
-                    features_position: bottom
-                    name: Paro iPhone
-                    type: tile
-                    vertical: false
-                grid_options:
-                  columns: 4
-                  rows: auto
-                type: vertical-stack
-            type: horizontal-stack
-          - heading: Multimedia
-            heading_style: title
-            icon: cil:tv
-            type: heading
-          - cards:
-              - cards:
-                  - entity: media_player.tv
-                    features_position: bottom
-                    grid_options:
-                      columns: 6
-                      rows: 2
-                    icon_tap_action:
-                      action: perform-action
-                      perform_action: script.media_tv_power
-                    name: Media TV
-                    show_entity_picture: true
-                    state_content: source
-                    type: tile
-                    vertical: true
-                  - entity: switch.bedroom_tv
-                    fill_container: true
-                    grid_options:
-                      columns: 6
-                      rows: 2
-                    layout: vertical
-                    name: Bedroom TV
-                    primary_info: name
-                    type: custom:mushroom-entity-card
-                columns: 2
-                square: false
-                type: grid
-            columns: 1
-            grid_options:
-              columns: 24
-              rows: auto
+      - type: grid
+        cards:
+          # Phones: battery + iCloud3 info + Ping (replaces the two ping badges)
+          - type: grid
+            columns: 2
             square: false
-            type: grid
-          - color_buttons: true
+            cards:
+              - type: custom:button-card
+                template: b_phone
+                entity: sensor.sushen_phone_battery
+                name: Sushen iPhone
+                triggers_update:
+                  - sensor.sushen_phone_badge
+                variables:
+                  device: b4c6338c2f8906f56d55bb1d873be555
+                  info: sensor.sushen_phone_badge
+                  tint: '#9b6bff'
+              - type: custom:button-card
+                template: b_phone
+                entity: sensor.paro_phone_battery
+                name: Paro iPhone
+                triggers_update:
+                  - sensor.paro_phone_info
+                variables:
+                  device: 1ff71fcd1fb9dfa21717952630c8f773
+                  info: sensor.paro_phone_info
+                  tint: '#3a8dff'
+
+          # TVs
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: b_wide
+                entity: media_player.tv
+                name: Media TV
+                icon: mdi:television
+                show_entity_picture: false
+                state_display: |
+                  [[[ return entity.state === 'off' ? 'Off · tap for power' : (entity.attributes.source || entity.state); ]]]
+                tap_action:
+                  action: perform-action
+                  perform_action: script.media_tv_power
+                hold_action:
+                  action: more-info
+              - type: custom:button-card
+                template: b_wide
+                entity: switch.bedroom_tv
+                name: Bedroom TV
+                icon: mdi:television-classic
+                tap_action:
+                  action: toggle
+
+          # LG remote (unchanged)
+          - type: custom:lg-remote-control
+            entity: media_player.tv
+            name: Media Tv
+            mac: b8:16:5F:77:FB:64
+            color_buttons: true
             dimensions:
               scale: '0.7'
-            entity: media_player.tv
             grid_options:
               columns: full
               rows: auto
-            mac: b8:16:5F:77:FB:64
-            name: Media Tv
             sources:
               - icon: mdi:netflix
                 name: Netflix
@@ -2366,9 +2579,9 @@ views:
                 name: Stremio
               - icon: mdi:youtube-tv
                 name: YouTube
-            type: custom:lg-remote-control
-        type: grid
-      - cards:
+
+      - type: grid
+        cards:
           - mobile:
               mode: floating
               show_labels: true
@@ -2482,104 +2695,96 @@ views:
               }
 
             type: custom:navbar-card
-        type: grid
-    show_icon_and_title: true
-    subview: true
-    title: Devices
+
+  - title: HVAC
+    path: hvac-mobile
+    icon: cil:home-climate
     type: sections
-  - badges:
-      - entity: sensor.living_room_inside_temperature
-        name: Living Room
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-      - entity: sensor.bedroom_temperature_temperature
-        name: Bedroom
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-      - entity: sensor.aarlo_temperature_samar_cam
-        name: Samar Room
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-      - entity: sensor.shanayaroomtemp_temperature
-        name: Shanaya Room
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-    cards: []
+    subview: true
+    max_columns: 1
     dense_section_placement: true
+    badges: []
+    cards: []
+
     header:
       card:
-        content: '# Climate'
-        text_only: true
-        type: markdown
-    icon: cil:home-climate
-    max_columns: 1
-    path: hvac-mobile
+        type: custom:button-card
+        template: b_title
+        triggers_update:
+          - climate.bed_ac
+          - climate.living_room
+          - climate.samar_room
+          - climate.shanaya_room
+          - sensor.living_room_inside_temperature
+          - sensor.bedroom_temperature_temperature
+          - sensor.aarlo_temperature_samar_cam
+          - sensor.shanayaroomtemp_temperature
+        variables:
+          title: Climate
+          sub: |
+            [[[
+              const acs = ['climate.bed_ac', 'climate.living_room', 'climate.samar_room', 'climate.shanaya_room'];
+              const running = acs.filter(a => states[a] && !['off', 'unavailable'].includes(states[a].state)).length;
+              const temps = ['sensor.living_room_inside_temperature', 'sensor.bedroom_temperature_temperature',
+                             'sensor.aarlo_temperature_samar_cam', 'sensor.shanayaroomtemp_temperature']
+                .map(s => parseFloat(states[s] ? states[s].state : NaN)).filter(n => !isNaN(n));
+              const avg = temps.length ? (temps.reduce((a, b) => a + b, 0) / temps.length).toFixed(1) : '–';
+              return `4 rooms · avg ${avg} °C · ` + (running ? `<span style="color:var(--amber-color)">${running} running</span>` : 'all off');
+            ]]]
+
     sections:
-      - cards:
-          - cards:
-              - collapsible_controls: false
-                entity: climate.bed_ac
-                fill_container: false
-                hold_action:
-                  action: more-info
-                hvac_modes:
-                  - auto
-                  - cool
-                  - heat
-                icon_type: icon
-                show_temperature_control: true
-                type: custom:mushroom-climate-card
-              - entity: climate.living_room
-                fill_container: false
-                hold_action:
-                  action: more-info
-                hvac_modes:
-                  - auto
-                  - heat
-                  - cool
-                  - 'off'
-                icon_type: icon
-                show_temperature_control: true
-                type: custom:mushroom-climate-card
-              - entity: climate.samar_room
-                fill_container: false
-                hold_action:
-                  action: more-info
-                hvac_modes:
-                  - 'off'
-                  - cool
-                  - auto
-                  - heat
-                icon_type: icon
-                show_temperature_control: true
-                type: custom:mushroom-climate-card
-              - entity: climate.shanaya_room
-                fill_container: false
-                hold_action:
-                  action: more-info
-                hvac_modes:
-                  - 'off'
-                  - cool
-                  - auto
-                  - heat
-                icon: mdi:thermostat
-                icon_type: icon
-                show_temperature_control: true
-                type: custom:mushroom-climate-card
-            columns: 1
+      - type: grid
+        cards:
+          # Room temperatures (replaces the old badges)
+          - type: grid
+            columns: 4
             square: false
-            title: Aircons
-            type: grid
-        type: grid
-      - cards:
+            cards:
+              - type: custom:button-card
+                template: b_round_temp
+                entity: sensor.living_room_inside_temperature
+                name: Living
+              - type: custom:button-card
+                template: b_round_temp
+                entity: sensor.bedroom_temperature_temperature
+                name: Bedroom
+              - type: custom:button-card
+                template: b_round_temp
+                entity: sensor.aarlo_temperature_samar_cam
+                name: Samar
+              - type: custom:button-card
+                template: b_round_temp
+                entity: sensor.shanayaroomtemp_temperature
+                name: Shanaya
+
+          # Aircons: 2 x 2
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: b_ac
+                entity: climate.bed_ac
+                name: Bed AC
+                icon: mdi:bed
+              - type: custom:button-card
+                template: b_ac
+                entity: climate.living_room
+                name: Living Room
+                icon: mdi:sofa
+              - type: custom:button-card
+                template: b_ac
+                entity: climate.samar_room
+                name: Samar Room
+                icon: mdi:bed-outline
+              - type: custom:button-card
+                template: b_ac
+                entity: climate.shanaya_room
+                name: Shanaya Room
+                icon: mdi:teddy-bear
+
+      - type: grid
+        cards:
           - mobile:
               mode: floating
               show_labels: true
@@ -2693,10 +2898,7 @@ views:
               }
 
             type: custom:navbar-card
-        type: grid
-    subview: true
-    title: HVAC
-    type: sections
+
   - max_columns: 4
     path: test
     sections:
