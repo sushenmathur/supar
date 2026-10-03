@@ -1631,91 +1631,216 @@ views:
               }
 
             type: custom:navbar-card
-  - badges:
-      - entity: binary_sensor.patiopresencesensor_occupancy
-        name: Patio Occupancy
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-      - entity: binary_sensor.side_door_contact
-        name: Side Door
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-      - entity: binary_sensor.laundrydoorsensor_contact
-        name: Laundry Door
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-      - entity: binary_sensor.patio_door
-        show_icon: true
-        show_name: true
-        show_state: true
-        type: entity
-    cards: []
-    icon: mdi:webcam
-    max_columns: 1
+  - title: 'Cameras '
     path: mobile-cameras
+    icon: mdi:webcam
+    type: sections
+    subview: true
+    max_columns: 1
+    dense_section_placement: true
+    badges: []
+    cards: []
+
+    # Header: title + live summary of doors and motion
+    header:
+      card:
+        type: custom:button-card
+        show_icon: false
+        show_name: false
+        show_state: false
+        tap_action:
+          action: none
+        triggers_update:
+          - binary_sensor.patiopresencesensor_occupancy
+          - binary_sensor.side_door_contact
+          - binary_sensor.laundrydoorsensor_contact
+          - binary_sensor.patio_door
+        custom_fields:
+          title: |
+            [[[
+              const doors = ['binary_sensor.side_door_contact','binary_sensor.laundrydoorsensor_contact','binary_sensor.patio_door']
+                .filter(d => states[d] && states[d].state === 'on').length;
+              const motion = states['binary_sensor.patiopresencesensor_occupancy']
+                && states['binary_sensor.patiopresencesensor_occupancy'].state === 'on';
+              const bits = ['6 cameras'];
+              bits.push(doors ? `<span style="color:var(--red-color)">${doors} door${doors > 1 ? 's' : ''} open</span>` : 'all doors closed');
+              if (motion) bits.push('<span style="color:var(--amber-color)">motion on patio</span>');
+              return `
+                <div style="font-size:11px;font-weight:600;color:var(--secondary-text-color);letter-spacing:.02em">${bits.join(' · ')}</div>
+                <div style="font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.05;
+                  background:linear-gradient(90deg,#ff9a56,#ffd56b);-webkit-background-clip:text;
+                  background-clip:text;-webkit-text-fill-color:transparent">Cameras</div>`;
+            ]]]
+        styles:
+          card:
+            - background: none
+            - box-shadow: none
+            - border: none
+            - padding: 4px 4px 0
+          grid:
+            - grid-template-areas: '"title"'
+          custom_fields:
+            title:
+              - justify-self: start
+              - text-align: left
+
     sections:
-      - cards:
-          - cards:
-              - camera_image: camera.driveway_live_view
-                camera_view: live
-                entity: camera.driveway_live_view
-                fit_mode: cover
-                name: Driveway
-                show_name: true
-                show_state: false
-                type: picture-entity
-              - camera_image: camera.driveway_live_view
-                camera_view: auto
+
+      # Status row: motion + doors (replaces the old badges)
+      - type: grid
+        cards:
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: custom:button-card
+                template: b_round
+                entity: binary_sensor.patiopresencesensor_occupancy
+                name: Patio
+                icon: mdi:motion-sensor
+                state_display: |
+                  [[[ return entity.state === 'on' ? 'Motion' : 'Clear'; ]]]
+                variables:
+                  tint: |
+                    [[[ return entity.state === 'on' ? 'var(--amber-color)' : 'var(--green-color)'; ]]]
+              - type: custom:button-card
+                template: b_round
+                entity: binary_sensor.side_door_contact
+                name: Side Door
+                icon: |
+                  [[[ return entity.state === 'on' ? 'mdi:door-open' : 'mdi:door-closed'; ]]]
+                state_display: |
+                  [[[ return entity.state === 'on' ? 'Open' : 'Closed'; ]]]
+                variables:
+                  tint: |
+                    [[[ return entity.state === 'on' ? 'var(--red-color)' : 'var(--green-color)'; ]]]
+              - type: custom:button-card
+                template: b_round
+                entity: binary_sensor.laundrydoorsensor_contact
+                name: Laundry
+                icon: |
+                  [[[ return entity.state === 'on' ? 'mdi:door-open' : 'mdi:door-closed'; ]]]
+                state_display: |
+                  [[[ return entity.state === 'on' ? 'Open' : 'Closed'; ]]]
+                variables:
+                  tint: |
+                    [[[ return entity.state === 'on' ? 'var(--red-color)' : 'var(--green-color)'; ]]]
+              - type: custom:button-card
+                template: b_round
+                entity: binary_sensor.patio_door
+                name: Patio Door
+                icon: |
+                  [[[ return entity.state === 'on' ? 'mdi:door-sliding-open' : 'mdi:door-sliding'; ]]]
+                state_display: |
+                  [[[ return entity.state === 'on' ? 'Open' : 'Closed'; ]]]
+                variables:
+                  tint: |
+                    [[[ return entity.state === 'on' ? 'var(--red-color)' : 'var(--green-color)'; ]]]
+
+          # Driveway: featured, live, full width
+          - type: picture-entity
+            entity: camera.driveway_live_view
+            camera_image: camera.driveway_live_view
+            camera_view: live
+            aspect_ratio: '16:9'
+            fit_mode: cover
+            name: Driveway
+            show_name: true
+            show_state: false
+            card_mod:
+              style: |
+                ha-card { border-radius: 18px; overflow: hidden; }
+
+          # The other five: compact 2-column grid, tap any to open live view
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: picture-entity
                 entity: camera.front_door_live_view_2
+                camera_image: camera.front_door_live_view_2
+                camera_view: auto
+                aspect_ratio: '4:3'
                 fit_mode: cover
                 name: Front Door
                 show_name: true
                 show_state: false
-                type: picture-entity
-              - camera_image: camera.backyard_live_view
-                camera_view: auto
+                card_mod:
+                  style: |
+                    ha-card { border-radius: 16px; overflow: hidden; }
+              - type: picture-entity
                 entity: camera.backyard_live_view
+                camera_image: camera.backyard_live_view
+                camera_view: auto
+                aspect_ratio: '4:3'
                 fit_mode: cover
                 name: Backyard
                 show_name: true
                 show_state: false
-                type: picture-entity
-              - camera_image: camera.patio_live_view
-                camera_view: auto
+                card_mod:
+                  style: |
+                    ha-card { border-radius: 16px; overflow: hidden; }
+              - type: picture-entity
                 entity: camera.patio_live_view
+                camera_image: camera.patio_live_view
+                camera_view: auto
+                aspect_ratio: '4:3'
                 fit_mode: cover
-                name: Backyard
+                name: Patio
                 show_name: true
                 show_state: false
-                type: picture-entity
-              - camera_image: camera.side_live_view
-                camera_view: auto
+                card_mod:
+                  style: |
+                    ha-card { border-radius: 16px; overflow: hidden; }
+              - type: picture-entity
                 entity: camera.side_live_view
+                camera_image: camera.side_live_view
+                camera_view: auto
+                aspect_ratio: '4:3'
                 fit_mode: cover
                 name: Side Access
                 show_name: true
                 show_state: false
-                type: picture-entity
-              - camera_image: camera.laundry_live_view
-                camera_view: auto
+                card_mod:
+                  style: |
+                    ha-card { border-radius: 16px; overflow: hidden; }
+              - type: picture-entity
                 entity: camera.laundry_live_view
+                camera_image: camera.laundry_live_view
+                camera_view: auto
+                aspect_ratio: '4:3'
                 fit_mode: cover
                 name: Laundry
                 show_name: true
                 show_state: false
-                type: picture-entity
-            columns: 2
-            square: true
-            title: Cameras
-            type: grid
-        type: grid
-      - cards:
+                card_mod:
+                  style: |
+                    ha-card { border-radius: 16px; overflow: hidden; }
+              - type: custom:button-card
+                name: All Devices
+                icon: mdi:cctv
+                show_state: false
+                tap_action:
+                  action: navigate
+                  navigation_path: /config/devices/dashboard
+                styles:
+                  card:
+                    - aspect-ratio: 4 / 3
+                    - border-radius: 16px
+                    - box-shadow: none
+                    - border: 1px dashed rgba(255,255,255,0.18)
+                    - background: rgba(255,255,255,0.03)
+                  icon:
+                    - width: 26px
+                    - color: var(--secondary-text-color)
+                  name:
+                    - font-size: 11px
+                    - font-weight: 600
+                    - color: var(--secondary-text-color)
+
+      # Navbar (unchanged)
+      - type: grid
+        cards:
           - mobile:
               mode: floating
               show_labels: true
@@ -1829,11 +1954,7 @@ views:
               }
 
             type: custom:navbar-card
-        type: grid
-    show_icon_and_title: true
-    subview: true
-    title: 'Cameras '
-    type: sections
+
   - badges: []
     dense_section_placement: true
     header: {}
