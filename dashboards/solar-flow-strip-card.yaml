@@ -1,104 +1,104 @@
-- type: custom:button-card
-  entity: sensor.sh50rs_a21c2106894_mppt_total_power
-  show_icon: false
-  show_name: false
-  show_state: false
-  tap_action:
-    action: navigate
-    navigation_path: /energy
-  triggers_update:
-    - sensor.sh50rs_a21c2106894_mppt_total_power
-    - sensor.sh50rs_a21c2106894_purchased_power
-    - sensor.sh50rs_a21c2106894_total_export_active_power
-    - sensor.bluey_charger_power
-    - sensor.kia_charger_power
-  extra_styles: |
-    .fs-wire{position:relative;height:4px;border-radius:2px;background:rgba(var(--rgb-primary-text-color),0.1);margin:0 4px;overflow:hidden}
-    .fs-wire i{position:absolute;top:0;bottom:0;width:30%;border-radius:2px;animation:fsrun 1.4s linear infinite}
-    .fs-rev i{animation-direction:reverse}
-    .fs-idle i{display:none}
-    @keyframes fsrun{from{left:-30%}to{left:100%}}
-    @media (prefers-reduced-motion: reduce){.fs-wire i{animation:none;left:35%}}
+type: custom:button-card
+entity: sensor.sh50rs_a21c2106894_mppt_total_power
+show_icon: false
+show_name: false
+show_state: false
+tap_action:
+  action: navigate
+  navigation_path: /energy
+triggers_update:
+  - sensor.sh50rs_a21c2106894_mppt_total_power
+  - sensor.sh50rs_a21c2106894_purchased_power
+  - sensor.sh50rs_a21c2106894_total_export_active_power
+  - sensor.bluey_charger_power
+  - sensor.kia_charger_power
+extra_styles: |
+  .fs-wire{position:relative;height:4px;border-radius:2px;background:rgba(var(--rgb-primary-text-color),0.1);margin:0 4px;overflow:hidden}
+  .fs-wire i{position:absolute;top:0;bottom:0;width:30%;border-radius:2px;animation:fsrun 1.4s linear infinite}
+  .fs-rev i{animation-direction:reverse}
+  .fs-idle i{display:none}
+  @keyframes fsrun{from{left:-30%}to{left:100%}}
+  @media (prefers-reduced-motion: reduce){.fs-wire i{animation:none;left:35%}}
+custom_fields:
+  flow: |
+    [[[
+      const w = id => {
+        const e = states[id];
+        if (!e) return 0;
+        const v = parseFloat(e.state);
+        if (isNaN(v)) return 0;
+        const u = (e.attributes.unit_of_measurement || '').toLowerCase();
+        return Math.abs(u === 'kw' ? v * 1000 : v);
+      };
+      const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
+      const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
+      const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
+      const tesla = w('sensor.bluey_charger_power');
+      const kia = w('sensor.kia_charger_power');
+
+      const fmt = v => v >= 1000 ? (v / 1000).toFixed(1) + ' kW' : Math.round(v) + ' W';
+      const house = Math.max(0, solar + imp - exp - tesla - kia);
+      const load = house + tesla + kia;
+      const self = load > 0 ? Math.round(Math.min(1, solar / load) * 100) : 0;
+      const C = { solar: '#ffb020', grid: '#a67cff', exp: '#c39bff', home: '#4c8dff', ev: '#30d158', kia: '#2bb5a6' };
+      const mute = 'var(--secondary-text-color)';
+      const gridCol = exp > 0 ? C.exp : C.grid;
+      const gridCls = exp > 0 ? 'fs-rev' : (imp > 0 ? '' : 'fs-idle');
+      const speed = v => Math.max(0.5, 2.2 - (v / 1000) * 0.4).toFixed(2) + 's';
+      const tint = (col, a) => `color-mix(in srgb, ${col} ${a}%, transparent)`;
+
+      const node = (icon, col, val, label, big) => `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;min-width:0">
+          <div style="width:${big ? 56 : 44}px;height:${big ? 56 : 44}px;border-radius:${big ? 18 : 14}px;display:grid;place-items:center;background:${tint(col, 16)}">
+            <ha-icon icon="${icon}" style="--mdc-icon-size:${big ? 30 : 24}px;color:${col}"></ha-icon>
+          </div>
+          <div style="font-size:13px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums">${val}</div>
+          <div style="font-size:9.5px;font-weight:600;color:${mute};white-space:nowrap">${label}</div>
+        </div>`;
+
+      const wire = (cls, col, v) => `<div class="fs-wire ${cls}"><i style="background:${col};animation-duration:${speed(v)}"></i></div>`;
+
+      const ev = (icon, col, name, v) => `
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:12px;background:rgba(var(--rgb-primary-text-color),0.05);min-width:0">
+          <ha-icon icon="${icon}" style="--mdc-icon-size:18px;color:${v > 0 ? col : mute}"></ha-icon>
+          <div style="min-width:0;text-align:left">
+            <div style="font-size:11px;font-weight:700">${name}</div>
+            <div style="font-size:10px;color:${mute};white-space:nowrap">${v > 0 ? 'Charging' : 'Not charging'}</div>
+          </div>
+          <div style="margin-left:auto;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;color:${v > 0 ? col : mute}">${fmt(v)}</div>
+        </div>`;
+
+      return `
+        <div style="display:grid;grid-template-columns:64px 1fr 72px 1fr 64px;align-items:center">
+          ${node('mdi:transmission-tower', C.grid, fmt(exp || imp), exp > 0 ? 'Exporting' : imp > 0 ? 'From grid' : 'Grid idle')}
+          ${wire(gridCls, gridCol, exp || imp)}
+          ${node('mdi:home', C.home, fmt(load), 'Home', true)}
+          ${wire(solar > 0 ? 'fs-rev' : 'fs-idle', C.solar, solar)}
+          ${node(solar > 0 ? 'mdi:solar-power-variant' : 'mdi:weather-night', C.solar, fmt(solar), 'Solar')}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
+          ${ev('mdi:car-electric', C.ev, 'Tesla', tesla)}
+          ${ev('mdi:car', C.kia, 'Kia', kia)}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:10.5px;color:${mute}">
+          <ha-icon icon="mdi:white-balance-sunny" style="--mdc-icon-size:14px;color:${C.solar}"></ha-icon>
+          <span>Self-powered</span>
+          <span style="flex:1;height:6px;border-radius:3px;background:rgba(var(--rgb-primary-text-color),0.1);overflow:hidden">
+            <i style="display:block;height:100%;width:${self}%;background:${C.solar};border-radius:3px"></i>
+          </span>
+          <b style="color:var(--primary-text-color);font-variant-numeric:tabular-nums">${self}%</b>
+        </div>`;
+    ]]]
+styles:
+  card:
+    - padding: 12px 10px 10px
+    - border-radius: 18px
+    - box-shadow: none
+    - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
+    - background: rgba(var(--rgb-primary-text-color),0.05)
+  grid:
+    - grid-template-areas: '"flow"'
+    - grid-template-columns: 1fr
   custom_fields:
-    flow: |
-      [[[
-        const w = id => {
-          const e = states[id];
-          if (!e) return 0;
-          const v = parseFloat(e.state);
-          if (isNaN(v)) return 0;
-          const u = (e.attributes.unit_of_measurement || '').toLowerCase();
-          return Math.abs(u === 'kw' ? v * 1000 : v);
-        };
-        const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
-        const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
-        const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
-        const tesla = w('sensor.bluey_charger_power');
-        const kia = w('sensor.kia_charger_power');
-
-        const fmt = v => v >= 1000 ? (v / 1000).toFixed(1) + ' kW' : Math.round(v) + ' W';
-        const house = Math.max(0, solar + imp - exp - tesla - kia);
-        const load = house + tesla + kia;
-        const self = load > 0 ? Math.round(Math.min(1, solar / load) * 100) : 0;
-        const C = { solar: '#ffb020', grid: '#a67cff', exp: '#c39bff', home: '#4c8dff', ev: '#30d158', kia: '#2bb5a6' };
-        const mute = 'var(--secondary-text-color)';
-        const gridCol = exp > 0 ? C.exp : C.grid;
-        const gridCls = exp > 0 ? 'fs-rev' : (imp > 0 ? '' : 'fs-idle');
-        const speed = v => Math.max(0.5, 2.2 - (v / 1000) * 0.4).toFixed(2) + 's';
-        const tint = (col, a) => `color-mix(in srgb, ${col} ${a}%, transparent)`;
-
-        const node = (icon, col, val, label, big) => `
-          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;min-width:0">
-            <div style="width:${big ? 56 : 44}px;height:${big ? 56 : 44}px;border-radius:${big ? 18 : 14}px;display:grid;place-items:center;background:${tint(col, 16)}">
-              <ha-icon icon="${icon}" style="--mdc-icon-size:${big ? 30 : 24}px;color:${col}"></ha-icon>
-            </div>
-            <div style="font-size:13px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums">${val}</div>
-            <div style="font-size:9.5px;font-weight:600;color:${mute};white-space:nowrap">${label}</div>
-          </div>`;
-
-        const wire = (cls, col, v) => `<div class="fs-wire ${cls}"><i style="background:${col};animation-duration:${speed(v)}"></i></div>`;
-
-        const ev = (icon, col, name, v) => `
-          <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:12px;background:rgba(var(--rgb-primary-text-color),0.05);min-width:0">
-            <ha-icon icon="${icon}" style="--mdc-icon-size:18px;color:${v > 0 ? col : mute}"></ha-icon>
-            <div style="min-width:0;text-align:left">
-              <div style="font-size:11px;font-weight:700">${name}</div>
-              <div style="font-size:10px;color:${mute};white-space:nowrap">${v > 0 ? 'Charging' : 'Not charging'}</div>
-            </div>
-            <div style="margin-left:auto;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;color:${v > 0 ? col : mute}">${fmt(v)}</div>
-          </div>`;
-
-        return `
-          <div style="display:grid;grid-template-columns:64px 1fr 72px 1fr 64px;align-items:center">
-            ${node('mdi:transmission-tower', C.grid, fmt(exp || imp), exp > 0 ? 'Exporting' : imp > 0 ? 'From grid' : 'Grid idle')}
-            ${wire(gridCls, gridCol, exp || imp)}
-            ${node('mdi:home', C.home, fmt(load), 'Home', true)}
-            ${wire(solar > 0 ? 'fs-rev' : 'fs-idle', C.solar, solar)}
-            ${node(solar > 0 ? 'mdi:solar-power-variant' : 'mdi:weather-night', C.solar, fmt(solar), 'Solar')}
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
-            ${ev('mdi:car-electric', C.ev, 'Tesla', tesla)}
-            ${ev('mdi:car', C.kia, 'Kia', kia)}
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:10.5px;color:${mute}">
-            <ha-icon icon="mdi:white-balance-sunny" style="--mdc-icon-size:14px;color:${C.solar}"></ha-icon>
-            <span>Self-powered</span>
-            <span style="flex:1;height:6px;border-radius:3px;background:rgba(var(--rgb-primary-text-color),0.1);overflow:hidden">
-              <i style="display:block;height:100%;width:${self}%;background:${C.solar};border-radius:3px"></i>
-            </span>
-            <b style="color:var(--primary-text-color);font-variant-numeric:tabular-nums">${self}%</b>
-          </div>`;
-      ]]]
-  styles:
-    card:
-      - padding: 12px 10px 10px
-      - border-radius: 18px
-      - box-shadow: none
-      - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
-      - background: rgba(var(--rgb-primary-text-color),0.05)
-    grid:
-      - grid-template-areas: '"flow"'
-      - grid-template-columns: 1fr
-    custom_fields:
-      flow:
-        - width: 100%
+    flow:
+      - width: 100%
