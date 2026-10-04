@@ -1,0 +1,243 @@
+# Dashboard-Hub: miniature "Home Energy" scene card
+# Replaces the power-flow card in the right-hand column of the Hub view.
+# Requires: custom:button-card (already used by the Energy New dashboard).
+type: custom:button-card
+entity: sensor.sh50rs_a21c2106894_mppt_total_power
+show_name: false
+show_icon: false
+show_state: false
+show_label: false
+tap_action:
+  action: navigate
+  navigation_path: /energy-new/energy   # <-- change to your Energy New dashboard URL
+hold_action:
+  action: more-info
+triggers_update:
+  - sensor.sh50rs_a21c2106894_mppt_total_power
+  - sensor.sh50rs_a21c2106894_purchased_power
+  - sensor.sh50rs_a21c2106894_total_export_active_power
+  - sensor.sh50rs_a21c2106894_daily_self_consumption_rate
+  - sensor.home_power_consumption
+  - sensor.bluey_charger_power
+  - sensor.bluey_battery_level
+  - sensor.bluey_battery_range
+  - sensor.kia_charger_power
+  - input_number.kia_battery_estimate
+  - sensor.dashboard_night_mode
+styles:
+  card:
+    - padding: '0'
+    - overflow: hidden
+  grid:
+    - grid-template-areas: '"scene"'
+    - grid-template-columns: 1fr
+    - grid-template-rows: auto
+  custom_fields:
+    scene:
+      - width: 100%
+custom_fields:
+  scene: |
+    [[[
+      const st = (e) => states[e] ? states[e].state : undefined;
+      const num = (e) => { const v = parseFloat(st(e)); return isNaN(v) ? 0 : v; };
+      const watts = (v) => (Math.abs(v) > 0 && Math.abs(v) < 50) ? v * 1000 : v;
+      const fmt = (w) => Math.abs(w) >= 1000 ? (w / 1000).toFixed(2) + ' kW' : Math.round(w) + ' W';
+
+      const solar = watts(num('sensor.sh50rs_a21c2106894_mppt_total_power'));
+      const imp   = watts(num('sensor.sh50rs_a21c2106894_purchased_power'));
+      const exp   = watts(num('sensor.sh50rs_a21c2106894_total_export_active_power'));
+      const total = watts(num('sensor.home_power_consumption'));
+      const tesla = watts(num('sensor.bluey_charger_power'));
+      const kia   = watts(num('sensor.kia_charger_power'));
+      const home  = Math.max(0, total - tesla - kia);
+      const selfUse    = num('sensor.sh50rs_a21c2106894_daily_self_consumption_rate');
+      const teslaBatt  = Math.round(num('sensor.bluey_battery_level'));
+      const teslaRange = Math.round(num('sensor.bluey_battery_range'));
+      const kiaBatt    = Math.round(Math.abs(num('input_number.kia_battery_estimate')));
+      const night = st('sensor.dashboard_night_mode') === 'on';
+
+      /* ---------- animated flow lines ---------- */
+      const flow = (d, c, dur) => `
+        <path d="${d}" fill="none" stroke="${c}" stroke-opacity=".75" stroke-width="1.3"
+              stroke-dasharray="4 3" stroke-linecap="round"/>
+        ${[0, dur / 3, (2 * dur) / 3].map(b => `
+          <circle r="4.2" fill="${c}" opacity=".35">
+            <animateMotion dur="${dur}s" begin="${b.toFixed(2)}s" repeatCount="indefinite" path="${d}"/></circle>
+          <circle r="2.3" fill="${c}">
+            <animateMotion dur="${dur}s" begin="${b.toFixed(2)}s" repeatCount="indefinite" path="${d}"/></circle>`).join('')}`;
+
+      const P_SOLAR_HOME = 'M 180 98 Q 186 118 181 140';
+      const P_SOLAR_GRID = 'M 176 96 C 130 66, 80 60, 30 66';
+      const P_GRID_HOME  = 'M 30 66 C 70 92, 120 120, 160 140';
+      const P_HOME_TESLA = 'M 200 150 Q 206 162 220 172';
+      const P_HOME_KIA   = 'M 214 148 Q 250 146 272 164';
+
+      let flows = '';
+      if (solar > 50) flows += flow(P_SOLAR_HOME, '#FFC107', 1.8);
+      if (exp   > 50) flows += flow(P_SOLAR_GRID, '#66BB6A', 2.2);
+      if (imp   > 50) flows += flow(P_GRID_HOME,  '#42A5F5', 2.2);
+      if (tesla > 50) flows += flow(P_HOME_TESLA, '#42A5F5', 1.5);
+      if (kia   > 50) flows += flow(P_HOME_KIA,   '#42A5F5', 1.5);
+
+      /* ---------- clip-art pieces ---------- */
+      const sky = night ? ['#0B1A33', '#2A3F66'] : ['#6EC1EE', '#D4F0FF'];
+      const sunOrMoon = night
+        ? `<g>
+             <circle cx="150" cy="26" r="11" fill="#F4F1DE"/>
+             <circle cx="155" cy="22" r="10" fill="${sky[0]}"/>
+             ${[[110,40],[190,50],[240,64],[130,58],[280,84],[60,90]].map(([x,y]) =>
+               `<circle cx="${x}" cy="${y}" r=".9" fill="#fff" opacity=".8"/>`).join('')}
+           </g>`
+        : `<g>
+             <g transform="translate(150 26)">
+               <g>
+                 ${[...Array(12).keys()].map(i =>
+                   `<line x1="0" y1="-17" x2="0" y2="-21" stroke="#FFC93C" stroke-width="2"
+                          stroke-linecap="round" transform="rotate(${i * 30})"/>`).join('')}
+                 <animateTransform attributeName="transform" type="rotate" from="0" to="360"
+                                   dur="40s" repeatCount="indefinite"/>
+               </g>
+               <circle r="13" fill="#FFC93C"/>
+               <circle r="13" fill="#FFE082" opacity=".5" transform="translate(-3 -3) scale(.6)"/>
+             </g>
+             <g fill="#fff" opacity=".9">
+               <ellipse cx="190" cy="58" rx="16" ry="5"/><ellipse cx="198" cy="54" rx="9" ry="6"/>
+               <ellipse cx="262" cy="70" rx="13" ry="4.5"/><ellipse cx="268" cy="66" rx="8" ry="5"/>
+             </g>
+           </g>`;
+
+      const pylon = `
+        <g stroke="#5E6B78" stroke-width="1.4" fill="none" stroke-linecap="round">
+          <path d="M 20 152 L 28 62 L 32 62 L 40 152"/>
+          <path d="M 14 70 H 46 M 18 82 H 42"/>
+          <path d="M 22 128 L 37 104 M 38 128 L 23 104 M 24 104 L 35 84 M 36 104 L 25 84"/>
+        </g>
+        <path d="M 14 70 Q 66 100 118 116 M 46 70 Q 90 96 122 116" stroke="#5E6B78"
+              stroke-width=".6" fill="none" opacity=".6"/>`;
+
+      const win = night ? '#FFD966' : '#A7D8F0';
+      const house = `
+        <circle cx="106" cy="128" r="17" fill="#4E8F3A"/><circle cx="96" cy="138" r="11" fill="#5FA046"/>
+        <rect x="104" y="140" width="4" height="16" fill="#6D4C33"/>
+        <rect x="125" y="116" width="105" height="46" fill="#F4EFE6" stroke="#D9D2C5" stroke-width=".8"/>
+        <rect x="184" y="126" width="40" height="36" fill="#E3DFD8" stroke="#C9C2B6" stroke-width=".8"/>
+        ${[132,138,144,150,156].map(y =>
+          `<line x1="185" y1="${y}" x2="223" y2="${y}" stroke="#CFC8BD" stroke-width=".8"/>`).join('')}
+        <polygon points="113,118 148,80 207,80 242,118" fill="#A3ADB8"/>
+        <polygon points="148,80 207,80 210,84 145,84" fill="#8C97A3"/>
+        <rect x="114" y="116" width="127" height="3" rx="1" fill="#7F8A96"/>
+        <polygon points="152,112 160,87 200,87 208,112" fill="#1A2B4C" stroke="#5C7BA8" stroke-width=".8"/>
+        <g stroke="#5C7BA8" stroke-width=".7">
+          <line x1="170" y1="87" x2="166" y2="112"/><line x1="180" y1="87" x2="180" y2="112"/>
+          <line x1="190" y1="87" x2="194" y2="112"/><line x1="156" y1="99.5" x2="204" y2="99.5"/>
+        </g>
+        <polygon points="161,88 168,88 163,98 157,98" fill="#fff" opacity=".18"/>
+        <rect x="139" y="135" width="13" height="27" rx="1" fill="#8D5A3B"/>
+        <circle cx="149" cy="149" r=".9" fill="#E8C66A"/>
+        <rect x="158" y="125" width="19" height="16" fill="${win}" stroke="#fff" stroke-width="1.5"/>
+        <line x1="167.5" y1="125" x2="167.5" y2="141" stroke="#fff" stroke-width="1"/>
+        <circle cx="128" cy="160" r="5" fill="#4E8F3A"/><circle cx="135" cy="162" r="4" fill="#5FA046"/>
+        <circle cx="233" cy="159" r="5" fill="#4E8F3A"/>`;
+
+      const sedan = (x, y, c) => `
+        <g transform="translate(${x} ${y})">
+          <ellipse cx="26" cy="24" rx="28" ry="2.4" fill="#000" opacity=".2"/>
+          <path d="M0 19 V13 Q1 9 7 8 L15 2 Q18 0 24 0 L36 0 Q41 0 45 6 L50 8 Q53 9 53 13 V19 Z" fill="${c}"/>
+          <path d="M17 3 Q19 2 24 2 L35 2 Q39 2 42 7 L13 7 Z" fill="#A9CBE6"/>
+          <line x1="28" y1="2" x2="28" y2="7" stroke="${c}" stroke-width="1.2"/>
+          <rect x="49.5" y="10" width="3" height="2" rx="1" fill="#FFF3B0"/>
+          <rect x=".5" y="11" width="2" height="2" rx="1" fill="#E53935"/>
+          <circle cx="11" cy="19" r="5" fill="#1C1C1C"/><circle cx="11" cy="19" r="2.2" fill="#C7C7C7"/>
+          <circle cx="42" cy="19" r="5" fill="#1C1C1C"/><circle cx="42" cy="19" r="2.2" fill="#C7C7C7"/>
+        </g>`;
+
+      const suv = (x, y, c) => `
+        <g transform="translate(${x} ${y})">
+          <ellipse cx="26" cy="26" rx="28" ry="2.4" fill="#000" opacity=".2"/>
+          <path d="M0 21 V11 Q0 8 5 7 L11 1 Q12 0 16 0 L44 0 Q47 0 48 3 L51 8 Q53 9 53 13 V21 Z"
+                fill="${c}" stroke="#9AA3AD" stroke-width=".6"/>
+          <line x1="15" y1="-1" x2="44" y2="-1" stroke="#7D8590" stroke-width="1"/>
+          <path d="M13 2 L44 2 L47 7 L9 7 Z" fill="#5F7486"/>
+          <line x1="25" y1="2" x2="25" y2="7" stroke="${c}" stroke-width="1.4"/>
+          <line x1="36" y1="2" x2="36" y2="7" stroke="${c}" stroke-width="1.4"/>
+          <rect x="49.5" y="10" width="3" height="2" rx="1" fill="#FFF3B0"/>
+          <rect x=".5" y="10" width="2" height="2.5" rx="1" fill="#E53935"/>
+          <circle cx="11" cy="21" r="5.5" fill="#1C1C1C"/><circle cx="11" cy="21" r="2.4" fill="#C7C7C7"/>
+          <circle cx="42" cy="21" r="5.5" fill="#1C1C1C"/><circle cx="42" cy="21" r="2.4" fill="#C7C7C7"/>
+        </g>`;
+
+      const grass = night ? ['#2E5A2A', '#24481F'] : ['#8BC34A', '#6FA83A'];
+      const scene = `
+        <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice"
+             style="position:absolute;inset:0;width:100%;height:100%;display:block;">
+          <defs>
+            <linearGradient id="mini-sky-${night ? 'n' : 'd'}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/>
+            </linearGradient>
+          </defs>
+          <rect width="300" height="200" fill="url(#mini-sky-${night ? 'n' : 'd'})"/>
+          ${sunOrMoon}
+          <path d="M0 156 Q 80 146 150 154 T 300 150 V200 H0Z" fill="${grass[0]}"/>
+          <path d="M0 176 Q 60 168 130 178 V200 H0Z" fill="${grass[1]}"/>
+          <polygon points="186,162 228,162 300,184 300,200 172,200" fill="${night ? '#5D6168' : '#D9D5CE'}"/>
+          <polygon points="141,162 151,162 156,200 132,200" fill="${night ? '#6A6E74' : '#E6E2DA'}"/>
+          ${pylon}
+          ${house}
+          ${suv(244, 162, '#C9CED4')}
+          ${sedan(194, 170, '#1F3A68')}
+          ${flows}
+        </svg>`;
+
+      /* ---------- glass chips ---------- */
+      const chip = (pos, border, label, value, extra = '') => `
+        <div style="position:absolute;${pos};padding:3px 8px;border-radius:10px;
+                    background:rgba(8,16,32,.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+                    border:1px solid ${border};box-shadow:0 4px 14px rgba(0,0,0,.35);
+                    color:#fff;font-family:Roboto,sans-serif;line-height:1.15;white-space:nowrap;">
+          <div style="font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;opacity:.75;">${label}</div>
+          <div style="font-size:14px;font-weight:700;">${value}</div>${extra}
+        </div>`;
+
+      const suColor = selfUse >= 80 ? '#66BB6A' : selfUse >= 50 ? '#FFC107' : '#EF5350';
+      const gridVal = imp > 50 ? `<span style="color:#EF5350;">▼ ${fmt(imp)}</span>`
+                    : exp > 50 ? `<span style="color:#66BB6A;">▲ ${fmt(exp)}</span>`
+                    : `<span style="opacity:.7;">Idle</span>`;
+
+      const chips =
+        chip('right:3%;top:4%', 'rgba(255,193,7,.6)', '☀️ Solar',
+             `<span style="color:#FFC107;">${fmt(solar)}</span>`,
+             `<div style="font-size:8.5px;color:${suColor};">Self use ${selfUse.toFixed(0)}%</div>`) +
+        chip('left:3%;top:4%', 'rgba(33,150,243,.6)', '⚡ Grid', gridVal) +
+        chip('left:3%;bottom:5%', 'rgba(255,179,0,.6)', '🏠 Home',
+             `<span style="color:#FFB300;">${fmt(home)}</span>`);
+
+      /* ---------- EV footer ---------- */
+      const battColor = (b) => b > 50 ? '#43A047' : b > 20 ? '#FFA000' : '#E53935';
+      const ev = (name, batt, w, sub) => `
+        <div style="display:flex;align-items:center;gap:4px;min-width:0;">
+          <ha-icon icon="${w > 50 ? 'mdi:car-electric' : 'mdi:car'}"
+                   style="--mdc-icon-size:18px;color:${w > 50 ? '#42A5F5' : 'var(--secondary-text-color)'};"></ha-icon>
+          <div style="line-height:1.15;min-width:0;">
+            <div style="font-size:12px;font-weight:600;">${name}
+              <span style="color:${battColor(batt)};">${batt}%</span></div>
+            <div style="font-size:10px;color:${w > 50 ? '#42A5F5' : 'var(--secondary-text-color)'};
+                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${w > 50 ? `⚡ ${(w / 1000).toFixed(1)} kW` : sub}</div>
+          </div>
+        </div>`;
+
+      const footer = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;
+                    padding:8px 12px;color:var(--primary-text-color);font-family:Roboto,sans-serif;">
+          ${ev('Tesla', teslaBatt, tesla, `${teslaRange} km`)}
+          ${ev('Kia', kiaBatt, kia, 'Not charging')}
+          <div style="display:flex;align-items:center;font-size:12px;font-weight:500;color:var(--primary-color);">
+            Energy<ha-icon icon="mdi:chevron-right" style="--mdc-icon-size:18px;"></ha-icon>
+          </div>
+        </div>`;
+
+      return `
+        <div style="position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;">
+          ${scene}${chips}
+        </div>${footer}`;
+    ]]]
