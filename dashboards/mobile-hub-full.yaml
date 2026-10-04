@@ -1650,7 +1650,7 @@ views:
                     show_state: false
                     tap_action:
                       action: navigate
-                      navigation_path: /energy
+                      navigation_path: /energy-new/energy
                     triggers_update:
                       - sensor.sh50rs_a21c2106894_mppt_total_power
                       - sensor.sh50rs_a21c2106894_purchased_power
@@ -1732,6 +1732,10 @@ views:
                                 <i style="display:block;height:100%;width:${self}%;background:${C.solar};border-radius:3px"></i>
                               </span>
                               <b style="color:var(--primary-text-color);font-variant-numeric:tabular-nums">${self}%</b>
+                            </div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin:10px -10px -10px;padding:10px 12px;border-top:1px solid rgba(var(--rgb-primary-text-color),0.1);font-size:12.5px;font-weight:600;color:var(--primary-color)">
+                              <span>Go to energy dashboard</span>
+                              <ha-icon icon="mdi:chevron-right" style="--mdc-icon-size:18px"></ha-icon>
                             </div>`;
                         ]]]
                     styles:
