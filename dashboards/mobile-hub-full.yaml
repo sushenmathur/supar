@@ -709,15 +709,15 @@ views:
               - type: custom:button-card
                 template: b_round
                 entity: device_tracker.kia_gps_location
-                name: Kia
-                icon: mdi:car
+                name: Sorento
+                icon: phu:kia
                 variables:
                   tint: var(--primary-text-color)
               - type: custom:button-card
                 template: b_round
                 entity: device_tracker.bluey_location
-                name: Tesla
-                icon: mdi:car-electric
+                name: Bluey
+                icon: phu:tesla-icon
                 variables:
                   tint: var(--blue-color)
               - type: custom:button-card
@@ -942,15 +942,10 @@ views:
                         name: Driveway
                         icon: mdi:light-flood-down
                       - type: custom:button-card
-                        template: b_sq
-                        entity: cover.garage_door_v2
-                        name: Garage
-                        icon: mdi:garage-variant
-                        tap_action:
-                          action: toggle
-                        variables:
-                          on_color: rgba(255, 90, 79, 0.92)
-                          on_text: '#ffffff'
+                        template: b_sq_light
+                        entity: light.sonoff_1000dbd8b7
+                        name: Media Lights
+                        icon: mdi:light-recessed
                       - type: custom:button-card
                         template: b_sq
                         entity: media_player.tv
@@ -1039,7 +1034,7 @@ views:
               - id: tab2
                 title: Lights
                 icon: mdi:lightbulb
-                badge_display: dot
+                badge_display: count
                 badge_templates:
                   - >-
                     {{ states.light | selectattr('state', 'eq', 'on')
@@ -1743,8 +1738,8 @@ views:
                               ${node(solar > 0 ? 'mdi:solar-power-variant' : 'mdi:weather-night', C.solar, fmt(solar), 'Solar')}
                             </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
-                              ${ev('mdi:car-electric', C.ev, 'Tesla', tesla)}
-                              ${ev('mdi:car', C.kia, 'Kia', kia)}
+                              ${ev('phu:tesla-icon', C.ev, 'Tesla', tesla)}
+                              ${ev('phu:kia', C.kia, 'Kia', kia)}
                             </div>
                             <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:10.5px;color:${mute}">
                               <ha-icon icon="mdi:white-balance-sunny" style="--mdc-icon-size:14px;color:${C.solar}"></ha-icon>
@@ -3233,27 +3228,3 @@ views:
               }
 
             type: custom:navbar-card
-
-  - max_columns: 4
-    path: test
-    sections:
-      - cards:
-          - area: garage
-            entity: input_boolean.keep_garage_door_open
-            features_position: inline
-            grid_options:
-              columns: 12
-              rows: 1
-            icon: >-
-              {{ 'mdi:toggle-switch' if is_state(entity, 'on') else
-              'mdi:toggle-switch-off' }}
-            icon_color: '{{ ''green'' if is_state(entity, ''on'') else ''grey'' }}'
-            primary: Keep Garage Door Open
-            tap_action:
-              action: toggle
-            type: custom:mushroom-template-card
-        column_span: 2
-        type: grid
-    subview: true
-    title: Test
-    type: sections
