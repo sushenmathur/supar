@@ -1046,12 +1046,33 @@ views:
                     | rejectattr('entity_id', 'search', '^light\.browser')
                     | list | count }}
                 cards:
-                  - type: shortcut
-                    label: All Lights
-                    vertical: false
+                  # All Lights: opens the #all-lights pop-up (hold for the old /light page)
+                  - type: custom:button-card
+                    template: b_wide
+                    name: All Lights
+                    icon: mdi:lightbulb-group
+                    triggers_update: all
                     tap_action:
                       action: navigate
+                      navigation_path: '#all-lights'
+                    hold_action:
+                      action: navigate
                       navigation_path: /light
+                    variables:
+                      icon_color: var(--amber-color)
+                      active: false
+                    state_display: |
+                      [[[
+                        const n = Object.values(states).filter(e =>
+                          e.entity_id.startsWith('light.') && !e.entity_id.startsWith('light.browser') && e.state === 'on').length;
+                        return n ? `${n} on · tap to see all` : 'All off · tap to see all';
+                      ]]]
+                    custom_fields:
+                      chev: '<ha-icon icon="mdi:chevron-up" style="--mdc-icon-size:20px;color:var(--secondary-text-color)"></ha-icon>'
+                    styles:
+                      grid:
+                        - grid-template-areas: '"i n chev" "i s chev"'
+                        - grid-template-columns: 36px 1fr auto
                   - type: grid
                     columns: 3
                     square: false
@@ -1827,6 +1848,178 @@ views:
                             entity_id: button.robbie_kitchen_clean
 
       # -------------------------------------------------------------------
+      # All Lights pop-up (Bubble Card). Opened from the Lights tab.
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#all-lights'
+            name: All Lights
+            icon: mdi:lightbulb-group
+            show_header: true
+            button_type: name
+            close_by_clicking_outside: true
+            bg_opacity: 88
+            bg_blur: 14
+            shadow_opacity: 0
+            margin_top_mobile: 60px
+            cards:
+              - type: custom:button-card
+                template: b_wide
+                entity: scene.good_night
+                name: Good Night
+                icon: mdi:weather-night
+                show_state: true
+                state_display: Turn everything off for bed
+                variables:
+                  icon_color: var(--blue-color)
+                tap_action:
+                  action: perform-action
+                  perform_action: scene.turn_on
+                  target:
+                    entity_id: scene.good_night
+              - type: heading
+                heading: Living & Kitchen
+                heading_style: subtitle
+                icon: mdi:sofa
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.dining_light
+                    name: Dining
+                    icon: mdi:ceiling-light
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.kitchen_pendants
+                    name: Pendants
+                    icon: mdi:vanity-light
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.kitchen_downlights
+                    name: Kitchen Downlights
+                    icon: mdi:light-recessed
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.kitchenled
+                    name: Kitchen Bench
+                    icon: mdi:led-strip-variant
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.sonoff_1000dbd8b7
+                    name: Media Downlights
+                    icon: mdi:light-recessed
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.sonoff_100090d020
+                    name: Lamp
+                    icon: mdi:lamp
+                    tap_action:
+                      action: toggle
+              - type: heading
+                heading: Hallways & Bedrooms
+                heading_style: subtitle
+                icon: mdi:bed
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.corridor_light
+                    name: Corridor
+                    icon: mdi:light-recessed
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.hallway_light
+                    name: Hallway
+                    icon: mdi:light-recessed
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.tall_lamp
+                    name: Tall Lamp
+                    icon: mdi:floor-lamp
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.aarlo_samar_cam
+                    name: Samar Night Light
+                    icon: mdi:lightbulb-night
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.sonoff_1000e5018c
+                    icon: mdi:light-recessed
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.sonoff_1000e54df1
+                    icon: mdi:light-recessed
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.sonoff_100090a014
+                    icon: mdi:light-recessed
+                    tap_action:
+                      action: toggle
+              - type: heading
+                heading: Garage & Outdoor
+                heading_style: subtitle
+                icon: mdi:gate
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.garage_light
+                    name: Garage Downlight
+                    icon: mdi:light-recessed
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.sonoff_10009be278
+                    icon: mdi:light-recessed
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.driveway_light
+                    name: Driveway Floodlight
+                    icon: mdi:spotlight-beam
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.sonoff_1000905c71
+                    name: Door Downlight
+                    icon: mdi:light-recessed
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.sonoff_100053e676
+                    name: Outdoor Lights
+                    icon: mdi:bulkhead-light
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.patio_lights
+                    name: Patio Lights
+                    icon: mdi:string-lights
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.backyard_light
+                    name: Backyard Spotlight
+                    icon: mdi:spotlight-beam
+                  - type: custom:button-card
+                    template: b_sq_light
+                    entity: light.laundry_light
+                    name: Laundry Spotlight
+                    icon: mdi:spotlight-beam
+
       # Navbar (unchanged)
       # -------------------------------------------------------------------
       - type: grid
