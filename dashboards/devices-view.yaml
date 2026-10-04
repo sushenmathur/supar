@@ -152,21 +152,20 @@ sections:
   # TV Remote pop-up (Bubble Card). Opened by the launcher above.
   - type: grid
     cards:
-      - type: vertical-stack
+      - type: custom:bubble-card
+        card_type: pop-up
+        hash: '#tv-remote'
+        name: Media TV
+        icon: mdi:remote-tv
+        entity: media_player.tv
+        show_header: true
+        button_type: name
+        close_by_clicking_outside: true
+        bg_opacity: 88
+        bg_blur: 14
+        shadow_opacity: 0
+        margin_top_mobile: 60px
         cards:
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: '#tv-remote'
-            name: Media TV
-            icon: mdi:remote-tv
-            entity: media_player.tv
-            show_header: true
-            button_type: name
-            close_by_clicking_outside: true
-            bg_opacity: 88
-            bg_blur: 14
-            shadow_opacity: 0
-            margin_top_mobile: 60px
           - type: custom:lg-remote-control
             entity: media_player.tv
             name: Media Tv
