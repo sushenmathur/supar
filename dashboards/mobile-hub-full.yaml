@@ -2637,7 +2637,7 @@ views:
             custom_fields:
               quick: |
                 [[[
-                  const hass = "document.querySelector('home-assistant').hass";
+                  const haRef = "document.querySelector('home-assistant').hass";
                   const muted = entity.attributes.is_volume_muted === true;
                   const b = (icon, js, color) => `
                     <div onclick="event.stopPropagation(); ${js}"
@@ -2646,10 +2646,10 @@ views:
                       <ha-icon icon="${icon}" style="--mdc-icon-size:19px;color:${color || 'var(--primary-text-color)'}"></ha-icon>
                     </div>`;
                   return `<div style="display:flex;gap:6px">
-                    ${b('mdi:power', `${hass}.callService('script','media_tv_power',{})`, 'var(--red-color)')}
-                    ${b(muted ? 'mdi:volume-off' : 'mdi:volume-mute', `${hass}.callService('media_player','volume_mute',{entity_id:'media_player.tv',is_volume_muted:${!muted}})`, muted ? 'var(--amber-color)' : null)}
-                    ${b('mdi:volume-minus', `${hass}.callService('media_player','volume_down',{entity_id:'media_player.tv'})`)}
-                    ${b('mdi:volume-plus', `${hass}.callService('media_player','volume_up',{entity_id:'media_player.tv'})`)}
+                    ${b('mdi:power', `${haRef}.callService('script','media_tv_power',{})`, 'var(--red-color)')}
+                    ${b(muted ? 'mdi:volume-off' : 'mdi:volume-mute', `${haRef}.callService('media_player','volume_mute',{entity_id:'media_player.tv',is_volume_muted:${!muted}})`, muted ? 'var(--amber-color)' : null)}
+                    ${b('mdi:volume-minus', `${haRef}.callService('media_player','volume_down',{entity_id:'media_player.tv'})`)}
+                    ${b('mdi:volume-plus', `${haRef}.callService('media_player','volume_up',{entity_id:'media_player.tv'})`)}
                   </div>`;
                 ]]]
             styles:
