@@ -1,0 +1,295 @@
+title: 'Cameras '
+path: mobile-cameras
+icon: mdi:webcam
+type: sections
+subview: true
+max_columns: 1
+dense_section_placement: true
+badges: []
+cards: []
+
+# Header: title + live summary of doors and motion
+header:
+  card:
+    type: custom:button-card
+    template: b_title
+    triggers_update:
+      - binary_sensor.patiopresencesensor_occupancy
+      - binary_sensor.side_door_contact
+      - binary_sensor.laundrydoorsensor_contact
+      - binary_sensor.patio_door
+    variables:
+      title: Cameras
+      sub: |
+        [[[
+          const doors = ['binary_sensor.side_door_contact','binary_sensor.laundrydoorsensor_contact','binary_sensor.patio_door']
+            .filter(d => states[d] && states[d].state === 'on').length;
+          const motion = states['binary_sensor.patiopresencesensor_occupancy']
+            && states['binary_sensor.patiopresencesensor_occupancy'].state === 'on';
+          const bits = ['7 cameras'];
+          bits.push(doors ? `<span style="color:var(--red-color)">${doors} door${doors > 1 ? 's' : ''} open</span>` : 'all doors closed');
+          if (motion) bits.push('<span style="color:var(--amber-color)">motion on patio</span>');
+          return bits.join(' · ');
+        ]]]
+
+sections:
+
+  # Status row: motion + doors (replaces the old badges)
+  - type: grid
+    cards:
+      - type: grid
+        columns: 4
+        square: false
+        cards:
+          - type: custom:button-card
+            template: b_round
+            entity: binary_sensor.patiopresencesensor_occupancy
+            name: Patio
+            icon: mdi:motion-sensor
+            state_display: |
+              [[[ return entity.state === 'on' ? 'Motion' : 'Clear'; ]]]
+            variables:
+              tint: |
+                [[[ return entity.state === 'on' ? 'var(--amber-color)' : 'var(--green-color)'; ]]]
+          - type: custom:button-card
+            template: b_round
+            entity: binary_sensor.side_door_contact
+            name: Side Door
+            icon: |
+              [[[ return entity.state === 'on' ? 'mdi:door-open' : 'mdi:door-closed'; ]]]
+            state_display: |
+              [[[ return entity.state === 'on' ? 'Open' : 'Closed'; ]]]
+            variables:
+              tint: |
+                [[[ return entity.state === 'on' ? 'var(--red-color)' : 'var(--green-color)'; ]]]
+          - type: custom:button-card
+            template: b_round
+            entity: binary_sensor.laundrydoorsensor_contact
+            name: Laundry
+            icon: |
+              [[[ return entity.state === 'on' ? 'mdi:door-open' : 'mdi:door-closed'; ]]]
+            state_display: |
+              [[[ return entity.state === 'on' ? 'Open' : 'Closed'; ]]]
+            variables:
+              tint: |
+                [[[ return entity.state === 'on' ? 'var(--red-color)' : 'var(--green-color)'; ]]]
+          - type: custom:button-card
+            template: b_round
+            entity: binary_sensor.patio_door
+            name: Patio Door
+            icon: |
+              [[[ return entity.state === 'on' ? 'mdi:door-sliding-open' : 'mdi:door-sliding'; ]]]
+            state_display: |
+              [[[ return entity.state === 'on' ? 'Open' : 'Closed'; ]]]
+            variables:
+              tint: |
+                [[[ return entity.state === 'on' ? 'var(--red-color)' : 'var(--green-color)'; ]]]
+
+      # Driveway: featured, live, full width
+      - type: picture-entity
+        entity: camera.driveway_live_view
+        camera_image: camera.driveway_live_view
+        camera_view: live
+        aspect_ratio: '16:9'
+        fit_mode: cover
+        name: Driveway
+        show_name: true
+        show_state: false
+        card_mod:
+          style: |
+            ha-card { border-radius: 18px; overflow: hidden; }
+
+      # The other five: compact 2-column grid, tap any to open live view
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: picture-entity
+            entity: camera.front_door_live_view_2
+            camera_image: camera.front_door_snapshot_2
+            camera_view: auto
+            aspect_ratio: '4:3'
+            fit_mode: cover
+            name: Front Door
+            show_name: true
+            show_state: false
+            card_mod:
+              style: |
+                ha-card { border-radius: 16px; overflow: hidden; }
+          - type: picture-entity
+            entity: camera.backyard_live_view
+            camera_image: camera.backyard_snapshot
+            camera_view: auto
+            aspect_ratio: '4:3'
+            fit_mode: cover
+            name: Backyard
+            show_name: true
+            show_state: false
+            card_mod:
+              style: |
+                ha-card { border-radius: 16px; overflow: hidden; }
+          - type: picture-entity
+            entity: camera.patio_live_view
+            camera_image: camera.patio_snapshot
+            camera_view: auto
+            aspect_ratio: '4:3'
+            fit_mode: cover
+            name: Patio
+            show_name: true
+            show_state: false
+            card_mod:
+              style: |
+                ha-card { border-radius: 16px; overflow: hidden; }
+          - type: picture-entity
+            entity: camera.side_live_view
+            camera_image: camera.side_snapshot
+            camera_view: auto
+            aspect_ratio: '4:3'
+            fit_mode: cover
+            name: Side Access
+            show_name: true
+            show_state: false
+            card_mod:
+              style: |
+                ha-card { border-radius: 16px; overflow: hidden; }
+          - type: picture-entity
+            entity: camera.laundry_live_view
+            camera_image: camera.laundry_snapshot
+            camera_view: auto
+            aspect_ratio: '4:3'
+            fit_mode: cover
+            name: Laundry
+            show_name: true
+            show_state: false
+            card_mod:
+              style: |
+                ha-card { border-radius: 16px; overflow: hidden; }
+          - type: picture-entity
+            entity: camera.garage_live_view
+            camera_image: camera.garage_snapshot
+            camera_view: auto
+            aspect_ratio: '4:3'
+            fit_mode: cover
+            name: Garage
+            show_name: true
+            show_state: false
+            card_mod:
+              style: |
+                ha-card { border-radius: 16px; overflow: hidden; }
+
+  # Navbar (unchanged)
+  - type: grid
+    cards:
+      - mobile:
+          mode: floating
+          show_labels: true
+          show_popup_label_backgrounds: false
+        routes:
+          - icon: mdi:home-assistant
+            icon_selected: ''
+            label: Home
+            url: /mobile-hub/mobile-hub
+          - hold_action:
+              action: navigate
+              navigation_path: /config/devices/dashboard
+            icon: mdi:webcam
+            icon_color: Orange
+            icon_selected: mdi:webcam
+            label: Cameras
+            url: /mobile-hub/mobile-cameras
+          - icon: mdi:music
+            icon_color: null
+            label: Media
+            url: /mobile-hub/media
+          - icon: mdi:home-thermometer
+            icon_color: null
+            label: Climate
+            url: /mobile-hub/hvac-mobile
+          - icon: mdi:devices
+            icon_color: null
+            icon_selected: ''
+            label: Devices
+            url: /mobile-hub/devices-mobile
+          - icon: mdi:dots-horizontal
+            icon_color: null
+            label: More
+            popup:
+              - icon: mdi:cog
+                url: /config/dashboard
+              - icon: mdi:hammer
+                url: /developer-tools/yaml
+              - icon: mdi:power
+                tap_action:
+                  action: call-service
+                  confirmation:
+                    text: Are you sure you want to restart Home Assistant?
+                  service: homeassistant.restart
+                  service_data: {}
+            tap_action:
+              action: open-popup
+        styles: |+
+          .navbar-card.mobile.floating {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 28px !important;
+            box-shadow:
+              0 8px 32px rgba(0, 0, 0, 0.2),
+              inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+          }
+
+          .button.active {
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(8px);
+            border-radius: 25px !important;
+            width: 50px !important;
+            height: 56px !important;
+            min-width: 40px !important;
+            min-height: 56px !important;
+            margin: 0 auto !important;
+          }
+
+          .route {
+            overflow: visible !important;
+          }
+          .icon.active {
+            color: #ffffff;
+          }
+
+          .navbar-popup {
+            background: rgba(20, 20, 20, 0.3) !important;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px !important;
+          }
+
+          .popup-item .button {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(6px);
+
+          }
+
+          .navbar-card.mobile.floating {
+            bottom: 24px !important;
+            margin: 0 16px !important;
+            min-height: 64px !important;
+            padding: 8px 0 !important;
+            overflow: visible !important;
+          }
+
+          .navbar.mobile.floating {
+            bottom: 0 !important;
+          }
+
+          .icon {
+            --navbar-route-icon-size: 22px;
+          }
+
+          .button {
+            min-width: 52px !important;
+            min-height: 52px !important;
+          }
+
+        type: custom:navbar-card

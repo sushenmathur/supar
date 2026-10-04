@@ -840,7 +840,7 @@ views:
                     [[[ return entity.state !== 'disarmed' && entity.state !== 'unavailable'; ]]]
               - type: picture-entity
                 entity: camera.driveway_live_view
-                camera_image: camera.driveway_live_view
+                camera_image: camera.driveway_snapshot
                 camera_view: auto
                 aspect_ratio: '112%'
                 fit_mode: cover
@@ -2236,7 +2236,7 @@ views:
             cards:
               - type: picture-entity
                 entity: camera.front_door_live_view_2
-                camera_image: camera.front_door_live_view_2
+                camera_image: camera.front_door_snapshot_2
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2248,7 +2248,7 @@ views:
                     ha-card { border-radius: 16px; overflow: hidden; }
               - type: picture-entity
                 entity: camera.backyard_live_view
-                camera_image: camera.backyard_live_view
+                camera_image: camera.backyard_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2260,7 +2260,7 @@ views:
                     ha-card { border-radius: 16px; overflow: hidden; }
               - type: picture-entity
                 entity: camera.patio_live_view
-                camera_image: camera.patio_live_view
+                camera_image: camera.patio_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2272,7 +2272,7 @@ views:
                     ha-card { border-radius: 16px; overflow: hidden; }
               - type: picture-entity
                 entity: camera.side_live_view
-                camera_image: camera.side_live_view
+                camera_image: camera.side_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2284,7 +2284,7 @@ views:
                     ha-card { border-radius: 16px; overflow: hidden; }
               - type: picture-entity
                 entity: camera.laundry_live_view
-                camera_image: camera.laundry_live_view
+                camera_image: camera.laundry_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2296,7 +2296,7 @@ views:
                     ha-card { border-radius: 16px; overflow: hidden; }
               - type: picture-entity
                 entity: camera.garage_live_view
-                camera_image: camera.garage_live_view
+                camera_image: camera.garage_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
