@@ -451,15 +451,37 @@ button_card_templates:
     label: |
       [[[ return variables.info && states[variables.info] ? states[variables.info].state : ''; ]]]
     custom_fields:
-      ping: |
-        [[[
-          return `
-            <div onclick="event.stopPropagation(); document.querySelector('home-assistant').hass.callService('icloud3','find_iphone_alert',{device_name:'${variables.device}'})"
-              style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 8px;border-radius:12px;cursor:pointer;
-              background:color-mix(in srgb, ${variables.tint} 16%, transparent);color:${variables.tint};font-size:9.5px;font-weight:700">
-              <ha-icon icon="mdi:bell-ring-outline" style="--mdc-icon-size:18px"></ha-icon>Ping
-            </div>`;
-        ]]]
+      ping:
+        card:
+          type: custom:button-card
+          name: Ping
+          icon: mdi:bell-ring-outline
+          show_state: false
+          tap_action:
+            action: perform-action
+            perform_action: icloud3.find_iphone_alert
+            data:
+              device_name: '[[[ return variables.device; ]]]'
+          hold_action:
+            action: none
+          styles:
+            card:
+              - width: 52px
+              - padding: 7px 4px
+              - border-radius: 12px
+              - box-shadow: none
+              - border: none
+              - background: '[[[ return `color-mix(in srgb, ${variables.tint} 16%, transparent)`; ]]]'
+            grid:
+              - grid-template-areas: '"i" "n"'
+              - row-gap: 2px
+            icon:
+              - width: 18px
+              - color: '[[[ return variables.tint; ]]]'
+            name:
+              - font-size: 9.5px
+              - font-weight: 700
+              - color: '[[[ return variables.tint; ]]]'
     styles:
       card:
         - padding: 10px
@@ -495,6 +517,30 @@ button_card_templates:
         - overflow: hidden
         - text-overflow: ellipsis
         - max-width: 100%
+
+
+  # ---- Small round quick button (TV Remote volume / power) ---------------
+  b_qbtn:
+    show_name: false
+    show_state: false
+    hold_action:
+      action: none
+    variables:
+      color: var(--primary-text-color)
+    styles:
+      card:
+        - width: 34px
+        - height: 34px
+        - padding: 0
+        - border-radius: 50%
+        - box-shadow: none
+        - border: none
+        - background: rgba(var(--rgb-primary-text-color),0.09)
+      grid:
+        - grid-template-areas: '"i"'
+      icon:
+        - width: 19px
+        - color: '[[[ return variables.color; ]]]'
 
 
 views:
@@ -2827,23 +2873,46 @@ views:
                 return 'Media TV · ' + (entity.attributes.source || entity.state);
               ]]]
             custom_fields:
-              quick: |
-                [[[
-                  const haRef = "document.querySelector('home-assistant').hass";
-                  const muted = entity.attributes.is_volume_muted === true;
-                  const b = (icon, js, color) => `
-                    <div onclick="event.stopPropagation(); ${js}"
-                      style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
-                      background:rgba(var(--rgb-primary-text-color),0.09)">
-                      <ha-icon icon="${icon}" style="--mdc-icon-size:19px;color:${color || 'var(--primary-text-color)'}"></ha-icon>
-                    </div>`;
-                  return `<div style="display:flex;gap:6px">
-                    ${b('mdi:power', `${haRef}.callService('script','media_tv_power',{})`, 'var(--red-color)')}
-                    ${b(muted ? 'mdi:volume-off' : 'mdi:volume-mute', `${haRef}.callService('media_player','volume_mute',{entity_id:'media_player.tv',is_volume_muted:${!muted}})`, muted ? 'var(--amber-color)' : null)}
-                    ${b('mdi:volume-minus', `${haRef}.callService('media_player','volume_down',{entity_id:'media_player.tv'})`)}
-                    ${b('mdi:volume-plus', `${haRef}.callService('media_player','volume_up',{entity_id:'media_player.tv'})`)}
-                  </div>`;
-                ]]]
+              quick:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - type: custom:button-card
+                      template: b_qbtn
+                      icon: mdi:power
+                      variables:
+                        color: var(--red-color)
+                      tap_action:
+                        action: perform-action
+                        perform_action: script.media_tv_power
+                    - type: custom:button-card
+                      template: b_qbtn
+                      icon: '[[[ return entity.attributes.is_volume_muted ? "mdi:volume-off" : "mdi:volume-mute"; ]]]'
+                      variables:
+                        color: '[[[ return entity.attributes.is_volume_muted ? "var(--amber-color)" : "var(--primary-text-color)"; ]]]'
+                      tap_action:
+                        action: perform-action
+                        perform_action: media_player.volume_mute
+                        target:
+                          entity_id: media_player.tv
+                        data:
+                          is_volume_muted: '[[[ return entity.attributes.is_volume_muted !== true; ]]]'
+                    - type: custom:button-card
+                      template: b_qbtn
+                      icon: mdi:volume-minus
+                      tap_action:
+                        action: perform-action
+                        perform_action: media_player.volume_down
+                        target:
+                          entity_id: media_player.tv
+                    - type: custom:button-card
+                      template: b_qbtn
+                      icon: mdi:volume-plus
+                      tap_action:
+                        action: perform-action
+                        perform_action: media_player.volume_up
+                        target:
+                          entity_id: media_player.tv
             styles:
               card:
                 - padding: 10px 12px
