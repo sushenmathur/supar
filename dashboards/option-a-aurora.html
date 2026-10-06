@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Option A – Aurora</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#080c1c;overflow:hidden;font-family:Inter,system-ui,'Segoe UI',Roboto,sans-serif;color:#f2f5ff;-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform-origin:center;overflow:hidden;
+  background:
+   radial-gradient(640px 520px at 12% 8%,rgba(99,102,241,.55),transparent 70%),
+   radial-gradient(520px 460px at 88% 14%,rgba(236,72,153,.34),transparent 70%),
+   radial-gradient(760px 560px at 72% 104%,rgba(20,184,166,.42),transparent 70%),
+   radial-gradient(620px 520px at 0% 100%,rgba(56,189,248,.28),transparent 70%),#0a0f24}
+.ic{display:block;flex:none}
+.g{background:linear-gradient(140deg,rgba(255,255,255,.13),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.15);
+  backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border-radius:26px;
+  box-shadow:0 18px 44px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.25)}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:8px}
+.dim{color:rgba(255,255,255,.58)}
+#main{position:absolute;left:32px;right:32px;top:30px;height:846px;display:grid;grid-template-columns:500px 560px 1fr;gap:22px}
+.col{display:flex;flex-direction:column;gap:20px;min-height:0}
+/* hero */
+.hero{padding:26px 28px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.time{font-size:112px;font-weight:200;letter-spacing:-.04em;line-height:1}
+.time small{font-size:30px;font-weight:500;letter-spacing:0;margin-left:8px;color:rgba(255,255,255,.6)}
+.wx{display:flex;align-items:center;gap:16px}
+.wx .t{font-size:44px;font-weight:300}
+.fc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.fc div{font-size:13px;display:grid;gap:7px}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
+.bar i{position:absolute;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#7dd3fc,#fde68a,#fb923c)}
+/* people */
+.people{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.p{padding:16px 18px;display:grid;gap:10px}
+.p .top{display:flex;gap:12px;align-items:center}
+.av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:19px;border:2px solid rgba(255,255,255,.5)}
+.p b{font-size:17px}.p .m{font-size:12px;display:flex;gap:14px}.p .m span{display:flex;gap:5px;align-items:center}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chip{padding:12px 14px;display:flex;align-items:center;gap:11px;border-radius:20px}
+.chip b{font-size:14px;display:block}.chip span{font-size:12px}
+.chip.hot .ic{color:#fda4af}
+.evt{padding:14px 18px;display:flex;align-items:center;gap:16px;border-radius:22px}
+.evt .d{text-align:center;line-height:1.1;padding-right:16px;border-right:1px solid rgba(255,255,255,.18)}
+.evt .d b{font-size:26px;display:block}.evt .d span{font-size:11px;color:#7dd3fc;font-weight:700;letter-spacing:.1em}
+.clk{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cl{padding:12px 16px;border-radius:20px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0f1b3d,#2a3a6b);border:1px solid rgba(255,255,255,.12)}
+.cl b{font-size:20px;display:block}.cl span{font-size:12px;color:rgba(255,255,255,.65)}
+/* mid */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.room{height:100px;border-radius:22px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;cursor:pointer;
+  border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px rgba(0,0,0,.25)}
+.room b{font-size:16px;display:block}.room span{font-size:12px;opacity:.85}
+.r0{background:linear-gradient(135deg,rgba(206,147,216,.75),rgba(171,71,188,.5))}
+.r1{background:linear-gradient(135deg,rgba(255,204,128,.9),rgba(251,140,0,.65));box-shadow:0 0 36px rgba(251,160,40,.45),inset 0 1px 0 rgba(255,255,255,.4)}
+.r2{background:linear-gradient(135deg,rgba(176,190,197,.55),rgba(96,125,139,.4))}
+.r3{background:linear-gradient(135deg,rgba(165,214,167,.7),rgba(67,160,71,.45))}
+.r4{background:linear-gradient(135deg,rgba(144,202,249,.7),rgba(30,136,229,.45))}
+.r5{background:linear-gradient(135deg,rgba(159,122,224,.75),rgba(109,69,196,.5))}
+.wide{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dev{padding:16px 18px;border-radius:22px;display:grid;gap:14px}
+.dev .h{display:flex;align-items:center;gap:12px}
+.dev .h b{font-size:16px;display:block}.dev .h span{font-size:12px;color:rgba(255,255,255,.55)}
+.ib{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.1)}
+.row{display:flex;gap:8px}.row>*{flex:1;height:42px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.08);cursor:pointer}
+.row .on{background:rgba(125,211,252,.28);color:#bae6fd}
+.light{padding:14px;border-radius:20px;display:flex;flex-direction:column;gap:12px;cursor:pointer;height:130px;justify-content:space-between;
+  background:linear-gradient(140deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.13)}
+.light b{font-size:13px;font-weight:600}.light span{font-size:11px;color:rgba(255,255,255,.5)}
+.light.on{background:linear-gradient(140deg,rgba(253,224,71,.5),rgba(251,146,60,.35));color:#fff;box-shadow:0 0 30px rgba(253,224,71,.3)}
+.light.on span{color:rgba(255,255,255,.85)}
+.light .tp{display:flex;justify-content:space-between;align-items:center}
+.sw{width:30px;height:18px;border-radius:9px;background:rgba(255,255,255,.18);position:relative}.sw:after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.on .sw{background:#fde047}.on .sw:after{left:14px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.q{height:78px;border-radius:22px;display:flex;flex-direction:column;gap:7px;align-items:center;justify-content:center;font-size:12px;font-weight:600;cursor:pointer}
+/* right */
+.seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:5px;border-radius:16px;background:rgba(0,0,0,.25)}
+.seg div{padding:11px 0;text-align:center;font-size:13px;font-weight:600;border-radius:12px;color:rgba(255,255,255,.6);cursor:pointer;display:flex;gap:6px;justify-content:center;align-items:center}
+.seg .on{background:rgba(255,255,255,.18);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.door{padding:14px;border-radius:20px;display:flex;gap:11px;align-items:center}
+.door b{font-size:14px;display:block}.door span{font-size:12px;color:rgba(255,255,255,.55)}
+.ok{color:#86efac}
+.en{padding:22px 24px;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.stats b{font-size:16px;display:block}.stats span{font-size:11px;color:rgba(255,255,255,.5)}
+.flow{display:grid;grid-template-columns:70px 1fr 80px 1fr 70px;align-items:center;margin:2px 0}
+.nd{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;text-align:center}
+.nd .b{width:58px;height:58px;border-radius:19px;display:grid;place-items:center}.nd.big .b{width:76px;height:76px;border-radius:24px}
+.nd b{font-size:15px}.nd span{color:rgba(255,255,255,.5);font-size:11px}
+.wire{height:5px;border-radius:2px;background:rgba(255,255,255,.12);margin:0 6px;position:relative;overflow:hidden;margin-bottom:34px}
+.wire i{position:absolute;top:0;bottom:0;width:30%;border-radius:2px;animation:run 1.6s linear infinite}
+@keyframes run{from{left:-30%}to{left:100%}}.wire.rev i{animation-direction:reverse}
+.ev{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ev>div{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06);display:flex;gap:9px;align-items:center;font-size:12px}
+.ev b{display:block;font-size:13px}.ev em{margin-left:auto;font-style:normal;font-weight:700;color:rgba(255,255,255,.5)}
+.pb{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.6)}
+.pb .bar{flex:1}.pb .bar i{left:0;width:100%;background:#fbbf24}
+.link{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#7dd3fc;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
+/* dock */
+#dock{position:absolute;left:50%;transform:translateX(-50%);bottom:26px;height:84px;padding:0 14px;display:flex;align-items:center;gap:6px;border-radius:32px}
+.nv{width:98px;height:62px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);position:relative;cursor:pointer}
+.nv.act{background:rgba(255,255,255,.17);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.bd{position:absolute;top:5px;right:26px;min-width:18px;height:18px;border-radius:9px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #1a2140}
+</style></head>
+<body><div id="stage">
+<div id="main">
+  <div class="col" id="c1"></div><div class="col" id="c2"></div><div class="col" id="c3"></div>
+</div>
+<div id="dock" class="g"></div>
+</div>
+<script src="shared.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const w=D.weather, e=D.energy;
+$('c1').innerHTML=`
+<div class="g hero">
+  <div><div class="lbl">${ic('pin',14)} Brisbane · ${D.now.date}</div>
+  <div class="time" style="margin-top:14px">${D.now.time}<small>${D.now.ampm}</small></div></div>
+  <div class="wx">${ic('cloudsun',54,1.25)}<div><div class="t">${w.temp}°</div><div class="dim" style="font-size:14px">${w.sky} · ${w.humidity}% humidity</div></div></div>
+  <div class="fc">${w.days.map(d=>`<div><span class="dim">${d[0]}</span><div class="bar"><i style="left:${(d[1]-14)*6}%;right:${100-(d[2]-14)*6}%"></i></div><span>${d[1]}° – ${d[2]}°</span></div>`).join('')}</div>
+</div>
+<div class="people">${D.people.map(p=>`<div class="g p"><div class="top"><div class="av" style="background:linear-gradient(135deg,hsl(${p.hue} 80% 60%),hsl(${p.hue+40} 70% 40%))">${p.init}</div><div><b>${p.name}</b><div class="dim" style="font-size:12px">${p.place} · ${p.ago}</div></div></div>
+<div class="m dim"><span style="color:#86efac">${ic('batt',15)}${p.batt}%</span><span>${ic(p.net=='WiFi'?'wifi':'cell',15)}${p.net}</span></div></div>`).join('')}</div>
+<div class="chips">${D.status.map(s=>`<div class="g chip ${s.hot?'hot':''}">${ic(s.icon,22)}<div><b>${s.name}</b><span class="dim">${s.sub}</span></div></div>`).join('')}</div>
+<div class="g evt"><div class="d"><span>${D.event.mon}</span><b>${D.event.num}</b></div><div><b style="font-size:15px">${D.event.title}</b><div class="dim" style="font-size:12px;margin-top:3px">${D.event.day} · ${D.event.time}</div></div></div>
+<div class="clk">${D.clocks.map(c=>`<div class="cl">${ic('moon',24)}<div><b>${c[1]} ${c[2]}</b><span>${c[0]}</span></div></div>`).join('')}</div>`;
+
+$('c2').innerHTML=`
+<div><div class="lbl" style="margin:0 4px 12px">${ic('grid',14)} Rooms</div>
+<div class="grid3">${D.rooms.map((r,i)=>`<div class="room r${i}" data-toggle>${ic(r.icon,26)}<div><b>${r.name}</b><span>${r.sub}</span></div></div>`).join('')}</div></div>
+<div class="wide">
+ <div class="g dev"><div class="h"><div class="ib">${ic('tv',22)}</div><div><b>TV</b><span>Off</span></div></div>
+  <div class="row"><div>${ic('power',18)}</div><div>${ic('play',16)}</div></div></div>
+ <div class="g dev"><div class="h"><div class="ib">${ic('wind',22)}</div><div><b>Aircon</b><span>Off · 25 °C</span></div></div>
+  <div class="row" data-seg><div>${ic('power',18)}</div><div>${ic('snow',18)}</div><div>${ic('sun',18)}</div><div>${ic('wind',18)}</div></div></div>
+</div>
+<div><div class="lbl" style="margin:0 4px 12px">${ic('bulb',14)} Favourites</div>
+<div class="grid3">${D.lights.map(l=>`<div class="light" data-toggle><div class="tp">${ic(l.icon,24)}<div class="sw"></div></div><div><b>${l.name}</b><br><span>Off</span></div></div>`).join('')}</div></div>
+<div class="quick" style="margin-top:auto">${D.quick.map(q=>`<div class="g q">${ic(q.icon,22)}${q.name}</div>`).join('')}</div>`;
+
+$('c3').innerHTML=`
+<div class="g" style="padding:18px;display:grid;gap:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center"><div class="lbl">${ic('shield',14)} Home Alarm</div><span class="ok" style="font-size:12px;font-weight:600">● ${D.security.alarm}</span></div>
+  <div class="seg" data-seg><div class="on">Disarmed</div><div>Home</div><div>Away</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+   <div class="g door">${ic('garage',24)}<div><b>Garage Door</b><span>${D.security.garage}</span></div></div>
+   <div class="g door"><span class="ok">${ic('lock',24)}</span><div><b>Front Door</b><span>${D.security.front}</span></div></div></div>
+</div>
+<div class="g en">
+  <div style="display:flex;justify-content:space-between;align-items:center"><div class="lbl">${ic('zap',14)} Energy</div><span class="dim" style="font-size:12px">Off-peak · $${e.rate}/kWh</span></div>
+  <div class="stats"><div><b>$${e.today}</b><span>Today</span></div><div><b style="color:#86efac">$${e.sold}</b><span>Sold</span></div><div><b>$${e.bill}</b><span>Bill to date</span></div><div><b>$${e.est}</b><span>Est. bill</span></div></div>
+  <div class="flow">
+   <div class="nd"><div class="b" style="background:rgba(167,124,255,.2);color:#c4b5fd">${ic('up',24)}</div><b>${e.grid} kW</b><span>Exporting</span></div>
+   <div class="wire rev"><i style="background:#c4b5fd"></i></div>
+   <div class="nd big"><div class="b" style="background:rgba(76,141,255,.25);color:#93c5fd">${ic('home',30)}</div><b>${e.home} W</b><span>Home</span></div>
+   <div class="wire rev"><i style="background:#fbbf24"></i></div>
+   <div class="nd"><div class="b" style="background:rgba(251,191,36,.2);color:#fcd34d">${ic('sun',24)}</div><b>${e.solar} kW</b><span>Solar</span></div>
+  </div>
+  <div class="ev">${e.evs.map(v=>`<div>${ic('car',18)}<div><b>${v[0]}</b><span class="dim">${v[1]}</span></div><em>0 W</em></div>`).join('')}</div>
+  <div class="pb">${ic('sun',14)} Self-powered <div class="bar"><i></i></div><b style="color:#fff">${e.self}%</b></div>
+  <div class="link"><span>Go to energy dashboard</span>${ic('chev',18)}</div>
+</div>
+<div class="g door" style="padding:16px 18px;border-radius:22px">
+  <div class="ib">${ic('bot',22)}</div><div><b>${D.robot.name}</b><span>${D.robot.state}</span></div></div>`;
+
+$('dock').innerHTML=D.nav.map(n=>`<div class="nv ${n.active?'act':''}">${ic(n.icon,24)}${n.name}${n.badge?`<i class="bd">${n.badge}</i>`:''}</div>`).join('');
+</script></body></html>
