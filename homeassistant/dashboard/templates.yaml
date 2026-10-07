@@ -88,54 +88,42 @@ button_card_templates:
         - font-size: 12px
         - color: var(--secondary-text-color)
 
-  # ---- Light / switch tile with a toggle pill ----
+  # ---- Light / switch tile: compact (icon + name), glows when on ----
   glass_toggle:
     section_mode: true
     show_state: false
-    show_label: true
-    label: '[[[ return entity.state === "on" ? "On" : "Off"; ]]]'
+    show_label: false
     tap_action:
       action: toggle
     hold_action:
       action: more-info
-    custom_fields:
-      sw: |
-        [[[
-          const on = entity.state === 'on';
-          return `<div style="width:34px;height:20px;border-radius:10px;position:relative;background:${on ? 'rgba(255,255,255,0.85)' : 'rgba(128,128,128,0.35)'}">
-            <i style="position:absolute;top:2px;left:${on ? 16 : 2}px;width:16px;height:16px;border-radius:50%;background:${on ? '#f59e0b' : '#fff'};transition:.2s"></i></div>`;
-        ]]]
     styles:
       card:
         - height: 100%
-        - border-radius: 24px
-        - padding: 14px 16px
+        - border-radius: 20px
+        - padding: 6px 10px
         - background: |
             [[[ return entity.state === 'on' ? 'var(--glass-on-bg)' : 'var(--glass-bg-soft)'; ]]]
         - box-shadow: |
             [[[ return (entity.state === 'on' ? 'var(--glass-on-glow), ' : '') + 'inset 0 1px 0 var(--glass-hi)'; ]]]
         - border: 1px solid var(--glass-border)
       grid:
-        - grid-template-areas: '"i sw" "n n" "l l"'
-        - grid-template-columns: 1fr auto
-        - grid-template-rows: 1fr min-content min-content
+        - grid-template-areas: '"i n"'
+        - grid-template-columns: 24px 1fr
+        - column-gap: 8px
+        - align-items: center
       icon:
-        - width: 26px
-        - justify-self: start
-        - color: var(--primary-text-color)
-      custom_fields:
-        sw:
-          - justify-self: end
-          - align-self: start
+        - width: 22px
+        - color: |
+            [[[ return entity.state === 'on' ? 'var(--primary-text-color)' : 'var(--secondary-text-color)'; ]]]
       name:
         - justify-self: start
-        - font-size: 15px
-        - font-weight: 700
-        - color: var(--primary-text-color)
-      label:
-        - justify-self: start
+        - text-align: left
         - font-size: 12px
-        - color: var(--secondary-text-color)
+        - font-weight: 600
+        - line-height: 1.2
+        - white-space: normal
+        - color: var(--primary-text-color)
 
   # ---- Status chip: vehicles and room occupancy ----
   glass_chip:

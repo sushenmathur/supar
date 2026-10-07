@@ -391,37 +391,37 @@
           name: Kitchen Pendants
           icon: mdi:ceiling-light-multiple
           template: glass_toggle
-          grid_options: { columns: 6, rows: 2 }
+          grid_options: { columns: 4, rows: 1 }
         - type: custom:button-card
           entity: light.dining_light
           name: Dining
           icon: mdi:ceiling-light
           template: glass_toggle
-          grid_options: { columns: 6, rows: 2 }
+          grid_options: { columns: 4, rows: 1 }
         - type: custom:button-card
           entity: light.sonoff_1000dbd8b7
           name: Media Room
           icon: mdi:light-recessed
           template: glass_toggle
-          grid_options: { columns: 6, rows: 2 }
+          grid_options: { columns: 4, rows: 1 }
         - type: custom:button-card
           entity: switch.sonoff_100090d020
           name: Lamp
           icon: mdi:lamp
           template: glass_toggle
-          grid_options: { columns: 6, rows: 2 }
+          grid_options: { columns: 4, rows: 1 }
         - type: custom:button-card
           entity: light.corridor_light
           name: Corridor
           icon: mdi:light-recessed
           template: glass_toggle
-          grid_options: { columns: 6, rows: 2 }
+          grid_options: { columns: 4, rows: 1 }
         - type: custom:button-card
           entity: light.hallway_light
           name: Hallway
           icon: mdi:light-recessed
           template: glass_toggle
-          grid_options: { columns: 6, rows: 2 }
+          grid_options: { columns: 4, rows: 1 }
 
     # ------------------------------------------------------------------
     # Section 3: Now (weather, calendar, status, world clocks, bins)
