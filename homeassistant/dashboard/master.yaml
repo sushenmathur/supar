@@ -1,3 +1,6 @@
+kiosk_mode:
+  hide_header: true
+  hide_sidebar: true
 button_card_templates:
   glass_action:
     section_mode: true
@@ -37,8 +40,8 @@ button_card_templates:
       force_on: false
     styles:
       card:
-        - height: 96px
-        - border-radius: 26px
+        - height: 76px
+        - border-radius: 24px
         - padding: 0 18px
         - background: |
             [[[
@@ -176,21 +179,21 @@ button_card_templates:
             return m < 60 ? `${m} min ago` : `${Math.round(m / 60)} hrs ago`;
           })();
           const pic = entity.attributes.entity_picture
-            ? `<img src="${entity.attributes.entity_picture}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--glass-hi)">`
-            : `<div style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--primary-color);color:#fff">${entity.attributes.friendly_name[0]}</div>`;
-          return `<div style="display:flex;gap:12px;align-items:center">${pic}
+            ? `<img src="${entity.attributes.entity_picture}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--glass-hi)">`
+            : `<div style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--primary-color);color:#fff">${entity.attributes.friendly_name[0]}</div>`;
+          return `<div style="display:flex;gap:10px;align-items:center">${pic}
             <div style="text-align:left;line-height:1.35">
-              <div style="font-size:16px;font-weight:700">${entity.attributes.friendly_name}</div>
-              <div style="font-size:12px;color:var(--secondary-text-color)">${place} · ${ago}</div>
-              <div style="font-size:12px;font-weight:600;color:${batt > 20 ? 'var(--glass-ok)' : 'var(--glass-bad)'}">
+              <div style="font-size:15px;font-weight:700">${entity.attributes.friendly_name}</div>
+              <div style="font-size:11px;color:var(--secondary-text-color);white-space:nowrap">${place} · ${ago}</div>
+              <div style="font-size:11px;font-weight:600;color:${batt > 20 ? 'var(--glass-ok)' : 'var(--glass-bad)'}">
                 ${isNaN(batt) ? '' : Math.round(batt) + '%'}${net ? ' · ' + net : ''}</div>
             </div></div>`;
         ]]]
     styles:
       card:
-        - height: 96px
+        - height: 84px
         - border-radius: 24px
-        - padding: 10px 14px
+        - padding: 8px 12px
         - background: var(--glass-bg)
         - border: 1px solid var(--glass-border)
         - box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi)
@@ -406,6 +409,8 @@ views:
               columns: full
             cards:
               - type: custom:button-card
+                card_mod:
+                  style: ':host { flex: 0.7 1 0 !important; }'
                 triggers_update: all
                 show_icon: false
                 show_name: false
@@ -420,12 +425,12 @@ views:
                       const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'long', day: 'numeric', month: 'long' });
                       return `<div style="text-align:left">
                         <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--secondary-text-color)">${date}</div>
-                        <div style="font-size:40px;font-weight:600;letter-spacing:-.03em;margin-top:4px">${hello}</div>
+                        <div style="font-size:34px;font-weight:600;letter-spacing:-.03em;margin-top:2px">${hello}</div>
                       </div>`;
                     ]]]
                 styles:
                   card:
-                    - height: 110px
+                    - height: 84px
                     - border-radius: 28px
                     - padding: 0 30px
                   grid:
@@ -434,6 +439,8 @@ views:
                     body:
                       - width: 100%
               - type: grid
+                card_mod:
+                  style: ':host { flex: 1.25 1 0 !important; }'
                 columns: 2
                 square: false
                 cards:
@@ -449,6 +456,8 @@ views:
                     variables:
                       battery: sensor.paro_phone_battery
               - type: grid
+                card_mod:
+                  style: ':host { flex: 1.05 1 0 !important; }'
                 columns: 4
                 square: false
                 cards:
@@ -809,7 +818,7 @@ views:
               - calendar.supar_family
             compact_days_to_show: 1
             compact_events_complete_days: true
-            compact_events_to_show: 3
+            compact_events_to_show: 2
             filter_duplicates: true
             show_location: false
             tap_action:
