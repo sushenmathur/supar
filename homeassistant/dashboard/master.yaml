@@ -321,7 +321,7 @@ navbar-templates:
         url: /dashboard-hub/security
       - icon: glyphs-poly:music
         label: Music
-        url: /dashboard-hub/media_new
+        url: /dashboard-hub/music
       - icon: mdi:dots-horizontal
         label: More
         popup:
@@ -3207,7 +3207,7 @@ views:
         voice_assistant_speak_feedback: false
         volume_wheel: true
     icon: glyphs-poly:music
-    path: media_new
+    path: music
     show_icon_and_title: true
     subview: true
     title: Media
