@@ -1,0 +1,881 @@
+# Replace the existing `hubhome` view (the first item under `views:`) with this one.
+# Entity IDs, scripts, scenes and popup actions are the same as your current dashboard.
+# Layout: one sections view, three columns on a 16:10 wall tablet. The first section spans all
+# three columns (header strip + rooms); sections 2 to 4 are Favourites, Now and Home status.
+- background:
+    alignment: center
+    attachment: fixed
+    image:
+      media_content_id: media-source://image_upload/3def5229108dac26fd7a30aa96e91398
+      media_content_type: image/png
+    opacity: 20
+    repeat: repeat
+    size: cover
+  badges:
+    # Only the conditional low-battery badge stays as a badge. Vehicles and room occupancy
+    # are now status chips in the middle column.
+    - color: red
+      content: Side Camera Battery Low
+      entity: sensor.side_battery
+      icon: mdi:battery-20
+      tap_action:
+        action: more-info
+      type: custom:mushroom-template-badge
+      visibility:
+        - below: 20
+          condition: numeric_state
+          entity: sensor.side_battery
+  dense_section_placement: true
+  header:
+    badges_position: top
+    badges_wrap: scroll
+    layout: center
+  icon: mdi:home-assistant
+  max_columns: 3
+  path: hubhome
+  title: Home
+  top_margin: false
+  type: sections
+  sections:
+
+    # ------------------------------------------------------------------
+    # Section 1 (full width): greeting + people + quick actions, then rooms
+    # ------------------------------------------------------------------
+    - column_span: 3
+      type: grid
+      cards:
+        - type: horizontal-stack
+          grid_options:
+            columns: full
+          cards:
+            - type: custom:button-card
+              triggers_update: all
+              show_icon: false
+              show_name: false
+              show_state: false
+              custom_fields:
+                body: |
+                  [[[
+                    const d = new Date();
+                    const tz = { timeZone: 'Australia/Brisbane' };
+                    const h = parseInt(d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', hour12: false }));
+                    const hello = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+                    const t = d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', minute: '2-digit', hour12: true }).split(' ');
+                    const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'long', day: 'numeric', month: 'long' });
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+                      <div style="text-align:left">
+                        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--secondary-text-color)">${date}</div>
+                        <div style="font-size:36px;font-weight:600;letter-spacing:-.03em;margin-top:4px">${hello}</div>
+                      </div>
+                      <div style="font-size:56px;font-weight:300;letter-spacing:-.04em;line-height:1">${t[0]}<span style="font-size:19px;font-weight:600;margin-left:4px">${(t[1] || '').toUpperCase()}</span></div>
+                    </div>`;
+                  ]]]
+              styles:
+                card:
+                  - height: 110px
+                  - border-radius: 28px
+                  - padding: 0 30px
+                grid:
+                  - grid-template-areas: '"body"'
+                custom_fields:
+                  body:
+                    - width: 100%
+
+            - type: grid
+              columns: 2
+              square: false
+              cards:
+                - type: custom:button-card
+                  entity: person.sushenmathur
+                  template: glass_person
+                  variables:
+                    battery: sensor.iphone_battery_level
+                    network: sensor.iphone_connection_type
+                - type: custom:button-card
+                  entity: person.paro
+                  template: glass_person
+                  variables:
+                    battery: sensor.paro_phone_battery
+
+            - type: grid
+              columns: 4
+              square: false
+              cards:
+                - type: custom:button-card
+                  entity: scene.good_night
+                  icon: mdi:weather-night
+                  name: Good Night
+                  template: glass_action
+                  tap_action:
+                    action: perform-action
+                    confirmation:
+                      text: Run the Good Night scene?
+                    perform_action: scene.turn_on
+                    target:
+                      entity_id: scene.good_night
+                - type: custom:button-card
+                  entity: script.say_tts_message
+                  icon: mdi:bullhorn
+                  name: Announce
+                  template: glass_action
+                  tap_action:
+                    action: more-info
+                - type: custom:button-card
+                  entity: script.lost_phone
+                  icon: mdi:cellphone-arrow-down
+                  name: Lost Phone
+                  template: glass_action
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Lost Phone
+                        content:
+                          - default: Sushen
+                            label: Phone
+                            name: phone
+                            selector:
+                              select:
+                                options:
+                                  - Paro
+                                  - Sushen
+                          - label: Passcode
+                            name: passcode
+                            selector:
+                              text:
+                                type: password
+                        left_button: Cancel
+                        right_button: Send alert
+                        right_button_action:
+                          service: script.lost_phone
+                          data:
+                            browser_id: THIS
+                            passcode: '{{ passcode }}'
+                            phone: '{{ phone }}'
+                - type: custom:button-card
+                  icon: mdi:wifi
+                  name: WiFi
+                  template: glass_action
+                  tap_action:
+                    action: perform-action
+                    perform_action: browser_mod.popup
+                    data:
+                      title: Scan for WiFi
+                      content:
+                        type: picture
+                        image:
+                          media_content_id: media-source://image_upload/50750ef2d78e15cc901576e1c9fa2bae
+                          media_content_type: image/png
+
+        - type: grid
+          columns: 6
+          square: false
+          grid_options:
+            columns: full
+          cards:
+            - type: custom:button-card
+              icon: mdi:sofa
+              name: Living
+              template: room_tile
+              tap_action:
+                action: navigate
+                navigation_path: /dashboard-hub/living-room
+              variables:
+                tint: '206,120,236'
+                lights:
+                  - light.dining_light
+                  - light.kitchen_pendants
+                  - light.kitchen_downlights
+                  - light.kitchenled
+                  - light.sonoff_1000dbd8b7
+                  - switch.sonoff_100090d020
+            - type: custom:button-card
+              icon: mdi:teddy-bear
+              name: Kids
+              template: room_tile
+              tap_action:
+                action: navigate
+                navigation_path: /dashboard-hub/kidsroom
+              variables:
+                tint: '255,196,110'
+                lights:
+                  - light.aarlo_samar_cam
+                  - light.tall_lamp
+            - type: custom:button-card
+              entity: cover.garage_door_v2
+              icon: mdi:garage-variant
+              name: Garage
+              template: room_tile
+              label: |
+                [[[
+                  return ({ open: 'Door open', closed: 'Door closed',
+                            opening: 'Door opening', closing: 'Door closing' })[entity.state]
+                         || `Door ${entity.state}`;
+                ]]]
+              tap_action:
+                action: navigate
+                navigation_path: /dashboard-hub/garage
+              variables:
+                tint: '170,185,205'
+                # Glows red-amber while the door is open
+                force_on: '[[[ return states["cover.garage_door_v2"]?.state === "open"; ]]]'
+            - type: custom:button-card
+              icon: mdi:gate
+              name: Outdoor
+              template: room_tile
+              tap_action:
+                action: navigate
+                navigation_path: /dashboard-hub/outdoor
+              variables:
+                tint: '110,220,160'
+                lights:
+                  - switch.patio_lights
+                  - light.backyard_light
+                  - light.driveway_light
+                  - light.laundry_light
+                  - switch.sonoff_100053e676
+                  - switch.sonoff_1000905c71
+            - type: custom:button-card
+              icon: mdi:washing-machine
+              name: Laundry
+              template: room_tile
+              label: |
+                [[[ const w = states['sensor.washer_current_status']?.state;
+                    const d = states['sensor.dryer_current_status']?.state;
+                    const on = s => s && !['power_off','unavailable','unknown'].includes(s);
+                    if (on(w) && on(d)) return 'Washer & dryer running';
+                    if (on(w)) return 'Washer running';
+                    if (on(d)) return 'Dryer running';
+                    return 'Idle'; ]]]
+              tap_action:
+                action: navigate
+                navigation_path: /dashboard-hub/laundry
+              variables:
+                tint: '100,180,255'
+                force_on: |
+                  [[[ const on = s => s && !['power_off','unavailable','unknown'].includes(s);
+                      return on(states['sensor.washer_current_status']?.state)
+                          || on(states['sensor.dryer_current_status']?.state); ]]]
+            - type: custom:button-card
+              entity: media_player.tv
+              icon: mdi:multimedia
+              name: Media
+              template: room_tile
+              triggers_update: all
+              label: |
+                [[[
+                  const skip = variables.skip || [], names = variables.names || {}, sw = variables.switches || {};
+                  const playing = Object.values(states).filter(e =>
+                    e.entity_id.startsWith('media_player.') && e.state === 'playing' &&
+                    !skip.some(s => e.entity_id.startsWith(s)))
+                    .map(e => names[e.entity_id] || e.attributes.friendly_name || e.entity_id);
+                  const on = Object.entries(sw).filter(([id, s]) =>
+                    states[id]?.state === 'on' && states[s.player]?.state !== 'playing').map(([id, s]) => s.name);
+                  const parts = [];
+                  if (playing.length === 1) parts.push(`${playing[0]} playing`);
+                  if (playing.length > 1) parts.push(`${playing.length} playing`);
+                  on.forEach(n => parts.push(`${n} on`));
+                  return parts.length ? parts.join(' · ') : 'All off';
+                ]]]
+              tap_action:
+                action: fire-dom-event
+                browser_mod:
+                  service: browser_mod.popup
+                  data:
+                    title: Media
+                    dismissable: true
+                    size: normal
+                    content:
+                      type: grid
+                      columns: 2
+                      square: false
+                      cards:
+                        - type: tile
+                          entity: media_player.tv
+                          name: TV
+                          vertical: false
+                          state_content: [state, app_name, media_title]
+                          features:
+                            - type: media-player-playback
+                            - type: media-player-volume-slider
+                          features_position: bottom
+                        - type: tile
+                          entity: switch.bedroom_tv
+                          name: Bedroom TV
+                          icon: mdi:television-classic
+                          vertical: false
+                          features:
+                            - type: toggle
+                          features_position: bottom
+                        - type: tile
+                          entity: media_player.media_apple_tv
+                          name: Media Apple TV
+                          vertical: false
+                          features:
+                            - type: media-player-playback
+                            - type: media-player-volume-slider
+                          features_position: bottom
+                        - type: tile
+                          entity: media_player.bedroom_apple_tv
+                          name: Bedroom Apple TV
+                          vertical: false
+                          state_content: [state, app_name, media_title]
+                          features:
+                            - type: media-player-playback
+                            - type: media-player-volume-slider
+                          features_position: bottom
+              variables:
+                tint: '160,130,235'
+                names:
+                  media_player.hubs_bedroom_apple_tv: Bedroom Apple TV
+                  media_player.media_apple_tv: Media Apple TV
+                  media_player.tv: TV
+                skip:
+                  - media_player.browser_
+                  - media_player.aarlo_
+                  - media_player.home_speakers_2
+                  - media_player.bluey_media_player
+                switches:
+                  switch.bedroom_tv:
+                    name: Bedroom TV
+                    player: media_player.hubs_bedroom_apple_tv
+                force_on: |
+                  [[[
+                    const skip = variables.skip || [], sw = variables.switches || {};
+                    return Object.values(states).some(e =>
+                        e.entity_id.startsWith('media_player.') && e.state === 'playing' &&
+                        !skip.some(s => e.entity_id.startsWith(s)))
+                      || Object.keys(sw).some(id => states[id]?.state === 'on');
+                  ]]]
+
+    # ------------------------------------------------------------------
+    # Section 2: Favourites
+    # ------------------------------------------------------------------
+    - type: grid
+      cards:
+        - type: heading
+          heading: Favourites
+          heading_style: title
+          icon: mdi:home-heart
+        - type: tile
+          entity: media_player.tv
+          icon: mdi:television
+          show_entity_picture: true
+          state_content: [state, source]
+          vertical: false
+          grid_options:
+            columns: 12
+            rows: 2
+          hold_action:
+            action: toggle
+          icon_tap_action:
+            action: perform-action
+            perform_action: script.media_tv_power
+          features:
+            - type: media-player-playback
+          features_position: bottom
+        - type: tile
+          entity: climate.living_room
+          name: Aircon
+          icon: mdi:air-conditioner
+          vertical: false
+          grid_options:
+            columns: 12
+            rows: 2
+          features:
+            - type: climate-hvac-modes
+          features_position: bottom
+        - type: custom:button-card
+          entity: light.kitchen_pendants
+          name: Kitchen Pendants
+          icon: mdi:ceiling-light-multiple
+          template: glass_toggle
+          grid_options: { columns: 6, rows: 2 }
+        - type: custom:button-card
+          entity: light.dining_light
+          name: Dining
+          icon: mdi:ceiling-light
+          template: glass_toggle
+          grid_options: { columns: 6, rows: 2 }
+        - type: custom:button-card
+          entity: light.sonoff_1000dbd8b7
+          name: Media Room
+          icon: mdi:light-recessed
+          template: glass_toggle
+          grid_options: { columns: 6, rows: 2 }
+        - type: custom:button-card
+          entity: switch.sonoff_100090d020
+          name: Lamp
+          icon: mdi:lamp
+          template: glass_toggle
+          grid_options: { columns: 6, rows: 2 }
+        - type: custom:button-card
+          entity: light.corridor_light
+          name: Corridor
+          icon: mdi:light-recessed
+          template: glass_toggle
+          grid_options: { columns: 6, rows: 2 }
+        - type: custom:button-card
+          entity: light.hallway_light
+          name: Hallway
+          icon: mdi:light-recessed
+          template: glass_toggle
+          grid_options: { columns: 6, rows: 2 }
+
+    # ------------------------------------------------------------------
+    # Section 3: Now (weather, calendar, status, world clocks, bins)
+    # ------------------------------------------------------------------
+    - type: grid
+      cards:
+        - type: custom:clock-weather-card
+          entity: weather.north_lakes_weather
+          name: Brisbane
+          sun_entity: sun.sun
+          date_pattern: ccc, d MMM yyyy
+          forecast_rows: 3
+          show_humidity: true
+          use_browser_time: true
+          weather_icon_type: fill
+          grid_options:
+            columns: full
+        - type: custom:calendar-card-pro
+          entities:
+            - calendar.supar_family
+          compact_days_to_show: 1
+          compact_events_complete_days: true
+          compact_events_to_show: 3
+          filter_duplicates: true
+          show_location: false
+          tap_action:
+            action: expand
+          today_weekday_color: Blue
+          weather:
+            position: event
+            date:
+              color: var(--primary-text-color)
+              font_size: 12px
+              icon_size: 14px
+              show_conditions: true
+              show_high_temp: true
+              show_low_temp: false
+            event:
+              color: var(--primary-text-color)
+              font_size: 12px
+              icon_size: 14px
+              show_conditions: true
+              show_temp: true
+        # Status chips: vehicles and room occupancy
+        - type: custom:button-card
+          entity: device_tracker.kia_gps_location
+          name: Sorento
+          icon: mdi:car-estate
+          template: glass_chip
+          label: '[[[ return entity.state === "home" ? "Home" : entity.state === "not_home" ? "Away" : entity.state; ]]]'
+          grid_options: { columns: 6, rows: 1 }
+        - type: custom:button-card
+          entity: device_tracker.bluey_location
+          name: Bluey
+          icon: mdi:car-electric
+          template: glass_chip
+          label: '[[[ return entity.state === "home" ? "Home" : entity.state === "not_home" ? "Away" : entity.state; ]]]'
+          grid_options: { columns: 6, rows: 1 }
+        - type: custom:button-card
+          entity: binary_sensor.shanaya_room_occupancy_status
+          name: Shanaya Room
+          icon: mdi:cradle
+          template: glass_chip
+          label: '[[[ return entity.state === "on" ? "Occupied" : "Clear"; ]]]'
+          variables:
+            hot: '[[[ return states["binary_sensor.shanaya_room_occupancy_status"]?.state === "on"; ]]]'
+          grid_options: { columns: 6, rows: 1 }
+        - type: custom:button-card
+          entity: binary_sensor.samar_room_occupancy_new
+          name: Samar Room
+          icon: mdi:bed
+          template: glass_chip
+          label: '[[[ return entity.state === "on" ? "Occupied" : "Clear"; ]]]'
+          variables:
+            hot: '[[[ return states["binary_sensor.samar_room_occupancy_new"]?.state === "on"; ]]]'
+          grid_options: { columns: 6, rows: 1 }
+        - type: custom:wheelie-bin-card
+          title: Next Bin Collection
+          entity:
+            - sensor.general_waste
+            - sensor.garden_organics
+            - sensor.recycling
+          bins:
+            - { color: red, icon: mdi:trash-can, label: General, match: [General Waste] }
+            - { color: green, icon: mdi:leaf, label: Garden, match: [Garden Organics] }
+            - { color: amber, icon: mdi:recycle, label: Recycling, match: [Recycling] }
+          chip_size: 22
+          chip_style: faded
+          hide_inactive: true
+          icon_size: 26
+          layout: horizontal
+          show_badges: true
+          show_labels: true
+          visibility:
+            - after: '06:00:00'
+              before: '23:59:00'
+              condition: time
+              weekdays: [mon, sun]
+        - type: custom:button-card
+          name: Austin
+          template: world_clock
+          variables:
+            daytime: binary_sensor.austin_daytime
+            tz: America/Chicago
+          grid_options: { columns: 6, rows: 1 }
+        - type: custom:button-card
+          name: India
+          template: world_clock
+          variables:
+            daytime: binary_sensor.hyd_daytime
+            tz: Asia/Kolkata
+          grid_options: { columns: 6, rows: 1 }
+
+    # ------------------------------------------------------------------
+    # Section 4: Home status (alarm, doors, energy, Robbie, laundry, alerts)
+    # ------------------------------------------------------------------
+    - type: grid
+      cards:
+        - type: custom:alert-ticker-card
+          alerts:
+            - entity: binary_sensor.garage_door_sensor_contact
+              icon: 🚨
+              message: Garage Door Open
+              name: Garage Door
+              operator: '='
+              priority: 1
+              secondary_entity: switch.sonoff_1000f6b15b
+              state: 'on'
+              theme: emergency
+              tts_engine: tts.google_ai_tts
+              tts_entity: media_player.kitchen_speaker
+              tts_notify_service: mobile_app_sushen_iphone
+              use_ha_icon: false
+            - conditions:
+                - entity: binary_sensor.crimsafe_door_contact
+                  operator: '='
+                  state: 'on'
+              entity: binary_sensor.front_door_contact
+              icon: 🚨
+              message: Front and Security Door Open
+              operator: '='
+              priority: 1
+              state: 'on'
+              theme: emergency
+              use_ha_icon: false
+            - entity: binary_sensor.side_door_contact
+              message: Side Door Open
+              name: Side Door
+              operator: '='
+              priority: 1
+              state: 'on'
+              theme: emergency
+            - entity: binary_sensor.front_door_contact
+              icon: 🏠
+              message: Front Door Open
+              name: Front Door
+              operator: '='
+              priority: 2
+              state: 'on'
+              theme: presence
+            - entity: binary_sensor.crimsafe_door_contact
+              icon: 🔔
+              message: Security Door Open
+              name: Security Screen
+              operator: '='
+              priority: 3
+              state: 'on'
+              theme: notification
+            - entity: binary_sensor.patio_door_contact
+              icon: 🚪
+              message: Patio Door Open
+              name: Patio
+              operator: '='
+              priority: 3
+              push_notify: true
+              push_notify_service: mobile_app_suparhub2
+              state: 'on'
+              theme: door
+            - entity: binary_sensor.laundrydoorsensor_contact
+              icon: 🚪
+              message: Laundry Door Open
+              name: Laundry Door
+              operator: '='
+              priority: 3
+              state: 'on'
+              theme: door
+            - entity: sensor.robbie_dock_dock_error
+              icon: 💧
+              message: Roborock Water Tank Empty
+              name: Vacuum Water Tank
+              operator: '!='
+              priority: 3
+              state: ok
+              theme: leak
+          clear_message: ''
+          clear_theme: success
+          cycle_animation: slide
+          cycle_interval: 5
+          grid_options:
+            columns: full
+          ha_theme: true
+          overlay_duration: 10
+          overlay_mode: true
+          overlay_position: bottom
+          overlay_scale: 1.5
+          show_when_clear: false
+          swipe_to_snooze: true
+
+        - type: custom:mushroom-alarm-control-panel-card
+          entity: alarm_control_panel.home_alarm
+          name: Home Alarm
+          states: [armed_home, armed_away]
+          grid_options:
+            columns: full
+            rows: 2
+        - type: custom:mushroom-template-card
+          entity: cover.garage_door_v2
+          primary: Garage Door
+          secondary: '{{ states(''input_select.garage_door_state'') }}'
+          icon: |
+            {% set s = states('cover.garage_door_v2') %}
+            {{ {'open': 'mdi:garage-open-variant',
+                'opening': 'mdi:arrow-up-bold-box-outline',
+                'closing': 'mdi:arrow-down-bold-box-outline'}.get(s, 'mdi:garage-variant') }}
+          color: >-
+            {{ 'red' if is_state('cover.garage_door_v2', 'open') else 'grey' }}
+          badge_color: >-
+            {{ 'red' if is_state('binary_sensor.garage_door_sensor_contact', 'on') else 'grey' }}
+          tap_action:
+            action: toggle
+          vertical: false
+          grid_options:
+            columns: 6
+            rows: 1
+        - type: custom:mushroom-template-card
+          entity: input_boolean.front_door
+          primary: Front Door
+          secondary: >-
+            {{ 'Locked' if is_state('input_boolean.front_door', 'off') else 'Unlocked' }} • {{ 'Closed' if
+            is_state('binary_sensor.front_door_contact', 'off') else 'Open' }}
+          icon: >-
+            {{ 'mdi:lock' if is_state('input_boolean.front_door', 'off') else 'mdi:lock-off-outline' }}
+          color: >-
+            {{ 'grey' if is_state('input_boolean.front_door', 'off') else 'red' }}
+          badge_icon: >
+            {{ 'mdi:door-open' if is_state('binary_sensor.front_door_contact', 'on')
+               or is_state('binary_sensor.crimsafe_door_contact', 'on') else 'mdi:door-closed' }}
+          badge_color: >-
+            {{ 'red' if is_state('binary_sensor.front_door_contact', 'on') else 'grey' }}
+          tap_action:
+            action: toggle
+          vertical: false
+          grid_options:
+            columns: 6
+            rows: 1
+
+        # Energy: stats row, live flow, EV chargers, self-powered, link
+        - type: custom:button-card
+          entity: sensor.sh50rs_a21c2106894_mppt_total_power
+          show_icon: false
+          show_name: false
+          show_state: false
+          grid_options:
+            columns: full
+          tap_action:
+            action: navigate
+            navigation_path: /energy-new/energy
+          triggers_update:
+            - sensor.sh50rs_a21c2106894_mppt_total_power
+            - sensor.sh50rs_a21c2106894_purchased_power
+            - sensor.sh50rs_a21c2106894_total_export_active_power
+            - sensor.bluey_charger_power
+            - sensor.kia_charger_power
+            - sensor.daily_import_cost
+            - sensor.daily_solar_credit
+            - sensor.current_energy_rate
+          extra_styles: |
+            .fs-wire{position:relative;height:5px;border-radius:3px;background:rgba(var(--rgb-primary-text-color),0.12);margin:0 6px 30px;overflow:hidden}
+            .fs-wire i{position:absolute;top:0;bottom:0;width:30%;border-radius:3px;animation:fsrun 1.6s linear infinite}
+            .fs-rev i{animation-direction:reverse}
+            .fs-idle i{display:none}
+            @keyframes fsrun{from{left:-30%}to{left:100%}}
+            @media (prefers-reduced-motion: reduce){.fs-wire i{animation:none;left:35%}}
+          custom_fields:
+            flow: |
+              [[[
+                const num = id => { const v = parseFloat(states[id]?.state); return isNaN(v) ? 0 : v; };
+                const w = id => {
+                  const e = states[id]; if (!e) return 0;
+                  const v = parseFloat(e.state); if (isNaN(v)) return 0;
+                  const u = (e.attributes.unit_of_measurement || '').toLowerCase();
+                  return Math.abs(u === 'kw' ? v * 1000 : v);
+                };
+                const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
+                const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
+                const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
+                const tesla = w('sensor.bluey_charger_power');
+                const kia = w('sensor.kia_charger_power');
+                const fmt = v => v >= 1000 ? (v / 1000).toFixed(1) + ' kW' : Math.round(v) + ' W';
+                const money = id => '$' + num(id).toFixed(2);
+                const house = Math.max(0, solar + imp - exp - tesla - kia);
+                const load = house + tesla + kia;
+                const self = load > 0 ? Math.round(Math.min(1, solar / load) * 100) : 0;
+                const C = { solar: '#f59e0b', grid: '#8b5cf6', home: '#3b82f6', ev: '#10b981', kia: '#14b8a6' };
+                const mute = 'var(--secondary-text-color)';
+                const gridCol = C.grid;
+                const gridCls = exp > 0 ? 'fs-rev' : (imp > 0 ? '' : 'fs-idle');
+                const speed = v => Math.max(0.5, 2.2 - (v / 1000) * 0.4).toFixed(2) + 's';
+                const tint = (col, a) => `color-mix(in srgb, ${col} ${a}%, transparent)`;
+                const tariff = states['select.grid_import_tariff']?.state || '';
+                const rate = states['sensor.current_energy_rate']?.state;
+
+                const stat = (v, l, col) => `<div><div style="font-size:17px;font-weight:700;color:${col || 'inherit'}">${v}</div><div style="font-size:11px;color:${mute}">${l}</div></div>`;
+                const node = (icon, col, val, label, big) => `
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;min-width:0">
+                    <div style="width:${big ? 70 : 56}px;height:${big ? 70 : 56}px;border-radius:${big ? 23 : 19}px;display:grid;place-items:center;background:${tint(col, 24)};box-shadow:0 0 26px ${tint(col, 40)}, inset 0 1px 0 var(--glass-hi)">
+                      <ha-icon icon="${icon}" style="--mdc-icon-size:${big ? 34 : 26}px;color:${col}"></ha-icon>
+                    </div>
+                    <div style="font-size:15px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums">${val}</div>
+                    <div style="font-size:11px;color:${mute};white-space:nowrap">${label}</div>
+                  </div>`;
+                const wire = (cls, col, v) => `<div class="fs-wire ${cls}"><i style="background:${col};animation-duration:${speed(v)}"></i></div>`;
+                const ev = (icon, col, name, v) => `
+                  <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:16px;background:var(--glass-field);min-width:0">
+                    <ha-icon icon="${icon}" style="--mdc-icon-size:18px;color:${v > 0 ? col : mute}"></ha-icon>
+                    <div style="min-width:0;text-align:left">
+                      <div style="font-size:13px;font-weight:700">${name}</div>
+                      <div style="font-size:11px;color:${mute};white-space:nowrap">${v > 0 ? 'Charging' : 'Not charging'}</div>
+                    </div>
+                    <div style="margin-left:auto;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:${v > 0 ? col : mute}">${fmt(v)}</div>
+                  </div>`;
+
+                return `
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${mute}">
+                      <ha-icon icon="mdi:home-lightning-bolt" style="--mdc-icon-size:15px"></ha-icon>Energy</div>
+                    <div style="font-size:12px;color:${mute}">${tariff}${rate ? ' · $' + Number(rate).toFixed(2) + '/kWh' : ''}</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;margin-bottom:14px">
+                    ${stat(money('sensor.daily_import_cost'), 'Today')}
+                    ${stat(money('sensor.daily_solar_credit'), 'Sold', 'var(--glass-ok)')}
+                    ${stat(money('sensor.electricity_bill_to_date'), 'Bill to date')}
+                    ${stat(money('sensor.electricity_estimated_bill'), 'Est. bill')}
+                  </div>
+                  <div style="display:grid;grid-template-columns:70px 1fr 84px 1fr 70px;align-items:center">
+                    ${node('mdi:transmission-tower', C.grid, fmt(exp || imp), exp > 0 ? 'Exporting' : imp > 0 ? 'From grid' : 'Grid idle')}
+                    ${wire(gridCls, gridCol, exp || imp)}
+                    ${node('mdi:home', C.home, fmt(load), 'Home', true)}
+                    ${wire(solar > 0 ? 'fs-rev' : 'fs-idle', C.solar, solar)}
+                    ${node(solar > 0 ? 'mdi:solar-power-variant' : 'mdi:weather-night', C.solar, fmt(solar), 'Solar')}
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+                    ${ev('phu:tesla-car', C.ev, 'Tesla', tesla)}
+                    ${ev('mdi:car-estate', C.kia, 'Kia', kia)}
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px;margin-top:14px;font-size:12px;color:${mute}">
+                    <ha-icon icon="mdi:white-balance-sunny" style="--mdc-icon-size:14px;color:${C.solar}"></ha-icon>
+                    <span>Self-powered</span>
+                    <span style="flex:1;height:7px;border-radius:4px;background:rgba(var(--rgb-primary-text-color),0.12);overflow:hidden">
+                      <i style="display:block;height:100%;width:${self}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:4px"></i>
+                    </span>
+                    <b style="color:var(--primary-text-color);font-variant-numeric:tabular-nums">${self}%</b>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--divider-color);font-size:13px;font-weight:700;color:var(--glass-link)">
+                    <span>Go to energy dashboard</span>
+                    <ha-icon icon="mdi:chevron-right" style="--mdc-icon-size:18px"></ha-icon>
+                  </div>`;
+              ]]]
+          styles:
+            card:
+              - padding: 20px 22px
+              - border-radius: 28px
+            custom_fields:
+              flow:
+                - width: 100%
+            grid:
+              - grid-template-areas: '"flow"'
+              - grid-template-columns: 1fr
+
+        - type: tile
+          entity: vacuum.robbie
+          name: Robbie
+          icon: mdi:robot-vacuum
+          icon_tap_action:
+            action: more-info
+          grid_options:
+            columns: full
+            rows: 1
+          tap_action:
+            action: perform-action
+            perform_action: browser_mod.popup
+            data:
+              title: Robbie
+              content:
+                type: vertical-stack
+                cards:
+                  - type: custom:mushroom-vacuum-card
+                    entity: vacuum.robbie
+                    commands: [start_pause, return_home, stop]
+                    icon_animation: true
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - { type: tile, entity: button.robbie_kitchen_clean, name: Kitchen, icon: 'mdi:countertop', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_kitchen_clean } } }
+                      - { type: tile, entity: button.robbie_media_clean, name: Media Room, icon: 'mdi:television-shimmer', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_media_clean } } }
+                      - { type: tile, entity: button.robbie_media_kitchen2, name: Media & Kitchen, icon: 'mdi:silverware-clean', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_media_kitchen2 } } }
+                      - { type: tile, entity: button.robbie_coffee_station_clean, name: Coffee Station, icon: 'mdi:coffee-maker', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_coffee_station_clean } } }
+                      - { type: tile, entity: button.robbie_tiled_area_clean, name: Mop Tiled Area, icon: 'mdi:vacuum-outline', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_tiled_area_clean } } }
+                      - { type: tile, entity: button.robbie_hallways, name: Hallways, icon: 'mdi:door-open', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_hallways } } }
+
+        # Laundry cards only appear while a cycle is running
+        - type: custom:mushroom-template-card
+          entity: sensor.washer_current_status
+          primary: Washer
+          icon: mdi:washing-machine
+          color: blue
+          secondary: |
+            {% set st = {'rinse_hold': 'Rinse Hold', 'cool_down': 'Cooling',
+                         'steam_softening': 'Steam'}.get(states(entity), states(entity) | replace('_', ' ') | title) %}
+            {% set end = states('sensor.washer_remaining_time') %}
+            {% if end not in ['unknown', 'unavailable', 'none', ''] %}
+              {% set mins = ((as_timestamp(end) - as_timestamp(now())) / 60) | int %}
+              {{ st }}{{ ' - ' ~ mins ~ ' min left' if mins > 0 else '' }}
+            {% else %}{{ st }}{% endif %}
+          tap_action:
+            action: navigate
+            navigation_path: /dashboard-hub/laundry
+          vertical: false
+          grid_options: { columns: 6, rows: 1 }
+          visibility:
+            - { condition: state, entity: sensor.washer_current_status, state_not: power_off }
+            - { condition: state, entity: sensor.washer_current_status, state_not: unavailable }
+        - type: custom:mushroom-template-card
+          entity: sensor.dryer_current_status
+          primary: Dryer
+          icon: mdi:tumble-dryer
+          color: green
+          secondary: >
+            {% set st = {'wrinkle_care': 'Wrinkle Care'}.get(states(entity),
+            states(entity) | replace('_', ' ') | title) %}
+            {% set end = states('sensor.dryer_remaining_time') %}
+            {% if end not in ['unknown', 'unavailable', 'none', ''] %}
+              {% set mins = ((as_timestamp(end) - as_timestamp(now())) / 60) | int %}
+              {{ st }}{{ ' - ' ~ mins ~ ' min left' if mins > 0 else '' }}
+            {% else %}{{ st }}{% endif %}
+          tap_action:
+            action: navigate
+            navigation_path: /dashboard-hub/laundry
+          vertical: false
+          grid_options: { columns: 6, rows: 1 }
+          visibility:
+            - { condition: state, entity: sensor.dryer_current_status, state_not: power_off }
+            - { condition: state, entity: sensor.dryer_current_status, state_not: unavailable }
+
+        - type: custom:navbar-card
+          template: main
