@@ -22,8 +22,7 @@ icon: mdi:garage-lock
 max_columns: 3
 path: garage
 sections:
-  - column_span: 2
-    type: grid
+  - type: grid
     cards:
       - assets_path: /local/garage-card-custom-v3
         car1_presence_entity: binary_sensor.tesla_at_home
@@ -31,15 +30,17 @@ sections:
         door_entity: cover.garage_door_v2
         grid_options:
           columns: full
-          rows: 7
+          rows: auto
         keep_open_entity: input_boolean.keep_garage_door_open
         light_entity: light.garage_light
         type: custom:garage-card
       - cameras:
           - camera_entity: camera.garage_live_view
+        dimensions:
+          aspect_ratio_mode: static
+          aspect_ratio: [16, 9]
         grid_options:
           columns: full
-          rows: 3
         type: custom:advanced-camera-card
   - type: grid
     cards:
@@ -48,14 +49,14 @@ sections:
         template: glass_vehicle
         variables:
           title: Bluey
-          image: /api/image/serve/cdd510be49f2493bc87fd540c01cea69
+          image: /api/image/serve/cdd510be49f2493bc87fd540c01cea69/512x512
           battery: sensor.bluey_battery_level
           tracker: device_tracker.bluey_location
           onroad: input_boolean.tesla_onroad
           charging: '[[[ return states["sensor.bluey_charging"]?.state === "Charging"; ]]]'
         grid_options:
           columns: 12
-          rows: 3
+          rows: 9
       - type: custom:button-card
         entity: sensor.bluey_battery_range
         name: Range
@@ -116,19 +117,21 @@ sections:
         grid_options:
           columns: 4
           rows: 1
+  - type: grid
+    cards:
       - type: custom:button-card
         entity: input_number.kia_battery_estimate
         template: glass_vehicle
         variables:
           title: Kia
-          image: /api/image/serve/b0801eee9b5f2d6fcf7972d71f0d7711
+          image: /api/image/serve/b0801eee9b5f2d6fcf7972d71f0d7711/512x512
           battery: input_number.kia_battery_estimate
           tracker: device_tracker.kia_gps_location
           onroad: input_boolean.kia_onroad
           charging: '[[[ return parseFloat(states["sensor.kia_charger_power"]?.state) > 10; ]]]'
         grid_options:
           columns: 12
-          rows: 3
+          rows: 9
       - type: custom:button-card
         entity: sensor.kia_charger_power
         name: Charge Power
@@ -175,11 +178,11 @@ sections:
           rows: 1
       - type: custom:button-card
         entity: binary_sensor.kia_at_home
-        name: At Home
+        name: Home
         icon: mdi:home-map-marker
         template: glass_chip
         label: >-
-          [[[ return entity.state === 'on' ? 'Home' : 'Away'; ]]]
+          [[[ return entity.state === 'on' ? 'At home' : 'Away'; ]]]
         tap_action:
           action: more-info
         grid_options:
