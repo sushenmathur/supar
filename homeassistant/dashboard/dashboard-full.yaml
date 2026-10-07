@@ -354,27 +354,25 @@ navbar-templates:
         tap_action:
           action: open-popup
     styles: |
+      /* Glass rail. Sizes are left to navbar-card so icon + label always fit on every view. */
       .navbar-card.desktop {
         background: var(--glass-bg) !important;
         backdrop-filter: blur(34px) saturate(190%);
         -webkit-backdrop-filter: blur(34px) saturate(190%);
-        border: 1px solid var(--glass-border);
+        border: 1px solid var(--glass-border) !important;
         border-radius: 32px !important;
         box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi) !important;
+        overflow: visible !important;
       }
-      .navbar.desktop.left { padding: 14px 10px !important; justify-content: center; }
-      .button { border-radius: 22px !important; }
+      .navbar.desktop.left { padding: 12px 8px !important; }
+      .button { border-radius: 20px !important; }
       .button.active {
         background: var(--glass-bg-soft) !important;
-        box-shadow: inset 0 1px 0 var(--glass-hi), 0 8px 20px rgba(0,0,0,0.15);
-        border-radius: 22px !important;
-        width: 72px !important;
-        height: 66px !important;
-        min-width: 72px !important;
-        min-height: 66px !important;
-        margin: 0 auto !important;
+        box-shadow: inset 0 1px 0 var(--glass-hi), 0 6px 16px rgba(0,0,0,0.12) !important;
+        border-radius: 20px !important;
       }
-      .icon.active { color: var(--primary-text-color); }
+      .icon.active, .label.active { color: var(--primary-text-color) !important; }
+      .icon, .label { color: var(--secondary-text-color); }
       .navbar-popup {
         background: var(--popup-background-color) !important;
         backdrop-filter: blur(34px) saturate(190%);
