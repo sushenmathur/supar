@@ -1,0 +1,387 @@
+<title>Supar Home Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=block">
+<style>
+/* Layout: page header + phone theme switch, three phones (A Apple Home, B Quiet, C Bento) each with notes; stacks on phones. */
+:root{
+  --bg:#f2f3f1; --surface:#fff; --fg:#151a1c; --muted:#5b676b; --line:#dbe0df; --accent:#d9661f;
+  --f-display:'Bricolage Grotesque','Figtree',system-ui,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --f-apple:-apple-system,'SF Pro Text','SF Pro Display',system-ui,'Figtree',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1113;--surface:#151b1e;--fg:#e7ecec;--muted:#95a2a5;--line:#253135;--accent:#ff9a56;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:28px 56px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4.4vw,44px);letter-spacing:-.02em;line-height:1.05;margin:0 0 10px;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:70ch}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 4px}
+.ctl .lbl{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.ctl button{font:600 13.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 14px;border-radius:999px;cursor:pointer}
+.ctl button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.ctl button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:30px;margin-top:22px;align-items:start}
+.opt{min-width:0;display:flex;flex-direction:column;gap:14px}
+.opt-head{display:flex;align-items:baseline;gap:10px}
+.opt-head .letter{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--accent);line-height:1}
+.opt-head h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0}
+.notes{display:flex;flex-direction:column;gap:10px;font-size:14px}
+.notes p{margin:0;color:var(--muted)}
+.notes dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:13.5px}
+.notes dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.notes dd{margin:0}
+.foot{margin-top:30px;font-size:13px;color:var(--muted);max-width:76ch}
+
+/* ---------- phone frame + shared ---------- */
+.frame{position:relative;width:360px;max-width:100%;margin:0 auto;border-radius:46px;padding:10px;background:#1b2124;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 24px 50px -20px rgba(0,0,0,.45)}
+.ph{position:relative;height:740px;border-radius:37px;overflow:hidden;font-size:13px;line-height:1.3}
+.ph .scr{position:absolute;inset:0;overflow-y:auto;padding:46px 14px 104px;scrollbar-width:none;display:flex;flex-direction:column;gap:14px}
+.ph .scr::-webkit-scrollbar{display:none}
+.ph .scr > *{flex-shrink:0}
+.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:98px;height:28px;border-radius:20px;background:#000;z-index:30}
+.ms{width:1em;overflow:hidden;flex:none;font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:20px;line-height:1;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 1,'wght' 450,'GRAD' 0,'opsz' 24;vertical-align:middle}
+.num{font-variant-numeric:tabular-nums}
+.ph button{all:unset;cursor:pointer;box-sizing:border-box}
+.ph button:focus-visible{outline:2px solid #ffb347;outline-offset:2px}
+.hscroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.hscroll::-webkit-scrollbar{display:none}
+.snap{position:relative;border-radius:14px;overflow:hidden;flex:none;background:linear-gradient(180deg,#3a4a52 0%,#26333a 55%,#4a4a3c 56%,#2e2e24 100%)}
+.snap::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(255,255,255,.04) 22px 24px)}
+.snap .lab{position:absolute;left:8px;bottom:6px;z-index:1;color:#fff;font-size:11px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.snap .age{position:absolute;right:7px;top:6px;z-index:1;color:#fff;font-size:9.5px;font-weight:600;background:rgba(0,0,0,.45);padding:1px 6px;border-radius:6px}
+.snap.k2{background:linear-gradient(180deg,#46405a 0%,#2e2a3a 60%,#4c4236 61%,#2c2620 100%)}
+.snap.k3{background:linear-gradient(180deg,#34483c 0%,#24342a 60%,#4a4438 61%,#2c2a22 100%)}
+
+/* ======================================================================
+   A — APPLE HOME (matched to the user's own Home app screenshot)
+   ====================================================================== */
+.A{font-family:var(--f-apple);--t-fg:#fff;--t-mute:rgba(255,255,255,.66);--tile:rgba(96,66,34,.46);--tile-on:#f4f0ea;--tile-on-fg:#141414;--chip:rgba(70,76,90,.42);
+  color:var(--t-fg);
+  background:
+    radial-gradient(90% 30% at 30% 62%,rgba(150,110,40,.55) 0%,transparent 70%),
+    radial-gradient(70% 25% at 80% 78%,rgba(120,120,60,.45) 0%,transparent 70%),
+    linear-gradient(180deg,#7f9fc2 0%,#9fb4c8 26%,#c4b9a0 44%,#9c7a45 58%,#6e5229 74%,#5a4524 100%)}
+.A[data-mode="light"]{--t-fg:#141414;--t-mute:rgba(0,0,0,.55);--tile:rgba(255,248,236,.5);--tile-on:#ffffff;--chip:rgba(255,255,255,.45);
+  background:
+    radial-gradient(90% 30% at 30% 62%,rgba(240,205,140,.6) 0%,transparent 70%),
+    linear-gradient(180deg,#bcd2ea 0%,#d7e2ec 28%,#efe4cf 46%,#e4cf9f 62%,#d6bb83 80%,#cbb07a 100%)}
+.A .top{display:flex;justify-content:flex-end}
+.A .pill{display:flex;align-items:center;gap:22px;padding:8px 18px;border-radius:24px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.A[data-mode="light"] .pill{background:rgba(255,255,255,.4)}
+.A .pill .ms{font-size:22px}
+.A h3{margin:4px 2px 0;font-size:31px;font-weight:800;letter-spacing:-.6px;line-height:1.05}
+.A .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:2px 14px}
+.A .chips::-webkit-scrollbar{display:none}
+.A .chip{flex:none;display:flex;align-items:center;gap:9px;padding:8px 16px 8px 11px;border-radius:24px;background:var(--chip);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.A .chip .ms{font-size:22px}
+.A .chip b{display:block;font-size:13px;font-weight:600}
+.A .chip small{display:block;font-size:12px;color:var(--t-mute)}
+.A .sec{display:flex;align-items:center;gap:2px;font-size:17px;font-weight:700;margin:8px 2px -4px}
+.A .sec .ms{font-size:20px;color:var(--t-mute)}
+.A .mosaic{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.A .mosaic::-webkit-scrollbar{display:none}
+.A .mosaic .col{display:flex;flex-direction:column;gap:2px;flex:none}
+.A .mosaic .snap{border-radius:0}
+.A .mosaic .first{border-radius:18px 0 0 18px}
+.A .mosaic .age{left:8px;right:auto;top:auto;bottom:6px;background:none;font-size:12px;font-weight:600;padding:0;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.A .mosaic .lab{display:none}
+.A .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.A .tile{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:20px;background:var(--tile);backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);min-width:0;min-height:62px;box-sizing:border-box;transition:background .2s}
+.A .tile .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none;background:rgba(255,255,255,.12)}
+.A[data-mode="light"] .tile .ic{background:rgba(0,0,0,.05)}
+.A .tile .ic .ms{font-size:21px;color:var(--offc,#fff)}
+.A[data-mode="light"] .tile .ic .ms{color:var(--offc,#555)}
+.A .tile .rm{font-size:11.5px;color:var(--t-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.A .tile .t{font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.A .tile .s{font-size:12px;color:var(--t-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.A .tile.on{background:var(--tile-on);color:var(--tile-on-fg)}
+.A .tile.on .s,.A .tile.on .rm{color:rgba(0,0,0,.5)}
+.A .tile.on .ic{background:transparent}
+.A .tile.on .ic .ms{color:var(--onc,#f5b400)}
+.A .tile.scene{min-height:58px;border-radius:22px;justify-content:center;gap:14px}
+.A .tile.scene .t{font-size:14px}
+.A .tile.wide{grid-column:span 2}
+.A .tile.alertt .ic{background:rgba(255,69,58,.92)} .A .tile.alertt .ic .ms{color:#fff}
+.A .bar{height:4px;border-radius:2px;background:rgba(127,127,127,.3);overflow:hidden;margin-top:5px}
+.A .bar i{display:block;height:100%;border-radius:2px;background:#34c759}
+.A .tabbar{position:absolute;left:30px;right:30px;bottom:18px;height:62px;border-radius:32px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:0 5px;box-sizing:border-box;background:rgba(120,90,50,.42);border:1px solid rgba(255,220,170,.35);backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%);z-index:6}
+.A[data-mode="light"] .tabbar{background:rgba(255,250,240,.55);border-color:rgba(255,255,255,.7)}
+.A .tabbar div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;height:52px;border-radius:26px;font-size:10.5px;font-weight:600;color:var(--t-fg)}
+.A .tabbar div .ms{font-size:24px}
+.A .tabbar div.on{background:rgba(190,110,30,.75);color:#ffd48a}
+.A[data-mode="light"] .tabbar div.on{background:rgba(255,170,60,.35);color:#a65a00}
+
+/* ======================================================================
+   B — QUIET (minimal list)
+   ====================================================================== */
+.B{font-family:var(--f-body);--q-bg:#0e0f10;--q-fg:#f2f2f0;--q-mute:#86898b;--q-line:rgba(255,255,255,.08);--q-card:#17181a;--q-acc:#ff9a56;
+  background:var(--q-bg);color:var(--q-fg)}
+.B[data-mode="light"]{--q-bg:#f6f5f2;--q-fg:#141414;--q-mute:#7c7f81;--q-line:rgba(0,0,0,.08);--q-card:#ffffff;--q-acc:#d9661f}
+.B .date{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--q-mute)}
+.B h3{margin:2px 0 0;font-family:var(--f-display);font-weight:600;font-size:30px;letter-spacing:-.6px;line-height:1.08}
+.B .sum{margin:6px 0 0;font-size:14.5px;line-height:1.45;color:var(--q-mute)}
+.B .sum b{color:var(--q-fg);font-weight:600}
+.B .sum .acc{color:var(--q-acc);font-weight:600}
+.B .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.B .quick > div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:var(--q-mute);font-weight:600}
+.B .qb{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--q-line);background:var(--q-card)}
+.B .qb .ms{font-size:22px;color:var(--q-fg)}
+.B .grp{background:var(--q-card);border-radius:18px;overflow:hidden}
+.B .gl{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--q-mute);margin:4px 4px -6px}
+.B .gl a{letter-spacing:0;text-transform:none;font-weight:600;color:var(--q-acc);font-size:12px}
+.B .row{display:flex;align-items:center;gap:12px;padding:0 14px;height:50px;border-bottom:1px solid var(--q-line);min-width:0}
+.B .row:last-child{border-bottom:0}
+.B .row .ms{font-size:20px;color:var(--q-mute)}
+.B .row .t{flex:1;min-width:0;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.B .row .v{font-size:13px;color:var(--q-mute);white-space:nowrap}
+.B .row .v.acc{color:var(--q-acc);font-weight:600}
+.B .row .ms.acc{color:var(--q-acc)}
+.B .sw{width:40px;height:24px;border-radius:12px;background:rgba(127,127,127,.3);position:relative;flex:none;transition:background .2s}
+.B .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.B .sw.on{background:var(--q-acc)} .B .sw.on::after{left:18px}
+.B .mini{width:46px;height:4px;border-radius:2px;background:var(--q-line);overflow:hidden;flex:none}
+.B .mini i{display:block;height:100%;background:var(--q-fg)}
+.B .play{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--q-fg);flex:none}
+.B .play .ms{font-size:18px;color:var(--q-bg)}
+.B .snaps{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:6px;height:150px}
+.B .snaps .snap:first-child{grid-row:span 2}
+.B .nav{position:absolute;left:50%;transform:translateX(-50%);bottom:20px;display:flex;gap:4px;padding:6px;border-radius:30px;background:var(--q-card);box-shadow:0 8px 30px rgba(0,0,0,.25);border:1px solid var(--q-line);z-index:6}
+.B .nav span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--q-mute)}
+.B .nav span.on{background:var(--q-fg);color:var(--q-bg)}
+.B .nav .ms{font-size:21px}
+
+/* ======================================================================
+   C — BENTO
+   ====================================================================== */
+.C{font-family:var(--f-body);--b-bg:#0b0c0e;--b-fg:#f3f3f3;--b-mute:#8b8f94;--b-card:#16181b;--b-card2:#1e2125;--b-line:rgba(255,255,255,.06);--b-acc:#ff9a56;
+  background:var(--b-bg);color:var(--b-fg)}
+.C[data-mode="light"]{--b-bg:#eef0f2;--b-fg:#121417;--b-mute:#6c7177;--b-card:#ffffff;--b-card2:#f3f4f6;--b-line:rgba(0,0,0,.06);--b-acc:#e2721f}
+.C .hd{display:flex;justify-content:space-between;align-items:flex-end}
+.C .hd small{display:block;font-size:11.5px;color:var(--b-mute);font-weight:600}
+.C .hd h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.5px;line-height:1.05}
+.C .avs{display:flex}
+.C .avs .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;border:2px solid var(--b-bg);margin-left:-8px;position:relative}
+.C .avs .av i{position:absolute;right:-2px;bottom:-2px;width:9px;height:9px;border-radius:50%;border:2px solid var(--b-bg)}
+.C .bento{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.C .b{background:var(--b-card);border-radius:22px;padding:13px;min-width:0;position:relative;overflow:hidden;border:1px solid var(--b-line)}
+.C .b.w{grid-column:span 2}
+.C .b.t{grid-row:span 2}
+.C .lbl{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--b-mute);letter-spacing:.02em}
+.C .lbl .ms{font-size:15px}
+.C .big{font-family:var(--f-display);font-weight:600;font-size:30px;line-height:1;letter-spacing:-.5px;margin-top:8px}
+.C .big small{font-family:var(--f-body);font-size:13px;font-weight:600;color:var(--b-mute);margin-left:2px;letter-spacing:0}
+.C .sub{font-size:11.5px;color:var(--b-mute);margin-top:4px}
+.C .icons3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.C .icons3 div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;border-radius:14px;background:var(--b-card2);font-size:10px;font-weight:600;color:var(--b-mute)}
+.C .icons3 .ms{font-size:20px;color:var(--b-fg)}
+.C .ring{width:64px;height:64px;position:absolute;right:12px;top:12px}
+.C .flowbar{display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;margin-top:10px;background:var(--b-card2)}
+.C .flowbar i{display:block;height:100%}
+.C .legend{display:flex;gap:10px;margin-top:8px;font-size:10.5px;color:var(--b-mute);flex-wrap:wrap}
+.C .legend span{display:flex;align-items:center;gap:4px}
+.C .legend i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.C .toggles{display:flex;gap:6px;margin-top:10px}
+.C .tg{flex:1;height:34px;border-radius:12px;display:grid;place-items:center;background:var(--b-card2)}
+.C .tg.on{background:var(--b-acc)}
+.C .tg .ms{font-size:18px}
+.C .tg.on .ms{color:#1d1002}
+.C .ev{display:flex;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--b-line);font-size:12.5px}
+.C .ev:first-of-type{border-top:0}
+.C .ev .tm{font:500 11px var(--f-mono);color:var(--b-acc);width:42px}
+.C .ctrl{display:flex;justify-content:space-between;margin-top:10px}
+.C .ctrl span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--b-card2)}
+.C .ctrl span.pp{background:var(--b-fg)} .C .ctrl span.pp .ms{color:var(--b-bg)}
+.C .nav{position:absolute;left:14px;right:14px;bottom:18px;height:60px;border-radius:24px;background:var(--b-card);border:1px solid var(--b-line);display:grid;grid-template-columns:repeat(6,1fr);align-items:center;z-index:6;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.C .nav div{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--b-mute);font-weight:600}
+.C .nav div .ms{font-size:21px}
+.C .nav div.on{color:var(--b-acc)}
+@media (prefers-reduced-motion: reduce){.A .tile,.B .sw,.B .sw::after{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Home Assistant · mobile-hub · redesign</div>
+    <h1>Three minimal directions for your Home view</h1>
+    <p>All three are built from the entities already in your dashboard: the people, weather, doors, alarm, lights, TV, kids' rooms, both cars, solar, vacuum, calendar and camera snapshots. Tap a light or switch in any phone to see its on and off states. Values are examples, not your live readings.</p>
+  </header>
+
+  <div class="ctl" role="group" aria-label="Phone theme">
+    <span class="lbl">Phone theme</span>
+    <button type="button" data-mode="dark" aria-pressed="true">Dark</button>
+    <button type="button" data-mode="light" aria-pressed="false">Light</button>
+  </div>
+
+  <div class="opts">
+    <article class="opt">
+      <div class="opt-head"><span class="letter">A</span><h2>Apple Home</h2></div>
+      <div class="frame"><div class="ph A" data-mode="dark" id="pA"></div></div>
+      <div class="notes">
+        <p>Matched to your own Apple Home screen: "SuPar Home" title, Climate / Lights / Security chips, a camera mosaic, cream scene buttons, three-line Favourites (room, device, state) and warm frosted tiles over a sky-to-golden wallpaper, with a floating glass tab bar. Rooms and chips open pop-ups for full control.</p>
+        <dl>
+          <dt>Feel</dt><dd>Familiar, calm, very Apple</dd>
+          <dt>Built with</dt><dd>button-card tiles, Bubble Card pop-ups for rooms and chips, a view background image</dd>
+          <dt>Trade-off</dt><dd>Fewer controls visible at once; detail lives in pop-ups</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">B</span><h2>Quiet</h2></div>
+      <div class="frame"><div class="ph B" data-mode="dark" id="pB"></div></div>
+      <div class="notes">
+        <p>The house written as a sentence: "Home is secure, 3 lights on, recycling goes out tonight." Four quick actions, then calm grouped rows with the value on the right. No colour except one orange accent for anything that needs you.</p>
+        <dl>
+          <dt>Feel</dt><dd>Editorial, the most minimal</dd>
+          <dt>Built with</dt><dd>One header button-card, simple list rows, Bubble Card pop-ups</dd>
+          <dt>Trade-off</dt><dd>Smallest visual punch; relies on reading</dd>
+        </dl>
+      </div>
+    </article>
+
+    <article class="opt">
+      <div class="opt-head"><span class="letter">C</span><h2>Bento</h2></div>
+      <div class="frame"><div class="ph C" data-mode="dark" id="pC"></div></div>
+      <div class="notes">
+        <p>One glance per area. A grid of mixed-size cards, each with a single big number: indoor temperature, home security, solar, Bluey's battery ring, lights on, now playing, today's calendar. Tap a card to open its pop-up.</p>
+        <dl>
+          <dt>Feel</dt><dd>Modern, widget-like, scannable</dd>
+          <dt>Built with</dt><dd>button-card in a 2-column grid, Bubble Card pop-ups</dd>
+          <dt>Trade-off</dt><dd>Needs the most custom card styling</dd>
+        </dl>
+      </div>
+    </article>
+  </div>
+
+  <p class="foot">The tabs (Favourites, Lights, Kids, Tesla, Garage, Solar, Vacuum) become pop-ups in all three, so the home screen stays short. Your other pages (Cameras, Media, Climate, Devices) and their navbar routes are unchanged. Pick A, B or C and I'll write the YAML from your current config.</p>
+</div>
+
+<script>
+const ic=(n,s='')=>`<span class="ms" style="${s}">${n}</span>`;
+const S={
+  temp:22,cond:'Partly cloudy',feels:23,hum:68,date:'Tue 7 Oct',
+  lights:[['Pendants','vanity-light',1,80],['Media Downlights','light-recessed',1,100],['Dining','ceiling-light',1,40],['Kitchen Bench','led-strip-variant',0,0],['Hallway','light-recessed',0,0],['Corridor','light-recessed',0,0]],
+};
+function lightsOn(){return S.lights.filter(l=>l[2]).length}
+const icm={ 'vanity-light':'wb_incandescent','light-recessed':'radio_button_checked','ceiling-light':'light','led-strip-variant':'linear_scale'};
+
+/* ---------- A: Apple Home ---------- */
+function A(){
+  const t=(icon,room,name,state,on,col,off,extra='')=>`<button class="tile${on?' on':''} ${extra}" data-toggle style="--onc:${col||'#f5b400'};${off?'--offc:'+off:''}"><span class="ic">${ic(icon)}</span><span style="min-width:0">${room?`<div class="rm">${room}</div>`:''}<div class="t">${name}</div>${state?`<div class="s">${state}</div>`:''}</span></button>`;
+  const L=S.lights.map((l,i)=>`<button class="tile${l[2]?' on':''}" data-light="${i}"><span class="ic">${ic('lightbulb')}</span><span style="min-width:0"><div class="rm">Living &amp; Kitchen</div><div class="t">${l[0]}</div><div class="s">${l[2]?l[3]+'%':'Off'}</div></span></button>`).join('');
+  const sn=(w,h,k,age,first)=>`<div class="snap ${k}${first?' first':''}" style="width:${w}px;height:${h}px"><span class="age">${age}</span></div>`;
+  return `
+  <div class="top"><span class="pill">${ic('add')}${ic('more_horiz')}</span></div>
+  <h3>SuPar Home</h3>
+  <div class="chips">
+    <div class="chip">${ic('mode_fan','color:#64d2ff')}<span><b>Climate</b><small>23.0 – 25.0°</small></span></div>
+    <div class="chip">${ic('lightbulb','color:#ffd60a')}<span><b>Lights</b><small data-count>${lightsOn()} On</small></span></div>
+    <div class="chip">${ic('lock','color:#63e6be')}<span><b>Security</b><small>No Alerts</small></span></div>
+    <div class="chip">${ic('tv','color:#bf5af2')}<span><b>Speakers &amp; TVs</b><small>1 Playing</small></span></div>
+    <div class="chip">${ic('bolt','color:#ffb020')}<span><b>Energy</b><small>1.1 kW</small></span></div>
+  </div>
+  <div class="sec">Cameras ${ic('chevron_right')}</div>
+  <div class="mosaic">
+    ${sn(178,190,'k2','1s',true)}
+    <div class="col">${sn(150,94,'k3','1s')}${sn(150,94,'','1s')}</div>
+    <div class="col">${sn(150,94,'','5m')}${sn(150,94,'k2','5m')}</div>
+    <div class="col">${sn(150,94,'k3','5m')}${sn(150,94,'','5m')}</div>
+  </div>
+  <div class="sec">Scenes ${ic('chevron_right')}</div>
+  <div class="g2">${t('bedtime','','Good Night','',0,'#5e5ce6','#c9c3ff','scene')}${t('wb_twilight','','Good Morning','',1,'#ff9f0a','','scene')}</div>
+  <div class="sec">Favourites</div>
+  <div class="g2">${t('lock','Front Door','Lock','Locked',0,'#ff3b5c','#63e6be')}${t('garage','Garage','Door','Closed',0,'#ff453a','#63e6be')}${t('tv','Media Room','Media TV','Netflix',1,'#bf5af2')}${t('shield','Home','Alarm','Disarmed',0,'#34c759','#63e6be')}</div>
+  <div class="sec">Living &amp; Kitchen ${ic('chevron_right')}</div>
+  <div class="g2">${L}${t('speaker','Kitchen','Speaker','Paused',0,'#bf5af2')}${t('mop','Kitchen','Robbie','Tank empty',0,'#ff453a','#ff8a80')}</div>
+  <div class="sec">Bedrooms ${ic('chevron_right')}</div>
+  <div class="g2">${t('toys','Shanaya','Room','Occupied · 24.6°',0,'','#ffb3c7')}${t('bed','Samar','Room','Clear · 26.2°',0,'','#9fd4ff')}${t('graphic_eq','Samar','White Noise','Off',0,'#5ac8fa')}${t('nightlight','Samar','Night Light','Off',0)}</div>
+  <div class="sec">Garage &amp; Cars ${ic('chevron_right')}</div>
+  <div class="g2">
+    <div class="tile" style="flex-direction:column;align-items:stretch;gap:0"><div style="display:flex;align-items:center;gap:10px"><span class="ic">${ic('electric_car','color:#34c759')}</span><span><div class="rm">Garage</div><div class="t">Bluey</div></span></div><div class="t num" style="font-size:19px;margin-top:6px">78% <span class="s" style="display:inline;font-size:11.5px">352 km · charging</span></div><div class="bar"><i style="width:78%"></i></div></div>
+    <div class="tile" style="flex-direction:column;align-items:stretch;gap:0"><div style="display:flex;align-items:center;gap:10px"><span class="ic">${ic('directions_car')}</span><span><div class="rm">Garage</div><div class="t">Sorento</div></span></div><div class="t num" style="font-size:19px;margin-top:6px">64% <span class="s" style="display:inline;font-size:11.5px">Home</span></div><div class="bar"><i style="width:64%"></i></div></div>
+    ${t('lightbulb','Garage','Light','Off',0)}${t('toggle_on','Garage','Keep Door Open','Off',0,'#34c759')}
+  </div>
+  <div class="tabbar">${[['home','Home',1],['videocam','Cameras'],['device_thermostat','Climate'],['devices','Devices']].map(n=>`<div class="${n[2]?'on':''}">${ic(n[0])}<span>${n[1]}</span></div>`).join('')}</div>`;
+}
+
+/* ---------- B: Quiet ---------- */
+function B(){
+  const row=(icon,t,v,acc,extra='')=>`<div class="row">${ic(icon,acc?'':'')}<span class="t">${t}</span>${extra}${v!=null?`<span class="v${acc?' acc':''}">${v}</span>`:''}</div>`;
+  const lrow=(l,i)=>`<button class="row" data-light="${i}" style="width:100%">${ic('lightbulb',l[2]?'color:var(--q-acc)':'')}<span class="t">${l[0]}</span>${l[2]?`<span class="mini"><i style="width:${l[3]}%"></i></span><span class="v num">${l[3]}%</span>`:''}<i class="sw${l[2]?' on':''}"></i></button>`;
+  return `
+  <div><div class="date">${S.date} · ${S.temp}° ${S.cond.toLowerCase()}</div>
+  <h3>Good evening,<br>Sushen</h3>
+  <p class="sum">Home is <b>secure</b>. <b data-count>${lightsOn()} lights</b> on. <span class="acc">Recycling goes out tonight.</span> Paro is home; you're <b>18 min</b> away.</p></div>
+  <div class="quick">
+    <div><span class="qb">${ic('bedtime')}</span>Good Night</div>
+    <div><span class="qb">${ic('wb_twilight')}</span>Morning</div>
+    <div><span class="qb">${ic('record_voice_over')}</span>Announce</div>
+    <div><span class="qb">${ic('call')}</span>Call Paro</div>
+  </div>
+  <div class="gl">Needs attention</div>
+  <div class="grp">${row('water_drop','Roborock tank empty','Robbie',true)}${row('delete','Recycling bin','Tonight',true)}</div>
+  <div class="gl">Security</div>
+  <div class="grp">${row('garage','Garage door','Closed')}${row('lock','Front door','Locked')}${row('shield','Alarm','Disarmed')}</div>
+  <div class="gl">Cameras <a>All 7 ›</a></div>
+  <div class="snaps"><div class="snap"><span class="age">Live</span><span class="lab">Driveway</span></div><div class="snap k2"><span class="lab">Front Door</span></div><div class="snap k3"><span class="lab">Backyard</span></div></div>
+  <div class="gl">Lights <a>All lights ›</a></div>
+  <div class="grp">${S.lights.slice(0,4).map(lrow).join('')}</div>
+  <div class="gl">Playing</div>
+  <div class="grp"><div class="row">${ic('tv')}<span class="t">Media TV<br><span style="font-size:12px;color:var(--q-mute)">Netflix</span></span><span class="play">${ic('pause')}</span></div>${row('speaker','Kitchen speaker','Paused')}</div>
+  <div class="gl">Cars & energy</div>
+  <div class="grp">${row('electric_car','Bluey','78% · charging',false,`<span class="mini"><i style="width:78%"></i></span>`)}${row('directions_car','Sorento','64%',false,`<span class="mini"><i style="width:64%"></i></span>`)}${row('bolt','House','1.1 kW from grid')}${row('solar_power','Solar today','$0.52 sold')}</div>
+  <div class="gl">Kids</div>
+  <div class="grp">${row('toys','Shanaya','Occupied · 24.6°')}${row('bed','Samar','Clear · 26.2°')}</div>
+  <div class="nav">${['home','videocam','device_thermostat','devices','more_horiz'].map((n,i)=>`<span class="${i?'':'on'}">${ic(n)}</span>`).join('')}</div>`;
+}
+
+/* ---------- C: Bento ---------- */
+function C(){
+  const ring=(p,col)=>`<svg class="ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="var(--b-card2)" stroke-width="7"/><circle cx="32" cy="32" r="26" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(p/100*163.4).toFixed(1)} 163.4" transform="rotate(-90 32 32)"/><text x="32" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="var(--b-fg)">${p}%</text></svg>`;
+  return `
+  <div class="hd"><div><small>${S.date} · Good evening</small><h3>Sushen</h3></div><div class="avs"><span class="av" style="background:#3a7bd5">S<i style="background:#ffb020"></i></span><span class="av" style="background:#c2508a">P<i style="background:#30d158"></i></span></div></div>
+  <div class="bento">
+    <div class="b t"><div class="lbl">${ic('partly_cloudy_day','color:#ffc53d')}Outside</div><div class="big num">${S.temp}°</div><div class="sub">${S.cond}<br>feels ${S.feels}° · ${S.hum}%</div>
+      <div class="lbl" style="margin-top:16px">${ic('home')}Inside</div><div class="big num" style="font-size:24px">25.2°</div><div class="sub">4 rooms · ACs off</div></div>
+    <div class="b"><div class="lbl">${ic('shield','color:#30d158')}Security</div><div class="big" style="font-size:20px;margin-top:6px">All locked</div>
+      <div class="icons3"><div>${ic('garage')}Garage</div><div>${ic('lock')}Front</div><div>${ic('shield')}Alarm</div></div></div>
+    <div class="b"><div class="lbl">${ic('lightbulb','color:var(--b-acc)')}Lights</div><div class="big num"><span data-count>${lightsOn()}</span><small>on</small></div>
+      <div class="toggles">${S.lights.slice(0,3).map((l,i)=>`<button class="tg${l[2]?' on':''}" data-light="${i}" aria-label="${l[0]}">${ic('lightbulb')}</button>`).join('')}</div></div>
+    <div class="b w"><div class="lbl">${ic('bolt','color:#ffb020')}Energy now</div><div class="big num">1.1<small>kW</small></div><div class="sub">All from grid · solar 0 W · today $2.07 used, $0.52 sold</div>
+      <div class="flowbar"><i style="flex:1;background:#a67cff"></i></div><div class="legend"><span><i style="background:#ffb020"></i>Solar 0%</span><span><i style="background:#a67cff"></i>Grid 100%</span><span><i style="background:#30d158"></i>Cars 0 W</span></div></div>
+    <div class="b">${ring(78,'#30d158')}<div class="lbl">${ic('electric_car')}Bluey</div><div class="big num" style="font-size:22px;margin-top:30px">352<small>km</small></div><div class="sub">Home · charging</div></div>
+    <div class="b">${ring(64,'#2bb5a6')}<div class="lbl">${ic('directions_car')}Sorento</div><div class="big num" style="font-size:22px;margin-top:30px">Home</div><div class="sub">Not charging</div></div>
+    <div class="b w" style="padding:0;height:150px"><div class="snap" style="position:absolute;inset:0;border-radius:0"><span class="age">Live</span><span class="lab">Driveway · 7 cameras ›</span></div></div>
+    <div class="b"><div class="lbl">${ic('tv','color:#bf5af2')}Media TV</div><div class="big" style="font-size:19px;margin-top:8px">Netflix</div><div class="sub">Playing</div><div class="ctrl"><span>${ic('skip_previous')}</span><span class="pp">${ic('pause')}</span><span>${ic('skip_next')}</span></div></div>
+    <div class="b"><div class="lbl">${ic('child_care')}Kids</div><div class="sub" style="margin-top:10px;color:var(--b-fg);font-weight:600">Shanaya · in room</div><div class="sub">24.6° · cam ›</div><div class="sub" style="margin-top:8px;color:var(--b-fg);font-weight:600">Samar · clear</div><div class="sub">26.2° · cam ›</div></div>
+    <div class="b w"><div class="lbl">${ic('event','color:var(--b-acc)')}Today</div>
+      <div class="ev"><span class="tm">18:30</span>Swimming pick-up</div><div class="ev"><span class="tm">20:00</span>Recycling bin out</div></div>
+    <div class="b w" style="display:flex;align-items:center;gap:10px"><span style="width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(255,90,79,.16)">${ic('water_drop','color:#ff5a4f')}</span><div><div style="font-weight:700;font-size:13px">Robbie needs water</div><div class="sub" style="margin:0">Docked · tap for clean modes</div></div></div>
+  </div>
+  <div class="nav">${[['home','Home'],['videocam','Cameras'],['music_note','Media'],['thermostat','Climate'],['devices','Devices'],['more_horiz','More']].map((n,i)=>`<div class="${i?'':'on'}">${ic(n[0])}<span>${n[1]}</span></div>`).join('')}</div>`;
+}
+
+const R={A,B,C};
+function renderAll(){
+  ['A','B','C'].forEach(k=>{
+    const ph=document.getElementById('p'+k);
+    const top=ph.querySelector('.scr')?.scrollTop||0;
+    const html=R[k]();
+    const navStart=html.search(/<div class="(tabbar|nav)">/);
+    ph.innerHTML=`<div class="notch"></div><div class="scr">${html.slice(0,navStart)}</div>${html.slice(navStart)}`;
+    ph.querySelector('.scr').scrollTop=top;
+  });
+}
+document.addEventListener('click',e=>{
+  const l=e.target.closest('[data-light]');
+  if(l){const i=+l.dataset.light;S.lights[i][2]=S.lights[i][2]?0:1;if(S.lights[i][2]&&!S.lights[i][3])S.lights[i][3]=100;renderAll();return;}
+  const t=e.target.closest('[data-toggle]');
+  if(t&&!t.classList.contains('scene')){t.classList.toggle('on');}
+  const m=e.target.closest('[data-mode]');
+  if(m&&m.tagName==='BUTTON'){document.querySelectorAll('.ctl [data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b===m)));document.querySelectorAll('.ph').forEach(p=>p.dataset.mode=m.dataset.mode);}
+});
+renderAll();
+</script>
