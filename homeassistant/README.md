@@ -11,7 +11,13 @@ light/dark mode, B's layout, A's energy card, and glass popups.
 | `dashboard/templates.yaml` | `button_card_templates` and `navbar-templates` blocks (same seven routes, badges and popups) |
 | `dashboard/home-view.yaml` | The redesigned `hubhome` view |
 
-## Install
+## Quickest install: one file
+
+`dashboard/dashboard-full.yaml` is the **complete** raw configuration (templates + new Home view + your other nine views unchanged).
+Back up your current raw config, select all in the Raw configuration editor, paste it in and save.
+The separate files below are the same content split up, if you prefer to merge by hand.
+
+## Install (step by step)
 
 1. **Cards needed** (you already use all of them): button-card, card-mod, mushroom, navbar-card,
    clock-weather-card, calendar-card-pro, wheelie-bin-card, alert-ticker-card, browser_mod.

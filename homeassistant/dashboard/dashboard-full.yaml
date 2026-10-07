@@ -1,0 +1,3094 @@
+# =============================================================================
+# Glass dashboard: COMPLETE raw configuration (replace everything in the editor)
+# Dashboard > pencil > three dots > Raw configuration editor > select all > paste > Save.
+# BACK UP your current raw config first (select all, copy to a file).
+# Contains: button_card_templates, navbar-templates, the redesigned Home view (hubhome)
+# and your other nine views carried over unchanged.
+# =============================================================================
+button_card_templates:
+
+  # ---- Quick actions (Good Night / Announce / Lost Phone / WiFi) ----
+  glass_action:
+    section_mode: true
+    show_icon: true
+    show_name: true
+    show_state: false
+    styles:
+      card:
+        - height: 84px
+        - border-radius: 24px
+        - background: var(--glass-bg-soft)
+        - border: 1px solid var(--glass-border)
+        - box-shadow: inset 0 1px 0 var(--glass-hi)
+        - padding: 10px 4px
+      grid:
+        - grid-template-areas: '"i" "n"'
+        - grid-template-rows: 1fr min-content
+      icon:
+        - width: 24px
+        - color: var(--primary-text-color)
+      name:
+        - font-size: 11px
+        - font-weight: 600
+        - color: var(--primary-text-color)
+
+  # ---- Room tiles. Tint is an "r,g,b" string; lit when any listed light is on ----
+  room_tile:
+    section_mode: true
+    show_label: true
+    show_state: false
+    label: |
+      [[[
+        const on = (variables.lights || []).filter(e => states[e]?.state === 'on').length;
+        return on ? `${on} on` : 'All off';
+      ]]]
+    variables:
+      tint: '150,150,200'
+      lights: []
+      force_on: false
+    styles:
+      card:
+        - height: 96px
+        - border-radius: 26px
+        - padding: 0 18px
+        - background: |
+            [[[
+              const lit = variables.force_on || (variables.lights || []).some(e => states[e]?.state === 'on');
+              return lit
+                ? 'linear-gradient(135deg, rgba(255,196,90,0.62), rgba(255,140,40,0.34))'
+                : `linear-gradient(135deg, rgba(${variables.tint},0.42), rgba(${variables.tint},0.14))`;
+            ]]]
+        - box-shadow: |
+            [[[
+              const lit = variables.force_on || (variables.lights || []).some(e => states[e]?.state === 'on');
+              return (lit ? 'var(--glass-on-glow), ' : '') + 'inset 0 1px 0 var(--glass-hi)';
+            ]]]
+        - border: 1px solid var(--glass-border)
+      grid:
+        - grid-template-areas: '"i n" "i l"'
+        - grid-template-columns: 52px 1fr
+        - grid-template-rows: 1fr 1fr
+        - column-gap: 14px
+      img_cell:
+        - width: 52px
+        - height: 52px
+        - border-radius: 18px
+        - background: var(--glass-field)
+        - align-self: center
+      icon:
+        - width: 26px
+        - color: var(--primary-text-color)
+      name:
+        - justify-self: start
+        - align-self: end
+        - font-weight: 700
+        - font-size: 16px
+        - color: var(--primary-text-color)
+      label:
+        - justify-self: start
+        - align-self: start
+        - font-size: 12px
+        - color: var(--secondary-text-color)
+
+  # ---- Light / switch tile with a toggle pill ----
+  glass_toggle:
+    section_mode: true
+    show_state: false
+    show_label: true
+    label: '[[[ return entity.state === "on" ? "On" : "Off"; ]]]'
+    tap_action:
+      action: toggle
+    hold_action:
+      action: more-info
+    custom_fields:
+      sw: |
+        [[[
+          const on = entity.state === 'on';
+          return `<div style="width:34px;height:20px;border-radius:10px;position:relative;background:${on ? 'rgba(255,255,255,0.85)' : 'rgba(128,128,128,0.35)'}">
+            <i style="position:absolute;top:2px;left:${on ? 16 : 2}px;width:16px;height:16px;border-radius:50%;background:${on ? '#f59e0b' : '#fff'};transition:.2s"></i></div>`;
+        ]]]
+    styles:
+      card:
+        - height: 100%
+        - border-radius: 24px
+        - padding: 14px 16px
+        - background: |
+            [[[ return entity.state === 'on' ? 'var(--glass-on-bg)' : 'var(--glass-bg-soft)'; ]]]
+        - box-shadow: |
+            [[[ return (entity.state === 'on' ? 'var(--glass-on-glow), ' : '') + 'inset 0 1px 0 var(--glass-hi)'; ]]]
+        - border: 1px solid var(--glass-border)
+      grid:
+        - grid-template-areas: '"i sw" "n n" "l l"'
+        - grid-template-columns: 1fr auto
+        - grid-template-rows: 1fr min-content min-content
+      icon:
+        - width: 26px
+        - justify-self: start
+        - color: var(--primary-text-color)
+      custom_fields:
+        sw:
+          - justify-self: end
+          - align-self: start
+      name:
+        - justify-self: start
+        - font-size: 15px
+        - font-weight: 700
+        - color: var(--primary-text-color)
+      label:
+        - justify-self: start
+        - font-size: 12px
+        - color: var(--secondary-text-color)
+
+  # ---- Status chip: vehicles and room occupancy ----
+  glass_chip:
+    section_mode: true
+    show_state: false
+    show_label: true
+    styles:
+      card:
+        - height: 100%
+        - border-radius: 22px
+        - padding: 0 14px
+        - background: |
+            [[[ return variables.hot ? 'linear-gradient(145deg, rgba(255,120,150,0.4), rgba(255,80,120,0.15))' : 'var(--glass-bg-soft)'; ]]]
+        - border: 1px solid var(--glass-border)
+        - box-shadow: inset 0 1px 0 var(--glass-hi)
+      grid:
+        - grid-template-areas: '"i n" "i l"'
+        - grid-template-columns: 30px 1fr
+        - column-gap: 11px
+      icon:
+        - width: 22px
+        - color: |
+            [[[ return variables.hot ? 'var(--glass-bad)' : 'var(--primary-text-color)'; ]]]
+      name:
+        - justify-self: start
+        - align-self: end
+        - font-size: 14px
+        - font-weight: 700
+        - color: var(--primary-text-color)
+      label:
+        - justify-self: start
+        - align-self: start
+        - font-size: 12px
+        - color: var(--secondary-text-color)
+    variables:
+      hot: false
+
+  # ---- Person: avatar, place, battery, network ----
+  glass_person:
+    section_mode: true
+    show_icon: false
+    show_name: false
+    show_state: false
+    triggers_update: all
+    tap_action:
+      action: more-info
+    custom_fields:
+      body: |
+        [[[
+          const place = {
+            home: 'Home', not_home: 'Away', 'Sushen - Work': 'Office',
+            'Paro - Work': 'Work', Gym: 'Gym'
+          }[entity.state] || entity.state;
+          const batt = parseFloat(states[variables.battery]?.state);
+          const net = variables.network ? states[variables.network]?.state : null;
+          const ago = (() => {
+            const m = Math.max(0, Math.round((Date.now() - new Date(entity.last_changed)) / 60000));
+            return m < 60 ? `${m} min ago` : `${Math.round(m / 60)} hrs ago`;
+          })();
+          const pic = entity.attributes.entity_picture
+            ? `<img src="${entity.attributes.entity_picture}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--glass-hi)">`
+            : `<div style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--primary-color);color:#fff">${entity.attributes.friendly_name[0]}</div>`;
+          return `<div style="display:flex;gap:12px;align-items:center">${pic}
+            <div style="text-align:left;line-height:1.35">
+              <div style="font-size:16px;font-weight:700">${entity.attributes.friendly_name}</div>
+              <div style="font-size:12px;color:var(--secondary-text-color)">${place} · ${ago}</div>
+              <div style="font-size:12px;font-weight:600;color:${batt > 20 ? 'var(--glass-ok)' : 'var(--glass-bad)'}">
+                ${isNaN(batt) ? '' : Math.round(batt) + '%'}${net ? ' · ' + net : ''}</div>
+            </div></div>`;
+        ]]]
+    styles:
+      card:
+        - height: 96px
+        - border-radius: 24px
+        - padding: 10px 14px
+        - background: var(--glass-bg)
+        - border: 1px solid var(--glass-border)
+        - box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi)
+      grid:
+        - grid-template-areas: '"body"'
+      custom_fields:
+        body:
+          - justify-self: start
+    variables:
+      battery: ''
+      network: ''
+
+  # ---- World clock (day/night aware) ----
+  world_clock:
+    icon: |-
+      [[[ return states[variables.daytime]?.state === 'on'
+            ? 'mdi:weather-sunny' : 'mdi:weather-night'; ]]]
+    layout: icon_name_state2nd
+    section_mode: true
+    show_state: true
+    state_display: |-
+      [[[ return new Date().toLocaleTimeString('en-AU', {
+            timeZone: variables.tz, hour: 'numeric', minute: '2-digit' }); ]]]
+    styles:
+      card:
+        - height: 100%
+        - padding: 6px 14px
+        - border-radius: 22px
+        - background: |-
+            [[[ return states[variables.daytime]?.state === 'on'
+                ? 'linear-gradient(135deg, rgba(143,211,255,0.55), rgba(255,233,168,0.45))'
+                : 'linear-gradient(135deg, rgba(15,27,61,0.55), rgba(42,58,107,0.4))'; ]]]
+        - border: 1px solid var(--glass-border)
+        - box-shadow: inset 0 1px 0 var(--glass-hi)
+      icon:
+        - width: 24px
+        - color: |-
+            [[[ return states[variables.daytime]?.state === 'on' ? '#f59e0b' : '#c7d2fe'; ]]]
+      name:
+        - font-size: 12px
+        - font-weight: 600
+        - color: var(--secondary-text-color)
+      state:
+        - font-size: 19px
+        - font-weight: 700
+        - color: var(--primary-text-color)
+    triggers_update: all
+    variables:
+      daytime: ''
+      tz: UTC
+
+navbar-templates:
+  main:
+    desktop:
+      min_width: 600
+      position: left
+      show_labels: true
+      show_popup_label_backgrounds: true
+    layout:
+      auto_padding:
+        desktop_px: 120
+        enabled: true
+        mobile_px: 100
+      reflect_child_state: true
+    mobile:
+      mode: docked
+      show_labels: true
+    routes:
+      - icon: mdi:home
+        label: Home
+        url: /dashboard-hub/hubhome
+      - icon: mdi:floor-plan
+        label: Rooms
+        popup:
+          - icon: mdi:sofa
+            label: Living
+            url: /dashboard-hub/living-room
+          - icon: mdi:teddy-bear
+            label: Kids
+            url: /dashboard-hub/kidsroom
+          - icon: mdi:garage-variant
+            label: Garage
+            url: /dashboard-hub/garage
+          - icon: mdi:gate
+            label: Outdoor
+            url: /dashboard-hub/outdoor
+          - icon: mdi:washing-machine
+            label: Laundry
+            url: /dashboard-hub/laundry
+        tap_action:
+          action: open-popup
+      - badge:
+          count: |
+            [[[ return Object.values(states).filter(e =>
+                  e.entity_id.startsWith('light.') &&
+                  !e.entity_id.startsWith('light.browser') && e.state === 'on').length; ]]]
+          show: |
+            [[[ return Object.values(states).some(e =>
+                  e.entity_id.startsWith('light.') &&
+                  !e.entity_id.startsWith('light.browser') && e.state === 'on'); ]]]
+        icon: mdi:lightbulb-outline
+        icon_selected: mdi:lightbulb-on
+        label: Lights
+        url: /dashboard-hub/lights
+      - icon: mdi:thermometer
+        label: Climate
+        url: /dashboard-hub/homeclimate
+      - badge:
+          count: |
+            [[[ return ['binary_sensor.garage_door_sensor_contact',
+                        'binary_sensor.front_door_contact',
+                        'binary_sensor.hallwaydoorsensor_contact',
+                        'binary_sensor.patio_door_contact',
+                        'binary_sensor.side_door_contact',
+                        'binary_sensor.laundrydoorsensor_contact']
+                  .filter(id => states[id]?.state === 'on').length; ]]]
+          show: |
+            [[[ return ['binary_sensor.garage_door_sensor_contact',
+                        'binary_sensor.front_door_contact',
+                        'binary_sensor.hallwaydoorsensor_contact',
+                        'binary_sensor.patio_door_contact',
+                        'binary_sensor.side_door_contact',
+                        'binary_sensor.laundrydoorsensor_contact']
+                  .some(id => states[id]?.state === 'on'); ]]]
+        icon: mdi:security
+        label: Security
+        url: /dashboard-hub/security
+      - icon: mdi:multimedia
+        label: Media
+        url: /dashboard-hub/media_new
+      - icon: mdi:dots-horizontal
+        label: More
+        popup:
+          - icon: mdi:devices
+            label: iCloud3
+            url: /ic3db-icloud3
+          - icon: mdi:cog
+            label: Settings
+            url: /config
+          - icon: mdi:hammer
+            label: Dev tools
+            url: /developer-tools/yaml
+          - icon: mdi:restart
+            label: Restart
+            tap_action:
+              action: perform-action
+              confirmation:
+                text: Are you sure you want to restart Home Assistant?
+              perform_action: homeassistant.restart
+        tap_action:
+          action: open-popup
+    styles: |
+      .navbar-card.desktop {
+        background: var(--glass-bg) !important;
+        backdrop-filter: blur(34px) saturate(190%);
+        -webkit-backdrop-filter: blur(34px) saturate(190%);
+        border: 1px solid var(--glass-border);
+        border-radius: 32px !important;
+        box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi) !important;
+      }
+      .navbar.desktop.left { padding: 14px 10px !important; justify-content: center; }
+      .button { border-radius: 22px !important; }
+      .button.active {
+        background: var(--glass-bg-soft) !important;
+        box-shadow: inset 0 1px 0 var(--glass-hi), 0 8px 20px rgba(0,0,0,0.15);
+        border-radius: 22px !important;
+        width: 72px !important;
+        height: 66px !important;
+        min-width: 72px !important;
+        min-height: 66px !important;
+        margin: 0 auto !important;
+      }
+      .icon.active { color: var(--primary-text-color); }
+      .navbar-popup {
+        background: var(--popup-background-color) !important;
+        backdrop-filter: blur(34px) saturate(190%);
+        -webkit-backdrop-filter: blur(34px) saturate(190%);
+        border: 1px solid var(--glass-border);
+        border-radius: 28px !important;
+      }
+
+views:
+  - background:
+      alignment: center
+      attachment: fixed
+      image:
+        media_content_id: media-source://image_upload/3def5229108dac26fd7a30aa96e91398
+        media_content_type: image/png
+      opacity: 20
+      repeat: repeat
+      size: cover
+    badges:
+      # Only the conditional low-battery badge stays as a badge. Vehicles and room occupancy
+      # are now status chips in the middle column.
+      - color: red
+        content: Side Camera Battery Low
+        entity: sensor.side_battery
+        icon: mdi:battery-20
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-badge
+        visibility:
+          - below: 20
+            condition: numeric_state
+            entity: sensor.side_battery
+    dense_section_placement: true
+    header:
+      badges_position: top
+      badges_wrap: scroll
+      layout: center
+    icon: mdi:home-assistant
+    max_columns: 3
+    path: hubhome
+    title: Home
+    top_margin: false
+    type: sections
+    sections:
+
+      # ------------------------------------------------------------------
+      # Section 1 (full width): greeting + people + quick actions, then rooms
+      # ------------------------------------------------------------------
+      - column_span: 3
+        type: grid
+        cards:
+          - type: horizontal-stack
+            grid_options:
+              columns: full
+            cards:
+              - type: custom:button-card
+                triggers_update: all
+                show_icon: false
+                show_name: false
+                show_state: false
+                custom_fields:
+                  body: |
+                    [[[
+                      const d = new Date();
+                      const tz = { timeZone: 'Australia/Brisbane' };
+                      const h = parseInt(d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', hour12: false }));
+                      const hello = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+                      const t = d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', minute: '2-digit', hour12: true }).split(' ');
+                      const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'long', day: 'numeric', month: 'long' });
+                      return `<div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+                        <div style="text-align:left">
+                          <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--secondary-text-color)">${date}</div>
+                          <div style="font-size:36px;font-weight:600;letter-spacing:-.03em;margin-top:4px">${hello}</div>
+                        </div>
+                        <div style="font-size:56px;font-weight:300;letter-spacing:-.04em;line-height:1">${t[0]}<span style="font-size:19px;font-weight:600;margin-left:4px">${(t[1] || '').toUpperCase()}</span></div>
+                      </div>`;
+                    ]]]
+                styles:
+                  card:
+                    - height: 110px
+                    - border-radius: 28px
+                    - padding: 0 30px
+                  grid:
+                    - grid-template-areas: '"body"'
+                  custom_fields:
+                    body:
+                      - width: 100%
+
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: custom:button-card
+                    entity: person.sushenmathur
+                    template: glass_person
+                    variables:
+                      battery: sensor.iphone_battery_level
+                      network: sensor.iphone_connection_type
+                  - type: custom:button-card
+                    entity: person.paro
+                    template: glass_person
+                    variables:
+                      battery: sensor.paro_phone_battery
+
+              - type: grid
+                columns: 4
+                square: false
+                cards:
+                  - type: custom:button-card
+                    entity: scene.good_night
+                    icon: mdi:weather-night
+                    name: Good Night
+                    template: glass_action
+                    tap_action:
+                      action: perform-action
+                      confirmation:
+                        text: Run the Good Night scene?
+                      perform_action: scene.turn_on
+                      target:
+                        entity_id: scene.good_night
+                  - type: custom:button-card
+                    entity: script.say_tts_message
+                    icon: mdi:bullhorn
+                    name: Announce
+                    template: glass_action
+                    tap_action:
+                      action: more-info
+                  - type: custom:button-card
+                    entity: script.lost_phone
+                    icon: mdi:cellphone-arrow-down
+                    name: Lost Phone
+                    template: glass_action
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Lost Phone
+                          content:
+                            - default: Sushen
+                              label: Phone
+                              name: phone
+                              selector:
+                                select:
+                                  options:
+                                    - Paro
+                                    - Sushen
+                            - label: Passcode
+                              name: passcode
+                              selector:
+                                text:
+                                  type: password
+                          left_button: Cancel
+                          right_button: Send alert
+                          right_button_action:
+                            service: script.lost_phone
+                            data:
+                              browser_id: THIS
+                              passcode: '{{ passcode }}'
+                              phone: '{{ phone }}'
+                  - type: custom:button-card
+                    icon: mdi:wifi
+                    name: WiFi
+                    template: glass_action
+                    tap_action:
+                      action: perform-action
+                      perform_action: browser_mod.popup
+                      data:
+                        title: Scan for WiFi
+                        content:
+                          type: picture
+                          image:
+                            media_content_id: media-source://image_upload/50750ef2d78e15cc901576e1c9fa2bae
+                            media_content_type: image/png
+
+          - type: grid
+            columns: 6
+            square: false
+            grid_options:
+              columns: full
+            cards:
+              - type: custom:button-card
+                icon: mdi:sofa
+                name: Living
+                template: room_tile
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-hub/living-room
+                variables:
+                  tint: '206,120,236'
+                  lights:
+                    - light.dining_light
+                    - light.kitchen_pendants
+                    - light.kitchen_downlights
+                    - light.kitchenled
+                    - light.sonoff_1000dbd8b7
+                    - switch.sonoff_100090d020
+              - type: custom:button-card
+                icon: mdi:teddy-bear
+                name: Kids
+                template: room_tile
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-hub/kidsroom
+                variables:
+                  tint: '255,196,110'
+                  lights:
+                    - light.aarlo_samar_cam
+                    - light.tall_lamp
+              - type: custom:button-card
+                entity: cover.garage_door_v2
+                icon: mdi:garage-variant
+                name: Garage
+                template: room_tile
+                label: |
+                  [[[
+                    return ({ open: 'Door open', closed: 'Door closed',
+                              opening: 'Door opening', closing: 'Door closing' })[entity.state]
+                           || `Door ${entity.state}`;
+                  ]]]
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-hub/garage
+                variables:
+                  tint: '170,185,205'
+                  # Glows red-amber while the door is open
+                  force_on: '[[[ return states["cover.garage_door_v2"]?.state === "open"; ]]]'
+              - type: custom:button-card
+                icon: mdi:gate
+                name: Outdoor
+                template: room_tile
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-hub/outdoor
+                variables:
+                  tint: '110,220,160'
+                  lights:
+                    - switch.patio_lights
+                    - light.backyard_light
+                    - light.driveway_light
+                    - light.laundry_light
+                    - switch.sonoff_100053e676
+                    - switch.sonoff_1000905c71
+              - type: custom:button-card
+                icon: mdi:washing-machine
+                name: Laundry
+                template: room_tile
+                label: |
+                  [[[ const w = states['sensor.washer_current_status']?.state;
+                      const d = states['sensor.dryer_current_status']?.state;
+                      const on = s => s && !['power_off','unavailable','unknown'].includes(s);
+                      if (on(w) && on(d)) return 'Washer & dryer running';
+                      if (on(w)) return 'Washer running';
+                      if (on(d)) return 'Dryer running';
+                      return 'Idle'; ]]]
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-hub/laundry
+                variables:
+                  tint: '100,180,255'
+                  force_on: |
+                    [[[ const on = s => s && !['power_off','unavailable','unknown'].includes(s);
+                        return on(states['sensor.washer_current_status']?.state)
+                            || on(states['sensor.dryer_current_status']?.state); ]]]
+              - type: custom:button-card
+                entity: media_player.tv
+                icon: mdi:multimedia
+                name: Media
+                template: room_tile
+                triggers_update: all
+                label: |
+                  [[[
+                    const skip = variables.skip || [], names = variables.names || {}, sw = variables.switches || {};
+                    const playing = Object.values(states).filter(e =>
+                      e.entity_id.startsWith('media_player.') && e.state === 'playing' &&
+                      !skip.some(s => e.entity_id.startsWith(s)))
+                      .map(e => names[e.entity_id] || e.attributes.friendly_name || e.entity_id);
+                    const on = Object.entries(sw).filter(([id, s]) =>
+                      states[id]?.state === 'on' && states[s.player]?.state !== 'playing').map(([id, s]) => s.name);
+                    const parts = [];
+                    if (playing.length === 1) parts.push(`${playing[0]} playing`);
+                    if (playing.length > 1) parts.push(`${playing.length} playing`);
+                    on.forEach(n => parts.push(`${n} on`));
+                    return parts.length ? parts.join(' · ') : 'All off';
+                  ]]]
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    service: browser_mod.popup
+                    data:
+                      title: Media
+                      dismissable: true
+                      size: normal
+                      content:
+                        type: grid
+                        columns: 2
+                        square: false
+                        cards:
+                          - type: tile
+                            entity: media_player.tv
+                            name: TV
+                            vertical: false
+                            state_content: [state, app_name, media_title]
+                            features:
+                              - type: media-player-playback
+                              - type: media-player-volume-slider
+                            features_position: bottom
+                          - type: tile
+                            entity: switch.bedroom_tv
+                            name: Bedroom TV
+                            icon: mdi:television-classic
+                            vertical: false
+                            features:
+                              - type: toggle
+                            features_position: bottom
+                          - type: tile
+                            entity: media_player.media_apple_tv
+                            name: Media Apple TV
+                            vertical: false
+                            features:
+                              - type: media-player-playback
+                              - type: media-player-volume-slider
+                            features_position: bottom
+                          - type: tile
+                            entity: media_player.bedroom_apple_tv
+                            name: Bedroom Apple TV
+                            vertical: false
+                            state_content: [state, app_name, media_title]
+                            features:
+                              - type: media-player-playback
+                              - type: media-player-volume-slider
+                            features_position: bottom
+                variables:
+                  tint: '160,130,235'
+                  names:
+                    media_player.hubs_bedroom_apple_tv: Bedroom Apple TV
+                    media_player.media_apple_tv: Media Apple TV
+                    media_player.tv: TV
+                  skip:
+                    - media_player.browser_
+                    - media_player.aarlo_
+                    - media_player.home_speakers_2
+                    - media_player.bluey_media_player
+                  switches:
+                    switch.bedroom_tv:
+                      name: Bedroom TV
+                      player: media_player.hubs_bedroom_apple_tv
+                  force_on: |
+                    [[[
+                      const skip = variables.skip || [], sw = variables.switches || {};
+                      return Object.values(states).some(e =>
+                          e.entity_id.startsWith('media_player.') && e.state === 'playing' &&
+                          !skip.some(s => e.entity_id.startsWith(s)))
+                        || Object.keys(sw).some(id => states[id]?.state === 'on');
+                    ]]]
+
+      # ------------------------------------------------------------------
+      # Section 2: Favourites
+      # ------------------------------------------------------------------
+      - type: grid
+        cards:
+          - type: heading
+            heading: Favourites
+            heading_style: title
+            icon: mdi:home-heart
+          - type: tile
+            entity: media_player.tv
+            icon: mdi:television
+            show_entity_picture: true
+            state_content: [state, source]
+            vertical: false
+            grid_options:
+              columns: 12
+              rows: 2
+            hold_action:
+              action: toggle
+            icon_tap_action:
+              action: perform-action
+              perform_action: script.media_tv_power
+            features:
+              - type: media-player-playback
+            features_position: bottom
+          - type: tile
+            entity: climate.living_room
+            name: Aircon
+            icon: mdi:air-conditioner
+            vertical: false
+            grid_options:
+              columns: 12
+              rows: 2
+            features:
+              - type: climate-hvac-modes
+            features_position: bottom
+          - type: custom:button-card
+            entity: light.kitchen_pendants
+            name: Kitchen Pendants
+            icon: mdi:ceiling-light-multiple
+            template: glass_toggle
+            grid_options: { columns: 6, rows: 2 }
+          - type: custom:button-card
+            entity: light.dining_light
+            name: Dining
+            icon: mdi:ceiling-light
+            template: glass_toggle
+            grid_options: { columns: 6, rows: 2 }
+          - type: custom:button-card
+            entity: light.sonoff_1000dbd8b7
+            name: Media Room
+            icon: mdi:light-recessed
+            template: glass_toggle
+            grid_options: { columns: 6, rows: 2 }
+          - type: custom:button-card
+            entity: switch.sonoff_100090d020
+            name: Lamp
+            icon: mdi:lamp
+            template: glass_toggle
+            grid_options: { columns: 6, rows: 2 }
+          - type: custom:button-card
+            entity: light.corridor_light
+            name: Corridor
+            icon: mdi:light-recessed
+            template: glass_toggle
+            grid_options: { columns: 6, rows: 2 }
+          - type: custom:button-card
+            entity: light.hallway_light
+            name: Hallway
+            icon: mdi:light-recessed
+            template: glass_toggle
+            grid_options: { columns: 6, rows: 2 }
+
+      # ------------------------------------------------------------------
+      # Section 3: Now (weather, calendar, status, world clocks, bins)
+      # ------------------------------------------------------------------
+      - type: grid
+        cards:
+          - type: custom:clock-weather-card
+            entity: weather.north_lakes_weather
+            name: Brisbane
+            sun_entity: sun.sun
+            date_pattern: ccc, d MMM yyyy
+            forecast_rows: 3
+            show_humidity: true
+            use_browser_time: true
+            weather_icon_type: fill
+            grid_options:
+              columns: full
+          - type: custom:calendar-card-pro
+            entities:
+              - calendar.supar_family
+            compact_days_to_show: 1
+            compact_events_complete_days: true
+            compact_events_to_show: 3
+            filter_duplicates: true
+            show_location: false
+            tap_action:
+              action: expand
+            today_weekday_color: Blue
+            weather:
+              position: event
+              date:
+                color: var(--primary-text-color)
+                font_size: 12px
+                icon_size: 14px
+                show_conditions: true
+                show_high_temp: true
+                show_low_temp: false
+              event:
+                color: var(--primary-text-color)
+                font_size: 12px
+                icon_size: 14px
+                show_conditions: true
+                show_temp: true
+          # Status chips: vehicles and room occupancy
+          - type: custom:button-card
+            entity: device_tracker.kia_gps_location
+            name: Sorento
+            icon: mdi:car-estate
+            template: glass_chip
+            label: '[[[ return entity.state === "home" ? "Home" : entity.state === "not_home" ? "Away" : entity.state; ]]]'
+            grid_options: { columns: 6, rows: 1 }
+          - type: custom:button-card
+            entity: device_tracker.bluey_location
+            name: Bluey
+            icon: mdi:car-electric
+            template: glass_chip
+            label: '[[[ return entity.state === "home" ? "Home" : entity.state === "not_home" ? "Away" : entity.state; ]]]'
+            grid_options: { columns: 6, rows: 1 }
+          - type: custom:button-card
+            entity: binary_sensor.shanaya_room_occupancy_status
+            name: Shanaya Room
+            icon: mdi:cradle
+            template: glass_chip
+            label: '[[[ return entity.state === "on" ? "Occupied" : "Clear"; ]]]'
+            variables:
+              hot: '[[[ return states["binary_sensor.shanaya_room_occupancy_status"]?.state === "on"; ]]]'
+            grid_options: { columns: 6, rows: 1 }
+          - type: custom:button-card
+            entity: binary_sensor.samar_room_occupancy_new
+            name: Samar Room
+            icon: mdi:bed
+            template: glass_chip
+            label: '[[[ return entity.state === "on" ? "Occupied" : "Clear"; ]]]'
+            variables:
+              hot: '[[[ return states["binary_sensor.samar_room_occupancy_new"]?.state === "on"; ]]]'
+            grid_options: { columns: 6, rows: 1 }
+          - type: custom:wheelie-bin-card
+            title: Next Bin Collection
+            entity:
+              - sensor.general_waste
+              - sensor.garden_organics
+              - sensor.recycling
+            bins:
+              - { color: red, icon: mdi:trash-can, label: General, match: [General Waste] }
+              - { color: green, icon: mdi:leaf, label: Garden, match: [Garden Organics] }
+              - { color: amber, icon: mdi:recycle, label: Recycling, match: [Recycling] }
+            chip_size: 22
+            chip_style: faded
+            hide_inactive: true
+            icon_size: 26
+            layout: horizontal
+            show_badges: true
+            show_labels: true
+            visibility:
+              - after: '06:00:00'
+                before: '23:59:00'
+                condition: time
+                weekdays: [mon, sun]
+          - type: custom:button-card
+            name: Austin
+            template: world_clock
+            variables:
+              daytime: binary_sensor.austin_daytime
+              tz: America/Chicago
+            grid_options: { columns: 6, rows: 1 }
+          - type: custom:button-card
+            name: India
+            template: world_clock
+            variables:
+              daytime: binary_sensor.hyd_daytime
+              tz: Asia/Kolkata
+            grid_options: { columns: 6, rows: 1 }
+
+      # ------------------------------------------------------------------
+      # Section 4: Home status (alarm, doors, energy, Robbie, laundry, alerts)
+      # ------------------------------------------------------------------
+      - type: grid
+        cards:
+          - type: custom:alert-ticker-card
+            alerts:
+              - entity: binary_sensor.garage_door_sensor_contact
+                icon: 🚨
+                message: Garage Door Open
+                name: Garage Door
+                operator: '='
+                priority: 1
+                secondary_entity: switch.sonoff_1000f6b15b
+                state: 'on'
+                theme: emergency
+                tts_engine: tts.google_ai_tts
+                tts_entity: media_player.kitchen_speaker
+                tts_notify_service: mobile_app_sushen_iphone
+                use_ha_icon: false
+              - conditions:
+                  - entity: binary_sensor.crimsafe_door_contact
+                    operator: '='
+                    state: 'on'
+                entity: binary_sensor.front_door_contact
+                icon: 🚨
+                message: Front and Security Door Open
+                operator: '='
+                priority: 1
+                state: 'on'
+                theme: emergency
+                use_ha_icon: false
+              - entity: binary_sensor.side_door_contact
+                message: Side Door Open
+                name: Side Door
+                operator: '='
+                priority: 1
+                state: 'on'
+                theme: emergency
+              - entity: binary_sensor.front_door_contact
+                icon: 🏠
+                message: Front Door Open
+                name: Front Door
+                operator: '='
+                priority: 2
+                state: 'on'
+                theme: presence
+              - entity: binary_sensor.crimsafe_door_contact
+                icon: 🔔
+                message: Security Door Open
+                name: Security Screen
+                operator: '='
+                priority: 3
+                state: 'on'
+                theme: notification
+              - entity: binary_sensor.patio_door_contact
+                icon: 🚪
+                message: Patio Door Open
+                name: Patio
+                operator: '='
+                priority: 3
+                push_notify: true
+                push_notify_service: mobile_app_suparhub2
+                state: 'on'
+                theme: door
+              - entity: binary_sensor.laundrydoorsensor_contact
+                icon: 🚪
+                message: Laundry Door Open
+                name: Laundry Door
+                operator: '='
+                priority: 3
+                state: 'on'
+                theme: door
+              - entity: sensor.robbie_dock_dock_error
+                icon: 💧
+                message: Roborock Water Tank Empty
+                name: Vacuum Water Tank
+                operator: '!='
+                priority: 3
+                state: ok
+                theme: leak
+            clear_message: ''
+            clear_theme: success
+            cycle_animation: slide
+            cycle_interval: 5
+            grid_options:
+              columns: full
+            ha_theme: true
+            overlay_duration: 10
+            overlay_mode: true
+            overlay_position: bottom
+            overlay_scale: 1.5
+            show_when_clear: false
+            swipe_to_snooze: true
+
+          - type: custom:mushroom-alarm-control-panel-card
+            entity: alarm_control_panel.home_alarm
+            name: Home Alarm
+            states: [armed_home, armed_away]
+            grid_options:
+              columns: full
+              rows: 2
+          - type: custom:mushroom-template-card
+            entity: cover.garage_door_v2
+            primary: Garage Door
+            secondary: '{{ states(''input_select.garage_door_state'') }}'
+            icon: |
+              {% set s = states('cover.garage_door_v2') %}
+              {{ {'open': 'mdi:garage-open-variant',
+                  'opening': 'mdi:arrow-up-bold-box-outline',
+                  'closing': 'mdi:arrow-down-bold-box-outline'}.get(s, 'mdi:garage-variant') }}
+            color: >-
+              {{ 'red' if is_state('cover.garage_door_v2', 'open') else 'grey' }}
+            badge_color: >-
+              {{ 'red' if is_state('binary_sensor.garage_door_sensor_contact', 'on') else 'grey' }}
+            tap_action:
+              action: toggle
+            vertical: false
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:mushroom-template-card
+            entity: input_boolean.front_door
+            primary: Front Door
+            secondary: >-
+              {{ 'Locked' if is_state('input_boolean.front_door', 'off') else 'Unlocked' }} • {{ 'Closed' if
+              is_state('binary_sensor.front_door_contact', 'off') else 'Open' }}
+            icon: >-
+              {{ 'mdi:lock' if is_state('input_boolean.front_door', 'off') else 'mdi:lock-off-outline' }}
+            color: >-
+              {{ 'grey' if is_state('input_boolean.front_door', 'off') else 'red' }}
+            badge_icon: >
+              {{ 'mdi:door-open' if is_state('binary_sensor.front_door_contact', 'on')
+                 or is_state('binary_sensor.crimsafe_door_contact', 'on') else 'mdi:door-closed' }}
+            badge_color: >-
+              {{ 'red' if is_state('binary_sensor.front_door_contact', 'on') else 'grey' }}
+            tap_action:
+              action: toggle
+            vertical: false
+            grid_options:
+              columns: 6
+              rows: 1
+
+          # Energy: stats row, live flow, EV chargers, self-powered, link
+          - type: custom:button-card
+            entity: sensor.sh50rs_a21c2106894_mppt_total_power
+            show_icon: false
+            show_name: false
+            show_state: false
+            grid_options:
+              columns: full
+            tap_action:
+              action: navigate
+              navigation_path: /energy-new/energy
+            triggers_update:
+              - sensor.sh50rs_a21c2106894_mppt_total_power
+              - sensor.sh50rs_a21c2106894_purchased_power
+              - sensor.sh50rs_a21c2106894_total_export_active_power
+              - sensor.bluey_charger_power
+              - sensor.kia_charger_power
+              - sensor.daily_import_cost
+              - sensor.daily_solar_credit
+              - sensor.current_energy_rate
+            extra_styles: |
+              .fs-wire{position:relative;height:5px;border-radius:3px;background:rgba(var(--rgb-primary-text-color),0.12);margin:0 6px 30px;overflow:hidden}
+              .fs-wire i{position:absolute;top:0;bottom:0;width:30%;border-radius:3px;animation:fsrun 1.6s linear infinite}
+              .fs-rev i{animation-direction:reverse}
+              .fs-idle i{display:none}
+              @keyframes fsrun{from{left:-30%}to{left:100%}}
+              @media (prefers-reduced-motion: reduce){.fs-wire i{animation:none;left:35%}}
+            custom_fields:
+              flow: |
+                [[[
+                  const num = id => { const v = parseFloat(states[id]?.state); return isNaN(v) ? 0 : v; };
+                  const w = id => {
+                    const e = states[id]; if (!e) return 0;
+                    const v = parseFloat(e.state); if (isNaN(v)) return 0;
+                    const u = (e.attributes.unit_of_measurement || '').toLowerCase();
+                    return Math.abs(u === 'kw' ? v * 1000 : v);
+                  };
+                  const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
+                  const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
+                  const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
+                  const tesla = w('sensor.bluey_charger_power');
+                  const kia = w('sensor.kia_charger_power');
+                  const fmt = v => v >= 1000 ? (v / 1000).toFixed(1) + ' kW' : Math.round(v) + ' W';
+                  const money = id => '$' + num(id).toFixed(2);
+                  const house = Math.max(0, solar + imp - exp - tesla - kia);
+                  const load = house + tesla + kia;
+                  const self = load > 0 ? Math.round(Math.min(1, solar / load) * 100) : 0;
+                  const C = { solar: '#f59e0b', grid: '#8b5cf6', home: '#3b82f6', ev: '#10b981', kia: '#14b8a6' };
+                  const mute = 'var(--secondary-text-color)';
+                  const gridCol = C.grid;
+                  const gridCls = exp > 0 ? 'fs-rev' : (imp > 0 ? '' : 'fs-idle');
+                  const speed = v => Math.max(0.5, 2.2 - (v / 1000) * 0.4).toFixed(2) + 's';
+                  const tint = (col, a) => `color-mix(in srgb, ${col} ${a}%, transparent)`;
+                  const tariff = states['select.grid_import_tariff']?.state || '';
+                  const rate = states['sensor.current_energy_rate']?.state;
+
+                  const stat = (v, l, col) => `<div><div style="font-size:17px;font-weight:700;color:${col || 'inherit'}">${v}</div><div style="font-size:11px;color:${mute}">${l}</div></div>`;
+                  const node = (icon, col, val, label, big) => `
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;min-width:0">
+                      <div style="width:${big ? 70 : 56}px;height:${big ? 70 : 56}px;border-radius:${big ? 23 : 19}px;display:grid;place-items:center;background:${tint(col, 24)};box-shadow:0 0 26px ${tint(col, 40)}, inset 0 1px 0 var(--glass-hi)">
+                        <ha-icon icon="${icon}" style="--mdc-icon-size:${big ? 34 : 26}px;color:${col}"></ha-icon>
+                      </div>
+                      <div style="font-size:15px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums">${val}</div>
+                      <div style="font-size:11px;color:${mute};white-space:nowrap">${label}</div>
+                    </div>`;
+                  const wire = (cls, col, v) => `<div class="fs-wire ${cls}"><i style="background:${col};animation-duration:${speed(v)}"></i></div>`;
+                  const ev = (icon, col, name, v) => `
+                    <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:16px;background:var(--glass-field);min-width:0">
+                      <ha-icon icon="${icon}" style="--mdc-icon-size:18px;color:${v > 0 ? col : mute}"></ha-icon>
+                      <div style="min-width:0;text-align:left">
+                        <div style="font-size:13px;font-weight:700">${name}</div>
+                        <div style="font-size:11px;color:${mute};white-space:nowrap">${v > 0 ? 'Charging' : 'Not charging'}</div>
+                      </div>
+                      <div style="margin-left:auto;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:${v > 0 ? col : mute}">${fmt(v)}</div>
+                    </div>`;
+
+                  return `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                      <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${mute}">
+                        <ha-icon icon="mdi:home-lightning-bolt" style="--mdc-icon-size:15px"></ha-icon>Energy</div>
+                      <div style="font-size:12px;color:${mute}">${tariff}${rate ? ' · $' + Number(rate).toFixed(2) + '/kWh' : ''}</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;margin-bottom:14px">
+                      ${stat(money('sensor.daily_import_cost'), 'Today')}
+                      ${stat(money('sensor.daily_solar_credit'), 'Sold', 'var(--glass-ok)')}
+                      ${stat(money('sensor.electricity_bill_to_date'), 'Bill to date')}
+                      ${stat(money('sensor.electricity_estimated_bill'), 'Est. bill')}
+                    </div>
+                    <div style="display:grid;grid-template-columns:70px 1fr 84px 1fr 70px;align-items:center">
+                      ${node('mdi:transmission-tower', C.grid, fmt(exp || imp), exp > 0 ? 'Exporting' : imp > 0 ? 'From grid' : 'Grid idle')}
+                      ${wire(gridCls, gridCol, exp || imp)}
+                      ${node('mdi:home', C.home, fmt(load), 'Home', true)}
+                      ${wire(solar > 0 ? 'fs-rev' : 'fs-idle', C.solar, solar)}
+                      ${node(solar > 0 ? 'mdi:solar-power-variant' : 'mdi:weather-night', C.solar, fmt(solar), 'Solar')}
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+                      ${ev('phu:tesla-car', C.ev, 'Tesla', tesla)}
+                      ${ev('mdi:car-estate', C.kia, 'Kia', kia)}
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:14px;font-size:12px;color:${mute}">
+                      <ha-icon icon="mdi:white-balance-sunny" style="--mdc-icon-size:14px;color:${C.solar}"></ha-icon>
+                      <span>Self-powered</span>
+                      <span style="flex:1;height:7px;border-radius:4px;background:rgba(var(--rgb-primary-text-color),0.12);overflow:hidden">
+                        <i style="display:block;height:100%;width:${self}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:4px"></i>
+                      </span>
+                      <b style="color:var(--primary-text-color);font-variant-numeric:tabular-nums">${self}%</b>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--divider-color);font-size:13px;font-weight:700;color:var(--glass-link)">
+                      <span>Go to energy dashboard</span>
+                      <ha-icon icon="mdi:chevron-right" style="--mdc-icon-size:18px"></ha-icon>
+                    </div>`;
+                ]]]
+            styles:
+              card:
+                - padding: 20px 22px
+                - border-radius: 28px
+              custom_fields:
+                flow:
+                  - width: 100%
+              grid:
+                - grid-template-areas: '"flow"'
+                - grid-template-columns: 1fr
+
+          - type: tile
+            entity: vacuum.robbie
+            name: Robbie
+            icon: mdi:robot-vacuum
+            icon_tap_action:
+              action: more-info
+            grid_options:
+              columns: full
+              rows: 1
+            tap_action:
+              action: perform-action
+              perform_action: browser_mod.popup
+              data:
+                title: Robbie
+                content:
+                  type: vertical-stack
+                  cards:
+                    - type: custom:mushroom-vacuum-card
+                      entity: vacuum.robbie
+                      commands: [start_pause, return_home, stop]
+                      icon_animation: true
+                    - type: grid
+                      columns: 2
+                      square: false
+                      cards:
+                        - { type: tile, entity: button.robbie_kitchen_clean, name: Kitchen, icon: 'mdi:countertop', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_kitchen_clean } } }
+                        - { type: tile, entity: button.robbie_media_clean, name: Media Room, icon: 'mdi:television-shimmer', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_media_clean } } }
+                        - { type: tile, entity: button.robbie_media_kitchen2, name: Media & Kitchen, icon: 'mdi:silverware-clean', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_media_kitchen2 } } }
+                        - { type: tile, entity: button.robbie_coffee_station_clean, name: Coffee Station, icon: 'mdi:coffee-maker', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_coffee_station_clean } } }
+                        - { type: tile, entity: button.robbie_tiled_area_clean, name: Mop Tiled Area, icon: 'mdi:vacuum-outline', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_tiled_area_clean } } }
+                        - { type: tile, entity: button.robbie_hallways, name: Hallways, icon: 'mdi:door-open', tap_action: { action: perform-action, perform_action: button.press, target: { entity_id: button.robbie_hallways } } }
+
+          # Laundry cards only appear while a cycle is running
+          - type: custom:mushroom-template-card
+            entity: sensor.washer_current_status
+            primary: Washer
+            icon: mdi:washing-machine
+            color: blue
+            secondary: |
+              {% set st = {'rinse_hold': 'Rinse Hold', 'cool_down': 'Cooling',
+                           'steam_softening': 'Steam'}.get(states(entity), states(entity) | replace('_', ' ') | title) %}
+              {% set end = states('sensor.washer_remaining_time') %}
+              {% if end not in ['unknown', 'unavailable', 'none', ''] %}
+                {% set mins = ((as_timestamp(end) - as_timestamp(now())) / 60) | int %}
+                {{ st }}{{ ' - ' ~ mins ~ ' min left' if mins > 0 else '' }}
+              {% else %}{{ st }}{% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-hub/laundry
+            vertical: false
+            grid_options: { columns: 6, rows: 1 }
+            visibility:
+              - { condition: state, entity: sensor.washer_current_status, state_not: power_off }
+              - { condition: state, entity: sensor.washer_current_status, state_not: unavailable }
+          - type: custom:mushroom-template-card
+            entity: sensor.dryer_current_status
+            primary: Dryer
+            icon: mdi:tumble-dryer
+            color: green
+            secondary: >
+              {% set st = {'wrinkle_care': 'Wrinkle Care'}.get(states(entity),
+              states(entity) | replace('_', ' ') | title) %}
+              {% set end = states('sensor.dryer_remaining_time') %}
+              {% if end not in ['unknown', 'unavailable', 'none', ''] %}
+                {% set mins = ((as_timestamp(end) - as_timestamp(now())) / 60) | int %}
+                {{ st }}{{ ' - ' ~ mins ~ ' min left' if mins > 0 else '' }}
+              {% else %}{{ st }}{% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-hub/laundry
+            vertical: false
+            grid_options: { columns: 6, rows: 1 }
+            visibility:
+              - { condition: state, entity: sensor.dryer_current_status, state_not: power_off }
+              - { condition: state, entity: sensor.dryer_current_status, state_not: unavailable }
+
+          - type: custom:navbar-card
+            template: main
+  - badges:
+      - entity: binary_sensor.patiopresencesensor_occupancy
+        icon: mdi:motion-sensor
+        name: Patio presence
+        type: entity
+      - entity: binary_sensor.patio_motion
+        name: Patio motion
+        type: entity
+      - entity: binary_sensor.backyard_motion
+        name: Backyard motion
+        type: entity
+    header:
+      badges_position: bottom
+      badges_wrap: scroll
+      card:
+        content: '# Security & Access'
+        text_only: true
+        type: markdown
+      layout: responsive
+    icon: mdi:security
+    max_columns: 3
+    path: security
+    sections:
+      - cards:
+          - heading: Access
+            heading_style: title
+            icon: mdi:door
+            type: heading
+          - entity: alarm_control_panel.home_alarm
+            grid_options:
+              columns: full
+            name: Home Alarm
+            states:
+              - armed_home
+              - armed_away
+            type: custom:mushroom-alarm-control-panel-card
+          - entity: cover.garage_door_v2
+            features:
+              - type: cover-open-close
+            features_position: bottom
+            grid_options:
+              columns: 6
+            name: Garage Door
+            type: tile
+          - entity: lock.front_door_lock
+            features:
+              - type: lock-commands
+            features_position: bottom
+            grid_options:
+              columns: 6
+            name: Front Door Lock
+            type: tile
+          - heading: Doors
+            heading_style: subtitle
+            icon: mdi:door-open
+            type: heading
+          - entity: binary_sensor.front_door_contact
+            grid_options:
+              columns: 4
+            name: Front
+            type: tile
+          - entity: binary_sensor.crimsafe_door_contact
+            grid_options:
+              columns: 4
+            name: Screen
+            type: tile
+          - entity: binary_sensor.garage_door_sensor_contact
+            grid_options:
+              columns: 4
+            name: Garage
+            type: tile
+          - entity: binary_sensor.hallwaydoorsensor_contact
+            grid_options:
+              columns: 4
+            name: Hallway
+            type: tile
+          - entity: binary_sensor.patio_door_contact
+            grid_options:
+              columns: 4
+            name: Patio
+            type: tile
+          - entity: binary_sensor.side_door_contact
+            grid_options:
+              columns: 4
+            name: Side
+            type: tile
+          - entity: binary_sensor.laundrydoorsensor_contact
+            grid_options:
+              columns: 4
+            name: Laundry
+            type: tile
+        type: grid
+      - cards:
+          - heading: Cameras
+            heading_style: title
+            icon: mdi:cctv
+            type: heading
+          - cameras:
+              - camera_entity: camera.driveway_live_view
+                title: Driveway
+              - camera_entity: camera.front_door_live_view_2
+                dimensions:
+                  layout:
+                    fit: fill
+                title: Front Door
+              - camera_entity: camera.garage_live_view
+                title: Garage
+              - camera_entity: camera.patio_live_view
+                title: Patio
+              - camera_entity: camera.backyard_live_view
+                title: Backyard
+              - camera_entity: camera.laundry_live_view
+                title: Laundry
+              - camera_entity: camera.side_live_view
+                title: Side Access
+            grid_options:
+              columns: full
+              rows: 6
+            image:
+              mode: camera
+              refresh_seconds: 60
+            live:
+              auto_play:
+                - selected
+              auto_unmute:
+                - microphone
+              display:
+                mode: grid
+              muted: false
+              preload: true
+            remote_control:
+              entities:
+                camera: input_select.devices
+            type: custom:advanced-camera-card
+            view:
+              dim: true
+          - template: main
+            type: custom:navbar-card
+        column_span: 2
+        type: grid
+    subview: true
+    title: Security
+    type: sections
+  - badges:
+      - entity: scene.good_night
+        icon: mdi:weather-night
+        name: Good Night
+        show_name: true
+        show_state: false
+        tap_action:
+          action: perform-action
+          perform_action: scene.turn_on
+          target:
+            entity_id: scene.good_night
+        type: entity
+    dense_section_placement: true
+    header:
+      card:
+        content: '# Lighting'
+        text_only: true
+        type: markdown
+    icon: mdi:lightbulb
+    max_columns: 3
+    path: lights
+    sections:
+      - cards:
+          - heading: Living & Kitchen
+            heading_style: title
+            icon: mdi:sofa
+            type: heading
+          - entity: light.dining_light
+            features:
+              - type: light-brightness
+            features_position: bottom
+            grid_options:
+              columns: 6
+            icon: phu:nanoleaf-recessed
+            name: Dining
+            type: tile
+            vertical: false
+          - entity: light.kitchen_pendants
+            features:
+              - type: light-brightness
+            grid_options:
+              columns: 6
+            icon: mdi:vanity-light
+            name: Pendants
+            type: tile
+          - entity: light.kitchenled
+            features:
+              - type: light-brightness
+            grid_options:
+              columns: 6
+            icon: mdi:led-strip-variant
+            name: Kitchen Bench
+            type: tile
+          - entity: light.sonoff_1000dbd8b7
+            features:
+              - type: light-brightness
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name: Media Downlights
+            type: tile
+          - entity: switch.sonoff_100090d020
+            grid_options:
+              columns: 6
+            icon: mdi:lamp
+            name: Lamp
+            type: tile
+          - entity: light.kitchen_downlights
+            features_position: bottom
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name: Kitchen Downlights
+            type: tile
+            vertical: false
+        type: grid
+      - cards:
+          - heading: Hallways & Bedrooms
+            heading_style: title
+            icon: mdi:bed
+            type: heading
+          - entity: light.corridor_light
+            features:
+              - type: light-brightness
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name: Corridor
+            type: tile
+          - entity: light.tall_lamp
+            features:
+              - type: light-brightness
+            grid_options:
+              columns: 6
+            icon: mdi:floor-lamp
+            name: Tall Lamp
+            type: tile
+          - entity: light.aarlo_samar_cam
+            features:
+              - type: light-brightness
+            features_position: bottom
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name:
+              type: entity
+            type: tile
+            vertical: false
+          - entity: light.hallway_light
+            features_position: bottom
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name: Hallway Light
+            type: tile
+            vertical: false
+          - entity: switch.sonoff_1000e5018c
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            type: tile
+          - entity: switch.sonoff_1000e54df1
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            type: tile
+        type: grid
+      - cards:
+          - heading: Garage & Outdoor
+            heading_style: title
+            icon: mdi:gate
+            type: heading
+          - entity: light.garage_light
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name: Garage Downlight
+            type: tile
+          - entity: switch.sonoff_10009be278
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            type: tile
+          - entity: light.driveway_light
+            grid_options:
+              columns: 6
+            icon: mdi:spotlight-beam
+            name: Driveway Floodlight
+            type: tile
+          - entity: switch.sonoff_1000905c71
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name: Door Downlight
+            type: tile
+          - entity: switch.sonoff_100053e676
+            grid_options:
+              columns: 6
+            icon: mdi:bulkhead-light
+            name: Outdoor Lights
+            type: tile
+          - entity: switch.patio_lights
+            grid_options:
+              columns: 6
+            icon: mdi:string-lights
+            name: Patio Lights
+            type: tile
+          - entity: light.backyard_light
+            grid_options:
+              columns: 6
+            icon: mdi:spotlight-beam
+            name: Backyard Spotlight
+            type: tile
+          - entity: light.laundry_light
+            grid_options:
+              columns: 6
+            icon: mdi:spotlight-beam
+            name: Laundry Spotlight
+            type: tile
+          - template: main
+            type: custom:navbar-card
+        type: grid
+    subview: true
+    title: Lights
+    type: sections
+  - badges:
+      - color: >
+          {% set temps = ['sensor.living_room_inside_temperature',
+                          'sensor.aarlo_temperature_samar_cam',
+                          'sensor.shanayaroomtemp_temperature',
+                          'sensor.bedroom_temperature_temperature']
+                         | map('states') | select('is_number') | map('float') | list %}
+          {% set avg = (temps | sum / temps | length) if temps else none %}
+
+          {{ 'grey' if avg is none else 'blue' if avg < 22 else 'amber' if avg <
+          27 else 'red' }}
+        content: >
+          {% set temps = ['sensor.living_room_inside_temperature',
+                          'sensor.aarlo_temperature_samar_cam',
+                          'sensor.shanayaroomtemp_temperature',
+                          'sensor.bedroom_temperature_temperature']
+                         | map('states') | select('is_number') | map('float') | list %}
+          {{ 'Average ' ~ (temps | sum / temps | length) | round(1) ~ '°' if
+          temps else 'No data' }}
+        icon: mdi:home-thermometer
+        type: custom:mushroom-template-badge
+    header:
+      badges_position: bottom
+      card:
+        content: '# Climate'
+        text_only: true
+        type: markdown
+      layout: center
+    icon: mdi:thermostat
+    max_columns: 4
+    path: homeclimate
+    sections:
+      - cards:
+          - cards:
+              - cards:
+                  - detail: 1
+                    entity: sensor.living_room_inside_temperature
+                    graph: line
+                    hours_to_show: 12
+                    name: Living Room
+                    type: sensor
+                  - entity: climate.living_room
+                    features:
+                      - type: climate-hvac-modes
+                    name: Aircon
+                    type: thermostat
+                type: vertical-stack
+              - cards:
+                  - detail: 1
+                    entity: sensor.bedroom_temperature_temperature
+                    graph: line
+                    hours_to_show: 12
+                    name: Bedroom
+                    type: sensor
+                  - entity: climate.bed_ac
+                    features:
+                      - type: climate-hvac-modes
+                    name: Aircon
+                    type: thermostat
+                type: vertical-stack
+              - cards:
+                  - detail: 1
+                    entity: sensor.aarlo_temperature_samar_cam
+                    graph: line
+                    hours_to_show: 12
+                    name: Samar Room
+                    type: sensor
+                  - entity: climate.samar_room
+                    features:
+                      - type: climate-hvac-modes
+                    name: Aircon
+                    type: thermostat
+                type: vertical-stack
+              - cards:
+                  - detail: 1
+                    entity: sensor.shanayaroomtemp_temperature
+                    graph: line
+                    hours_to_show: 12
+                    name: Shanaya Room
+                    type: sensor
+                  - entity: climate.shanaya_room
+                    features:
+                      - type: climate-hvac-modes
+                    name: Aircon
+                    type: thermostat
+                type: vertical-stack
+            grid_options:
+              columns: full
+            type: horizontal-stack
+          - template: main
+            type: custom:navbar-card
+        column_span: 4
+        type: grid
+    subview: true
+    title: Climate
+    type: sections
+  - badges:
+      - entity: binary_sensor.corridormotionsensor_occupancy
+        icon: mdi:motion-sensor
+        name: Corridor
+        state_content:
+          - name
+          - state
+        type: entity
+      - entity: binary_sensor.hallwaymotionsensor_occupancy
+        icon: mdi:motion-sensor
+        name: Hallway
+        state_content:
+          - name
+          - state
+        type: entity
+      - entity: binary_sensor.dining_sensor_vibration
+        icon: mdi:motion-sensor
+        name: Dining Table
+        state_content:
+          - name
+          - state
+        type: entity
+    header:
+      card:
+        content: '# Living, Kitchen & Dining'
+        text_only: true
+        type: markdown
+    icon: mdi:sofa
+    max_columns: 3
+    path: living-room
+    sections:
+      - cards:
+          - dark_mode_image: /api/image/serve/cbbd3b4658275dd38c08c3e87ddacc41/512x512
+            elements:
+              - entity: light.dining_light
+                hold_action:
+                  action: more-info
+                icon: mdi:lightbulb
+                style:
+                  left: 40%
+                  top: 40%
+                tap_action:
+                  action: toggle
+                type: icon
+              - entity: switch.sonoff_100090d020
+                icon: mdi:lamp
+                style:
+                  left: 4%
+                  top: 61%
+                tap_action:
+                  action: toggle
+                title: Lamp
+                type: icon
+              - entity: light.kitchen_pendants
+                icon: mdi:lightbulb-group
+                style:
+                  left: 75%
+                  top: 39%
+                tap_action:
+                  action: toggle
+                type: icon
+              - entity: light.kitchen_downlights
+                icon: mdi:light-recessed
+                style:
+                  left: 88%
+                  top: 21%
+                tap_action:
+                  action: toggle
+                type: icon
+              - entity: light.kitchenled
+                icon: mdi:led-strip-variant
+                style:
+                  left: 90%
+                  top: 66%
+                tap_action:
+                  action: toggle
+                type: state-icon
+              - entity: climate.living_room
+                icon: mdi:air-conditioner
+                style:
+                  left: 8%
+                  top: 22%
+                tap_action:
+                  action: more-info
+                title: Aircon
+                type: icon
+            grid_options:
+              columns: full
+            image: /api/image/serve/4f7585416645db017d4cdb7d40e9bb2a/512x512
+            type: picture-elements
+        column_span: 2
+        type: grid
+      - cards:
+          - heading: Robbie
+            heading_style: title
+            icon: mdi:robot-vacuum
+            type: heading
+          - commands:
+              - start_pause
+              - return_home
+              - stop
+            entity: vacuum.robbie
+            grid_options:
+              columns: full
+            icon_animation: true
+            type: custom:mushroom-vacuum-card
+          - entity: button.robbie_kitchen_clean
+            grid_options:
+              columns: 6
+            icon: mdi:countertop
+            name: Kitchen
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.robbie_kitchen_clean
+            type: tile
+          - entity: button.robbie_media_clean
+            grid_options:
+              columns: 6
+            icon: mdi:television-shimmer
+            name: Media Room
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.robbie_media_clean
+            type: tile
+          - entity: button.robbie_media_kitchen2
+            grid_options:
+              columns: 6
+            icon: mdi:silverware-clean
+            name: Media & Kitchen
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.robbie_media_kitchen2
+            type: tile
+          - entity: button.robbie_coffee_station_clean
+            grid_options:
+              columns: 6
+            icon: mdi:coffee-maker
+            name: Coffee Station
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.robbie_coffee_station_clean
+            type: tile
+          - entity: button.robbie_tiled_area_clean
+            grid_options:
+              columns: 6
+            icon: mdi:vacuum-outline
+            name: Mop Tiled Area
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.robbie_tiled_area_clean
+            type: tile
+          - template: main
+            type: custom:navbar-card
+        type: grid
+    subview: true
+    title: Living Room
+    type: sections
+  - header:
+      card:
+        cards:
+          - content: '# Garage'
+            text_only: true
+            type: markdown
+          - alignment: center
+            chips:
+              - entity: binary_sensor.garage_door_sensor_contact
+                type: entity
+              - entity: binary_sensor.hallwaydoorsensor_contact
+                type: entity
+              - content_info: state
+                entity: binary_sensor.garagemotionsensor_occupancy
+                type: entity
+              - entity: sensor.garagemotionsensor_device_temperature
+                type: entity
+            type: custom:mushroom-chips-card
+        type: vertical-stack
+      layout: center
+    icon: mdi:garage-lock
+    max_columns: 3
+    path: garage
+    sections:
+      - cards:
+          - action_image_width: 100
+            bar_row_alignment: center
+            bars:
+              - action_animation: none
+                action_animation_entity: ''
+                action_animation_state: ''
+                alignment: space-between
+                animation_entity: ''
+                animation_state: ''
+                animation_type: none
+                background_color: 'var(--card-background-color, #121212)'
+                bar_color: 'var(--primary-color, #3498db)'
+                bar_name: Battery
+                bar_radius: round
+                bar_size: thiccc
+                bar_style: outline
+                border_color: 'var(--divider-color, #555555)'
+                entity: sensor.bluey_battery_level
+                gradient_display_mode: value_based
+                gradient_stops:
+                  - color: '#ff0000'
+                    id: '1'
+                    position: 0
+                  - color: '#f7f702'
+                    id: stop-3
+                    position: 75
+                  - color: '#00ff00'
+                    id: '2'
+                    position: 100
+                left_condition:
+                  entity: ''
+                  state: ''
+                  type: none
+                left_text_color: 'var(--primary-text-color, #ffffff)'
+                left_text_size: 14
+                left_title_color: 'var(--secondary-text-color, #999999)'
+                left_title_size: 14
+                limit_indicator_color: 'var(--error-color, #ff0000)'
+                percentage_amount_entity: ''
+                percentage_attribute: ''
+                percentage_template: ''
+                percentage_text_bold: true
+                percentage_text_color: '#212121'
+                percentage_text_size: 17
+                percentage_text_uppercase: true
+                percentage_total_entity: ''
+                percentage_type: entity
+                right_condition:
+                  entity: sensor.bluey_charging
+                  state: Charging
+                  type: show
+                right_entity: ''
+                right_text_color: 'var(--primary-text-color, #ffffff)'
+                right_text_size: 14
+                right_title: Charging
+                right_title_color: 'var(--secondary-text-color, #999999)'
+                right_title_size: 14
+                show_left: false
+                show_left_title: true
+                show_left_value: true
+                show_percentage: true
+                show_right: false
+                show_right_title: true
+                show_right_value: true
+                use_gradient: true
+                width: '100'
+              - action_animation: none
+                action_animation_entity: ''
+                action_animation_state: ''
+                alignment: center
+                animation_entity: ''
+                animation_state: ''
+                animation_type: charging-lines
+                background_color: 'var(--card-background-color, #121212)'
+                bar_color: '#21c700'
+                bar_name: Charging
+                bar_radius: round
+                bar_size: regular
+                bar_style: neon
+                border_color: 'var(--divider-color, #555555)'
+                entity: sensor.bluey_battery_level
+                gradient_display_mode: value_based
+                gradient_stops:
+                  - color: '#ff0000'
+                    id: '1'
+                    position: 0
+                  - color: '#00ff00'
+                    id: '2'
+                    position: 100
+                left_entity: ''
+                left_text_color: 'var(--primary-text-color, #ffffff)'
+                left_text_size: 14
+                left_title: ''
+                left_title_color: 'var(--secondary-text-color, #999999)'
+                left_title_size: 14
+                limit_indicator_color: 'var(--error-color, #ff0000)'
+                percentage_amount_entity: ''
+                percentage_attribute: ''
+                percentage_template: ''
+                percentage_text_color: '#1a1919'
+                percentage_text_size: 14
+                percentage_total_entity: ''
+                percentage_type: entity
+                right_condition:
+                  entity: ''
+                  state: ''
+                  type: none
+                right_entity: ''
+                right_text_color: 'var(--primary-text-color, #ffffff)'
+                right_text_size: 14
+                right_title: Charging
+                right_title_color: 'var(--secondary-text-color, #999999)'
+                right_title_size: 14
+                show_left: false
+                show_left_title: true
+                show_left_value: true
+                show_percentage: true
+                show_right: true
+                show_right_title: true
+                show_right_value: true
+                use_gradient: false
+                width: '100'
+            formatted_entities: true
+            help_highlight: true
+            icon_rows:
+              - alignment: center
+                columns: 0
+                confirmation_mode: true
+                icons:
+                  - action: ''
+                    active_state: 'on'
+                    active_state_text: ''
+                    active_template: ''
+                    active_template_mode: false
+                    color_active: var(--primary-color)
+                    color_inactive: var(--secondary-text-color)
+                    container_background: none
+                    container_background_color: var(--secondary-background-color)
+                    container_width: '100'
+                    draggable: true
+                    dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: lock.bluey_lock
+                    icon_active: mdi:lock-open
+                    icon_background: none
+                    icon_background_color: var(--secondary-background-color)
+                    icon_inactive: mdi:lock
+                    icon_size: 28
+                    inactive_state: 'off'
+                    inactive_state_text: ''
+                    inactive_template: ''
+                    inactive_template_mode: false
+                    name: ''
+                    name_color_active: var(--primary-text-color)
+                    name_color_inactive: var(--primary-text-color)
+                    on_click_action: more-info
+                    service_data: {}
+                    show_icon_active: true
+                    show_icon_inactive: true
+                    show_name: false
+                    show_name_active: false
+                    show_name_inactive: false
+                    show_state: true
+                    show_state_active: true
+                    show_state_inactive: true
+                    show_units: true
+                    single_click_action: toggle
+                    single_entity: lock.bluey_lock
+                    single_service_data: {}
+                    state_color_active: var(--primary-text-color)
+                    state_color_inactive: var(--secondary-text-color)
+                    text_alignment: center
+                    text_position: bottom
+                    text_size: 14
+                    use_entity_color_for_container_background: false
+                    use_entity_color_for_icon: false
+                    use_entity_color_for_icon_active: false
+                    use_entity_color_for_icon_background: false
+                    use_entity_color_for_icon_inactive: false
+                    vertical_alignment: center
+                  - action: ''
+                    active_state: 'on'
+                    active_state_text: ''
+                    active_template: ''
+                    active_template_mode: false
+                    color_active: var(--primary-color)
+                    color_inactive: var(--secondary-text-color)
+                    container_background: none
+                    container_background_color: var(--secondary-background-color)
+                    container_width: '100'
+                    draggable: true
+                    dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: cover.bluey_trunk
+                    icon_active: phu:tesla-trunk
+                    icon_background: none
+                    icon_background_color: var(--secondary-background-color)
+                    icon_inactive: phu:tesla-trunk
+                    icon_size: 28
+                    inactive_state: 'off'
+                    inactive_state_text: ''
+                    inactive_template: ''
+                    inactive_template_mode: false
+                    name: Boot
+                    name_color_active: var(--primary-text-color)
+                    name_color_inactive: var(--primary-text-color)
+                    on_click_action: more-info
+                    service_data: {}
+                    show_icon_active: true
+                    show_icon_inactive: true
+                    show_name: false
+                    show_name_active: false
+                    show_name_inactive: false
+                    show_state: true
+                    show_state_active: true
+                    show_state_inactive: true
+                    show_units: true
+                    single_click_action: toggle
+                    single_entity: cover.bluey_trunk
+                    single_service_data: {}
+                    state_color_active: var(--primary-text-color)
+                    state_color_inactive: var(--secondary-text-color)
+                    text_alignment: center
+                    text_position: bottom
+                    text_size: 14
+                    use_entity_color_for_container_background: false
+                    use_entity_color_for_icon: false
+                    use_entity_color_for_icon_active: false
+                    use_entity_color_for_icon_background: false
+                    use_entity_color_for_icon_inactive: false
+                    vertical_alignment: center
+                  - action: ''
+                    active_state: 'on'
+                    active_state_text: ''
+                    active_template: ''
+                    active_template_mode: false
+                    color_active: var(--primary-color)
+                    color_inactive: var(--secondary-text-color)
+                    container_background: none
+                    container_background_color: var(--secondary-background-color)
+                    container_width: '100'
+                    draggable: true
+                    dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: switch.bluey_charge
+                    icon_active: mdi:toggle-switch
+                    icon_background: none
+                    icon_background_color: var(--secondary-background-color)
+                    icon_inactive: mdi:toggle-switch-off
+                    icon_size: 30
+                    inactive_state: 'off'
+                    inactive_state_text: ''
+                    inactive_template: ''
+                    inactive_template_mode: false
+                    name: Charger
+                    name_color_active: var(--primary-text-color)
+                    name_color_inactive: var(--primary-text-color)
+                    on_click_action: more-info
+                    service_data: {}
+                    show_icon_active: true
+                    show_icon_inactive: true
+                    show_name: false
+                    show_name_active: true
+                    show_name_inactive: true
+                    show_state: true
+                    show_state_active: true
+                    show_state_inactive: false
+                    show_units: true
+                    single_click_action: toggle
+                    state_color_active: var(--primary-text-color)
+                    state_color_inactive: var(--secondary-text-color)
+                    text_alignment: center
+                    text_position: bottom
+                    text_size: 14
+                    use_entity_color_for_container_background: false
+                    use_entity_color_for_icon: false
+                    use_entity_color_for_icon_active: false
+                    use_entity_color_for_icon_background: false
+                    use_entity_color_for_icon_inactive: false
+                    vertical_alignment: center
+                id: 3nv88m1
+                row_name: Lock
+                spacing: none
+                vertical_alignment: center
+                width: '100'
+            image_priority_mode: order
+            images:
+              - hold_click_action: navigate
+                hold_navigation_path: /config/devices/device/5386d27d87fe3b8845b97b7eb8e259d4
+                id: r35zj5q
+                image: /api/image/serve/cdd510be49f2493bc87fd540c01cea69
+                image_crop:
+                  bottom: 0
+                  left: 0
+                  right: 0
+                  top: -10
+                image_type: upload
+                image_width: 245
+                name: ''
+                priority: 0
+            info_rows:
+              - alignment: space-around
+                allow_wrap: true
+                columns: 0
+                id: d5djjy5
+                info_entities:
+                  - dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: sensor.bluey_battery_range
+                    icon: mdi:gauge
+                    icon_color: var(--secondary-text-color)
+                    icon_size: 21
+                    id: bgsb46p
+                    name: Range
+                    name_size: 13
+                    on_click_action: more-info
+                    show_icon: true
+                    show_name: true
+                    text_color: var(--primary-text-color)
+                    text_size: 15
+                  - dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: sensor.bluey_charge_energy_added
+                    icon: mdi:lightning-bolt
+                    icon_color: var(--secondary-text-color)
+                    icon_size: 23
+                    id: 4kv6mhk
+                    name: Last Charge
+                    name_size: 13
+                    on_click_action: more-info
+                    show_icon: true
+                    show_name: true
+                    text_color: var(--primary-text-color)
+                    text_size: 13
+                row_name: Range
+                spacing: none
+                vertical_alignment: center
+                width: '100'
+              - alignment: space-around
+                allow_wrap: false
+                columns: 0
+                id: elnb5zw
+                info_entities:
+                  - dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: device_tracker.bluey_location
+                    icon: mdi:map-marker-radius
+                    icon_color: var(--secondary-text-color)
+                    icon_size: 24
+                    id: hg8olut
+                    name: ''
+                    name_size: 14
+                    on_click_action: more-info
+                    show_icon: true
+                    show_name: false
+                    template_mode: false
+                    text_color: var(--primary-text-color)
+                    text_size: 14
+                  - dynamic_color_template: |2
+                        {% if is_state('input_boolean.tesla_onroad', 'on') %}
+                        var(--success-color)
+                      {% else %}
+                        var(--error-color)
+                      {% endif %}
+                    dynamic_color_template_mode: true
+                    dynamic_icon_template: |
+                      {% if is_state('input_boolean.tesla_onroad', 'on') %}
+                        mdi:car
+                      {% else %}
+                        mdi:car-brake-parking
+                      {% endif %}
+                    dynamic_icon_template_mode: true
+                    entity: input_boolean.tesla_onroad
+                    icon: ''
+                    icon_color: var(--secondary-text-color)
+                    icon_size: 24
+                    id: hi37jj7
+                    name: On Road
+                    name_size: 14
+                    on_click_action: more-info
+                    show_icon: true
+                    show_name: false
+                    template_mode: true
+                    text_color: var(--primary-text-color)
+                    text_size: 14
+                    value_template: |2
+                        {% if is_state('input_boolean.tesla_onroad', 'on') %}
+                          Driving
+                        {% else %}
+                          Parked
+                        {% endif %}
+                row_name: HomeState
+                spacing: medium
+                vertical_alignment: center
+                width: '100'
+            layout_type: full_half
+            section_conditions:
+              bar_0:
+                entity: sensor.bluey_charging
+                state: Charging
+                type: hide
+              bar_1:
+                entity: sensor.bluey_charging
+                state: Charging
+                type: show
+            sections_columns:
+              icon_row_3nv88m1: full_half_row1_full
+              info_row_d5djjy5: full_half_row1_full
+              info_row_elnb5zw: full_half_row1_full
+            sections_order:
+              - title
+              - image
+              - info
+              - info_row_elnb5zw
+              - bar_0
+              - bar_1
+              - info_row_d5djjy5
+              - icon_row_3nv88m1
+            show_car_state: true
+            show_info_icons: true
+            show_location: true
+            show_mileage: true
+            show_units: true
+            status_image_type: none
+            title: Bluey
+            title_alignment: center
+            title_bold: true
+            title_color: '#2346d1'
+            title_italic: false
+            title_size: 24
+            title_strikethrough: false
+            title_uppercase: false
+            type: custom:ultra-vehicle-card
+            vehicle_image_type: default
+            vehicle_image_width: 100
+          - action_image_width: 100
+            bar_row_alignment: center
+            bars:
+              - action_animation: none
+                action_animation_entity: ''
+                action_animation_state: ''
+                alignment: space-between
+                animation_entity: ''
+                animation_state: ''
+                animation_type: none
+                background_color: 'var(--card-background-color, #121212)'
+                bar_color: '#8c90a1'
+                bar_name: Battery
+                bar_radius: round
+                bar_size: thiccc
+                bar_style: outline
+                border_color: 'var(--divider-color, #555555)'
+                entity: input_number.kia_battery_estimate
+                gradient_display_mode: value_based
+                gradient_stops:
+                  - color: '#ff0000'
+                    id: '1'
+                    position: 0
+                  - color: '#deaa1b'
+                    id: stop-3
+                    position: 50
+                  - color: '#2fc62f'
+                    id: '2'
+                    position: 100
+                left_entity: ''
+                left_text_color: 'var(--primary-text-color, #ffffff)'
+                left_text_size: 14
+                left_title: ''
+                left_title_color: 'var(--secondary-text-color, #999999)'
+                left_title_size: 14
+                limit_indicator_color: 'var(--error-color, #ff0000)'
+                percentage_amount_entity: ''
+                percentage_attribute: ''
+                percentage_template: ''
+                percentage_text_size: 18
+                percentage_total_entity: ''
+                percentage_type: entity
+                right_entity: ''
+                right_text_color: 'var(--primary-text-color, #ffffff)'
+                right_text_size: 14
+                right_title: ''
+                right_title_color: 'var(--secondary-text-color, #999999)'
+                right_title_size: 14
+                show_left: false
+                show_left_title: true
+                show_left_value: true
+                show_percentage: true
+                show_right: false
+                show_right_title: true
+                show_right_value: true
+                use_gradient: true
+                width: '100'
+            formatted_entities: true
+            help_highlight: true
+            icon_rows:
+              - alignment: center
+                columns: 0
+                confirmation_mode: false
+                icons:
+                  - action: ''
+                    active_animation: pulse
+                    active_state: 'on'
+                    active_state_text: Charging
+                    active_template: '{{ states(''sensor.kia_charger_power'') | float > 10 }}'
+                    active_template_mode: true
+                    color_active: '#00c703'
+                    color_inactive: var(--secondary-text-color)
+                    container_background: none
+                    container_background_color: var(--secondary-background-color)
+                    draggable: true
+                    dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: switch.kia_charger
+                    icon_active: mdi:car-electric
+                    icon_background: none
+                    icon_background_color: var(--secondary-background-color)
+                    icon_inactive: mdi:toggle-switch-off
+                    icon_size: 28
+                    inactive_state: 'off'
+                    inactive_template: ''
+                    inactive_template_mode: false
+                    name: Charger
+                    name_color_active: var(--primary-text-color)
+                    name_color_inactive: var(--primary-text-color)
+                    on_click_action: more-info
+                    service_data: {}
+                    show_icon_active: true
+                    show_icon_inactive: true
+                    show_name: false
+                    show_name_active: true
+                    show_name_inactive: true
+                    show_state: true
+                    show_state_active: false
+                    show_state_inactive: true
+                    show_units: true
+                    single_click_action: toggle
+                    single_entity: switch.kia_charger
+                    state_color_active: var(--primary-text-color)
+                    state_color_inactive: var(--secondary-text-color)
+                    text_alignment: center
+                    text_position: bottom
+                    text_size: 14
+                    use_entity_color_for_container_background: false
+                    use_entity_color_for_icon: false
+                    use_entity_color_for_icon_active: false
+                    use_entity_color_for_icon_background: false
+                    use_entity_color_for_icon_inactive: false
+                    vertical_alignment: center
+                id: 3d4yacj
+                row_name: Kia Charger
+                spacing: none
+                vertical_alignment: center
+                width: '100'
+            image_priority_mode: order
+            images:
+              - double_click_action: toggle
+                double_entity: input_boolean.kia_onroad
+                id: 5lkx2gs
+                image: /api/image/serve/b0801eee9b5f2d6fcf7972d71f0d7711
+                image_type: upload
+                image_width: 100
+                name: ''
+                priority: 0
+            info_rows:
+              - alignment: space-around
+                allow_wrap: false
+                columns: 0
+                id: elnb5zw
+                info_entities:
+                  - dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: device_tracker.kia_gps_location
+                    icon: mdi:map-marker
+                    icon_color: var(--secondary-text-color)
+                    icon_size: 24
+                    id: hg8olut
+                    name: ' HomeState'
+                    name_size: 14
+                    on_click_action: more-info
+                    show_icon: true
+                    show_name: false
+                    template_mode: false
+                    text_color: var(--primary-text-color)
+                    text_size: 14
+                  - dynamic_color_template: |
+                      {% if is_state('input_boolean.kia_onroad', 'on') %}
+                        var(--success-color)
+                      {% else %}
+                        var(--error-color)
+                      {% endif %}
+                    dynamic_color_template_mode: true
+                    dynamic_icon_template: |
+                      {% if is_state('input_boolean.kia_onroad', 'on') %}
+                        mdi:car
+                      {% else %}
+                        mdi:car-brake-parking
+                      {% endif %}
+                    dynamic_icon_template_mode: true
+                    entity: input_boolean.kia_onroad
+                    icon: mdi:car-brake-parking
+                    icon_color: var(--secondary-text-color)
+                    icon_size: 24
+                    id: al8nsv1
+                    name: On Road
+                    name_size: 14
+                    on_click_action: more-info
+                    show_icon: true
+                    show_name: false
+                    template_mode: true
+                    text_color: var(--primary-text-color)
+                    text_size: 14
+                    value_template: |2
+                        {% if is_state('input_boolean.kia_onroad', 'on') %}
+                          Driving
+                        {% else %}
+                          Parked
+                        {% endif %}
+                row_name: HomeState
+                spacing: medium
+                vertical_alignment: flex-end
+                width: '100'
+              - alignment: center
+                allow_wrap: false
+                columns: 0
+                id: qw9c121
+                info_entities:
+                  - dynamic_color_template: ''
+                    dynamic_color_template_mode: false
+                    dynamic_icon_template: ''
+                    dynamic_icon_template_mode: false
+                    entity: sensor.kia_last_charge_added
+                    icon: mdi:gauge
+                    icon_color: var(--secondary-text-color)
+                    icon_size: 24
+                    id: cuuxirq
+                    name: Last Charge
+                    name_size: 14
+                    on_click_action: more-info
+                    show_icon: true
+                    show_name: true
+                    text_color: var(--primary-text-color)
+                    text_size: 14
+                row_name: Last Charge
+                spacing: medium
+                vertical_alignment: center
+                width: '100'
+            layout_type: full_half
+            section_conditions:
+              bar_0:
+                entity: sensor.bluey_charging
+                state: Charging
+                type: hide
+              bar_1:
+                entity: sensor.bluey_charging
+                state: Charging
+                type: show
+            sections_columns:
+              icon_row_3d4yacj: full_half_row2_right
+              image: full_half_row1_full
+              info_row_elnb5zw: full_half_row1_full
+              info_row_qw9c121: full_half_row2_left
+            sections_order:
+              - title
+              - image
+              - info
+              - info_row_elnb5zw
+              - bar_0
+              - info_row_qw9c121
+              - icon_row_3d4yacj
+            show_car_state: true
+            show_info_icons: true
+            show_location: true
+            show_mileage: true
+            show_units: true
+            status_image_type: none
+            title: Kia
+            title_alignment: center
+            title_bold: true
+            title_size: 24
+            type: custom:ultra-vehicle-card
+            vehicle_image_type: default
+            vehicle_image_width: 100
+        column_span: 2
+        type: grid
+      - cards:
+          - assets_path: /local/garage-card-custom-v3
+            car1_presence_entity: binary_sensor.tesla_at_home
+            car2_presence_entity: binary_sensor.kia_at_home
+            door_entity: cover.garage_door_v2
+            grid_options:
+              rows: auto
+            keep_open_entity: input_boolean.keep_garage_door_open
+            light_entity: light.garage_light
+            type: custom:garage-card
+          - cameras:
+              - camera_entity: camera.garage_live_view
+            type: custom:advanced-camera-card
+          - template: main
+            type: custom:navbar-card
+        type: grid
+    subview: true
+    title: Garage
+    type: sections
+  - header:
+      card:
+        content: '# Kids Rooms'
+        text_only: true
+        type: markdown
+    icon: mdi:baby-face
+    max_columns: 2
+    path: kidsroom
+    sections:
+      - cards:
+          - heading: Samar Room
+            heading_style: title
+            icon: mdi:teddy-bear
+            type: heading
+          - chips:
+              - entity: sensor.aarlo_temperature_samar_cam
+                type: entity
+              - entity: binary_sensor.samar_room_occupancy_new
+                icon: mdi:motion-sensor
+                type: entity
+              - content_info: name
+                entity: light.aarlo_samar_cam
+                hold_action:
+                  action: more-info
+                icon: mdi:lightbulb-night
+                name: Night Light
+                tap_action:
+                  action: toggle
+                type: light
+                use_light_color: true
+              - entity: light.tall_lamp
+                hold_action:
+                  action: more-info
+                icon: mdi:floor-lamp-outline
+                tap_action:
+                  action: toggle
+                type: light
+              - entity: media_player.aarlo_samar_cam
+                name: White Noise
+                type: entity
+            type: custom:mushroom-chips-card
+          - camera_image: camera.aarlo_samar_cam
+            camera_view: live
+            entity: camera.aarlo_samar_cam
+            fit_mode: fill
+            name: Samar Room
+            show_state: false
+            type: picture-entity
+          - entity: climate.samar_room
+            grid_options:
+              columns: full
+            hvac_modes:
+              - cool
+              - heat
+              - 'off'
+            layout: horizontal
+            show_temperature_control: true
+            type: custom:mushroom-climate-card
+        type: grid
+      - cards:
+          - heading: Shanaya Room
+            heading_style: title
+            icon: mdi:cradle
+            type: heading
+          - chips:
+              - entity: sensor.shanayaroomtemp_temperature
+                type: entity
+              - entity: binary_sensor.shanaya_presence_sensor_presence
+                type: entity
+              - content_info: state
+                entity: input_boolean.shanaya_motion_detected
+                icon: mdi:cradle
+                name: Occupancy
+                tap_action:
+                  action: toggle
+                type: entity
+            type: custom:mushroom-chips-card
+          - camera_image: camera.shanaya_cam_live_view
+            camera_view: live
+            entity: camera.shanaya_cam_live_view
+            fit_mode: fill
+            name: Shanaya Room
+            show_state: false
+            type: picture-entity
+          - entity: climate.shanaya_room
+            grid_options:
+              columns: full
+            hvac_modes:
+              - cool
+              - heat
+              - 'off'
+            layout: horizontal
+            show_temperature_control: true
+            type: custom:mushroom-climate-card
+          - template: main
+            type: custom:navbar-card
+        type: grid
+    subview: true
+    title: Kids Rooms
+    type: sections
+  - header:
+      card:
+        content: '# Outdoor'
+        text_only: true
+        type: markdown
+    icon: mdi:gate
+    max_columns: 3
+    path: outdoor
+    sections:
+      - cards:
+          - badges:
+              - entity: binary_sensor.patiopresencesensor_occupancy
+                type: entity
+              - entity: binary_sensor.patio_motion
+                type: entity
+            heading: Backyard & Patio
+            heading_style: title
+            icon: mdi:pine-tree
+            type: heading
+          - entity: switch.patio_lights
+            grid_options:
+              columns: 6
+            icon: mdi:string-lights
+            name: Patio Lights
+            type: tile
+          - entity: light.backyard_light
+            grid_options:
+              columns: 6
+            icon: mdi:spotlight-beam
+            name: Spotlight
+            type: tile
+        type: grid
+      - cards:
+          - heading: Front
+            heading_style: title
+            icon: mdi:home-outline
+            type: heading
+          - entity: input_boolean.front_door
+            grid_options:
+              columns: full
+            icon: mdi:lock
+            name: Front Door
+            type: tile
+          - entity: switch.sonoff_1000905c71
+            grid_options:
+              columns: 6
+            icon: mdi:light-recessed
+            name: Door Downlight
+            type: tile
+          - entity: switch.sonoff_100053e676
+            grid_options:
+              columns: 6
+            icon: mdi:light-flood-down
+            name: Outdoor Lights
+            type: tile
+          - entity: light.driveway_light
+            grid_options:
+              columns: 6
+            icon: mdi:spotlight-beam
+            name: Driveway
+            type: tile
+          - entity: switch.single_adaptor_pc190ha_socket_1
+            grid_options:
+              columns: 6
+            icon: mdi:power-socket-au
+            name: Outdoor Plug
+            type: tile
+        type: grid
+      - cards:
+          - heading: Side & Laundry
+            heading_style: title
+            icon: mdi:door
+            type: heading
+          - entity: binary_sensor.side_door_contact
+            grid_options:
+              columns: 6
+            name: Side Door
+            type: tile
+          - entity: binary_sensor.laundrydoorsensor_contact
+            grid_options:
+              columns: 6
+            name: Laundry Door
+            type: tile
+          - entity: input_boolean.keep_side_door_open
+            grid_options:
+              columns: 6
+            name: Keep Side Door Open
+            type: tile
+          - entity: light.laundry_light
+            grid_options:
+              columns: 6
+            icon: mdi:spotlight-beam
+            name: Laundry Spotlight
+            type: tile
+          - template: main
+            type: custom:navbar-card
+        type: grid
+    subview: true
+    title: Outdoor
+    type: sections
+  - badges:
+      - color: >
+          {% set w = states('weather.north_lakes_weather') %} {% set h =
+          state_attr('weather.north_lakes_weather', 'humidity') | float(0) %} {%
+          set r = state_attr('weather.north_lakes_weather', 'rain_rate') |
+          float(0) %} {{ 'red' if w in
+          ['rainy','pouring','snowy','snowy-rainy','lightning-rainy','hail'] or
+          r > 0 or h > 75
+             else 'amber' if h > 60 else 'green' }}
+        content: >
+          {% set w = states('weather.north_lakes_weather') %} {% set h =
+          state_attr('weather.north_lakes_weather', 'humidity') | float(0) %} {%
+          set r = state_attr('weather.north_lakes_weather', 'rain_rate') |
+          float(0) %} Drying: {{ 'Poor - use dryer' if w in
+          ['rainy','pouring','snowy','snowy-rainy','lightning-rainy','hail'] or
+          r > 0 or h > 75
+                     else 'OK' if h > 60 else 'Good' }}
+        entity: weather.north_lakes_weather
+        icon: >
+          {% set w = states('weather.north_lakes_weather') %} {% set h =
+          state_attr('weather.north_lakes_weather', 'humidity') | float(0) %} {%
+          set r = state_attr('weather.north_lakes_weather', 'rain_rate') |
+          float(0) %} {{ 'mdi:weather-pouring' if w in
+          ['rainy','pouring','snowy','snowy-rainy','lightning-rainy','hail'] or
+          r > 0 or h > 75
+             else 'mdi:weather-partly-cloudy' if h > 60 else 'mdi:weather-sunny' }}
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-badge
+      - color: '{{ ''red'' if is_state(entity, ''on'') else ''green'' }}'
+        content: '{{ ''Water Leak'' if is_state(entity, ''on'') else ''No Leak'' }}'
+        entity: binary_sensor.0x0c2a6ffffe3be7d5_water_leak
+        icon: >-
+          {{ 'mdi:water-alert' if is_state(entity, 'on') else 'mdi:water-check'
+          }}
+        label: Water
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-badge
+      - color: '{{ ''red'' if is_state(entity, ''on'') else ''green'' }}'
+        content: '{{ ''Open'' if is_state(entity, ''on'') else ''Closed'' }}'
+        entity: binary_sensor.laundrydoorsensor_contact
+        icon: '{{ ''mdi:door-open'' if is_state(entity, ''on'') else ''mdi:door-closed'' }}'
+        label: Laundry Door
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-badge
+    dense_section_placement: true
+    header:
+      card:
+        content: '# Laundry'
+        text_only: true
+        type: markdown
+    icon: phu:rooms-laundry-room
+    max_columns: 2
+    path: laundry
+    sections:
+      - cards:
+          - appliance_type: washer
+            cost_entity: input_number.energy_rate_day
+            currency: $
+            duration_entity: input_number.wm_last_duration
+            energy_entity: sensor.laundry_plug_energy
+            hide_status_panel: false
+            last_wash_entity: input_datetime.wm_last_start
+            name: Washer
+            notify_entity: automation.washing_completed_notification
+            plug_entity: switch.laundry_plug
+            power_entity: sensor.laundry_plug_power
+            power_max: 2500
+            power_threshold: 10
+            status_entity: sensor.washer_current_status
+            type: custom:washing-machine-card
+        type: grid
+      - cards:
+          - appliance_type: dryer
+            currency: $
+            duration_entity: input_number.dm_last_duration
+            hide_status_panel: false
+            last_wash_entity: input_datetime.dm_last_start
+            name: Dryer
+            notify_entity: automation.washing_machine_finished_announcement
+            plug_entity: switch.dryer_power
+            power_max: 2500
+            power_threshold: 10
+            running_states:
+              - running
+              - detecting
+              - cooling
+              - wrinkle_care
+            status_entity: sensor.dryer_current_status
+            type: custom:washing-machine-card
+          - template: main
+            type: custom:navbar-card
+        type: grid
+    subview: true
+    title: Laundry
+    type: sections
+  - cards:
+      - action_menu_labels: true
+        active_player_helper_entity: ''
+        ambient_light_brightness: 35
+        ambient_light_cooldown: 8
+        ambient_light_enabled: false
+        ambient_light_entities: []
+        ambient_light_player_map: []
+        ambient_light_transition: 3
+        announcement_tts_entity: ''
+        announcement_tts_language: auto
+        aux_button_2_action: toggle
+        aux_button_2_enabled: false
+        aux_button_2_entity: ''
+        aux_button_2_icon: power
+        aux_button_2_name: ''
+        aux_button_3_action: toggle
+        aux_button_3_enabled: false
+        aux_button_3_entity: ''
+        aux_button_3_icon: power
+        aux_button_3_name: ''
+        aux_button_4_action: toggle
+        aux_button_4_enabled: false
+        aux_button_4_entity: ''
+        aux_button_4_icon: power
+        aux_button_4_name: ''
+        config_entry_id: ''
+        discovery_mode_enabled: true
+        entity_sticky: false
+        excluded_player_entities: []
+        fan_theme: adaptive
+        flow_assistant_auto_close_ms: 4200
+        flow_assistant_listen_timeout_ms: 12000
+        flow_assistant_response_timeout_ms: 18000
+        height: 1660
+        homeii_engine_instance_id: ''
+        homeii_engine_mode: required
+        homeii_engine_profile_id: ''
+        homeii_engine_timeout_ms: 3500
+        hotel_mode: false
+        language: en
+        layout_mode: tablet
+        lrclib_lyrics_enabled: false
+        ma_interface_target: _self
+        ma_interface_url: /music-assistant
+        main_opacity: 0.66
+        mobile_announcement_presets: []
+        mobile_announcement_volume: 20
+        mobile_background_motion_mode: subtle
+        mobile_compact_edge_to_edge: true
+        mobile_compact_mode: false
+        mobile_compact_widget_mode: full
+        mobile_cover_flow: false
+        mobile_custom_color: '#f5a623'
+        mobile_custom_text_tone: light
+        mobile_dynamic_theme_mode: auto
+        mobile_edge_to_edge: false
+        mobile_font_scale: 1
+        mobile_footer_mode: icon
+        mobile_footer_search_enabled: false
+        mobile_home_shortcut: true
+        mobile_home_shortcut_path: /dashboard-hub/hubhome
+        mobile_icon_scale: 1
+        mobile_layout_mode: auto
+        mobile_library_default_layout: grid
+        mobile_library_tabs:
+          - library_search
+          - library_playlists
+          - library_artists
+          - library_albums
+          - library_tracks
+          - library_radio
+        mobile_main_bar_items:
+          - actions
+          - players
+          - library
+          - settings
+          - home
+          - search
+        mobile_mic_mode: smart
+        mobile_queue_flow: true
+        mobile_quick_action_1: timer
+        mobile_quick_action_10: ''
+        mobile_quick_action_2: like
+        mobile_quick_action_3: lyrics
+        mobile_quick_action_4: queue
+        mobile_quick_action_5: queue_flow
+        mobile_quick_action_6: radio
+        mobile_quick_action_7: history
+        mobile_quick_action_8: ''
+        mobile_quick_action_9: ''
+        mobile_quick_actions:
+          - timer
+          - like
+          - lyrics
+          - queue
+          - queue_flow
+          - radio
+          - history
+        mobile_radio_browser_country: all
+        mobile_radio_source_mode: combined
+        mobile_show_up_next: false
+        mobile_studio_shortcut: false
+        mobile_swipe_mode: browse
+        mobile_volume_mode: button
+        mobile_volume_step_buttons: true
+        mobile_volume_step_percent: 5
+        music_assistant_timeout_ms: 12000
+        night_mode: auto
+        night_mode_auto_end: '06:00'
+        night_mode_auto_start: '22:00'
+        night_mode_days:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+        performance_mode: false
+        performance_profile: full
+        pinned_player_entities: []
+        pinned_player_entity: ''
+        pinned_player_master: ''
+        pinned_players_exclusive: false
+        player_design: immersive
+        player_order_entities: []
+        player_order_entity_1: ''
+        player_order_entity_10: ''
+        player_order_entity_11: ''
+        player_order_entity_12: ''
+        player_order_entity_13: ''
+        player_order_entity_14: ''
+        player_order_entity_15: ''
+        player_order_entity_16: ''
+        player_order_entity_17: ''
+        player_order_entity_18: ''
+        player_order_entity_19: ''
+        player_order_entity_2: ''
+        player_order_entity_20: ''
+        player_order_entity_3: ''
+        player_order_entity_4: ''
+        player_order_entity_5: ''
+        player_order_entity_6: ''
+        player_order_entity_7: ''
+        player_order_entity_8: ''
+        player_order_entity_9: ''
+        player_sort_mode: default
+        popup_opacity: 0.92
+        power_button_action: stop_player
+        power_button_enabled: false
+        power_button_entity: ''
+        power_button_icon: power
+        power_button_name: ''
+        rtl: false
+        screensaver_auto_lyrics_when_playing: false
+        screensaver_clock_mode: digital
+        screensaver_clock_size: 0.9
+        screensaver_clock_x: 66
+        screensaver_clock_y: 25
+        screensaver_control_buttons:
+          - previous
+          - next
+          - play_pause
+          - mute
+        screensaver_controls_enabled: false
+        screensaver_enabled: true
+        screensaver_message: ''
+        screensaver_timeout_seconds: 30
+        settings_source: card
+        show_ma_button: true
+        show_quality_badge: true
+        show_source_badge: true
+        show_theme_toggle: true
+        theme_mode: dark
+        type: custom:homeii-music-flow
+        voice_assistant_agent_id: ''
+        voice_assistant_enabled: false
+        voice_assistant_mode: hybrid
+        voice_assistant_speak_feedback: false
+        volume_wheel: true
+    icon: glyphs-poly:music
+    path: media_new
+    show_icon_and_title: true
+    subview: true
+    title: Media
+    type: panel
