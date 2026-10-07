@@ -1,0 +1,56 @@
+glass_vehicle:
+  section_mode: true
+  show_icon: false
+  show_name: false
+  show_state: false
+  triggers_update: all
+  tap_action:
+    action: more-info
+  variables:
+    title: ''
+    image: ''
+    battery: ''
+    tracker: ''
+    onroad: ''
+    charging: false
+  custom_fields:
+    body: |
+      [[[
+        const pct = parseFloat(states[variables.battery]?.state);
+        const has = !isNaN(pct);
+        const col = !has ? 'var(--divider-color)' : pct < 20 ? '#ef4444' : pct < 50 ? '#f59e0b' : '#10b981';
+        const loc = states[variables.tracker]?.state;
+        const place = !loc || loc === 'unknown' || loc === 'unavailable' ? 'Unknown'
+          : loc === 'home' ? 'Home' : loc === 'not_home' ? 'Away' : loc;
+        const driving = states[variables.onroad]?.state === 'on';
+        const charging = variables.charging === true || variables.charging === 'true';
+        const pill = (icon, text, c) => `<div style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:12px;background:var(--glass-field);font-size:12px;font-weight:600;white-space:nowrap;color:${c || 'var(--primary-text-color)'}"><ha-icon icon="${icon}" style="--mdc-icon-size:15px"></ha-icon>${text}</div>`;
+        return `<div style="display:grid;grid-template-columns:42% 1fr;gap:14px;align-items:center;width:100%">
+          <div style="text-align:center;min-width:0">
+            <div style="font-size:18px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px">${variables.title}</div>
+            <img src="${variables.image}" style="max-width:100%;max-height:92px;object-fit:contain">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              ${pill('mdi:map-marker', place)}${pill(driving ? 'mdi:car' : 'mdi:car-brake-parking', driving ? 'Driving' : 'Parked', driving ? 'var(--glass-ok)' : '')}
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1;height:14px;border-radius:7px;background:rgba(var(--rgb-primary-text-color),0.12);overflow:hidden">
+                <i style="display:block;height:100%;width:${has ? Math.max(0, Math.min(100, pct)) : 0}%;background:${col};border-radius:7px"></i>
+              </div>
+              <div style="font-size:15px;font-weight:700;min-width:42px;text-align:right">${has ? Math.round(pct) + '%' : '—'}</div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:${charging ? 'var(--glass-ok)' : 'var(--secondary-text-color)'}">${charging ? '⚡ Charging' : 'Not charging'}</div>
+          </div>
+        </div>`;
+      ]]]
+  styles:
+    card:
+      - height: 100%
+      - border-radius: 28px
+      - padding: 12px 18px
+    grid:
+      - grid-template-areas: '"body"'
+    custom_fields:
+      body:
+        - width: 100%
