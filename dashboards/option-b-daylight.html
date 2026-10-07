@@ -14,7 +14,7 @@ html,body{height:100%;background:#dfe9ff;overflow:hidden;font-family:Inter,syste
  box-shadow:0 16px 40px rgba(60,80,140,.14),inset 0 1px 0 #fff}
 .lbl{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:8px}
 .mut{color:var(--mut)}
-#rail{position:absolute;left:28px;top:28px;bottom:28px;width:92px;display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:6px;border-radius:32px}
+#rail{position:absolute;left:28px;top:28px;bottom:28px;width:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 0;gap:10px;border-radius:32px}
 .nv{width:72px;height:66px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;color:var(--mut);position:relative;cursor:pointer}
 .nv.act{background:#fff;color:var(--acc);box-shadow:0 8px 18px rgba(47,107,255,.2)}
 .bd{position:absolute;top:6px;right:12px;min-width:18px;height:18px;border-radius:9px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #fff}
@@ -101,7 +101,7 @@ html,body{height:100%;background:#dfe9ff;overflow:hidden;font-family:Inter,syste
 <script src="shared.js"></script>
 <script>
 const $=id=>document.getElementById(id), w=D.weather, e=D.energy;
-$('rail').innerHTML=`<div class="logo">${ic('home',26)}</div>`+D.nav.map(n=>`<div class="nv ${n.active?'act':''}">${ic(n.icon,24)}${n.name}${n.badge?`<i class="bd">${n.badge}</i>`:''}</div>`).join('');
+$('rail').innerHTML=D.nav.map(n=>`<div class="nv ${n.active?'act':''}">${ic(n.icon,24)}${n.name}${n.badge?`<i class="bd">${n.badge}</i>`:''}</div>`).join('');
 $('hd').innerHTML=`
 <div class="g hi"><div><div class="lbl">${D.now.date}</div><h1 style="margin-top:6px">Good morning</h1></div><div class="t">${D.now.time}<small>${D.now.ampm}</small></div></div>
 <div class="g pp">${D.people.map(p=>`<div class="pc"><div class="av" style="background:linear-gradient(135deg,hsl(${p.hue} 85% 62%),hsl(${p.hue+40} 75% 48%))">${p.init}</div><div><b>${p.name}</b><span class="mut">${p.place} · ${p.ago}</span><span class="${p.batt>90?'ok':'mut'}" style="font-weight:600">${p.batt}% · ${p.net}</span></div></div>`).join('')}</div>
