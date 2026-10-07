@@ -703,6 +703,19 @@ views:
                 name: Media
                 template: room_tile
                 triggers_update: all
+                extra_styles: |
+                  .mq {
+                    overflow: hidden; min-width: 0; flex: 1;
+                    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
+                    mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
+                  }
+                  .run { display: inline-flex; animation: tick 9s linear infinite; }
+                  .run span { padding-right: 28px; }
+                  @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+                  @media (prefers-reduced-motion: reduce) {
+                    .run { animation: none; }
+                    .run span + span { display: none; }
+                  }
                 label: |
                   [[[
                     const skip = variables.skip || [], names = variables.names || {}, sw = variables.switches || {};
@@ -714,10 +727,21 @@ views:
                       states[id]?.state === 'on' && states[s.player]?.state !== 'playing').map(([id, s]) => s.name);
                     const parts = [];
                     if (playing.length === 1) parts.push(`${playing[0]} playing`);
-                    if (playing.length > 1) parts.push(`${playing.length} playing`);
+                    if (playing.length > 1) parts.push(`${playing.length} playing: ${playing.join(', ')}`);
                     on.forEach(n => parts.push(`${n} on`));
-                    return parts.length ? parts.join(' · ') : 'All off';
+                    if (!parts.length) return 'All off';
+                    const text = parts.join(' · ');
+                    if (text.length <= 13) return text;
+                    return `<span class="mq"><span class="run"><span>${text}</span><span>${text}</span></span></span>`;
                   ]]]
+                styles:
+                  label:
+                    - width: 100%
+                    - min-width: 0
+                    - overflow: hidden
+                    - display: flex
+                    - align-items: center
+                    - white-space: nowrap
                 tap_action:
                   action: fire-dom-event
                   browser_mod:
