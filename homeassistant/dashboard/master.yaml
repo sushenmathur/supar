@@ -422,9 +422,9 @@ views:
                       const tz = { timeZone: 'Australia/Brisbane' };
                       const h = parseInt(d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', hour12: false }));
                       const hello = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-                      const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'long', day: 'numeric', month: 'long' });
+                      const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'short', day: 'numeric', month: 'short' });
                       return `<div style="text-align:left">
-                        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--secondary-text-color)">${date}</div>
+                        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--secondary-text-color)">${date}</div>
                         <div style="font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:2px;white-space:nowrap">${hello}</div>
                       </div>`;
                     ]]]
