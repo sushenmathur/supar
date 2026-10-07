@@ -1,0 +1,128 @@
+# Replace the existing `navbar-templates:` block in the raw config editor with this.
+navbar-templates:
+  main:
+    desktop:
+      min_width: 600
+      position: left
+      show_labels: true
+      show_popup_label_backgrounds: true
+    layout:
+      auto_padding:
+        desktop_px: 120
+        enabled: true
+        mobile_px: 100
+      reflect_child_state: true
+    mobile:
+      mode: docked
+      show_labels: true
+    routes:
+      - icon: mdi:home
+        label: Home
+        url: /dashboard-hub/hubhome
+      - icon: mdi:floor-plan
+        label: Rooms
+        popup:
+          - icon: mdi:sofa
+            label: Living
+            url: /dashboard-hub/living-room
+          - icon: mdi:teddy-bear
+            label: Kids
+            url: /dashboard-hub/kidsroom
+          - icon: mdi:garage-variant
+            label: Garage
+            url: /dashboard-hub/garage
+          - icon: mdi:gate
+            label: Outdoor
+            url: /dashboard-hub/outdoor
+          - icon: mdi:washing-machine
+            label: Laundry
+            url: /dashboard-hub/laundry
+        tap_action:
+          action: open-popup
+      - badge:
+          count: |
+            [[[ return Object.values(states).filter(e =>
+                  e.entity_id.startsWith('light.') &&
+                  !e.entity_id.startsWith('light.browser') && e.state === 'on').length; ]]]
+          show: |
+            [[[ return Object.values(states).some(e =>
+                  e.entity_id.startsWith('light.') &&
+                  !e.entity_id.startsWith('light.browser') && e.state === 'on'); ]]]
+        icon: mdi:lightbulb-outline
+        icon_selected: mdi:lightbulb-on
+        label: Lights
+        url: /dashboard-hub/lights
+      - icon: mdi:thermometer
+        label: Climate
+        url: /dashboard-hub/homeclimate
+      - badge:
+          count: |
+            [[[ return ['binary_sensor.garage_door_sensor_contact',
+                        'binary_sensor.front_door_contact',
+                        'binary_sensor.hallwaydoorsensor_contact',
+                        'binary_sensor.patio_door_contact',
+                        'binary_sensor.side_door_contact',
+                        'binary_sensor.laundrydoorsensor_contact']
+                  .filter(id => states[id]?.state === 'on').length; ]]]
+          show: |
+            [[[ return ['binary_sensor.garage_door_sensor_contact',
+                        'binary_sensor.front_door_contact',
+                        'binary_sensor.hallwaydoorsensor_contact',
+                        'binary_sensor.patio_door_contact',
+                        'binary_sensor.side_door_contact',
+                        'binary_sensor.laundrydoorsensor_contact']
+                  .some(id => states[id]?.state === 'on'); ]]]
+        icon: mdi:security
+        label: Security
+        url: /dashboard-hub/security
+      - icon: glyphs-poly:music
+        label: Music
+        url: /dashboard-hub/media_new
+      - icon: mdi:dots-horizontal
+        label: More
+        popup:
+          - icon: mdi:devices
+            label: iCloud3
+            url: /ic3db-icloud3
+          - icon: mdi:cog
+            label: Settings
+            url: /config
+          - icon: mdi:hammer
+            label: Dev tools
+            url: /developer-tools/yaml
+          - icon: mdi:restart
+            label: Restart
+            tap_action:
+              action: perform-action
+              confirmation:
+                text: Are you sure you want to restart Home Assistant?
+              perform_action: homeassistant.restart
+        tap_action:
+          action: open-popup
+    styles: |
+      /* Glass rail. Sizes are left to navbar-card so icon + label always fit on every view. */
+      .navbar-card.desktop {
+        background: var(--glass-bg) !important;
+        backdrop-filter: blur(34px) saturate(190%);
+        -webkit-backdrop-filter: blur(34px) saturate(190%);
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 32px !important;
+        box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi) !important;
+        overflow: visible !important;
+      }
+      .navbar.desktop.left { padding: 12px 8px !important; justify-content: center; }
+      .button { border-radius: 20px !important; }
+      .button.active {
+        background: var(--glass-bg-soft) !important;
+        box-shadow: inset 0 1px 0 var(--glass-hi), 0 6px 16px rgba(0,0,0,0.12) !important;
+        border-radius: 20px !important;
+      }
+      .icon.active, .label.active { color: var(--primary-text-color) !important; }
+      .icon, .label { color: var(--secondary-text-color); }
+      .navbar-popup {
+        background: var(--popup-background-color) !important;
+        backdrop-filter: blur(34px) saturate(190%);
+        -webkit-backdrop-filter: blur(34px) saturate(190%);
+        border: 1px solid var(--glass-border);
+        border-radius: 28px !important;
+      }
