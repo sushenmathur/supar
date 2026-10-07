@@ -2070,7 +2070,7 @@ views:
               - camera_entity: camera.garage_live_view
             dimensions:
               aspect_ratio_mode: static
-              aspect_ratio: [16, 9]
+              aspect_ratio: [16, 7]
             grid_options:
               columns: full
             type: custom:advanced-camera-card
@@ -2088,7 +2088,7 @@ views:
               charging: '[[[ return states["sensor.bluey_charging"]?.state === "Charging"; ]]]'
             grid_options:
               columns: 12
-              rows: 9
+              rows: 8
           - type: custom:button-card
             entity: sensor.bluey_battery_range
             name: Range
@@ -2163,7 +2163,7 @@ views:
               charging: '[[[ return parseFloat(states["sensor.kia_charger_power"]?.state) > 10; ]]]'
             grid_options:
               columns: 12
-              rows: 9
+              rows: 8
           - type: custom:button-card
             entity: sensor.kia_charger_power
             name: Charge Power
