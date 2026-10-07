@@ -417,14 +417,10 @@ views:
                       const tz = { timeZone: 'Australia/Brisbane' };
                       const h = parseInt(d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', hour12: false }));
                       const hello = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-                      const t = d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', minute: '2-digit', hour12: true }).split(' ');
                       const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'long', day: 'numeric', month: 'long' });
-                      return `<div style="display:flex;justify-content:space-between;align-items:center;width:100%">
-                        <div style="text-align:left">
-                          <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--secondary-text-color)">${date}</div>
-                          <div style="font-size:36px;font-weight:600;letter-spacing:-.03em;margin-top:4px">${hello}</div>
-                        </div>
-                        <div style="font-size:56px;font-weight:300;letter-spacing:-.04em;line-height:1">${t[0]}<span style="font-size:19px;font-weight:600;margin-left:4px">${(t[1] || '').toUpperCase()}</span></div>
+                      return `<div style="text-align:left">
+                        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--secondary-text-color)">${date}</div>
+                        <div style="font-size:40px;font-weight:600;letter-spacing:-.03em;margin-top:4px">${hello}</div>
                       </div>`;
                     ]]]
                 styles:
