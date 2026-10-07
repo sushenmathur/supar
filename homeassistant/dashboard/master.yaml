@@ -243,6 +243,60 @@ button_card_templates:
     variables:
       daytime: ''
       tz: UTC
+  glass_vehicle:
+    section_mode: true
+    show_icon: false
+    show_name: false
+    show_state: false
+    triggers_update: all
+    tap_action:
+      action: more-info
+    variables:
+      title: ''
+      image: ''
+      battery: ''
+      tracker: ''
+      onroad: ''
+      charging: false
+    custom_fields:
+      body: |
+        [[[
+          const pct = parseFloat(states[variables.battery]?.state);
+          const has = !isNaN(pct);
+          const col = !has ? 'var(--divider-color)' : pct < 20 ? '#ef4444' : pct < 50 ? '#f59e0b' : '#10b981';
+          const loc = states[variables.tracker]?.state;
+          const place = !loc || loc === 'unknown' || loc === 'unavailable' ? 'Unknown'
+            : loc === 'home' ? 'Home' : loc === 'not_home' ? 'Away' : loc;
+          const driving = states[variables.onroad]?.state === 'on';
+          const charging = variables.charging === true || variables.charging === 'true';
+          const pill = (icon, text, c) => `<div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:14px;background:var(--glass-field);font-size:12px;font-weight:600;color:${c || 'var(--primary-text-color)'}"><ha-icon icon="${icon}" style="--mdc-icon-size:16px"></ha-icon>${text}</div>`;
+          return `<div style="width:100%;text-align:center">
+            <div style="font-size:20px;font-weight:700;letter-spacing:-.01em">${variables.title}</div>
+            <div style="height:120px;display:flex;align-items:center;justify-content:center;margin:6px 0">
+              <img src="${variables.image}" style="max-height:120px;max-width:90%;object-fit:contain">
+            </div>
+            <div style="display:flex;justify-content:center;gap:8px;margin-bottom:12px">
+              ${pill('mdi:map-marker', place)}${pill(driving ? 'mdi:car' : 'mdi:car-brake-parking', driving ? 'Driving' : 'Parked', driving ? 'var(--glass-ok)' : '')}
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1;height:14px;border-radius:7px;background:rgba(var(--rgb-primary-text-color),0.12);overflow:hidden">
+                <i style="display:block;height:100%;width:${has ? Math.max(0, Math.min(100, pct)) : 0}%;background:${col};border-radius:7px"></i>
+              </div>
+              <div style="font-size:15px;font-weight:700;min-width:44px;text-align:right">${has ? Math.round(pct) + '%' : '—'}</div>
+            </div>
+            <div style="margin-top:6px;font-size:12px;font-weight:600;color:${charging ? 'var(--glass-ok)' : 'var(--secondary-text-color)'}">${charging ? '⚡ Charging' : 'Not charging'}</div>
+          </div>`;
+        ]]]
+    styles:
+      card:
+        - height: 100%
+        - border-radius: 28px
+        - padding: 16px 18px
+      grid:
+        - grid-template-areas: '"body"'
+      custom_fields:
+        body:
+          - width: 100%
 navbar-templates:
   main:
     desktop:
@@ -1999,708 +2053,154 @@ views:
     max_columns: 3
     path: garage
     sections:
-      - cards:
-          - action_image_width: 100
-            bar_row_alignment: center
-            bars:
-              - action_animation: none
-                action_animation_entity: ''
-                action_animation_state: ''
-                alignment: space-between
-                animation_entity: ''
-                animation_state: ''
-                animation_type: none
-                background_color: 'var(--card-background-color, #121212)'
-                bar_color: 'var(--primary-color, #3498db)'
-                bar_name: Battery
-                bar_radius: round
-                bar_size: thiccc
-                bar_style: outline
-                border_color: 'var(--divider-color, #555555)'
-                entity: sensor.bluey_battery_level
-                gradient_display_mode: value_based
-                gradient_stops:
-                  - color: '#ff0000'
-                    id: '1'
-                    position: 0
-                  - color: '#f7f702'
-                    id: stop-3
-                    position: 75
-                  - color: '#00ff00'
-                    id: '2'
-                    position: 100
-                left_condition:
-                  entity: ''
-                  state: ''
-                  type: none
-                left_text_color: 'var(--primary-text-color, #ffffff)'
-                left_text_size: 14
-                left_title_color: 'var(--secondary-text-color, #999999)'
-                left_title_size: 14
-                limit_indicator_color: 'var(--error-color, #ff0000)'
-                percentage_amount_entity: ''
-                percentage_attribute: ''
-                percentage_template: ''
-                percentage_text_bold: true
-                percentage_text_color: '#212121'
-                percentage_text_size: 17
-                percentage_text_uppercase: true
-                percentage_total_entity: ''
-                percentage_type: entity
-                right_condition:
-                  entity: sensor.bluey_charging
-                  state: Charging
-                  type: show
-                right_entity: ''
-                right_text_color: 'var(--primary-text-color, #ffffff)'
-                right_text_size: 14
-                right_title: Charging
-                right_title_color: 'var(--secondary-text-color, #999999)'
-                right_title_size: 14
-                show_left: false
-                show_left_title: true
-                show_left_value: true
-                show_percentage: true
-                show_right: false
-                show_right_title: true
-                show_right_value: true
-                use_gradient: true
-                width: '100'
-              - action_animation: none
-                action_animation_entity: ''
-                action_animation_state: ''
-                alignment: center
-                animation_entity: ''
-                animation_state: ''
-                animation_type: charging-lines
-                background_color: 'var(--card-background-color, #121212)'
-                bar_color: '#21c700'
-                bar_name: Charging
-                bar_radius: round
-                bar_size: regular
-                bar_style: neon
-                border_color: 'var(--divider-color, #555555)'
-                entity: sensor.bluey_battery_level
-                gradient_display_mode: value_based
-                gradient_stops:
-                  - color: '#ff0000'
-                    id: '1'
-                    position: 0
-                  - color: '#00ff00'
-                    id: '2'
-                    position: 100
-                left_entity: ''
-                left_text_color: 'var(--primary-text-color, #ffffff)'
-                left_text_size: 14
-                left_title: ''
-                left_title_color: 'var(--secondary-text-color, #999999)'
-                left_title_size: 14
-                limit_indicator_color: 'var(--error-color, #ff0000)'
-                percentage_amount_entity: ''
-                percentage_attribute: ''
-                percentage_template: ''
-                percentage_text_color: '#1a1919'
-                percentage_text_size: 14
-                percentage_total_entity: ''
-                percentage_type: entity
-                right_condition:
-                  entity: ''
-                  state: ''
-                  type: none
-                right_entity: ''
-                right_text_color: 'var(--primary-text-color, #ffffff)'
-                right_text_size: 14
-                right_title: Charging
-                right_title_color: 'var(--secondary-text-color, #999999)'
-                right_title_size: 14
-                show_left: false
-                show_left_title: true
-                show_left_value: true
-                show_percentage: true
-                show_right: true
-                show_right_title: true
-                show_right_value: true
-                use_gradient: false
-                width: '100'
-            formatted_entities: true
-            help_highlight: true
-            icon_rows:
-              - alignment: center
-                columns: 0
-                confirmation_mode: true
-                icons:
-                  - action: ''
-                    active_state: 'on'
-                    active_state_text: ''
-                    active_template: ''
-                    active_template_mode: false
-                    color_active: var(--primary-color)
-                    color_inactive: var(--secondary-text-color)
-                    container_background: none
-                    container_background_color: var(--secondary-background-color)
-                    container_width: '100'
-                    draggable: true
-                    dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: lock.bluey_lock
-                    icon_active: mdi:lock-open
-                    icon_background: none
-                    icon_background_color: var(--secondary-background-color)
-                    icon_inactive: mdi:lock
-                    icon_size: 28
-                    inactive_state: 'off'
-                    inactive_state_text: ''
-                    inactive_template: ''
-                    inactive_template_mode: false
-                    name: ''
-                    name_color_active: var(--primary-text-color)
-                    name_color_inactive: var(--primary-text-color)
-                    on_click_action: more-info
-                    service_data: {}
-                    show_icon_active: true
-                    show_icon_inactive: true
-                    show_name: false
-                    show_name_active: false
-                    show_name_inactive: false
-                    show_state: true
-                    show_state_active: true
-                    show_state_inactive: true
-                    show_units: true
-                    single_click_action: toggle
-                    single_entity: lock.bluey_lock
-                    single_service_data: {}
-                    state_color_active: var(--primary-text-color)
-                    state_color_inactive: var(--secondary-text-color)
-                    text_alignment: center
-                    text_position: bottom
-                    text_size: 14
-                    use_entity_color_for_container_background: false
-                    use_entity_color_for_icon: false
-                    use_entity_color_for_icon_active: false
-                    use_entity_color_for_icon_background: false
-                    use_entity_color_for_icon_inactive: false
-                    vertical_alignment: center
-                  - action: ''
-                    active_state: 'on'
-                    active_state_text: ''
-                    active_template: ''
-                    active_template_mode: false
-                    color_active: var(--primary-color)
-                    color_inactive: var(--secondary-text-color)
-                    container_background: none
-                    container_background_color: var(--secondary-background-color)
-                    container_width: '100'
-                    draggable: true
-                    dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: cover.bluey_trunk
-                    icon_active: phu:tesla-trunk
-                    icon_background: none
-                    icon_background_color: var(--secondary-background-color)
-                    icon_inactive: phu:tesla-trunk
-                    icon_size: 28
-                    inactive_state: 'off'
-                    inactive_state_text: ''
-                    inactive_template: ''
-                    inactive_template_mode: false
-                    name: Boot
-                    name_color_active: var(--primary-text-color)
-                    name_color_inactive: var(--primary-text-color)
-                    on_click_action: more-info
-                    service_data: {}
-                    show_icon_active: true
-                    show_icon_inactive: true
-                    show_name: false
-                    show_name_active: false
-                    show_name_inactive: false
-                    show_state: true
-                    show_state_active: true
-                    show_state_inactive: true
-                    show_units: true
-                    single_click_action: toggle
-                    single_entity: cover.bluey_trunk
-                    single_service_data: {}
-                    state_color_active: var(--primary-text-color)
-                    state_color_inactive: var(--secondary-text-color)
-                    text_alignment: center
-                    text_position: bottom
-                    text_size: 14
-                    use_entity_color_for_container_background: false
-                    use_entity_color_for_icon: false
-                    use_entity_color_for_icon_active: false
-                    use_entity_color_for_icon_background: false
-                    use_entity_color_for_icon_inactive: false
-                    vertical_alignment: center
-                  - action: ''
-                    active_state: 'on'
-                    active_state_text: ''
-                    active_template: ''
-                    active_template_mode: false
-                    color_active: var(--primary-color)
-                    color_inactive: var(--secondary-text-color)
-                    container_background: none
-                    container_background_color: var(--secondary-background-color)
-                    container_width: '100'
-                    draggable: true
-                    dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: switch.bluey_charge
-                    icon_active: mdi:toggle-switch
-                    icon_background: none
-                    icon_background_color: var(--secondary-background-color)
-                    icon_inactive: mdi:toggle-switch-off
-                    icon_size: 30
-                    inactive_state: 'off'
-                    inactive_state_text: ''
-                    inactive_template: ''
-                    inactive_template_mode: false
-                    name: Charger
-                    name_color_active: var(--primary-text-color)
-                    name_color_inactive: var(--primary-text-color)
-                    on_click_action: more-info
-                    service_data: {}
-                    show_icon_active: true
-                    show_icon_inactive: true
-                    show_name: false
-                    show_name_active: true
-                    show_name_inactive: true
-                    show_state: true
-                    show_state_active: true
-                    show_state_inactive: false
-                    show_units: true
-                    single_click_action: toggle
-                    state_color_active: var(--primary-text-color)
-                    state_color_inactive: var(--secondary-text-color)
-                    text_alignment: center
-                    text_position: bottom
-                    text_size: 14
-                    use_entity_color_for_container_background: false
-                    use_entity_color_for_icon: false
-                    use_entity_color_for_icon_active: false
-                    use_entity_color_for_icon_background: false
-                    use_entity_color_for_icon_inactive: false
-                    vertical_alignment: center
-                id: 3nv88m1
-                row_name: Lock
-                spacing: none
-                vertical_alignment: center
-                width: '100'
-            image_priority_mode: order
-            images:
-              - hold_click_action: navigate
-                hold_navigation_path: /config/devices/device/5386d27d87fe3b8845b97b7eb8e259d4
-                id: r35zj5q
-                image: /api/image/serve/cdd510be49f2493bc87fd540c01cea69
-                image_crop:
-                  bottom: 0
-                  left: 0
-                  right: 0
-                  top: -10
-                image_type: upload
-                image_width: 245
-                name: ''
-                priority: 0
-            info_rows:
-              - alignment: space-around
-                allow_wrap: true
-                columns: 0
-                id: d5djjy5
-                info_entities:
-                  - dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: sensor.bluey_battery_range
-                    icon: mdi:gauge
-                    icon_color: var(--secondary-text-color)
-                    icon_size: 21
-                    id: bgsb46p
-                    name: Range
-                    name_size: 13
-                    on_click_action: more-info
-                    show_icon: true
-                    show_name: true
-                    text_color: var(--primary-text-color)
-                    text_size: 15
-                  - dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: sensor.bluey_charge_energy_added
-                    icon: mdi:lightning-bolt
-                    icon_color: var(--secondary-text-color)
-                    icon_size: 23
-                    id: 4kv6mhk
-                    name: Last Charge
-                    name_size: 13
-                    on_click_action: more-info
-                    show_icon: true
-                    show_name: true
-                    text_color: var(--primary-text-color)
-                    text_size: 13
-                row_name: Range
-                spacing: none
-                vertical_alignment: center
-                width: '100'
-              - alignment: space-around
-                allow_wrap: false
-                columns: 0
-                id: elnb5zw
-                info_entities:
-                  - dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: device_tracker.bluey_location
-                    icon: mdi:map-marker-radius
-                    icon_color: var(--secondary-text-color)
-                    icon_size: 24
-                    id: hg8olut
-                    name: ''
-                    name_size: 14
-                    on_click_action: more-info
-                    show_icon: true
-                    show_name: false
-                    template_mode: false
-                    text_color: var(--primary-text-color)
-                    text_size: 14
-                  - dynamic_color_template: |2
-                        {% if is_state('input_boolean.tesla_onroad', 'on') %}
-                        var(--success-color)
-                      {% else %}
-                        var(--error-color)
-                      {% endif %}
-                    dynamic_color_template_mode: true
-                    dynamic_icon_template: |
-                      {% if is_state('input_boolean.tesla_onroad', 'on') %}
-                        mdi:car
-                      {% else %}
-                        mdi:car-brake-parking
-                      {% endif %}
-                    dynamic_icon_template_mode: true
-                    entity: input_boolean.tesla_onroad
-                    icon: ''
-                    icon_color: var(--secondary-text-color)
-                    icon_size: 24
-                    id: hi37jj7
-                    name: On Road
-                    name_size: 14
-                    on_click_action: more-info
-                    show_icon: true
-                    show_name: false
-                    template_mode: true
-                    text_color: var(--primary-text-color)
-                    text_size: 14
-                    value_template: |2
-                        {% if is_state('input_boolean.tesla_onroad', 'on') %}
-                          Driving
-                        {% else %}
-                          Parked
-                        {% endif %}
-                row_name: HomeState
-                spacing: medium
-                vertical_alignment: center
-                width: '100'
-            layout_type: full_half
-            section_conditions:
-              bar_0:
-                entity: sensor.bluey_charging
-                state: Charging
-                type: hide
-              bar_1:
-                entity: sensor.bluey_charging
-                state: Charging
-                type: show
-            sections_columns:
-              icon_row_3nv88m1: full_half_row1_full
-              info_row_d5djjy5: full_half_row1_full
-              info_row_elnb5zw: full_half_row1_full
-            sections_order:
-              - title
-              - image
-              - info
-              - info_row_elnb5zw
-              - bar_0
-              - bar_1
-              - info_row_d5djjy5
-              - icon_row_3nv88m1
-            show_car_state: true
-            show_info_icons: true
-            show_location: true
-            show_mileage: true
-            show_units: true
-            status_image_type: none
-            title: Bluey
-            title_alignment: center
-            title_bold: true
-            title_color: '#2346d1'
-            title_italic: false
-            title_size: 24
-            title_strikethrough: false
-            title_uppercase: false
-            type: custom:ultra-vehicle-card
-            vehicle_image_type: default
-            vehicle_image_width: 100
-          - action_image_width: 100
-            bar_row_alignment: center
-            bars:
-              - action_animation: none
-                action_animation_entity: ''
-                action_animation_state: ''
-                alignment: space-between
-                animation_entity: ''
-                animation_state: ''
-                animation_type: none
-                background_color: 'var(--card-background-color, #121212)'
-                bar_color: '#8c90a1'
-                bar_name: Battery
-                bar_radius: round
-                bar_size: thiccc
-                bar_style: outline
-                border_color: 'var(--divider-color, #555555)'
-                entity: input_number.kia_battery_estimate
-                gradient_display_mode: value_based
-                gradient_stops:
-                  - color: '#ff0000'
-                    id: '1'
-                    position: 0
-                  - color: '#deaa1b'
-                    id: stop-3
-                    position: 50
-                  - color: '#2fc62f'
-                    id: '2'
-                    position: 100
-                left_entity: ''
-                left_text_color: 'var(--primary-text-color, #ffffff)'
-                left_text_size: 14
-                left_title: ''
-                left_title_color: 'var(--secondary-text-color, #999999)'
-                left_title_size: 14
-                limit_indicator_color: 'var(--error-color, #ff0000)'
-                percentage_amount_entity: ''
-                percentage_attribute: ''
-                percentage_template: ''
-                percentage_text_size: 18
-                percentage_total_entity: ''
-                percentage_type: entity
-                right_entity: ''
-                right_text_color: 'var(--primary-text-color, #ffffff)'
-                right_text_size: 14
-                right_title: ''
-                right_title_color: 'var(--secondary-text-color, #999999)'
-                right_title_size: 14
-                show_left: false
-                show_left_title: true
-                show_left_value: true
-                show_percentage: true
-                show_right: false
-                show_right_title: true
-                show_right_value: true
-                use_gradient: true
-                width: '100'
-            formatted_entities: true
-            help_highlight: true
-            icon_rows:
-              - alignment: center
-                columns: 0
-                confirmation_mode: false
-                icons:
-                  - action: ''
-                    active_animation: pulse
-                    active_state: 'on'
-                    active_state_text: Charging
-                    active_template: '{{ states(''sensor.kia_charger_power'') | float > 10 }}'
-                    active_template_mode: true
-                    color_active: '#00c703'
-                    color_inactive: var(--secondary-text-color)
-                    container_background: none
-                    container_background_color: var(--secondary-background-color)
-                    draggable: true
-                    dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: switch.kia_charger
-                    icon_active: mdi:car-electric
-                    icon_background: none
-                    icon_background_color: var(--secondary-background-color)
-                    icon_inactive: mdi:toggle-switch-off
-                    icon_size: 28
-                    inactive_state: 'off'
-                    inactive_template: ''
-                    inactive_template_mode: false
-                    name: Charger
-                    name_color_active: var(--primary-text-color)
-                    name_color_inactive: var(--primary-text-color)
-                    on_click_action: more-info
-                    service_data: {}
-                    show_icon_active: true
-                    show_icon_inactive: true
-                    show_name: false
-                    show_name_active: true
-                    show_name_inactive: true
-                    show_state: true
-                    show_state_active: false
-                    show_state_inactive: true
-                    show_units: true
-                    single_click_action: toggle
-                    single_entity: switch.kia_charger
-                    state_color_active: var(--primary-text-color)
-                    state_color_inactive: var(--secondary-text-color)
-                    text_alignment: center
-                    text_position: bottom
-                    text_size: 14
-                    use_entity_color_for_container_background: false
-                    use_entity_color_for_icon: false
-                    use_entity_color_for_icon_active: false
-                    use_entity_color_for_icon_background: false
-                    use_entity_color_for_icon_inactive: false
-                    vertical_alignment: center
-                id: 3d4yacj
-                row_name: Kia Charger
-                spacing: none
-                vertical_alignment: center
-                width: '100'
-            image_priority_mode: order
-            images:
-              - double_click_action: toggle
-                double_entity: input_boolean.kia_onroad
-                id: 5lkx2gs
-                image: /api/image/serve/b0801eee9b5f2d6fcf7972d71f0d7711
-                image_type: upload
-                image_width: 100
-                name: ''
-                priority: 0
-            info_rows:
-              - alignment: space-around
-                allow_wrap: false
-                columns: 0
-                id: elnb5zw
-                info_entities:
-                  - dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: device_tracker.kia_gps_location
-                    icon: mdi:map-marker
-                    icon_color: var(--secondary-text-color)
-                    icon_size: 24
-                    id: hg8olut
-                    name: ' HomeState'
-                    name_size: 14
-                    on_click_action: more-info
-                    show_icon: true
-                    show_name: false
-                    template_mode: false
-                    text_color: var(--primary-text-color)
-                    text_size: 14
-                  - dynamic_color_template: |
-                      {% if is_state('input_boolean.kia_onroad', 'on') %}
-                        var(--success-color)
-                      {% else %}
-                        var(--error-color)
-                      {% endif %}
-                    dynamic_color_template_mode: true
-                    dynamic_icon_template: |
-                      {% if is_state('input_boolean.kia_onroad', 'on') %}
-                        mdi:car
-                      {% else %}
-                        mdi:car-brake-parking
-                      {% endif %}
-                    dynamic_icon_template_mode: true
-                    entity: input_boolean.kia_onroad
-                    icon: mdi:car-brake-parking
-                    icon_color: var(--secondary-text-color)
-                    icon_size: 24
-                    id: al8nsv1
-                    name: On Road
-                    name_size: 14
-                    on_click_action: more-info
-                    show_icon: true
-                    show_name: false
-                    template_mode: true
-                    text_color: var(--primary-text-color)
-                    text_size: 14
-                    value_template: |2
-                        {% if is_state('input_boolean.kia_onroad', 'on') %}
-                          Driving
-                        {% else %}
-                          Parked
-                        {% endif %}
-                row_name: HomeState
-                spacing: medium
-                vertical_alignment: flex-end
-                width: '100'
-              - alignment: center
-                allow_wrap: false
-                columns: 0
-                id: qw9c121
-                info_entities:
-                  - dynamic_color_template: ''
-                    dynamic_color_template_mode: false
-                    dynamic_icon_template: ''
-                    dynamic_icon_template_mode: false
-                    entity: sensor.kia_last_charge_added
-                    icon: mdi:gauge
-                    icon_color: var(--secondary-text-color)
-                    icon_size: 24
-                    id: cuuxirq
-                    name: Last Charge
-                    name_size: 14
-                    on_click_action: more-info
-                    show_icon: true
-                    show_name: true
-                    text_color: var(--primary-text-color)
-                    text_size: 14
-                row_name: Last Charge
-                spacing: medium
-                vertical_alignment: center
-                width: '100'
-            layout_type: full_half
-            section_conditions:
-              bar_0:
-                entity: sensor.bluey_charging
-                state: Charging
-                type: hide
-              bar_1:
-                entity: sensor.bluey_charging
-                state: Charging
-                type: show
-            sections_columns:
-              icon_row_3d4yacj: full_half_row2_right
-              image: full_half_row1_full
-              info_row_elnb5zw: full_half_row1_full
-              info_row_qw9c121: full_half_row2_left
-            sections_order:
-              - title
-              - image
-              - info
-              - info_row_elnb5zw
-              - bar_0
-              - info_row_qw9c121
-              - icon_row_3d4yacj
-            show_car_state: true
-            show_info_icons: true
-            show_location: true
-            show_mileage: true
-            show_units: true
-            status_image_type: none
-            title: Kia
-            title_alignment: center
-            title_bold: true
-            title_size: 24
-            type: custom:ultra-vehicle-card
-            vehicle_image_type: default
-            vehicle_image_width: 100
-        column_span: 2
-        type: grid
-      - cards:
+      - type: grid
+        cards:
+          - type: custom:button-card
+            entity: sensor.bluey_battery_level
+            template: glass_vehicle
+            variables:
+              title: Bluey
+              image: /api/image/serve/cdd510be49f2493bc87fd540c01cea69
+              battery: sensor.bluey_battery_level
+              tracker: device_tracker.bluey_location
+              onroad: input_boolean.tesla_onroad
+              charging: '[[[ return states["sensor.bluey_charging"]?.state === "Charging"; ]]]'
+            grid_options:
+              columns: 12
+              rows: 5
+          - type: custom:button-card
+            entity: sensor.bluey_battery_range
+            name: Range
+            icon: mdi:gauge
+            template: glass_chip
+            label: >-
+              [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:button-card
+            entity: sensor.bluey_charge_energy_added
+            name: Last Charge
+            icon: mdi:lightning-bolt
+            template: glass_chip
+            label: >-
+              [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:button-card
+            entity: lock.bluey_lock
+            name: Lock
+            icon: mdi:lock
+            template: glass_chip
+            label: >-
+              [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+            tap_action:
+              action: toggle
+              confirmation:
+                text: Lock or unlock Bluey?
+            grid_options:
+              columns: 4
+              rows: 1
+          - type: custom:button-card
+            entity: cover.bluey_trunk
+            name: Boot
+            icon: phu:tesla-trunk
+            template: glass_chip
+            label: >-
+              [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+            tap_action:
+              action: toggle
+              confirmation:
+                text: Open or close the boot?
+            grid_options:
+              columns: 4
+              rows: 1
+          - type: custom:button-card
+            entity: switch.bluey_charge
+            name: Charger
+            icon: mdi:ev-station
+            template: glass_chip
+            label: >-
+              [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+            tap_action:
+              action: toggle
+            grid_options:
+              columns: 4
+              rows: 1
+      - type: grid
+        cards:
+          - type: custom:button-card
+            entity: input_number.kia_battery_estimate
+            template: glass_vehicle
+            variables:
+              title: Kia
+              image: /api/image/serve/b0801eee9b5f2d6fcf7972d71f0d7711
+              battery: input_number.kia_battery_estimate
+              tracker: device_tracker.kia_gps_location
+              onroad: input_boolean.kia_onroad
+              charging: '[[[ return parseFloat(states["sensor.kia_charger_power"]?.state) > 10; ]]]'
+            grid_options:
+              columns: 12
+              rows: 5
+          - type: custom:button-card
+            entity: sensor.kia_charger_power
+            name: Charge Power
+            icon: mdi:flash
+            template: glass_chip
+            label: >-
+              [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:button-card
+            entity: sensor.kia_last_charge_added
+            name: Last Charge
+            icon: mdi:lightning-bolt
+            template: glass_chip
+            label: >-
+              [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:button-card
+            entity: switch.kia_charger
+            name: Charger
+            icon: mdi:ev-station
+            template: glass_chip
+            label: >-
+              [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+            tap_action:
+              action: toggle
+            grid_options:
+              columns: 4
+              rows: 1
+          - type: custom:button-card
+            entity: input_boolean.kia_onroad
+            name: On Road
+            icon: mdi:road-variant
+            template: glass_chip
+            label: >-
+              [[[ return entity.state === 'on' ? 'Driving' : 'Parked'; ]]]
+            tap_action:
+              action: toggle
+            grid_options:
+              columns: 4
+              rows: 1
+          - type: custom:button-card
+            entity: binary_sensor.kia_at_home
+            name: At Home
+            icon: mdi:home-map-marker
+            template: glass_chip
+            label: >-
+              [[[ return entity.state === 'on' ? 'Home' : 'Away'; ]]]
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 4
+              rows: 1
+      - type: grid
+        cards:
           - assets_path: /local/garage-card-custom-v3
             car1_presence_entity: binary_sensor.tesla_at_home
             car2_presence_entity: binary_sensor.kia_at_home
@@ -2715,7 +2215,6 @@ views:
             type: custom:advanced-camera-card
           - template: main
             type: custom:navbar-card
-        type: grid
     subview: true
     title: Garage
     type: sections
