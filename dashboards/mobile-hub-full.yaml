@@ -797,6 +797,59 @@ views:
         swipe_to_snooze: true
     - type: grid
       cards:
+      - type: custom:button-card
+        template: b_bento
+        variables:
+          label: Quick actions
+          icon: mdi:lightning-bolt-circle
+          tint: var(--secondary-text-color)
+          height: auto
+        custom_fields:
+          acts:
+            card:
+              type: horizontal-stack
+              cards:
+              - type: custom:button-card
+                template: b_act
+                name: Good Night
+                icon: mdi:weather-night
+                tap_action:
+                  action: perform-action
+                  perform_action: scene.turn_on
+                  target:
+                    entity_id: scene.good_night
+              - type: custom:button-card
+                template: b_act
+                name: Morning
+                icon: mdi:weather-sunset-up
+                tap_action:
+                  action: perform-action
+                  perform_action: scene.turn_on
+                  target:
+                    entity_id: scene.good_morning
+              - type: custom:button-card
+                template: b_act
+                name: Announce
+                icon: mdi:account-voice
+                tap_action:
+                  action: perform-action
+                  perform_action: script.turn_on
+                  target:
+                    entity_id: script.say_tts_message
+              - type: custom:button-card
+                template: b_act
+                name: Call Paro
+                icon: mdi:phone
+                tap_action:
+                  action: perform-action
+                  perform_action: script.turn_on
+                  target:
+                    entity_id: script.attention_paro
+        styles:
+          grid:
+          - grid-template-areas: '"lbl" "acts"'
+          - grid-template-rows: min-content min-content
+          - row-gap: 8px
       - type: grid
         columns: 2
         square: false
@@ -1165,59 +1218,6 @@ views:
                 return row('Shanaya', occ('binary_sensor.shanaya_room_occupancy_status'), t('sensor.shanayaroomtemp_temperature'), true)
                      + row('Samar', occ('binary_sensor.samar_room_occupancy_new'), t('sensor.aarlo_temperature_samar_cam'));
               ]]]
-      - type: custom:button-card
-        template: b_bento
-        variables:
-          label: Quick actions
-          icon: mdi:lightning-bolt-circle
-          tint: var(--secondary-text-color)
-          height: auto
-        custom_fields:
-          acts:
-            card:
-              type: horizontal-stack
-              cards:
-              - type: custom:button-card
-                template: b_act
-                name: Good Night
-                icon: mdi:weather-night
-                tap_action:
-                  action: perform-action
-                  perform_action: scene.turn_on
-                  target:
-                    entity_id: scene.good_night
-              - type: custom:button-card
-                template: b_act
-                name: Morning
-                icon: mdi:weather-sunset-up
-                tap_action:
-                  action: perform-action
-                  perform_action: scene.turn_on
-                  target:
-                    entity_id: scene.good_morning
-              - type: custom:button-card
-                template: b_act
-                name: Announce
-                icon: mdi:account-voice
-                tap_action:
-                  action: perform-action
-                  perform_action: script.turn_on
-                  target:
-                    entity_id: script.say_tts_message
-              - type: custom:button-card
-                template: b_act
-                name: Call Paro
-                icon: mdi:phone
-                tap_action:
-                  action: perform-action
-                  perform_action: script.turn_on
-                  target:
-                    entity_id: script.attention_paro
-        styles:
-          grid:
-          - grid-template-areas: '"lbl" "acts"'
-          - grid-template-rows: min-content min-content
-          - row-gap: 8px
       - type: custom:button-card
         template: b_bento
         entity: sensor.general_waste_daysto
