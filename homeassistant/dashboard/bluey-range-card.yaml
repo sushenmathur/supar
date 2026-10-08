@@ -1,0 +1,15 @@
+type: custom:button-card
+entity: sensor.bluey_battery_range
+name: Range
+icon: mdi:gauge
+template: glass_chip
+label: |
+  [[[
+    const v = parseFloat(entity.state);
+    if (isNaN(v)) return entity.state.charAt(0).toUpperCase() + entity.state.slice(1);
+    const u = entity.attributes.unit_of_measurement;
+    return Math.round(v) + (u ? ' ' + u : '');
+  ]]]
+grid_options:
+  columns: 6
+  rows: 1
