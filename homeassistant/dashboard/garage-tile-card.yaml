@@ -1,0 +1,48 @@
+type: custom:button-card
+entity: cover.garage_door_v2
+icon: mdi:garage-variant
+name: Garage
+template: room_tile
+triggers_update:
+  - cover.garage_door_v2
+  - light.garage_light
+extra_styles: |
+  .mq {
+    overflow: hidden; min-width: 0; flex: 1;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
+  }
+  .run { display: inline-flex; animation: tick 9s linear infinite; }
+  .run span { padding-right: 28px; }
+  @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .run { animation: none; }
+    .run span + span { display: none; }
+  }
+label: |
+  [[[
+    const door = ({ open: 'Door open', closed: 'Door closed',
+                    opening: 'Door opening', closing: 'Door closing' })[entity.state]
+                 || `Door ${entity.state}`;
+    const ls = states['light.garage_light']?.state;
+    const light = ls === 'on' ? 'Light on' : ls === 'off' ? 'Light off' : 'Light unavailable';
+    const text = `${door} · ${light}`;
+    if (text.length <= 18) return text;
+    return `<span class="mq"><span class="run"><span>${text}</span><span>${text}</span></span></span>`;
+  ]]]
+styles:
+  label:
+    - width: 100%
+    - min-width: 0
+    - overflow: hidden
+    - display: flex
+    - align-items: center
+    - white-space: nowrap
+tap_action:
+  action: navigate
+  navigation_path: /dashboard-hub/garage
+variables:
+  tint: 170,185,205
+  force_on: >-
+    [[[ return states["cover.garage_door_v2"]?.state === "open" ||
+    states["light.garage_light"]?.state === "on"; ]]]
