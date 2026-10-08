@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Garage tile options</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#14203a;--mut:rgba(20,32,58,.6)}
+body{width:1600px;height:900px;font-family:Inter,system-ui,sans-serif;color:var(--ink);
+ background:radial-gradient(700px 520px at 8% 8%,rgba(255,190,150,.65),transparent 70%),radial-gradient(640px 500px at 60% 30%,rgba(150,200,255,.6),transparent 70%),radial-gradient(620px 480px at 98% 10%,rgba(200,170,255,.6),transparent 70%),linear-gradient(160deg,#eef2fb,#e4eaf7)}
+h1{position:absolute;left:40px;top:24px;font-size:22px;font-weight:600}
+.sub{position:absolute;left:40px;top:56px;font-size:13px;color:var(--mut)}
+.grid{position:absolute;left:40px;top:100px;display:grid;grid-template-columns:150px repeat(3,1fr);gap:18px 26px;width:1520px}
+.hd{font-size:14px;font-weight:700;padding-bottom:2px}.hd small{display:block;font-weight:500;font-size:12px;color:var(--mut);margin-top:3px}
+.st{font-size:13px;font-weight:600;align-self:center;line-height:1.4}.st small{display:block;font-weight:500;color:var(--mut);font-size:12px}
+.rm{height:76px;width:250px;border-radius:24px;padding:0 18px;display:grid;grid-template-columns:52px minmax(0,1fr);grid-template-rows:1fr 1fr;column-gap:14px;align-items:center;
+ background:linear-gradient(135deg,rgba(170,185,205,.42),rgba(170,185,205,.14));border:1px solid rgba(255,255,255,.85);box-shadow:inset 0 1px 0 #fff,0 12px 28px rgba(60,70,130,.16);color:var(--ink)}
+.rm.lit{background:linear-gradient(135deg,rgba(255,196,90,.62),rgba(255,140,40,.34));box-shadow:0 0 34px rgba(255,170,60,.5),inset 0 1px 0 #fff}
+.rm .ib{grid-row:1/3;width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.6);display:grid;place-items:center;box-shadow:inset 0 1px 0 #fff}
+.rm b{font-size:16px;align-self:end}.rm .l{font-size:12px;color:var(--mut);align-self:start;display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;overflow:hidden}
+.rm .l svg{flex:none}.rm .l .on{color:#b45309;font-weight:700}
+.mq{overflow:hidden;min-width:0;flex:1;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6px,#000 calc(100% - 10px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6px,#000 calc(100% - 10px),transparent 100%)}
+.run{display:inline-flex}.run span{padding-right:28px}
+.note{position:absolute;left:40px;bottom:26px;font-size:13px;color:var(--mut);width:1500px;line-height:1.6}
+</style></head><body>
+<h1>Garage room tile: door + light</h1><div class="sub">Home view, 6-across room row. The tile glows amber when the door is open or the light is on. Real tile width is shown (about 18 characters of label fit).</div>
+<div class="grid" id="g"></div>
+<div class="note"><b>Glow rule used in all three:</b> lit = door open OR light on, so you can see from across the room that something in the garage needs attention. Option C is the only one that needs the ticker, but all three use it if the text is ever too long.</div>
+<script src="shared.js"></script>
+<script>
+const st=[['Door closed','Light off',0,0],['Door closed','Light on',0,1],['Door open','Light off',1,0],['Door open','Light on',1,1]];
+const ico=(n,s=14)=>ic(n,s,2);
+// A: short text
+const A=(o,l)=>`${o?'Open':'Closed'} · Light ${l?'on':'off'}`;
+// B: icons + words
+const B=(o,l)=>`${ico('garage')}<span class="${o?'on':''}">${o?'Open':'Closed'}</span>${ico('bulb')}<span class="${l?'on':''}">${l?'On':'Off'}</span>`;
+// C: full ticker text
+const C=(o,l)=>{const t=`Door ${o?'open':'closed'} · Light ${l?'on':'off'}`;return `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`};
+const tile=(lit,label)=>`<div class="rm ${lit?'lit':''}"><div class="ib">${ic('garage',26)}</div><b>Garage</b><div class="l">${label}</div></div>`;
+let h=`<div></div><div class="hd">A · Short text<small>"Closed · Light off". Fits as-is, no scrolling</small></div><div class="hd">B · Icons + state<small>Door and bulb icons with state words, amber when active</small></div><div class="hd">C · Full wording ticker<small>"Door closed · Light on" scrolls across the tile</small></div>`;
+st.forEach(([d,l,o,li])=>{h+=`<div class="st">${d}<small>${l}</small></div>`+tile(o||li,A(o,li))+tile(o||li,B(o,li))+tile(o||li,C(o,li))});
+document.getElementById('g').innerHTML=h;
+</script></body></html>
