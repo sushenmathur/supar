@@ -562,7 +562,42 @@ views:
                     name: Announce
                     template: glass_action
                     tap_action:
-                      action: more-info
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Announce
+                          icon: mdi:bullhorn
+                          content:
+                            - name: speakers
+                              label: Speakers
+                              default: media_player.home_speakers
+                              selector:
+                                entity:
+                                  domain: media_player
+                            - name: message
+                              label: Message
+                              selector:
+                                text:
+                                  multiline: true
+                            - name: volume
+                              label: Volume
+                              default: 75
+                              selector:
+                                number:
+                                  min: 0
+                                  max: 100
+                                  step: 5
+                                  mode: slider
+                                  unit_of_measurement: '%'
+                          left_button: Cancel
+                          right_button: Announce
+                          right_button_action:
+                            service: script.say_tts_message
+                            data:
+                              speakers: '{{ speakers }}'
+                              message: '{{ message }}'
+                              volume: '{{ volume }}'
                   - type: custom:button-card
                     entity: script.lost_phone
                     icon: mdi:cellphone-arrow-down
