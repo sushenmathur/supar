@@ -59,31 +59,58 @@ sections:
           rows: 8
       - type: custom:button-card
         entity: sensor.bluey_battery_range
-        name: Range
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Range', 13);
+          ]]]
         icon: mdi:gauge
         template: glass_chip
-        label: >-
-          [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const v = parseFloat(entity.state);
+            const u = entity.attributes.unit_of_measurement;
+            const text = isNaN(v) ? entity.state.charAt(0).toUpperCase() + entity.state.slice(1) : Math.round(v) + (u ? ' ' + u : '');
+            return tick(text, 15);
+          ]]]
         grid_options:
           columns: 6
           rows: 1
       - type: custom:button-card
         entity: sensor.bluey_charge_energy_added
-        name: Last Charge
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Last Charge', 13);
+          ]]]
         icon: mdi:lightning-bolt
         template: glass_chip
-        label: >-
-          [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const u = entity.attributes.unit_of_measurement;
+            const text = entity.state + (u ? ' ' + u : '');
+            return tick(text, 15);
+          ]]]
         grid_options:
           columns: 6
           rows: 1
       - type: custom:button-card
         entity: lock.bluey_lock
-        name: Lock
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Lock', 7);
+          ]]]
         icon: mdi:lock
         template: glass_chip
-        label: >-
-          [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const text = entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' ');
+            return tick(text, 9);
+          ]]]
         tap_action:
           action: toggle
           confirmation:
@@ -93,11 +120,19 @@ sections:
           rows: 1
       - type: custom:button-card
         entity: cover.bluey_trunk
-        name: Boot
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Boot', 7);
+          ]]]
         icon: phu:tesla-trunk
         template: glass_chip
-        label: >-
-          [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const text = entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' ');
+            return tick(text, 9);
+          ]]]
         tap_action:
           action: toggle
           confirmation:
@@ -107,11 +142,19 @@ sections:
           rows: 1
       - type: custom:button-card
         entity: switch.bluey_charge
-        name: Charger
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Charger', 7);
+          ]]]
         icon: mdi:ev-station
         template: glass_chip
-        label: >-
-          [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const text = entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' ');
+            return tick(text, 9);
+          ]]]
         tap_action:
           action: toggle
         grid_options:
@@ -134,31 +177,57 @@ sections:
           rows: 8
       - type: custom:button-card
         entity: sensor.kia_charger_power
-        name: Charge Power
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Charge Power', 13);
+          ]]]
         icon: mdi:flash
         template: glass_chip
-        label: >-
-          [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const u = entity.attributes.unit_of_measurement;
+            const text = entity.state + (u ? ' ' + u : '');
+            return tick(text, 15);
+          ]]]
         grid_options:
           columns: 6
           rows: 1
       - type: custom:button-card
         entity: sensor.kia_last_charge_added
-        name: Last Charge
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Last Charge', 13);
+          ]]]
         icon: mdi:lightning-bolt
         template: glass_chip
-        label: >-
-          [[[ return entity.state + (entity.attributes.unit_of_measurement ? ' ' + entity.attributes.unit_of_measurement : ''); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const u = entity.attributes.unit_of_measurement;
+            const text = entity.state + (u ? ' ' + u : '');
+            return tick(text, 15);
+          ]]]
         grid_options:
           columns: 6
           rows: 1
       - type: custom:button-card
         entity: switch.kia_charger
-        name: Charger
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Charger', 7);
+          ]]]
         icon: mdi:ev-station
         template: glass_chip
-        label: >-
-          [[[ return entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' '); ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const text = entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' ');
+            return tick(text, 9);
+          ]]]
         tap_action:
           action: toggle
         grid_options:
@@ -166,11 +235,19 @@ sections:
           rows: 1
       - type: custom:button-card
         entity: input_boolean.kia_onroad
-        name: On Road
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('On Road', 7);
+          ]]]
         icon: mdi:road-variant
         template: glass_chip
-        label: >-
-          [[[ return entity.state === 'on' ? 'Driving' : 'Parked'; ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const text = entity.state === 'on' ? 'Driving' : 'Parked';
+            return tick(text, 9);
+          ]]]
         tap_action:
           action: toggle
         grid_options:
@@ -178,11 +255,19 @@ sections:
           rows: 1
       - type: custom:button-card
         entity: binary_sensor.kia_at_home
-        name: Home
+        name: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            return tick('Location', 7);
+          ]]]
         icon: mdi:home-map-marker
         template: glass_chip
-        label: >-
-          [[[ return entity.state === 'on' ? 'At home' : 'Away'; ]]]
+        label: |
+          [[[
+            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+            const text = entity.state === 'on' ? 'At home' : 'Away';
+            return tick(text, 9);
+          ]]]
         tap_action:
           action: more-info
         grid_options:
