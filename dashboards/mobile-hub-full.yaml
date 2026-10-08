@@ -1001,8 +1001,8 @@ views:
                 const zones = states['device_tracker.bluey_location'] ? states['device_tracker.bluey_location'].attributes.in_zones : null;
                 const z = Array.isArray(zones) && zones.length ? zones[0] : null;
                 const loc = shift === 'd' ? 'Driving' : z === 'zone.home' ? 'Home' : (z && z.indexOf('_work') !== -1) ? 'Work' : 'Away';
-                return `<div style="font-size:22px;font-weight:700;line-height:1;margin-top:34px">${r}<span style="font-size:12px;font-weight:600;color:var(--secondary-text-color);margin-left:2px">km</span></div>
-                  <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px">${loc} · ${chg ? '<span style="color:#30d158">charging</span>' : 'not charging'}</div>`;
+                return `<div style="font-size:22px;font-weight:700;line-height:1;margin-top:34px">${loc}</div>
+                  <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px">${r} km · ${chg ? '<span style="color:#30d158">charging</span>' : 'not charging'}</div>`;
               ]]]
             ring: |-
               [[[
