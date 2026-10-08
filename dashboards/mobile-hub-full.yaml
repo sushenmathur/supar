@@ -3207,14 +3207,17 @@ views:
           - sensor.paro_phone_battery
           - media_player.tv
           - switch.bedroom_tv
+          - media_player.media_apple_tv
+          - media_player.bedroom_apple_tv
         variables:
           title: Devices
           sub: |
             [[[
               const on = e => states[e] && !['off', 'unavailable', 'standby'].includes(states[e].state);
-              const tv = on('media_player.tv') ? '<span style="color:var(--amber-color)">Media TV on</span>' : 'Media TV off';
-              const bed = on('switch.bedroom_tv') ? '<span style="color:var(--amber-color)">Bedroom TV on</span>' : 'Bedroom TV off';
-              return `2 phones · ${tv} · ${bed}`;
+              const tag = (e, n) => on(e) ? `<span style="color:var(--amber-color)">${n} on</span>` : `${n} off`;
+              return [tag('media_player.tv', 'Media TV'), tag('switch.bedroom_tv', 'Bedroom TV'),
+                      tag('media_player.media_apple_tv', 'Media Apple TV'),
+                      tag('media_player.bedroom_apple_tv', 'Bedroom Apple TV')].join(' · ');
             ]]]
 
     sections:
@@ -3271,6 +3274,60 @@ views:
                 icon: mdi:television-classic
                 tap_action:
                   action: toggle
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: b_wide
+                entity: media_player.media_apple_tv
+                name: Media Apple TV
+                icon: mdi:apple
+                variables:
+                  on_color: rgba(191, 90, 242, 0.9)
+                  on_text: '#ffffff'
+                  active: |
+                    [[[ return !['off', 'standby', 'unavailable'].includes(entity.state); ]]]
+                state_display: |
+                  [[[
+                    if (['off', 'standby', 'unavailable'].includes(entity.state)) return 'Off';
+                    const a = entity.attributes;
+                    const what = a.media_title || a.app_name || '';
+                    const st = entity.state.charAt(0).toUpperCase() + entity.state.slice(1);
+                    return what ? `${st} · ${what}` : st;
+                  ]]]
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: media_player.media_play_pause
+                  target:
+                    entity_id: media_player.media_apple_tv
+              - type: custom:button-card
+                template: b_wide
+                entity: media_player.bedroom_apple_tv
+                name: Bedroom Apple TV
+                icon: mdi:apple
+                variables:
+                  on_color: rgba(191, 90, 242, 0.9)
+                  on_text: '#ffffff'
+                  active: |
+                    [[[ return !['off', 'standby', 'unavailable'].includes(entity.state); ]]]
+                state_display: |
+                  [[[
+                    if (['off', 'standby', 'unavailable'].includes(entity.state)) return 'Off';
+                    const a = entity.attributes;
+                    const what = a.media_title || a.app_name || '';
+                    const st = entity.state.charAt(0).toUpperCase() + entity.state.slice(1);
+                    return what ? `${st} · ${what}` : st;
+                  ]]]
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: media_player.media_play_pause
+                  target:
+                    entity_id: media_player.bedroom_apple_tv
 
           # TV Remote launcher: opens the Bubble Card pop-up (#tv-remote)
           - type: custom:button-card

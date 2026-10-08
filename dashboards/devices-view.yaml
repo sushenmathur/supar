@@ -18,14 +18,17 @@ header:
       - sensor.paro_phone_battery
       - media_player.tv
       - switch.bedroom_tv
+      - media_player.media_apple_tv
+      - media_player.bedroom_apple_tv
     variables:
       title: Devices
       sub: |
         [[[
           const on = e => states[e] && !['off', 'unavailable', 'standby'].includes(states[e].state);
-          const tv = on('media_player.tv') ? '<span style="color:var(--amber-color)">Media TV on</span>' : 'Media TV off';
-          const bed = on('switch.bedroom_tv') ? '<span style="color:var(--amber-color)">Bedroom TV on</span>' : 'Bedroom TV off';
-          return `2 phones · ${tv} · ${bed}`;
+          const tag = (e, n) => on(e) ? `<span style="color:var(--amber-color)">${n} on</span>` : `${n} off`;
+          return [tag('media_player.tv', 'Media TV'), tag('switch.bedroom_tv', 'Bedroom TV'),
+                  tag('media_player.media_apple_tv', 'Media Apple TV'),
+                  tag('media_player.bedroom_apple_tv', 'Bedroom Apple TV')].join(' · ');
         ]]]
 
 sections:
@@ -46,38 +49,6 @@ sections:
               device: b4c6338c2f8906f56d55bb1d873be555
               info: sensor.sushen_phone_badge
               tint: '#9b6bff'
-            custom_fields:
-              ping:
-                card:
-                  type: custom:button-card
-                  name: Ping
-                  icon: mdi:bell-ring-outline
-                  show_state: false
-                  tap_action:
-                    action: perform-action
-                    perform_action: icloud3.find_iphone_alert
-                    data:
-                      device_name: b4c6338c2f8906f56d55bb1d873be555
-                  hold_action:
-                    action: none
-                  styles:
-                    card:
-                      - width: 52px
-                      - padding: 7px 4px
-                      - border-radius: 12px
-                      - box-shadow: none
-                      - border: none
-                      - background: color-mix(in srgb, #9b6bff 16%, transparent)
-                    grid:
-                      - grid-template-areas: '"i" "n"'
-                      - row-gap: 2px
-                    icon:
-                      - width: 18px
-                      - color: '#9b6bff'
-                    name:
-                      - font-size: 9.5px
-                      - font-weight: 700
-                      - color: '#9b6bff'
           - type: custom:button-card
             template: b_phone
             entity: sensor.paro_phone_battery
@@ -88,38 +59,6 @@ sections:
               device: 1ff71fcd1fb9dfa21717952630c8f773
               info: sensor.paro_phone_info
               tint: '#3a8dff'
-            custom_fields:
-              ping:
-                card:
-                  type: custom:button-card
-                  name: Ping
-                  icon: mdi:bell-ring-outline
-                  show_state: false
-                  tap_action:
-                    action: perform-action
-                    perform_action: icloud3.find_iphone_alert
-                    data:
-                      device_name: 1ff71fcd1fb9dfa21717952630c8f773
-                  hold_action:
-                    action: none
-                  styles:
-                    card:
-                      - width: 52px
-                      - padding: 7px 4px
-                      - border-radius: 12px
-                      - box-shadow: none
-                      - border: none
-                      - background: color-mix(in srgb, #3a8dff 16%, transparent)
-                    grid:
-                      - grid-template-areas: '"i" "n"'
-                      - row-gap: 2px
-                    icon:
-                      - width: 18px
-                      - color: '#3a8dff'
-                    name:
-                      - font-size: 9.5px
-                      - font-weight: 700
-                      - color: '#3a8dff'
 
       # TVs
       - type: grid
@@ -146,6 +85,60 @@ sections:
             icon: mdi:television-classic
             tap_action:
               action: toggle
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:button-card
+            template: b_wide
+            entity: media_player.media_apple_tv
+            name: Media Apple TV
+            icon: mdi:apple
+            variables:
+              on_color: rgba(191, 90, 242, 0.9)
+              on_text: '#ffffff'
+              active: |
+                [[[ return !['off', 'standby', 'unavailable'].includes(entity.state); ]]]
+            state_display: |
+              [[[
+                if (['off', 'standby', 'unavailable'].includes(entity.state)) return 'Off';
+                const a = entity.attributes;
+                const what = a.media_title || a.app_name || '';
+                const st = entity.state.charAt(0).toUpperCase() + entity.state.slice(1);
+                return what ? `${st} · ${what}` : st;
+              ]]]
+            tap_action:
+              action: more-info
+            hold_action:
+              action: perform-action
+              perform_action: media_player.media_play_pause
+              target:
+                entity_id: media_player.media_apple_tv
+          - type: custom:button-card
+            template: b_wide
+            entity: media_player.bedroom_apple_tv
+            name: Bedroom Apple TV
+            icon: mdi:apple
+            variables:
+              on_color: rgba(191, 90, 242, 0.9)
+              on_text: '#ffffff'
+              active: |
+                [[[ return !['off', 'standby', 'unavailable'].includes(entity.state); ]]]
+            state_display: |
+              [[[
+                if (['off', 'standby', 'unavailable'].includes(entity.state)) return 'Off';
+                const a = entity.attributes;
+                const what = a.media_title || a.app_name || '';
+                const st = entity.state.charAt(0).toUpperCase() + entity.state.slice(1);
+                return what ? `${st} · ${what}` : st;
+              ]]]
+            tap_action:
+              action: more-info
+            hold_action:
+              action: perform-action
+              perform_action: media_player.media_play_pause
+              target:
+                entity_id: media_player.bedroom_apple_tv
 
       # TV Remote launcher: opens the Bubble Card pop-up (#tv-remote)
       - type: custom:button-card
@@ -168,107 +161,42 @@ sections:
             card:
               type: horizontal-stack
               cards:
-              - type: custom:button-card
-                icon: mdi:power
-                tap_action:
-                  action: perform-action
-                  perform_action: script.media_tv_power
-                show_name: false
-                show_state: false
-                hold_action:
-                  action: none
-                styles:
-                  card:
-                  - width: 34px
-                  - height: 34px
-                  - padding: 0
-                  - border-radius: 50%
-                  - box-shadow: none
-                  - border: none
-                  - background: rgba(var(--rgb-primary-text-color),0.09)
-                  grid:
-                  - grid-template-areas: '"i"'
-                  icon:
-                  - width: 19px
-                  - color: var(--red-color)
-              - type: custom:button-card
-                entity: media_player.tv
-                icon: '[[[ return entity.attributes.is_volume_muted ? "mdi:volume-off" : "mdi:volume-mute"; ]]]'
-                tap_action:
-                  action: perform-action
-                  perform_action: media_player.volume_mute
-                  target:
-                    entity_id: media_player.tv
-                  data:
-                    is_volume_muted: '[[[ return entity.attributes.is_volume_muted !== true; ]]]'
-                show_name: false
-                show_state: false
-                hold_action:
-                  action: none
-                styles:
-                  card:
-                  - width: 34px
-                  - height: 34px
-                  - padding: 0
-                  - border-radius: 50%
-                  - box-shadow: none
-                  - border: none
-                  - background: rgba(var(--rgb-primary-text-color),0.09)
-                  grid:
-                  - grid-template-areas: '"i"'
-                  icon:
-                  - width: 19px
-                  - color: '[[[ return entity.attributes.is_volume_muted ? "var(--amber-color)" : "var(--primary-text-color)"; ]]]'
-              - type: custom:button-card
-                icon: mdi:volume-minus
-                tap_action:
-                  action: perform-action
-                  perform_action: media_player.volume_down
-                  target:
-                    entity_id: media_player.tv
-                show_name: false
-                show_state: false
-                hold_action:
-                  action: none
-                styles:
-                  card:
-                  - width: 34px
-                  - height: 34px
-                  - padding: 0
-                  - border-radius: 50%
-                  - box-shadow: none
-                  - border: none
-                  - background: rgba(var(--rgb-primary-text-color),0.09)
-                  grid:
-                  - grid-template-areas: '"i"'
-                  icon:
-                  - width: 19px
-                  - color: var(--primary-text-color)
-              - type: custom:button-card
-                icon: mdi:volume-plus
-                tap_action:
-                  action: perform-action
-                  perform_action: media_player.volume_up
-                  target:
-                    entity_id: media_player.tv
-                show_name: false
-                show_state: false
-                hold_action:
-                  action: none
-                styles:
-                  card:
-                  - width: 34px
-                  - height: 34px
-                  - padding: 0
-                  - border-radius: 50%
-                  - box-shadow: none
-                  - border: none
-                  - background: rgba(var(--rgb-primary-text-color),0.09)
-                  grid:
-                  - grid-template-areas: '"i"'
-                  icon:
-                  - width: 19px
-                  - color: var(--primary-text-color)
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: mdi:power
+                  variables:
+                    color: var(--red-color)
+                  tap_action:
+                    action: perform-action
+                    perform_action: script.media_tv_power
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: '[[[ return entity.attributes.is_volume_muted ? "mdi:volume-off" : "mdi:volume-mute"; ]]]'
+                  variables:
+                    color: '[[[ return entity.attributes.is_volume_muted ? "var(--amber-color)" : "var(--primary-text-color)"; ]]]'
+                  tap_action:
+                    action: perform-action
+                    perform_action: media_player.volume_mute
+                    target:
+                      entity_id: media_player.tv
+                    data:
+                      is_volume_muted: '[[[ return entity.attributes.is_volume_muted !== true; ]]]'
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: mdi:volume-minus
+                  tap_action:
+                    action: perform-action
+                    perform_action: media_player.volume_down
+                    target:
+                      entity_id: media_player.tv
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: mdi:volume-plus
+                  tap_action:
+                    action: perform-action
+                    perform_action: media_player.volume_up
+                    target:
+                      entity_id: media_player.tv
         styles:
           card:
             - padding: 10px 12px
