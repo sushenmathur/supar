@@ -586,8 +586,39 @@ views:
                   - type: custom:button-card
                     entity: vacuum.robbie
                     icon: mdi:robot-vacuum
-                    name: Robbie
+                    name: |
+                      [[[
+                        const s = entity.state;
+                        return s === 'docked' ? 'Robbie' : s === 'cleaning' ? 'Cleaning' : s === 'returning' ? 'Returning'
+                          : s === 'paused' ? 'Paused' : s === 'error' ? 'Error' : s.charAt(0).toUpperCase() + s.slice(1);
+                      ]]]
                     template: glass_action
+                    triggers_update:
+                      - vacuum.robbie
+                    extra_styles: |
+                      @keyframes robbie-spin { to { transform: rotate(360deg); } }
+                      @keyframes robbie-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+                      @keyframes robbie-glow {
+                        0%, 100% { box-shadow: 0 0 0 0 rgba(45,212,191,0.0), inset 0 1px 0 var(--glass-hi); }
+                        50% { box-shadow: 0 0 22px 3px rgba(45,212,191,0.55), inset 0 1px 0 var(--glass-hi); }
+                      }
+                      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+                    styles:
+                      card:
+                        - animation: |
+                            [[[ return entity.state === 'cleaning' ? 'robbie-glow 2.4s ease-in-out infinite' : 'none'; ]]]
+                        - border-color: |
+                            [[[ return entity.state === 'docked' ? 'var(--glass-border)' : 'rgba(45,212,191,0.7)'; ]]]
+                      icon:
+                        - transform-origin: center
+                        - color: |
+                            [[[ return entity.state === 'docked' ? 'var(--primary-text-color)' : '#2dd4bf'; ]]]
+                        - animation: |
+                            [[[
+                              const s = entity.state;
+                              return s === 'cleaning' ? 'robbie-spin 3s linear infinite'
+                                : s === 'returning' ? 'robbie-pulse 1.4s ease-in-out infinite' : 'none';
+                            ]]]
                     tap_action:
                       action: perform-action
                       perform_action: browser_mod.popup
@@ -603,6 +634,18 @@ views:
                                 - return_home
                                 - stop
                               icon_animation: true
+                              card_mod:
+                                style:
+                                  mushroom-shape-icon$: |
+                                    {% if not is_state('vacuum.robbie', 'docked') %}
+                                    .shape { animation: robbie-pulse 2s ease-in-out infinite; }
+                                    {% endif %}
+                                    @keyframes robbie-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); } 50% { box-shadow: 0 0 18px 4px rgba(45,212,191,0.55); } }
+                                  .: |
+                                    {% if not is_state('vacuum.robbie', 'docked') %}
+                                    mushroom-shape-icon ha-state-icon, mushroom-shape-icon ha-icon { animation: robbie-spin 3s linear infinite; transform-origin: center; }
+                                    {% endif %}
+                                    @keyframes robbie-spin { to { transform: rotate(360deg); } }
                             - type: grid
                               columns: 2
                               square: false
@@ -1966,6 +2009,18 @@ views:
             grid_options:
               columns: full
             icon_animation: true
+            card_mod:
+              style:
+                mushroom-shape-icon$: |
+                  {% if not is_state('vacuum.robbie', 'docked') %}
+                  .shape { animation: robbie-pulse 2s ease-in-out infinite; }
+                  {% endif %}
+                  @keyframes robbie-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); } 50% { box-shadow: 0 0 18px 4px rgba(45,212,191,0.55); } }
+                .: |
+                  {% if not is_state('vacuum.robbie', 'docked') %}
+                  mushroom-shape-icon ha-state-icon, mushroom-shape-icon ha-icon { animation: robbie-spin 3s linear infinite; transform-origin: center; }
+                  {% endif %}
+                  @keyframes robbie-spin { to { transform: rotate(360deg); } }
             type: custom:mushroom-vacuum-card
           - entity: button.robbie_kitchen_clean
             grid_options:
