@@ -1,6 +1,9 @@
 kiosk_mode:
-  hide_header: true
-  hide_sidebar: true
+  user_settings:
+    - users:
+        - suparhome
+      hide_header: true
+      hide_sidebar: true
 button_card_templates:
   glass_action:
     section_mode: true
@@ -374,7 +377,7 @@ navbar-templates:
         icon: mdi:security
         label: Security
         url: /dashboard-hub/security
-      - icon: glyphs-poly:music
+      - icon: mdi:music
         label: Music
         url: /dashboard-hub/music
       - icon: mdi:dots-horizontal
@@ -1002,6 +1005,24 @@ views:
               rows: 2
       - type: grid
         cards:
+          - type: custom:button-card
+            name: India
+            template: world_clock
+            variables:
+              daytime: binary_sensor.hyd_daytime
+              tz: Asia/Kolkata
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:button-card
+            name: Austin
+            template: world_clock
+            variables:
+              daytime: binary_sensor.austin_daytime
+              tz: America/Chicago
+            grid_options:
+              columns: 6
+              rows: 1
           - type: custom:clock-weather-card
             entity: weather.north_lakes_weather
             name: Brisbane
@@ -1125,24 +1146,6 @@ views:
                 weekdays:
                   - mon
                   - sun
-          - type: custom:button-card
-            name: Austin
-            template: world_clock
-            variables:
-              daytime: binary_sensor.austin_daytime
-              tz: America/Chicago
-            grid_options:
-              columns: 6
-              rows: 1
-          - type: custom:button-card
-            name: India
-            template: world_clock
-            variables:
-              daytime: binary_sensor.hyd_daytime
-              tz: Asia/Kolkata
-            grid_options:
-              columns: 6
-              rows: 1
       - type: grid
         cards:
           - type: custom:alert-ticker-card
@@ -2009,18 +2012,6 @@ views:
             grid_options:
               columns: full
             icon_animation: true
-            card_mod:
-              style:
-                mushroom-shape-icon$: |
-                  {% if not is_state('vacuum.robbie', 'docked') %}
-                  .shape { animation: robbie-pulse 2s ease-in-out infinite; }
-                  {% endif %}
-                  @keyframes robbie-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); } 50% { box-shadow: 0 0 18px 4px rgba(45,212,191,0.55); } }
-                .: |
-                  {% if not is_state('vacuum.robbie', 'docked') %}
-                  mushroom-shape-icon ha-state-icon, mushroom-shape-icon ha-icon { animation: robbie-spin 3s linear infinite; transform-origin: center; }
-                  {% endif %}
-                  @keyframes robbie-spin { to { transform: rotate(360deg); } }
             type: custom:mushroom-vacuum-card
           - entity: button.robbie_kitchen_clean
             grid_options:
@@ -2265,7 +2256,7 @@ views:
               rows: 1
           - type: custom:button-card
             entity: binary_sensor.kia_at_home
-            name: Home
+            name: Location
             icon: mdi:home-map-marker
             template: glass_chip
             label: >-
