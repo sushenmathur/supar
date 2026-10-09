@@ -27,6 +27,12 @@ custom_fields:
       const cond = states['weather.north_lakes_weather'] ? states['weather.north_lakes_weather'].state : '';
       const pretty = cond === 'partlycloudy' ? 'Partly cloudy' : cond === 'clear-night' ? 'Clear night'
         : cond.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+      const icons = {sunny: ['weather-sunny', '#ffc53d'], 'clear-night': ['weather-night', '#a5b4fc'], partlycloudy: ['weather-partly-cloudy', '#ffc53d'],
+        cloudy: ['weather-cloudy', '#94a3b8'], rainy: ['weather-rainy', '#60a5fa'], pouring: ['weather-pouring', '#3b82f6'],
+        lightning: ['weather-lightning', '#fbbf24'], 'lightning-rainy': ['weather-lightning-rainy', '#a78bfa'], snowy: ['weather-snowy', '#7dd3fc'],
+        'snowy-rainy': ['weather-snowy-rainy', '#7dd3fc'], fog: ['weather-fog', '#94a3b8'], hail: ['weather-hail', '#7dd3fc'],
+        windy: ['weather-windy', '#5eead4'], 'windy-variant': ['weather-windy-variant', '#5eead4']};
+      const [wi, wc] = icons[cond] || ['alert-circle-outline', '#94a3b8'];
       const feels = states['sensor.home_apparent_temperature'] ? states['sensor.home_apparent_temperature'].state : '–';
       const rooms = ['sensor.living_room_inside_temperature', 'sensor.bedroom_temperature_temperature',
                      'sensor.aarlo_temperature_samar_cam', 'sensor.shanayaroomtemp_temperature']
@@ -35,7 +41,10 @@ custom_fields:
       const run = ['climate.bed_ac', 'climate.living_room', 'climate.samar_room', 'climate.shanaya_room']
         .filter(a => states[a] && !['off', 'unavailable'].includes(states[a].state)).length;
       return `<div style="display:block !important;width:100%;text-align:left !important">
-        <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px">${w.temperature ?? '–'}°</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;margin-top:6px">
+          <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;padding-top:4px">${w.temperature ?? '–'}°</div>
+          <ha-icon icon="mdi:${wi}" style="display:block;flex:none;width:44px;height:44px;--mdc-icon-size:44px;color:${wc}"></ha-icon>
+        </div>
         <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">${pretty}<br>feels ${feels}° · ${w.humidity ?? '–'}%</div>
         <div style="display:block !important;width:100% !important;text-align:left !important;margin:18px 0 0 0 !important;padding:0 !important;font-size:11px;font-weight:700;line-height:16px;color:var(--secondary-text-color);white-space:nowrap">
           <svg viewBox="0 0 24 24" width="15" height="15" style="display:inline-block !important;vertical-align:middle;margin:0 6px 0 0 !important;width:15px !important;height:15px !important;flex:none"><path fill="#ffc53d" d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/></svg><span style="vertical-align:middle;display:inline !important;margin:0 !important;float:none !important">Inside</span></div>
