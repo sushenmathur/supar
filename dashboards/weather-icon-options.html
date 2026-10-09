@@ -1,0 +1,19 @@
+<!doctype html><meta charset=utf-8><title>Weather card icon options</title>
+<style>
+body{margin:0;padding:26px;font-family:system-ui,Roboto,sans-serif;background:#e9eef7;color:#14203a}
+h2{margin:0 0 14px;font-size:15px}.row{display:grid;grid-template-columns:repeat(3,250px);gap:22px;margin-bottom:22px}
+.lab{font-size:13px;font-weight:700;margin-bottom:8px}
+.card{background:linear-gradient(145deg,#fff,#f3f6fb);border-radius:24px;padding:14px 16px;box-shadow:0 10px 30px rgba(60,70,130,.18);border:1px solid #fff;height:230px;box-sizing:border-box}
+.hd{font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;color:rgba(20,32,58,.62)}
+.t{font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px}.s{font-size:11.5px;color:rgba(20,32,58,.62);margin-top:4px;line-height:1.35}
+.in{font-size:11px;font-weight:700;color:rgba(20,32,58,.62);margin-top:16px}.t2{font-size:24px;font-weight:700;margin-top:6px}
+.ic{font-size:40px;line-height:1}.g{display:flex;gap:14px;flex-wrap:wrap}.g div{background:#fff;border-radius:16px;padding:10px 14px;text-align:center;font-size:11px;min-width:70px}.g .ic{font-size:32px;display:block;margin-bottom:4px}
+</style>
+<h2>Weather card: condition icon options (emoji stand in for the mdi weather icons the card uses)</h2>
+<div class=row>
+<div><div class=lab>A. Icon top right (built)</div><div class=card><div class=hd>🌤 Outside</div><div style="display:flex;justify-content:space-between;margin-top:6px"><div class=t style="padding-top:4px">25.2°</div><div class=ic>☀️</div></div><div class=s>Sunny<br>feels 26.3° · 55%</div><div class=in>🏠 Inside</div><div class=t2>25.6°</div><div class=s>4 rooms · ACs off</div></div></div>
+<div><div class=lab>B. Icon left of temperature</div><div class=card><div class=hd>🌤 Outside</div><div style="display:flex;align-items:center;gap:10px;margin-top:6px"><div class=ic>☀️</div><div><div class=t>25.2°</div><div class=s style="margin-top:2px">Sunny</div></div></div><div class=s style="margin-top:6px">feels 26.3° · 55%</div><div class=in>🏠 Inside</div><div class=t2>25.6°</div><div class=s>4 rooms · ACs off</div></div></div>
+<div><div class=lab>C. Header icon changes, no extra icon</div><div class=card><div class=hd>☀️ Outside</div><div class=t style="margin-top:12px">25.2°</div><div class=s>Sunny<br>feels 26.3° · 55%</div><div class=in>🏠 Inside</div><div class=t2>25.6°</div><div class=s>4 rooms · ACs off</div></div></div>
+</div>
+<h2>Condition icons (A)</h2>
+<div class=g><div><span class=ic>☀️</span>Sunny</div><div><span class=ic>🌙</span>Clear night</div><div><span class=ic>⛅</span>Partly cloudy</div><div><span class=ic>☁️</span>Cloudy</div><div><span class=ic>🌧️</span>Rainy</div><div><span class=ic>⛈️</span>Storm</div><div><span class=ic>🌨️</span>Snow</div><div><span class=ic>🌫️</span>Fog</div><div><span class=ic>💨</span>Windy</div></div>
