@@ -1,0 +1,36 @@
+<!doctype html><meta charset=utf-8><title>Energy card: rate options</title>
+<style>
+:root{--t:#14203a;--s:rgba(20,32,58,.62);--bar:rgba(20,32,58,.08)}
+body{margin:0;padding:28px;font-family:system-ui,Roboto,sans-serif;background:#e9eef7;color:var(--t)}
+h2{margin:0 0 14px;font-size:15px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:26px}
+.lab{font-size:13px;font-weight:700;margin-bottom:8px}
+.card{background:linear-gradient(145deg,#fff,#f3f6fb);border-radius:24px;padding:16px 18px;box-shadow:0 10px 30px rgba(60,70,130,.18);border:1px solid #fff}
+.dark{background:#10182f;--t:#fff;--s:rgba(255,255,255,.62);--bar:rgba(255,255,255,.1);color:#fff;border-radius:20px;padding:18px;margin:0 -10px}
+.dark .card{background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border-color:rgba(255,255,255,.2);box-shadow:none}
+.hd{font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px}.hd b{color:#ffb020}
+.big{font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px}
+.big small{font-size:13px;font-weight:600;color:var(--s);margin-left:3px}
+.sub{font-size:11.5px;color:var(--s);margin-top:4px;line-height:1.35}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;margin-top:10px;background:var(--bar)}
+.bar i{display:block}
+.leg{display:flex;gap:12px;margin-top:8px;font-size:10.5px;color:var(--s);flex-wrap:wrap}
+.leg span{display:flex;align-items:center;gap:4px}.leg i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(48,209,88,.18);color:#15803d}
+.dark .pill{color:#6ee7b7}.pill.peak{background:rgba(251,113,133,.2);color:#be123c}.dark .pill.peak{color:#fb7185}
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+.rate{text-align:right}.rate .v{font-size:20px;font-weight:700;line-height:1}.rate .v small{font-size:11px;color:var(--s);font-weight:600}
+.rate .t{font-size:10.5px;color:var(--s);margin-top:3px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.cell{background:rgba(128,128,128,.1);border-radius:14px;padding:8px 10px}.cell .k{font-size:10px;color:var(--s)}.cell .n{font-size:15px;font-weight:700;margin-top:2px}
+</style>
+<h2>Energy card: current rate. Each option shown light and dark. Sample: 31.4 c/kWh peak, 8.0 c/kWh feed-in.</h2>
+<div class=row id=r></div>
+<script>
+const bar='<div class=bar><i style="flex:71;background:#ffb020"></i><i style="flex:29;background:#a67cff"></i></div><div class=leg><span><i style="background:#ffb020"></i>Solar 71%</span><span><i style="background:#a67cff"></i>Grid 29%</span><span><i style="background:#30d158"></i>Cars 0 W</span></div>';
+const A=`<div class=hd><b>⚡</b>Energy now</div><div class=big>695<small>W</small></div><div class=sub>2.2 kW solar · exporting 1.5 kW · today $2.52 used, $0.06 sold</div><div style="margin-top:8px"><span class="pill peak">● Buy 31.4¢/kWh · Peak</span></div>${bar}`;
+const B=`<div class=top><div><div class=hd><b>⚡</b>Energy now</div><div class=big>695<small>W</small></div></div><div class=rate><div class=v>31.4<small>¢/kWh</small></div><div class=t>Peak · sell 8.0¢</div></div></div><div class=sub style="margin-top:6px">2.2 kW solar · exporting 1.5 kW · today $2.52 used, $0.06 sold</div>${bar}`;
+const C=`<div class=hd><b>⚡</b>Energy now</div><div class=big>695<small>W</small></div><div class=split><div class=cell><div class=k>Buy rate · Peak</div><div class=n>31.4¢</div></div><div class=cell><div class=k>Feed-in rate</div><div class=n>8.0¢</div></div></div><div class=sub style="margin-top:8px">2.2 kW solar · exporting 1.5 kW · today $2.52 used, $0.06 sold</div>${bar}`;
+const L=['A. Rate pill under the sub-line','B. Rate top right (always visible)','C. Buy and feed-in tiles'];
+r.innerHTML=[A,B,C].map((h,i)=>`<div><div class=lab>${L[i]}</div><div class=card>${h}</div><div class=dark style="margin-top:12px"><div class=card>${h}</div></div></div>`).join('');
+</script>
