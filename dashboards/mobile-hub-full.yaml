@@ -925,15 +925,15 @@ views:
                   const fOpen = f && f.state === 'on';
                   const armed = a && !['disarmed', 'unavailable'].includes(a.state);
                   const head = gOpen ? ['Garage open', 'var(--red-color)'] : fOpen ? ['Door unlocked', 'var(--red-color)'] : ['All locked', 'var(--primary-text-color)'];
-                  const tile = (i, t, bad) => `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:12px;
-                      background:${bad ? 'color-mix(in srgb, var(--red-color) 18%, transparent)' : 'rgba(var(--rgb-primary-text-color),0.07)'};
-                      font-size:9.5px;font-weight:600;color:var(--secondary-text-color)">
-                      <ha-icon icon="${i}" style="--mdc-icon-size:18px;color:${bad ? 'var(--red-color)' : 'var(--primary-text-color)'}"></ha-icon>${t}</div>`;
+                  const tile = (i, t, bad, good) => `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:12px;
+                      background:${bad ? 'color-mix(in srgb, var(--red-color) 18%, transparent)' : good ? 'rgba(48, 209, 88, 0.9)' : 'rgba(var(--rgb-primary-text-color),0.07)'};
+                      font-size:9.5px;font-weight:600;color:${good ? '#04210d' : 'var(--secondary-text-color)'}">
+                      <ha-icon icon="${i}" style="--mdc-icon-size:18px;color:${bad ? 'var(--red-color)' : good ? '#04210d' : 'var(--primary-text-color)'}"></ha-icon>${t}</div>`;
                   return `<div style="font-size:17px;font-weight:700;margin-top:6px;color:${head[1]}">${head[0]}</div>
                     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px">
                       ${tile(gOpen ? 'mdi:garage-open-variant' : 'mdi:garage-variant', 'Garage', gOpen)}
                       ${tile(fOpen ? 'mdi:lock-open-variant' : 'mdi:lock', 'Front', fOpen)}
-                      ${tile('mdi:shield-home', armed ? 'Armed' : 'Alarm', false)}
+                      ${tile('mdi:shield-home', armed ? 'Armed' : 'Alarm', false, armed)}
                     </div>`;
                 ]]]
           - type: custom:button-card
