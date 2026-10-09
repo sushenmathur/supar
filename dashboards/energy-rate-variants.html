@@ -1,0 +1,33 @@
+<!doctype html><meta charset=utf-8><title>Energy card: rate options</title>
+<style>
+:root{--t:#14203a;--s:rgba(20,32,58,.62);--bar:rgba(20,32,58,.08)}
+body{margin:0;padding:28px;font-family:system-ui,Roboto,sans-serif;background:#e9eef7;color:var(--t)}
+h2{margin:0 0 14px;font-size:15px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:26px}
+.lab{font-size:13px;font-weight:700;margin-bottom:8px}
+.card{background:linear-gradient(145deg,#fff,#f3f6fb);border-radius:24px;padding:16px 18px;box-shadow:0 10px 30px rgba(60,70,130,.18);border:1px solid #fff}
+.dark{background:#10182f;--t:#fff;--s:rgba(255,255,255,.62);--bar:rgba(255,255,255,.1);color:#fff;border-radius:20px;padding:18px;margin:0 -10px}
+.dark .card{background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border-color:rgba(255,255,255,.2);box-shadow:none}
+.hd{font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px}.hd b{color:#ffb020}
+.big{font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px}
+.big small{font-size:13px;font-weight:600;color:var(--s);margin-left:3px}
+.sub{font-size:11.5px;color:var(--s);margin-top:4px;line-height:1.35}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;margin-top:10px;background:var(--bar)}
+.bar i{display:block}
+.leg{display:flex;gap:12px;margin-top:8px;font-size:10.5px;color:var(--s);flex-wrap:wrap}
+.leg span{display:flex;align-items:center;gap:4px}.leg i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(48,209,88,.18);color:#15803d}
+.dark .pill{color:#6ee7b7}.pill.peak{background:rgba(251,113,133,.2);color:#be123c}.dark .pill.peak{color:#fb7185}
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+.rate{text-align:right}.rate .v{font-size:20px;font-weight:700;line-height:1}.rate .v small{font-size:11px;color:var(--s);font-weight:600}
+.rate .t{font-size:10.5px;color:var(--s);margin-top:3px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.cell{background:rgba(128,128,128,.1);border-radius:14px;padding:8px 10px}.cell .k{font-size:10px;color:var(--s)}.cell .n{font-size:15px;font-weight:700;margin-top:2px}
+</style>
+<h2>Energy card, layout B: tariff variants (light and dark)</h2>
+<div class=row style="grid-template-columns:repeat(4,1fr)" id=r></div>
+<script>
+const V=[['Peak','#fb7185','31.4','695','W','Solar asleep',0,100],['Shoulder','#fbbf24','22.8','1.2','kW','1.9 kW solar · exporting 0.7 kW',60,40],['Off-peak','#34d399','14.2','2.4','kW','3.1 kW solar · exporting 0.7 kW',100,0],['Night','#34d399','11.0','410','W','Solar asleep',0,100]];
+const card=v=>`<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:2px"><div><div class=hd><b>⚡</b>Energy now</div><div class=big>${v[3]}<small>${v[4]}</small></div></div><div class=rate><div class=v>${v[2]}<small>¢/kWh</small></div><div class=t style="font-weight:700;color:${v[1]}">● ${v[0]}</div></div></div><div class=sub style="margin-top:6px">${v[5]} · today $2.52 used, $0.06 sold</div><div class=bar><i style="flex:${v[6]};background:#ffb020"></i><i style="flex:${v[7]};background:#a67cff"></i></div><div class=leg><span><i style="background:#ffb020"></i>Solar ${v[6]}%</span><span><i style="background:#a67cff"></i>Grid ${v[7]}%</span><span><i style="background:#30d158"></i>Cars 0 W</span></div>`;
+r.innerHTML=V.map(v=>`<div><div class=lab>${v[0]}</div><div class=card>${card(v)}</div><div class=dark style="margin-top:12px"><div class=card>${card(v)}</div></div></div>`).join('');
+</script>
