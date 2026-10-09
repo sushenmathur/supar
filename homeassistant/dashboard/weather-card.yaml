@@ -1,0 +1,45 @@
+type: custom:button-card
+template: b_bento
+variables:
+  label: Outside
+  icon: mdi:weather-partly-cloudy
+  tint: '#ffc53d'
+  height: 248px
+tap_action:
+  action: navigate
+  navigation_path: /mobile-hub/hvac-mobile
+triggers_update:
+  - weather.north_lakes_weather
+  - weather.forecast_home_2
+  - sensor.home_apparent_temperature
+  - sensor.living_room_inside_temperature
+  - sensor.bedroom_temperature_temperature
+  - sensor.aarlo_temperature_samar_cam
+  - sensor.shanayaroomtemp_temperature
+  - climate.bed_ac
+  - climate.living_room
+  - climate.samar_room
+  - climate.shanaya_room
+custom_fields:
+  body: |-
+    [[[
+      const w = states['weather.forecast_home_2'] ? states['weather.forecast_home_2'].attributes : {};
+      const cond = states['weather.north_lakes_weather'] ? states['weather.north_lakes_weather'].state : '';
+      const pretty = cond === 'partlycloudy' ? 'Partly cloudy' : cond === 'clear-night' ? 'Clear night'
+        : cond.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+      const feels = states['sensor.home_apparent_temperature'] ? states['sensor.home_apparent_temperature'].state : '–';
+      const rooms = ['sensor.living_room_inside_temperature', 'sensor.bedroom_temperature_temperature',
+                     'sensor.aarlo_temperature_samar_cam', 'sensor.shanayaroomtemp_temperature']
+        .map(s => parseFloat(states[s] ? states[s].state : NaN)).filter(n => !isNaN(n));
+      const inside = rooms.length ? (rooms.reduce((a, b) => a + b, 0) / rooms.length).toFixed(1) : '–';
+      const run = ['climate.bed_ac', 'climate.living_room', 'climate.samar_room', 'climate.shanaya_room']
+        .filter(a => states[a] && !['off', 'unavailable'].includes(states[a].state)).length;
+      return `<div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;width:100%;text-align:left">
+        <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px">${w.temperature ?? '–'}°</div>
+        <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">${pretty}<br>feels ${feels}° · ${w.humidity ?? '–'}%</div>
+        <div style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;width:100%;margin-top:18px;font-size:11px;font-weight:700;line-height:1;color:var(--secondary-text-color)">
+          <ha-icon icon="mdi:home-thermometer" style="--mdc-icon-size:16px;color:#ffc53d;display:flex"></ha-icon><span>Inside</span></div>
+        <div style="font-size:24px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px">${inside}°</div>
+        <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">4 rooms · ${run ? run + ' AC on' : 'ACs off'}</div>
+      </div>`;
+    ]]]
