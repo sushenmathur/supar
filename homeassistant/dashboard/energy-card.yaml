@@ -1,0 +1,59 @@
+type: custom:button-card
+template: b_bento
+variables:
+  label: Energy now
+  icon: mdi:lightning-bolt
+  tint: '#ffb020'
+  height: auto
+tap_action:
+  action: navigate
+  navigation_path: '#energy'
+triggers_update:
+  - sensor.sh50rs_a21c2106894_mppt_total_power
+  - sensor.sh50rs_a21c2106894_purchased_power
+  - sensor.sh50rs_a21c2106894_total_export_active_power
+  - sensor.bluey_charger_power
+  - sensor.kia_charger_power
+  - sensor.daily_import_cost
+  - sensor.daily_solar_credit
+  - sensor.current_energy_rate
+  - select.grid_import_tariff
+custom_fields:
+  body: |-
+    [[[
+      const w = id => {
+        const e = states[id];
+        if (!e) return 0;
+        const v = parseFloat(e.state);
+        if (isNaN(v)) return 0;
+        const u = (e.attributes.unit_of_measurement || '').toLowerCase();
+        return Math.abs(u === 'kw' ? v * 1000 : v);
+      };
+      const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
+      const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
+      const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
+      const cars = w('sensor.bluey_charger_power') + w('sensor.kia_charger_power');
+      const load = Math.max(0, solar + imp - exp);
+      const fromSolar = Math.max(0, solar - exp);
+      const sPct = load > 0 ? Math.round(Math.min(1, fromSolar / load) * 100) : 0;
+      const gPct = load > 0 ? 100 - sPct : 0;
+      const fmt = v => v >= 1000 ? [(v / 1000).toFixed(1), 'kW'] : [Math.round(v), 'W'];
+      const [lv, lu] = fmt(load);
+      const money = s => states[s] && !isNaN(parseFloat(states[s].state)) ? '$' + parseFloat(states[s].state).toFixed(2) : '–';
+      const src = solar > 0 ? `${fmt(solar).join(' ')} solar${exp > 0 ? ' · exporting ' + fmt(exp).join(' ') : ''}` : 'Solar asleep';
+      const leg = (c, t) => `<span style="display:flex;align-items:center;gap:4px"><i style="width:8px;height:8px;border-radius:2px;background:${c};display:inline-block"></i>${t}</span>`;
+      const rv = parseFloat(states['sensor.current_energy_rate']?.state);
+      const rate = isNaN(rv) ? '–' : (rv < 5 ? rv * 100 : rv).toFixed(1);
+      const tariff = {day: ['Peak', '#fb7185'], shoulder: ['Shoulder', '#fbbf24'], offpeak: ['Off-peak', '#34d399'], night: ['Night', '#34d399']}[states['select.grid_import_tariff']?.state] || ['', 'var(--secondary-text-color)'];
+      return `<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px">
+          <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px">${lv}<span style="font-size:13px;font-weight:600;color:var(--secondary-text-color);margin-left:3px">${lu}</span></div>
+          <div style="text-align:right">
+            <div style="font-size:20px;font-weight:700;line-height:1">${rate}<span style="font-size:11px;font-weight:600;color:var(--secondary-text-color);margin-left:2px">¢/kWh</span></div>
+            <div style="font-size:10.5px;font-weight:700;margin-top:3px;color:${tariff[1]}">${tariff[0] ? '● ' + tariff[0] : ''}</div>
+          </div></div>
+        <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">${src} · today ${money('sensor.daily_import_cost')} used, ${money('sensor.daily_solar_credit')} sold</div>
+        <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;margin-top:10px;background:rgba(var(--rgb-primary-text-color),0.08)">
+          <i style="flex:${sPct};background:#ffb020"></i><i style="flex:${gPct};background:#a67cff"></i></div>
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:10.5px;color:var(--secondary-text-color);flex-wrap:wrap">
+          ${leg('#ffb020', 'Solar ' + sPct + '%')}${leg('#a67cff', 'Grid ' + gPct + '%')}${leg('#30d158', 'Cars ' + fmt(cars).join(' '))}</div>`;
+    ]]]
