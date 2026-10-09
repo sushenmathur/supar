@@ -1,0 +1,86 @@
+type: custom:button-card
+template: b_bento
+variables:
+  label: Quick actions
+  icon: mdi:lightning-bolt-circle
+  tint: var(--secondary-text-color)
+  height: auto
+custom_fields:
+  acts:
+    card:
+      type: horizontal-stack
+      cards:
+        - type: custom:button-card
+          template: b_act
+          name: Good Night
+          icon: mdi:weather-night
+          tap_action:
+            action: perform-action
+            perform_action: scene.turn_on
+            target:
+              entity_id: scene.good_night
+        - type: custom:button-card
+          template: b_act
+          name: Morning
+          icon: mdi:weather-sunset-up
+          tap_action:
+            action: perform-action
+            perform_action: scene.turn_on
+            target:
+              entity_id: scene.good_morning
+        - type: custom:button-card
+          template: b_act
+          name: Announce
+          icon: mdi:account-voice
+          tap_action:
+            action: fire-dom-event
+            browser_mod:
+              service: browser_mod.popup
+              data:
+                title: Announce
+                icon: mdi:bullhorn
+                dismissable: true
+                content:
+                  - name: speakers
+                    label: Speakers
+                    default: media_player.home_speakers
+                    selector:
+                      entity:
+                        domain: media_player
+                  - name: message
+                    label: Message
+                    selector:
+                      text:
+                        multiline: true
+                  - name: volume
+                    label: Volume
+                    default: 75
+                    selector:
+                      number:
+                        min: 0
+                        max: 100
+                        step: 5
+                        mode: slider
+                        unit_of_measurement: '%'
+                left_button: Cancel
+                right_button: Announce
+                right_button_action:
+                  service: script.say_tts_message
+                  data:
+                    speakers: '{{ speakers }}'
+                    message: '{{ message }}'
+                    volume: '{{ volume }}'
+        - type: custom:button-card
+          template: b_act
+          name: Call Paro
+          icon: mdi:phone
+          tap_action:
+            action: perform-action
+            perform_action: script.turn_on
+            target:
+              entity_id: script.attention_paro
+styles:
+  grid:
+    - grid-template-areas: '"lbl" "acts"'
+    - grid-template-rows: min-content min-content
+    - row-gap: 8px
