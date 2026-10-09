@@ -38,7 +38,7 @@ custom_fields:
         <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px">${w.temperature ?? '–'}°</div>
         <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">${pretty}<br>feels ${feels}° · ${w.humidity ?? '–'}%</div>
         <div style="display:block !important;width:100% !important;text-align:left !important;margin:18px 0 0 0 !important;padding:0 !important;font-size:11px;font-weight:700;line-height:16px;color:var(--secondary-text-color);white-space:nowrap">
-          <ha-icon icon="mdi:home-thermometer" style="display:inline-block !important;vertical-align:middle;--mdc-icon-size:16px;color:#ffc53d;margin:0 6px 0 0 !important"></ha-icon><span style="vertical-align:middle;display:inline !important;margin:0 !important">Inside</span></div>
+          <svg viewBox="0 0 24 24" width="15" height="15" style="display:inline-block !important;vertical-align:middle;margin:0 6px 0 0 !important;width:15px !important;height:15px !important;flex:none"><path fill="#ffc53d" d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/></svg><span style="vertical-align:middle;display:inline !important;margin:0 !important;float:none !important">Inside</span></div>
         <div style="font-size:24px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px">${inside}°</div>
         <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">4 rooms · ${run ? run + ' AC on' : 'ACs off'}</div>
       </div>`;
