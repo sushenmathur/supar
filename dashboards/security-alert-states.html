@@ -1,0 +1,30 @@
+<!doctype html><meta charset=utf-8><title>Security alert states</title>
+<style>
+body{margin:0;padding:26px;font-family:system-ui,Roboto,sans-serif;background:#e9eef7;color:#14203a}
+h2{margin:0 0 14px;font-size:15px}.row{display:grid;grid-template-columns:repeat(3,270px);gap:22px;margin-bottom:8px}
+.lab{font-size:13px;font-weight:700;margin-bottom:8px}.sm{font-weight:500;color:rgba(20,32,58,.6)}
+.wrap{padding:14px;border-radius:22px;margin-bottom:12px}.dk{background:#10182f;--t:#fff;--s:rgba(255,255,255,.62);color:#fff}
+.lt{--t:#14203a;--s:rgba(20,32,58,.62)}
+.card{border-radius:24px;padding:14px 16px;border:1px solid #fff;background:linear-gradient(145deg,#fff,#f3f6fb);box-shadow:0 10px 30px rgba(60,70,130,.18);height:150px;box-sizing:border-box;color:var(--t)}
+.dk .card{background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border-color:rgba(255,255,255,.22);box-shadow:none}
+.hd{font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--s)}.dot{width:14px;height:14px;border-radius:50%}
+.big{font-size:20px;font-weight:700;margin:8px 0 10px}
+.btns{display:flex;gap:8px}.b{flex:1;border-radius:14px;padding:8px 0;text-align:center;font-size:10.5px;font-weight:700;background:rgba(128,128,128,.12)}
+.b i{display:block;font-style:normal;font-size:16px;margin-bottom:2px}
+.warn{background:linear-gradient(145deg,rgba(255,214,102,.95),rgba(255,170,70,.7));border-color:rgba(255,190,80,.9);box-shadow:0 0 30px rgba(255,170,60,.45);color:#3a2300}
+.dk .warn{background:linear-gradient(145deg,rgba(255,214,102,.5),rgba(255,150,60,.3));border-color:rgba(255,190,80,.6);color:#fff}
+.alert{background:linear-gradient(145deg,rgba(255,120,140,.95),rgba(220,38,72,.75));border-color:rgba(255,140,160,.95);box-shadow:0 0 36px rgba(244,63,94,.6);color:#fff}
+.dk .alert{background:linear-gradient(145deg,rgba(251,113,133,.55),rgba(190,18,60,.45));border-color:rgba(251,113,133,.8)}
+.warn .hd,.alert .hd{color:inherit;opacity:.85}.warn .b,.alert .b{background:rgba(255,255,255,.28)}
+.alert .b.open{background:#fff;color:#be123c}.warn .b.open{background:#fff;color:#b45309}
+</style>
+<h2>Security tile: alert states (the red state pulses slowly on the real card)</h2>
+<div class=row id=r></div>
+<script>
+const S=[
+['Normal','','#15803d','All locked','🏠','⚪','All doors closed',['Garage','Front','Alarm'],-1],
+['Warning: door open, daytime','warn','#b45309','Front door open','🚪','','Open for 4 min',['Garage','Front','Alarm'],1],
+['Alert: door open after dark','alert','#fff','Garage open · 11:42 pm','🚨','','Open for 38 min · tap to close',['Garage','Front','Alarm'],0]];
+const tile=s=>`<div class="card ${s[1]}"><div class=hd><span class=dot style="background:${s[2]}"></span>Security</div><div class=big>${s[3]}</div><div class=btns>${s[7].map((n,i)=>`<div class="b ${i==s[8]?'open':''}"><i>${['▭','🔒','🛡'][i]}</i>${n}</div>`).join('')}</div></div>`;
+r.innerHTML=S.map(s=>`<div><div class=lab>${s[0]}</div><div class="wrap lt">${tile(s)}</div><div class="wrap dk">${tile(s)}</div></div>`).join('');
+</script>
