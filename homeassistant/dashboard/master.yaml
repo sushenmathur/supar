@@ -127,15 +127,20 @@ button_card_templates:
     section_mode: true
     show_state: false
     show_label: true
-    extra_styles: |
+    extra_styles: >
       .mq {
         overflow: hidden; min-width: 0; flex: 1;
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
         mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
       }
+
       .run { display: inline-flex; animation: tick 9s linear infinite; }
+
       .run span { padding-right: 28px; }
-      @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+      @keyframes tick { from { transform: translateX(0); } to { transform:
+      translateX(-50%); } }
+
       @media (prefers-reduced-motion: reduce) {
         .run { animation: none; }
         .run span + span { display: none; }
@@ -409,7 +414,7 @@ navbar-templates:
         label: More
         popup:
           - icon: mdi:devices
-            label: iCloud3
+            label: Phones
             url: /ic3db-icloud3
           - icon: mdi:cog
             label: Settings
@@ -426,8 +431,10 @@ navbar-templates:
               perform_action: homeassistant.restart
         tap_action:
           action: open-popup
-    styles: |
-      /* Glass rail. Sizes are left to navbar-card so icon + label always fit on every view. */
+    styles: >
+      /* Glass rail. Sizes are left to navbar-card so icon + label always fit on
+      every view. */
+
       .navbar-card.desktop {
         background: var(--glass-bg) !important;
         backdrop-filter: blur(34px) saturate(190%);
@@ -437,15 +444,23 @@ navbar-templates:
         box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi) !important;
         overflow: visible !important;
       }
-      .navbar.desktop.left { padding: 12px 8px !important; justify-content: center; }
+
+      .navbar.desktop.left { padding: 12px 8px !important; justify-content:
+      center; }
+
       .button { border-radius: 20px !important; }
+
       .button.active {
         background: var(--glass-bg-soft) !important;
         box-shadow: inset 0 1px 0 var(--glass-hi), 0 6px 16px rgba(0,0,0,0.12) !important;
         border-radius: 20px !important;
       }
-      .icon.active, .label.active { color: var(--primary-text-color) !important; }
+
+      .icon.active, .label.active { color: var(--primary-text-color) !important;
+      }
+
       .icon, .label { color: var(--secondary-text-color); }
+
       .navbar-popup {
         background: var(--popup-background-color) !important;
         backdrop-filter: blur(34px) saturate(190%);
@@ -456,7 +471,10 @@ navbar-templates:
         gap: 8px !important;
         box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi) !important;
       }
-      /* Each sub route is its own glass tile: icon over label, equal width, comfortable touch target */
+
+      /* Each sub route is its own glass tile: icon over label, equal width,
+      comfortable touch target */
+
       .popup-item {
         min-width: 84px !important;
         padding: 12px 10px 10px !important;
@@ -470,8 +488,12 @@ navbar-templates:
         gap: 6px !important;
         color: var(--primary-text-color) !important;
       }
+
       .popup-item:active { transform: scale(0.96); }
-      .popup-item ha-icon, .popup-item .icon { --mdc-icon-size: 30px; color: var(--primary-text-color) !important; }
+
+      .popup-item ha-icon, .popup-item .icon { --mdc-icon-size: 30px; color:
+      var(--primary-text-color) !important; }
+
       .popup-item .label, .popup-label, .popup-label-text {
         background: transparent !important;
         box-shadow: none !important;
@@ -653,8 +675,8 @@ views:
                       const hello = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
                       const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'short', day: 'numeric', month: 'short' });
                       return `<div style="text-align:left">
-                        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--secondary-text-color)">${date}</div>
-                        <div style="font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:2px;white-space:nowrap">${hello}</div>
+                        <div style="font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--secondary-text-color)">${date}</div>
+                        <div style="font-size:20px;font-weight:600;letter-spacing:-.02em;margin-top:2px;white-space:nowrap">${hello}</div>
                       </div>`;
                     ]]]
                 styles:
@@ -668,8 +690,6 @@ views:
                     body:
                       - width: 100%
               - type: grid
-                card_mod:
-                  style: ':host { flex: 1.25 1 0 !important; }'
                 columns: 2
                 square: false
                 cards:
@@ -684,9 +704,10 @@ views:
                     template: glass_person
                     variables:
                       battery: sensor.paro_phone_battery
-              - type: grid
+                      network: sensor.iphone_connection_type
                 card_mod:
-                  style: ':host { flex: 1.35 1 0 !important; }'
+                  style: ':host { flex: 1.25 1 0 !important; }'
+              - type: grid
                 columns: 5
                 square: false
                 cards:
@@ -789,8 +810,7 @@ views:
                         content:
                           type: picture
                           image:
-                            media_content_id: >-
-                              media-source://image_upload/50750ef2d78e15cc901576e1c9fa2bae
+                            media_content_id: media-source://image_upload/50750ef2d78e15cc901576e1c9fa2bae
                             media_content_type: image/png
                   - type: custom:button-card
                     entity: vacuum.robbie
@@ -804,24 +824,34 @@ views:
                     template: glass_action
                     triggers_update:
                       - vacuum.robbie
-                    extra_styles: |
-                      @keyframes robbie-spin { to { transform: rotate(360deg); } }
-                      @keyframes robbie-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+                    extra_styles: >
+                      @keyframes robbie-spin { to { transform: rotate(360deg); }
+                      }
+
+                      @keyframes robbie-pulse { 0%, 100% { transform: scale(1);
+                      } 50% { transform: scale(1.2); } }
+
                       @keyframes robbie-glow {
                         0%, 100% { box-shadow: 0 0 0 0 rgba(45,212,191,0.0), inset 0 1px 0 var(--glass-hi); }
                         50% { box-shadow: 0 0 22px 3px rgba(45,212,191,0.55), inset 0 1px 0 var(--glass-hi); }
                       }
-                      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+                      @media (prefers-reduced-motion: reduce) { * { animation:
+                      none !important; } }
                     styles:
                       card:
-                        - animation: |
-                            [[[ return entity.state === 'cleaning' ? 'robbie-glow 2.4s ease-in-out infinite' : 'none'; ]]]
-                        - border-color: |
-                            [[[ return entity.state === 'docked' ? 'var(--glass-border)' : 'rgba(45,212,191,0.7)'; ]]]
+                        - animation: >
+                            [[[ return entity.state === 'cleaning' ?
+                            'robbie-glow 2.4s ease-in-out infinite' : 'none';
+                            ]]]
+                        - border-color: >
+                            [[[ return entity.state === 'docked' ?
+                            'var(--glass-border)' : 'rgba(45,212,191,0.7)'; ]]]
                       icon:
                         - transform-origin: center
-                        - color: |
-                            [[[ return entity.state === 'docked' ? 'var(--primary-text-color)' : '#2dd4bf'; ]]]
+                        - color: >
+                            [[[ return entity.state === 'docked' ?
+                            'var(--primary-text-color)' : '#2dd4bf'; ]]]
                         - animation: |
                             [[[
                               const s = entity.state;
@@ -845,16 +875,32 @@ views:
                               icon_animation: true
                               card_mod:
                                 style:
-                                  mushroom-shape-icon$: |
-                                    {% if not is_state('vacuum.robbie', 'docked') %}
-                                    .shape { animation: robbie-pulse 2s ease-in-out infinite; }
+                                  mushroom-shape-icon$: >
+                                    {% if not is_state('vacuum.robbie',
+                                    'docked') %}
+
+                                    .shape { animation: robbie-pulse 2s
+                                    ease-in-out infinite; }
+
                                     {% endif %}
-                                    @keyframes robbie-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); } 50% { box-shadow: 0 0 18px 4px rgba(45,212,191,0.55); } }
-                                  .: |
-                                    {% if not is_state('vacuum.robbie', 'docked') %}
-                                    mushroom-shape-icon ha-state-icon, mushroom-shape-icon ha-icon { animation: robbie-spin 3s linear infinite; transform-origin: center; }
+
+                                    @keyframes robbie-pulse { 0%, 100% {
+                                    box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+                                    50% { box-shadow: 0 0 18px 4px
+                                    rgba(45,212,191,0.55); } }
+                                  .: >
+                                    {% if not is_state('vacuum.robbie',
+                                    'docked') %}
+
+                                    mushroom-shape-icon ha-state-icon,
+                                    mushroom-shape-icon ha-icon { animation:
+                                    robbie-spin 3s linear infinite;
+                                    transform-origin: center; }
+
                                     {% endif %}
-                                    @keyframes robbie-spin { to { transform: rotate(360deg); } }
+
+                                    @keyframes robbie-spin { to { transform:
+                                    rotate(360deg); } }
                             - type: grid
                               columns: 2
                               square: false
@@ -913,6 +959,8 @@ views:
                                     perform_action: button.press
                                     target:
                                       entity_id: button.robbie_hallways
+                card_mod:
+                  style: ':host { flex: 1.35 1 0 !important; }'
           - type: grid
             columns: 6
             square: false
@@ -955,15 +1003,21 @@ views:
                 triggers_update:
                   - cover.garage_door_v2
                   - light.garage_light
-                extra_styles: |
+                extra_styles: >
                   .mq {
                     overflow: hidden; min-width: 0; flex: 1;
                     -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
                     mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
                   }
-                  .run { display: inline-flex; animation: tick 9s linear infinite; }
+
+                  .run { display: inline-flex; animation: tick 9s linear
+                  infinite; }
+
                   .run span { padding-right: 28px; }
-                  @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+                  @keyframes tick { from { transform: translateX(0); } to {
+                  transform: translateX(-50%); } }
+
                   @media (prefers-reduced-motion: reduce) {
                     .run { animation: none; }
                     .run span + span { display: none; }
@@ -993,8 +1047,8 @@ views:
                 variables:
                   tint: 170,185,205
                   force_on: >-
-                    [[[ return states["cover.garage_door_v2"]?.state === "open" ||
-                    states["light.garage_light"]?.state === "on"; ]]]
+                    [[[ return states["cover.garage_door_v2"]?.state === "open"
+                    || states["light.garage_light"]?.state === "on"; ]]]
               - type: custom:button-card
                 icon: mdi:gate
                 name: Outdoor
@@ -1039,15 +1093,21 @@ views:
                 name: Media
                 template: room_tile
                 triggers_update: all
-                extra_styles: |
+                extra_styles: >
                   .mq {
                     overflow: hidden; min-width: 0; flex: 1;
                     -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
                     mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
                   }
-                  .run { display: inline-flex; animation: tick 9s linear infinite; }
+
+                  .run { display: inline-flex; animation: tick 9s linear
+                  infinite; }
+
                   .run span { padding-right: 28px; }
-                  @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+                  @keyframes tick { from { transform: translateX(0); } to {
+                  transform: translateX(-50%); } }
+
                   @media (prefers-reduced-motion: reduce) {
                     .run { animation: none; }
                     .run span + span { display: none; }
@@ -1156,10 +1216,42 @@ views:
                     ]]]
       - type: grid
         cards:
-          - type: heading
-            heading: Favourites
-            heading_style: title
-            icon: mdi:home-heart
+          - type: custom:wheelie-bin-card
+            title: Next Bin Collection
+            entity:
+              - sensor.general_waste
+              - sensor.garden_organics
+              - sensor.recycling
+            bins:
+              - color: red
+                icon: mdi:trash-can
+                label: General
+                match:
+                  - General Waste
+              - color: green
+                icon: mdi:leaf
+                label: Garden
+                match:
+                  - Garden Organics
+              - color: amber
+                icon: mdi:recycle
+                label: Recycling
+                match:
+                  - Recycling
+            chip_size: 22
+            chip_style: faded
+            hide_inactive: true
+            icon_size: 26
+            layout: horizontal
+            show_badges: true
+            show_labels: true
+            visibility:
+              - after: '06:00:00'
+                before: '23:59:00'
+                condition: time
+                weekdays:
+                  - mon
+                  - sun
           - type: tile
             entity: media_player.tv
             icon: mdi:television
@@ -1345,42 +1437,6 @@ views:
             grid_options:
               columns: 6
               rows: 1
-          - type: custom:wheelie-bin-card
-            title: Next Bin Collection
-            entity:
-              - sensor.general_waste
-              - sensor.garden_organics
-              - sensor.recycling
-            bins:
-              - color: red
-                icon: mdi:trash-can
-                label: General
-                match:
-                  - General Waste
-              - color: green
-                icon: mdi:leaf
-                label: Garden
-                match:
-                  - Garden Organics
-              - color: amber
-                icon: mdi:recycle
-                label: Recycling
-                match:
-                  - Recycling
-            chip_size: 22
-            chip_style: faded
-            hide_inactive: true
-            icon_size: 26
-            layout: horizontal
-            show_badges: true
-            show_labels: true
-            visibility:
-              - after: '06:00:00'
-                before: '23:59:00'
-                condition: time
-                weekdays:
-                  - mon
-                  - sun
       - type: grid
         cards:
           - type: custom:alert-ticker-card
@@ -2351,7 +2407,9 @@ views:
               - camera_entity: camera.garage_live_view
             dimensions:
               aspect_ratio_mode: static
-              aspect_ratio: [16, 7]
+              aspect_ratio:
+                - 16
+                - 7
             grid_options:
               columns: full
             type: custom:advanced-camera-card
@@ -2366,7 +2424,9 @@ views:
               battery: sensor.bluey_battery_level
               tracker: device_tracker.bluey_location
               onroad: input_boolean.tesla_onroad
-              charging: '[[[ return states["sensor.bluey_charging"]?.state === "Charging"; ]]]'
+              charging: >-
+                [[[ return states["sensor.bluey_charging"]?.state ===
+                "Charging"; ]]]
             grid_options:
               columns: 12
               rows: 8
@@ -2484,7 +2544,9 @@ views:
               battery: input_number.kia_battery_estimate
               tracker: device_tracker.kia_gps_location
               onroad: input_boolean.kia_onroad
-              charging: '[[[ return parseFloat(states["sensor.kia_charger_power"]?.state) > 10; ]]]'
+              charging: >-
+                [[[ return parseFloat(states["sensor.kia_charger_power"]?.state)
+                > 10; ]]]
             grid_options:
               columns: 12
               rows: 8
@@ -2726,6 +2788,13 @@ views:
             icon: mdi:spotlight-beam
             name: Spotlight
             type: tile
+          - type: tile
+            grid_options:
+              columns: 6
+            entity: binary_sensor.patio_door
+            name: Patio Door
+            vertical: false
+            features_position: bottom
         type: grid
       - cards:
           - heading: Front
