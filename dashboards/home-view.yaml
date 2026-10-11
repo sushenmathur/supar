@@ -414,8 +414,7 @@ sections:
           ]]]
       styles: *id001
   - type: picture-entity
-    entity: camera.driveway_live_view
-    camera_image: camera.driveway_snapshot
+    entity: camera.driveway_snapshot
     camera_view: auto
     aspect_ratio: '16:9'
     fit_mode: cover
@@ -427,6 +426,7 @@ sections:
       navigation_path: /mobile-hub/mobile-cameras
     hold_action:
       action: more-info
+      entity: camera.driveway_live_view
     card_mod:
       style: |
         ha-card { border-radius: 22px; overflow: hidden; }

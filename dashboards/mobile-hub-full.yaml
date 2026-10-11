@@ -1189,8 +1189,7 @@ views:
               ]]]
           styles: *id001
       - type: picture-entity
-        entity: camera.driveway_live_view
-        camera_image: camera.driveway_snapshot
+        entity: camera.driveway_snapshot
         camera_view: auto
         aspect_ratio: '16:9'
         fit_mode: cover
@@ -1202,6 +1201,7 @@ views:
           navigation_path: /mobile-hub/mobile-cameras
         hold_action:
           action: more-info
+          entity: camera.driveway_live_view
         card_mod:
           style: |
             ha-card { border-radius: 22px; overflow: hidden; }
@@ -2877,8 +2877,7 @@ views:
             square: false
             cards:
               - type: picture-entity
-                entity: camera.front_door_live_view_2
-                camera_image: camera.front_door_snapshot_2
+                entity: camera.front_door_snapshot_2
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2888,9 +2887,11 @@ views:
                 card_mod:
                   style: |
                     ha-card { border-radius: 16px; overflow: hidden; }
+                tap_action:
+                  action: more-info
+                  entity: camera.front_door_live_view_2
               - type: picture-entity
-                entity: camera.backyard_live_view
-                camera_image: camera.backyard_snapshot
+                entity: camera.backyard_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2900,9 +2901,11 @@ views:
                 card_mod:
                   style: |
                     ha-card { border-radius: 16px; overflow: hidden; }
+                tap_action:
+                  action: more-info
+                  entity: camera.backyard_live_view
               - type: picture-entity
-                entity: camera.patio_live_view
-                camera_image: camera.patio_snapshot
+                entity: camera.patio_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2912,9 +2915,11 @@ views:
                 card_mod:
                   style: |
                     ha-card { border-radius: 16px; overflow: hidden; }
+                tap_action:
+                  action: more-info
+                  entity: camera.patio_live_view
               - type: picture-entity
-                entity: camera.side_live_view
-                camera_image: camera.side_snapshot
+                entity: camera.side_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2924,9 +2929,11 @@ views:
                 card_mod:
                   style: |
                     ha-card { border-radius: 16px; overflow: hidden; }
+                tap_action:
+                  action: more-info
+                  entity: camera.side_live_view
               - type: picture-entity
-                entity: camera.laundry_live_view
-                camera_image: camera.laundry_snapshot
+                entity: camera.laundry_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2936,9 +2943,11 @@ views:
                 card_mod:
                   style: |
                     ha-card { border-radius: 16px; overflow: hidden; }
+                tap_action:
+                  action: more-info
+                  entity: camera.laundry_live_view
               - type: picture-entity
-                entity: camera.garage_live_view
-                camera_image: camera.garage_snapshot
+                entity: camera.garage_snapshot
                 camera_view: auto
                 aspect_ratio: '4:3'
                 fit_mode: cover
@@ -2948,6 +2957,9 @@ views:
                 card_mod:
                   style: |
                     ha-card { border-radius: 16px; overflow: hidden; }
+                tap_action:
+                  action: more-info
+                  entity: camera.garage_live_view
 
       # Navbar (unchanged)
       - type: grid
