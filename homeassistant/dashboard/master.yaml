@@ -550,6 +550,9 @@ views:
                   - condition: state
                     entity: binary_sensor.side_door_contact
                     state: 'on'
+                  - condition: state
+                    entity: binary_sensor.crimsafe_door_contact
+                    state: 'on'
                   - condition: and
                     conditions:
                       - condition: state
@@ -559,9 +562,6 @@ views:
                         conditions:
                           - condition: state
                             entity: binary_sensor.front_door_contact
-                            state: 'on'
-                          - condition: state
-                            entity: binary_sensor.crimsafe_door_contact
                             state: 'on'
                           - condition: state
                             entity: binary_sensor.patio_door_contact
@@ -614,14 +614,14 @@ views:
                       const kept = on('input_boolean.keep_side_door_open');
                       list.push({ p: kept ? 3 : 1, id: 'binary_sensor.side_door_contact', msg: kept ? 'Side door kept open' : 'Side door open', icon: 'mdi:door-open' });
                     }
-                    // Everything below can be snoozed.
+                    // Security door is high priority and is never snoozed.
+                    if (screen) {
+                      list.push({ p: 1, id: 'binary_sensor.crimsafe_door_contact', msg: front ? 'Front and security doors open' : 'Security door open', icon: 'mdi:shield-home' });
+                    }
+                    // Everything below can be snoozed. Front door is medium (amber); the rest is low (slate).
                     if (!snoozed) {
-                      if (front && screen)
-                        list.push({ p: 1, id: 'binary_sensor.front_door_contact', msg: 'Front and security doors open', icon: 'mdi:door-open' });
                       if (front && !screen)
                         list.push({ p: 2, id: 'binary_sensor.front_door_contact', msg: 'Front door open', icon: 'mdi:home-alert' });
-                      if (screen && !front)
-                        list.push({ p: 3, id: 'binary_sensor.crimsafe_door_contact', msg: 'Security door open', icon: 'mdi:shield-home' });
                       if (on('binary_sensor.patio_door_contact'))
                         list.push({ p: 3, id: 'binary_sensor.patio_door_contact', msg: 'Patio door open', icon: 'mdi:door-open' });
                       if (on('binary_sensor.laundrydoorsensor_contact'))
@@ -742,7 +742,7 @@ views:
                             [[[
                               const on = id => states[id]?.state === 'on';
                               const robbie = states['sensor.robbie_dock_dock_error']?.state;
-                              const any = on('binary_sensor.front_door_contact') || on('binary_sensor.crimsafe_door_contact')
+                              const any = on('binary_sensor.front_door_contact')
                                 || on('binary_sensor.patio_door_contact') || on('binary_sensor.laundrydoorsensor_contact')
                                 || (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie));
                               return any && !on('input_boolean.alert_banner_snooze') ? 'flex' : 'none';
