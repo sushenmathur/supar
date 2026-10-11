@@ -542,29 +542,37 @@ views:
             grid_options:
               columns: full
             conditions:
-              - condition: state
-                entity: sun.sun
-                state: below_horizon
               - condition: or
                 conditions:
                   - condition: state
-                    entity: cover.garage_door_v2
-                    state: open
+                    entity: binary_sensor.garage_door_sensor_contact
+                    state: 'on'
                   - condition: state
                     entity: binary_sensor.front_door_contact
-                    state: 'on'
-                  - condition: state
-                    entity: binary_sensor.hallwaydoorsensor_contact
-                    state: 'on'
-                  - condition: state
-                    entity: binary_sensor.patio_door_contact
                     state: 'on'
                   - condition: state
                     entity: binary_sensor.side_door_contact
                     state: 'on'
                   - condition: state
+                    entity: binary_sensor.crimsafe_door_contact
+                    state: 'on'
+                  - condition: state
+                    entity: binary_sensor.patio_door_contact
+                    state: 'on'
+                  - condition: state
                     entity: binary_sensor.laundrydoorsensor_contact
                     state: 'on'
+                  - condition: and
+                    conditions:
+                      - condition: state
+                        entity: sensor.robbie_dock_dock_error
+                        state_not: ok
+                      - condition: state
+                        entity: sensor.robbie_dock_dock_error
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.robbie_dock_dock_error
+                        state_not: unknown
             card:
               type: custom:button-card
               show_icon: false
@@ -580,28 +588,49 @@ views:
                   50% { box-shadow: 0 0 56px rgba(244,63,94,.85), inset 0 1px 0 rgba(255,255,255,.5); }
                 }
                 @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+              variables:
+                alerts: |
+                  [[[
+                    const s = id => states[id]?.state;
+                    const on = id => s(id) === 'on';
+                    const front = on('binary_sensor.front_door_contact');
+                    const screen = on('binary_sensor.crimsafe_door_contact');
+                    const robbie = s('sensor.robbie_dock_dock_error');
+                    const list = [];
+                    if (on('binary_sensor.garage_door_sensor_contact'))
+                      list.push({ p: 1, id: 'binary_sensor.garage_door_sensor_contact', msg: 'Garage door open', icon: 'mdi:garage-open-variant' });
+                    if (front && screen)
+                      list.push({ p: 1, id: 'binary_sensor.front_door_contact', msg: 'Front and security doors open', icon: 'mdi:door-open' });
+                    if (on('binary_sensor.side_door_contact'))
+                      list.push({ p: 1, id: 'binary_sensor.side_door_contact', msg: 'Side door open', icon: 'mdi:door-open' });
+                    if (front && !screen)
+                      list.push({ p: 2, id: 'binary_sensor.front_door_contact', msg: 'Front door open', icon: 'mdi:home-alert' });
+                    if (screen && !front)
+                      list.push({ p: 3, id: 'binary_sensor.crimsafe_door_contact', msg: 'Security door open', icon: 'mdi:shield-home' });
+                    if (on('binary_sensor.patio_door_contact'))
+                      list.push({ p: 3, id: 'binary_sensor.patio_door_contact', msg: 'Patio door open', icon: 'mdi:door-open' });
+                    if (on('binary_sensor.laundrydoorsensor_contact'))
+                      list.push({ p: 3, id: 'binary_sensor.laundrydoorsensor_contact', msg: 'Laundry door open', icon: 'mdi:door-open' });
+                    if (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie))
+                      list.push({ p: 3, id: 'sensor.robbie_dock_dock_error', msg: 'Roborock water tank empty', icon: 'mdi:water-alert' });
+                    return list.sort((a, b) => a.p - b.p);
+                  ]]]
               custom_fields:
                 body: |
                   [[[
-                    const items = [
-                      ['cover.garage_door_v2', 'Garage door', 'open'],
-                      ['binary_sensor.front_door_contact', 'Front door', 'on'],
-                      ['binary_sensor.hallwaydoorsensor_contact', 'Hallway door', 'on'],
-                      ['binary_sensor.patio_door_contact', 'Patio door', 'on'],
-                      ['binary_sensor.side_door_contact', 'Side door', 'on'],
-                      ['binary_sensor.laundrydoorsensor_contact', 'Laundry door', 'on']
-                    ].filter(([id, , on]) => states[id]?.state === on);
-                    if (!items.length) return `<div style="font-size:15px;font-weight:600;color:#fff;text-align:left">All doors closed</div>`;
-                    const since = Math.min(...items.map(([id]) => new Date(states[id].last_changed).getTime()));
+                    const list = variables.alerts;
+                    if (!list.length) return `<div style="font-size:15px;font-weight:600;color:#fff;text-align:left">No active alerts</div>`;
+                    const top = list[0];
+                    const since = new Date(states[top.id].last_changed).getTime();
                     const mins = Math.max(0, Math.round((Date.now() - since) / 60000));
                     const dur = mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${mins % 60} min`;
-                    const title = items.length === 1 ? `${items[0][1]} open` : `${items.length} doors open`;
-                    const sub = items.length === 1 ? `Open for ${dur} · after dark` : `${items.map(i => i[1]).join(', ')} · open for ${dur}`;
+                    const more = list.slice(1).map(a => a.msg.replace(/ open$/, '')).join(' · ');
+                    const sub = (more ? `${dur} · Also: ${more}` : `For ${dur}`);
                     return `<div style="display:flex;align-items:center;gap:18px;text-align:left;color:#fff">
                       <div style="width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.22);display:grid;place-items:center;flex:none">
-                        <ha-icon icon="mdi:shield-alert" style="--mdc-icon-size:30px;display:block;width:30px;height:30px"></ha-icon></div>
+                        <ha-icon icon="${top.icon}" style="--mdc-icon-size:30px;display:block;width:30px;height:30px"></ha-icon></div>
                       <div style="min-width:0">
-                        <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;white-space:nowrap">${title}</div>
+                        <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;white-space:nowrap">${top.msg}</div>
                         <div style="font-size:13px;opacity:.9;margin-top:2px;white-space:nowrap">${sub}</div></div></div>`;
                   ]]]
                 close:
@@ -642,9 +671,15 @@ views:
                   - height: 84px
                   - border-radius: 28px
                   - padding: 0 30px
-                  - background: linear-gradient(135deg, rgba(244,63,94,.92), rgba(190,18,60,.88))
-                  - border: 1px solid rgba(255,170,190,.8)
-                  - animation: alert-pulse 2.4s ease-in-out infinite
+                  - background: |
+                      [[[
+                        const p = variables.alerts[0]?.p || 3;
+                        return p === 1 ? 'linear-gradient(135deg, rgba(244,63,94,.92), rgba(190,18,60,.88))'
+                          : p === 2 ? 'linear-gradient(135deg, rgba(245,158,11,.92), rgba(217,119,6,.88))'
+                          : 'linear-gradient(135deg, rgba(71,85,105,.92), rgba(51,65,85,.9))';
+                      ]]]
+                  - border: 1px solid rgba(255,255,255,.45)
+                  - animation: "[[[ return (variables.alerts[0]?.p || 3) === 1 ? 'alert-pulse 2.4s ease-in-out infinite' : 'none'; ]]]"
                 grid:
                   - grid-template-areas: '"body close"'
                   - grid-template-columns: 1fr auto
