@@ -70,13 +70,6 @@
               variables:
                 mode: heat
                 col: '#ff7a45'
-            - type: custom:button-card
-              template: b_acmode
-              entity: '[[[ return entity.entity_id; ]]]'
-              icon: mdi:thermostat-auto
-              variables:
-                mode: auto
-                col: '#30b158'
     styles:
       card:
         - padding: 10px
