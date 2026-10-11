@@ -1,0 +1,12 @@
+# Settings > Automations > Create > Edit in YAML, paste this.
+# LG webOS can't power on by itself over the network. This makes every
+# media_player.turn_on on the Media TV (tile power, LG remote card power,
+# voice, etc.) run the same script the Devices page uses.
+alias: Media TV - turn on via script
+description: Runs script.media_tv_power when HA is asked to turn the Media TV on
+mode: single
+triggers:
+  - trigger: webostv.turn_on
+    entity_id: media_player.tv
+actions:
+  - action: script.media_tv_power

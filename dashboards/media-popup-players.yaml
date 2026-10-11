@@ -1,0 +1,137 @@
+# Media pop-up (#media): replaces the 2-column grid holding the TV and
+# Kitchen speaker tiles. The TV power button runs script.media_tv_power,
+# the same as the Devices page.
+type: grid
+columns: 2
+square: false
+cards:
+  - type: custom:button-card
+    template: b_bento
+    entity: media_player.tv
+    triggers_update:
+      - media_player.tv
+    variables:
+      label: Media TV
+      icon: mdi:television
+      tint: '#bf5af2'
+      height: 132px
+    tap_action:
+      action: more-info
+    custom_fields:
+      body: |-
+        [[[
+          const on = !['off', 'unavailable', 'standby'].includes(entity.state);
+          const src = on ? (entity.attributes.media_title || entity.attributes.source || 'On') : 'Off';
+          const st = on ? (entity.attributes.source && entity.attributes.media_title ? entity.attributes.source : entity.state.charAt(0).toUpperCase() + entity.state.slice(1)) : 'Tap power to turn on';
+          return `<div style="font-size:16px;font-weight:700;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${src}</div>
+            <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${st}</div>`;
+        ]]]
+      ctrl:
+        card:
+          type: horizontal-stack
+          cards:
+            - type: custom:button-card
+              template: b_mini
+              icon: mdi:power
+              styles:
+                icon:
+                  - color: |
+                      [[[ return ['off', 'unavailable', 'standby'].includes(states['media_player.tv'].state) ? 'var(--primary-text-color)' : 'var(--red-color)'; ]]]
+              tap_action:
+                action: perform-action
+                perform_action: script.media_tv_power
+              hold_action:
+                action: none
+            - type: custom:button-card
+              template: b_mini
+              icon: mdi:skip-previous
+              tap_action:
+                action: perform-action
+                perform_action: media_player.media_previous_track
+                target:
+                  entity_id: media_player.tv
+              hold_action:
+                action: none
+            - type: custom:button-card
+              template: b_mini
+              icon: mdi:play-pause
+              tap_action:
+                action: perform-action
+                perform_action: media_player.media_play_pause
+                target:
+                  entity_id: media_player.tv
+              hold_action:
+                action: none
+            - type: custom:button-card
+              template: b_mini
+              icon: mdi:skip-next
+              tap_action:
+                action: perform-action
+                perform_action: media_player.media_next_track
+                target:
+                  entity_id: media_player.tv
+              hold_action:
+                action: none
+    styles:
+      grid:
+        - grid-template-areas: '"lbl" "body" "ctrl"'
+        - grid-template-rows: min-content 1fr min-content
+  - type: custom:button-card
+    template: b_bento
+    entity: media_player.kitchen_speaker
+    triggers_update:
+      - media_player.kitchen_speaker
+    variables:
+      label: Kitchen speaker
+      icon: mdi:speaker
+      tint: '#30d158'
+      height: 132px
+    tap_action:
+      action: more-info
+    custom_fields:
+      body: |-
+        [[[
+          const on = !['off', 'unavailable', 'standby', 'idle'].includes(entity.state);
+          const t = on ? (entity.attributes.media_title || entity.attributes.source || 'Playing') : (entity.state === 'idle' ? 'Idle' : 'Off');
+          const s = on ? (entity.attributes.media_artist || entity.state.charAt(0).toUpperCase() + entity.state.slice(1)) : 'Nothing playing';
+          return `<div style="font-size:16px;font-weight:700;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t}</div>
+            <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s}</div>`;
+        ]]]
+      ctrl:
+        card:
+          type: horizontal-stack
+          cards:
+            - type: custom:button-card
+              template: b_mini
+              icon: mdi:power
+              tap_action:
+                action: perform-action
+                perform_action: media_player.toggle
+                target:
+                  entity_id: media_player.kitchen_speaker
+              hold_action:
+                action: none
+            - type: custom:button-card
+              template: b_mini
+              icon: mdi:play-pause
+              tap_action:
+                action: perform-action
+                perform_action: media_player.media_play_pause
+                target:
+                  entity_id: media_player.kitchen_speaker
+              hold_action:
+                action: none
+            - type: custom:button-card
+              template: b_mini
+              icon: mdi:skip-next
+              tap_action:
+                action: perform-action
+                perform_action: media_player.media_next_track
+                target:
+                  entity_id: media_player.kitchen_speaker
+              hold_action:
+                action: none
+    styles:
+      grid:
+        - grid-template-areas: '"lbl" "body" "ctrl"'
+        - grid-template-rows: min-content 1fr min-content
