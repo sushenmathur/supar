@@ -119,7 +119,7 @@ card:
         triggers_update: all
         styles:
           card:
-            - display: "[[[ return states['binary_sensor.garage_door_sensor_contact']?.state === 'on' && entity.state === 'open' ? 'flex' : 'none'; ]]]"
+            - display: "[[[ return states['binary_sensor.garage_door_sensor_contact']?.state === 'on' && states['cover.garage_door_v2']?.state === 'open' ? 'flex' : 'none'; ]]]"
             - margin-left: 10px
             - background: '#fff'
             - color: '#be123c'
@@ -156,8 +156,8 @@ card:
           card:
             - display: "[[[ return states['binary_sensor.garage_door_sensor_contact']?.state === 'on' ? 'flex' : 'none'; ]]]"
             - margin-left: 10px
-            - background: "[[[ return entity.state === 'on' ? '#fff' : 'rgba(255,255,255,.22)'; ]]]"
-            - color: "[[[ return entity.state === 'on' ? '#334155' : '#fff'; ]]]"
+            - background: "[[[ return states['input_boolean.keep_garage_door_open']?.state === 'on' ? '#fff' : 'rgba(255,255,255,.22)'; ]]]"
+            - color: "[[[ return states['input_boolean.keep_garage_door_open']?.state === 'on' ? '#334155' : '#fff'; ]]]"
             - border-radius: 18px
             - padding: 12px 20px
             - font-weight: 700
@@ -178,8 +178,8 @@ card:
           card:
             - display: "[[[ return states['binary_sensor.side_door_contact']?.state === 'on' ? 'flex' : 'none'; ]]]"
             - margin-left: 10px
-            - background: "[[[ return entity.state === 'on' ? '#fff' : 'rgba(255,255,255,.22)'; ]]]"
-            - color: "[[[ return entity.state === 'on' ? '#334155' : '#fff'; ]]]"
+            - background: "[[[ return states['input_boolean.keep_side_door_open']?.state === 'on' ? '#fff' : 'rgba(255,255,255,.22)'; ]]]"
+            - color: "[[[ return states['input_boolean.keep_side_door_open']?.state === 'on' ? '#334155' : '#fff'; ]]]"
             - border-radius: 18px
             - padding: 12px 20px
             - font-weight: 700
