@@ -334,11 +334,6 @@ button_card_templates:
     hold_action:
       action: more-info
     variables:
-      modes:
-        - 'off'
-        - cool
-        - heat
-        - auto
       mode_color: |
         [[[
           const c = { cool: '#4c8dff', heat: '#ff7a45', auto: '#30b158', heat_cool: '#30b158', dry: '#2bb5a6', fan_only: '#8a9599' };
@@ -352,44 +347,59 @@ button_card_templates:
         return cur != null ? `${m} · now ${cur}°` : m;
       ]]]
     custom_fields:
-      temp: |
+      minus:
+        card:
+          type: custom:button-card
+          template: b_acstep
+          entity: '[[[ return entity.entity_id; ]]]'
+          icon: mdi:minus
+          variables:
+            dir: -1
+      tval: |
         [[[
-          const a = entity.attributes;
-          const t = a.temperature;
-          if (t == null) return '';
-          const step = a.target_temp_step || 1;
-          const min = a.min_temp != null ? a.min_temp : 16;
-          const max = a.max_temp != null ? a.max_temp : 30;
-          const off = entity.state === 'off';
-          const call = v => `event.stopPropagation(); document.querySelector('home-assistant').hass.callService('climate','set_temperature',{entity_id:'${entity.entity_id}',temperature:${v}})`;
-          const btn = (icon, v) => `
-            <div onclick="${call(v)}" style="width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
-              background:rgba(var(--rgb-primary-text-color),0.08)">
-              <ha-icon icon="${icon}" style="--mdc-icon-size:18px;color:var(--primary-text-color)"></ha-icon>
-            </div>`;
-          return `
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              ${btn('mdi:minus', +Math.max(min, t - step).toFixed(1))}
-              <div style="font-size:24px;font-weight:700;color:var(--primary-text-color);opacity:${off ? 0.5 : 1}">${t}°</div>
-              ${btn('mdi:plus', +Math.min(max, t + step).toFixed(1))}
-            </div>`;
+          const t = entity.attributes.temperature;
+          return `<div style="font-size:24px;font-weight:700;color:var(--primary-text-color);opacity:${entity.state === 'off' ? 0.5 : 1}">${t != null ? t + '°' : '–'}</div>`;
         ]]]
-      modes: |
-        [[[
-          const icons = { off: 'mdi:power', cool: 'mdi:snowflake', heat: 'mdi:fire', auto: 'mdi:thermostat-auto',
-                          heat_cool: 'mdi:sun-snowflake-variant', dry: 'mdi:water-percent', fan_only: 'mdi:fan' };
-          const cols = { off: '#8a9599', cool: '#4c8dff', heat: '#ff7a45', auto: '#30b158', heat_cool: '#30b158', dry: '#2bb5a6', fan_only: '#8a9599' };
-          const avail = entity.attributes.hvac_modes || variables.modes;
-          const modes = variables.modes.filter(m => avail.includes(m));
-          return `<div style="display:flex;gap:4px">${modes.map(m => {
-            const on = entity.state === m;
-            return `<div onclick="event.stopPropagation(); document.querySelector('home-assistant').hass.callService('climate','set_hvac_mode',{entity_id:'${entity.entity_id}',hvac_mode:'${m}'})"
-              style="flex:1;height:28px;border-radius:10px;display:grid;place-items:center;cursor:pointer;
-              background:${on ? cols[m] : 'rgba(var(--rgb-primary-text-color),0.06)'}">
-              <ha-icon icon="${icons[m] || 'mdi:help'}" style="--mdc-icon-size:16px;color:${on ? '#fff' : 'var(--secondary-text-color)'}"></ha-icon>
-            </div>`;
-          }).join('')}</div>`;
-        ]]]
+      plus:
+        card:
+          type: custom:button-card
+          template: b_acstep
+          entity: '[[[ return entity.entity_id; ]]]'
+          icon: mdi:plus
+          variables:
+            dir: 1
+      modes:
+        card:
+          type: horizontal-stack
+          cards:
+            - type: custom:button-card
+              template: b_acmode
+              entity: '[[[ return entity.entity_id; ]]]'
+              icon: mdi:power
+              variables:
+                mode: 'off'
+                col: '#8a9599'
+            - type: custom:button-card
+              template: b_acmode
+              entity: '[[[ return entity.entity_id; ]]]'
+              icon: mdi:snowflake
+              variables:
+                mode: cool
+                col: '#4c8dff'
+            - type: custom:button-card
+              template: b_acmode
+              entity: '[[[ return entity.entity_id; ]]]'
+              icon: mdi:fire
+              variables:
+                mode: heat
+                col: '#ff7a45'
+            - type: custom:button-card
+              template: b_acmode
+              entity: '[[[ return entity.entity_id; ]]]'
+              icon: mdi:thermostat-auto
+              variables:
+                mode: auto
+                col: '#30b158'
     styles:
       card:
         - padding: 10px
@@ -403,16 +413,15 @@ button_card_templates:
                 : `color-mix(in srgb, ${variables.mode_color} 14%, transparent)`;
             ]]]
       grid:
-        - grid-template-areas: '"i n" "i s" "temp temp" "modes modes"'
-        - grid-template-columns: 34px 1fr
+        - grid-template-areas: '"i n n" "i s s" "minus tval plus" "modes modes modes"'
+        - grid-template-columns: 40px 1fr 40px
         - grid-template-rows: min-content min-content auto auto
-        - column-gap: 8px
+        - column-gap: 6px
       img_cell:
         - width: 32px
         - height: 32px
         - border-radius: 50%
-        - background: |
-            [[[ return `color-mix(in srgb, ${variables.mode_color} 20%, transparent)`; ]]]
+        - background: '[[[ return `color-mix(in srgb, ${variables.mode_color} 20%, transparent)`; ]]]'
       icon:
         - width: 18px
         - color: '[[[ return variables.mode_color; ]]]'
@@ -429,11 +438,87 @@ button_card_templates:
         - font-size: 10px
         - opacity: 0.7
       custom_fields:
-        temp:
+        minus:
+          - margin-top: 10px
+        tval:
+          - margin-top: 10px
+          - justify-self: center
+        plus:
           - margin-top: 10px
         modes:
           - margin-top: 8px
 
+  # ---- Aircon step button (−/+ target temperature) -----------------------
+  b_acstep:
+    show_name: false
+    show_state: false
+    hold_action:
+      action: none
+    tap_action:
+      action: perform-action
+      perform_action: climate.set_temperature
+      target:
+        entity_id: '[[[ return entity.entity_id; ]]]'
+      data:
+        temperature: |
+          [[[
+            const a = entity.attributes;
+            const step = a.target_temp_step || 1;
+            const min = a.min_temp != null ? a.min_temp : 16;
+            const max = a.max_temp != null ? a.max_temp : 30;
+            const t = a.temperature != null ? a.temperature : 22;
+            return +Math.min(max, Math.max(min, t + variables.dir * step)).toFixed(1);
+          ]]]
+    variables:
+      dir: 1
+    styles:
+      card:
+        - width: 34px
+        - height: 34px
+        - padding: 0
+        - border-radius: 50%
+        - box-shadow: none
+        - border: none
+        - background: rgba(var(--rgb-primary-text-color),0.08)
+      grid:
+        - grid-template-areas: '"i"'
+      icon:
+        - width: 18px
+        - color: var(--primary-text-color)
+
+  # ---- Aircon mode button --------------------------------------------------
+  b_acmode:
+    show_name: false
+    show_state: false
+    hold_action:
+      action: none
+    tap_action:
+      action: perform-action
+      perform_action: climate.set_hvac_mode
+      target:
+        entity_id: '[[[ return entity.entity_id; ]]]'
+      data:
+        hvac_mode: '[[[ return variables.mode; ]]]'
+    variables:
+      mode: 'off'
+      col: '#8a9599'
+    styles:
+      card:
+        - height: 28px
+        - padding: 0
+        - border-radius: 10px
+        - box-shadow: none
+        - border: none
+        - background: |
+            [[[ return entity.state === variables.mode ? variables.col : 'rgba(var(--rgb-primary-text-color),0.06)'; ]]]
+        - display: |
+            [[[ return (entity.attributes.hvac_modes || [variables.mode]).includes(variables.mode) ? 'block' : 'none'; ]]]
+      grid:
+        - grid-template-areas: '"i"'
+      icon:
+        - width: 16px
+        - color: |
+            [[[ return entity.state === variables.mode ? '#ffffff' : 'var(--secondary-text-color)'; ]]]
   # ---- Phone card: battery, location info, Ping button --------------------
   b_phone:
     show_icon: true
