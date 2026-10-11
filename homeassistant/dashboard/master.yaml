@@ -548,31 +548,38 @@ views:
                     entity: binary_sensor.garage_door_sensor_contact
                     state: 'on'
                   - condition: state
-                    entity: binary_sensor.front_door_contact
-                    state: 'on'
-                  - condition: state
                     entity: binary_sensor.side_door_contact
-                    state: 'on'
-                  - condition: state
-                    entity: binary_sensor.crimsafe_door_contact
-                    state: 'on'
-                  - condition: state
-                    entity: binary_sensor.patio_door_contact
-                    state: 'on'
-                  - condition: state
-                    entity: binary_sensor.laundrydoorsensor_contact
                     state: 'on'
                   - condition: and
                     conditions:
                       - condition: state
-                        entity: sensor.robbie_dock_dock_error
-                        state_not: ok
-                      - condition: state
-                        entity: sensor.robbie_dock_dock_error
-                        state_not: unavailable
-                      - condition: state
-                        entity: sensor.robbie_dock_dock_error
-                        state_not: unknown
+                        entity: input_boolean.alert_banner_snooze
+                        state: 'off'
+                      - condition: or
+                        conditions:
+                          - condition: state
+                            entity: binary_sensor.front_door_contact
+                            state: 'on'
+                          - condition: state
+                            entity: binary_sensor.crimsafe_door_contact
+                            state: 'on'
+                          - condition: state
+                            entity: binary_sensor.patio_door_contact
+                            state: 'on'
+                          - condition: state
+                            entity: binary_sensor.laundrydoorsensor_contact
+                            state: 'on'
+                          - condition: and
+                            conditions:
+                              - condition: state
+                                entity: sensor.robbie_dock_dock_error
+                                state_not: ok
+                              - condition: state
+                                entity: sensor.robbie_dock_dock_error
+                                state_not: unavailable
+                              - condition: state
+                                entity: sensor.robbie_dock_dock_error
+                                state_not: unknown
             card:
               type: custom:button-card
               show_icon: false
@@ -593,26 +600,35 @@ views:
                   [[[
                     const s = id => states[id]?.state;
                     const on = id => s(id) === 'on';
+                    const snoozed = on('input_boolean.alert_banner_snooze');
                     const front = on('binary_sensor.front_door_contact');
                     const screen = on('binary_sensor.crimsafe_door_contact');
                     const robbie = s('sensor.robbie_dock_dock_error');
                     const list = [];
-                    if (on('binary_sensor.garage_door_sensor_contact'))
-                      list.push({ p: 1, id: 'binary_sensor.garage_door_sensor_contact', msg: 'Garage door open', icon: 'mdi:garage-open-variant' });
-                    if (front && screen)
-                      list.push({ p: 1, id: 'binary_sensor.front_door_contact', msg: 'Front and security doors open', icon: 'mdi:door-open' });
-                    if (on('binary_sensor.side_door_contact'))
-                      list.push({ p: 1, id: 'binary_sensor.side_door_contact', msg: 'Side door open', icon: 'mdi:door-open' });
-                    if (front && !screen)
-                      list.push({ p: 2, id: 'binary_sensor.front_door_contact', msg: 'Front door open', icon: 'mdi:home-alert' });
-                    if (screen && !front)
-                      list.push({ p: 3, id: 'binary_sensor.crimsafe_door_contact', msg: 'Security door open', icon: 'mdi:shield-home' });
-                    if (on('binary_sensor.patio_door_contact'))
-                      list.push({ p: 3, id: 'binary_sensor.patio_door_contact', msg: 'Patio door open', icon: 'mdi:door-open' });
-                    if (on('binary_sensor.laundrydoorsensor_contact'))
-                      list.push({ p: 3, id: 'binary_sensor.laundrydoorsensor_contact', msg: 'Laundry door open', icon: 'mdi:door-open' });
-                    if (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie))
-                      list.push({ p: 3, id: 'sensor.robbie_dock_dock_error', msg: 'Roborock water tank empty', icon: 'mdi:water-alert' });
+                    // Garage and side door are never snoozed. Turning "keep open" on calms them down instead.
+                    if (on('binary_sensor.garage_door_sensor_contact')) {
+                      const kept = on('input_boolean.keep_garage_door_open');
+                      list.push({ p: kept ? 3 : 1, id: 'binary_sensor.garage_door_sensor_contact', msg: kept ? 'Garage door kept open' : 'Garage door open', icon: 'mdi:garage-open-variant' });
+                    }
+                    if (on('binary_sensor.side_door_contact')) {
+                      const kept = on('input_boolean.keep_side_door_open');
+                      list.push({ p: kept ? 3 : 1, id: 'binary_sensor.side_door_contact', msg: kept ? 'Side door kept open' : 'Side door open', icon: 'mdi:door-open' });
+                    }
+                    // Everything below can be snoozed.
+                    if (!snoozed) {
+                      if (front && screen)
+                        list.push({ p: 1, id: 'binary_sensor.front_door_contact', msg: 'Front and security doors open', icon: 'mdi:door-open' });
+                      if (front && !screen)
+                        list.push({ p: 2, id: 'binary_sensor.front_door_contact', msg: 'Front door open', icon: 'mdi:home-alert' });
+                      if (screen && !front)
+                        list.push({ p: 3, id: 'binary_sensor.crimsafe_door_contact', msg: 'Security door open', icon: 'mdi:shield-home' });
+                      if (on('binary_sensor.patio_door_contact'))
+                        list.push({ p: 3, id: 'binary_sensor.patio_door_contact', msg: 'Patio door open', icon: 'mdi:door-open' });
+                      if (on('binary_sensor.laundrydoorsensor_contact'))
+                        list.push({ p: 3, id: 'binary_sensor.laundrydoorsensor_contact', msg: 'Laundry door open', icon: 'mdi:door-open' });
+                      if (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie))
+                        list.push({ p: 3, id: 'sensor.robbie_dock_dock_error', msg: 'Roborock water tank empty', icon: 'mdi:water-alert' });
+                    }
                     return list.sort((a, b) => a.p - b.p);
                   ]]]
               custom_fields:
@@ -640,17 +656,17 @@ views:
                     name: Close door
                     show_icon: false
                     show_state: false
-                    triggers_update:
-                      - cover.garage_door_v2
+                    triggers_update: all
                     styles:
                       card:
-                        - display: "[[[ return entity.state === 'open' ? 'flex' : 'none'; ]]]"
+                        - display: "[[[ return states['binary_sensor.garage_door_sensor_contact']?.state === 'on' && entity.state === 'open' ? 'flex' : 'none'; ]]]"
+                        - margin-left: 10px
                         - background: '#fff'
                         - color: '#be123c'
                         - border-radius: 18px
-                        - padding: 14px 26px
+                        - padding: 12px 20px
                         - font-weight: 700
-                        - font-size: 15px
+                        - font-size: 14px
                         - box-shadow: none
                         - border: 0
                     tap_action:
@@ -666,6 +682,80 @@ views:
                             service: cover.close_cover
                             target:
                               entity_id: cover.garage_door_v2
+                keepgarage:
+                  card:
+                    type: custom:button-card
+                    entity: input_boolean.keep_garage_door_open
+                    name: Keep garage open
+                    show_icon: false
+                    show_state: false
+                    triggers_update: all
+                    tap_action:
+                      action: toggle
+                    styles:
+                      card:
+                        - display: "[[[ return states['binary_sensor.garage_door_sensor_contact']?.state === 'on' ? 'flex' : 'none'; ]]]"
+                        - margin-left: 10px
+                        - background: "[[[ return entity.state === 'on' ? '#fff' : 'rgba(255,255,255,.22)'; ]]]"
+                        - color: "[[[ return entity.state === 'on' ? '#334155' : '#fff'; ]]]"
+                        - border-radius: 18px
+                        - padding: 12px 20px
+                        - font-weight: 700
+                        - font-size: 14px
+                        - box-shadow: none
+                        - border: 1px solid rgba(255,255,255,.55)
+                keepside:
+                  card:
+                    type: custom:button-card
+                    entity: input_boolean.keep_side_door_open
+                    name: Keep side open
+                    show_icon: false
+                    show_state: false
+                    triggers_update: all
+                    tap_action:
+                      action: toggle
+                    styles:
+                      card:
+                        - display: "[[[ return states['binary_sensor.side_door_contact']?.state === 'on' ? 'flex' : 'none'; ]]]"
+                        - margin-left: 10px
+                        - background: "[[[ return entity.state === 'on' ? '#fff' : 'rgba(255,255,255,.22)'; ]]]"
+                        - color: "[[[ return entity.state === 'on' ? '#334155' : '#fff'; ]]]"
+                        - border-radius: 18px
+                        - padding: 12px 20px
+                        - font-weight: 700
+                        - font-size: 14px
+                        - box-shadow: none
+                        - border: 1px solid rgba(255,255,255,.55)
+                snooze:
+                  card:
+                    type: custom:button-card
+                    entity: input_boolean.alert_banner_snooze
+                    name: Snooze 30 min
+                    show_icon: false
+                    show_state: false
+                    triggers_update: all
+                    tap_action:
+                      action: toggle
+                    styles:
+                      card:
+                        - display: |
+                            [[[
+                              const on = id => states[id]?.state === 'on';
+                              const robbie = states['sensor.robbie_dock_dock_error']?.state;
+                              const any = on('binary_sensor.front_door_contact') || on('binary_sensor.crimsafe_door_contact')
+                                || on('binary_sensor.patio_door_contact') || on('binary_sensor.laundrydoorsensor_contact')
+                                || (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie));
+                              return any && !on('input_boolean.alert_banner_snooze') ? 'flex' : 'none';
+                            ]]]
+                        - margin-left: 10px
+                        - background: rgba(255,255,255,.22)
+                        - color: '#fff'
+                        - border-radius: 18px
+                        - padding: 12px 20px
+                        - font-weight: 700
+                        - font-size: 14px
+                        - box-shadow: none
+                        - border: 1px solid rgba(255,255,255,.55)
               styles:
                 card:
                   - height: 84px
@@ -681,13 +771,20 @@ views:
                   - border: 1px solid rgba(255,255,255,.45)
                   - animation: "[[[ return (variables.alerts[0]?.p || 3) === 1 ? 'alert-pulse 2.4s ease-in-out infinite' : 'none'; ]]]"
                 grid:
-                  - grid-template-areas: '"body close"'
-                  - grid-template-columns: 1fr auto
+                  - grid-template-areas: '"body close keepgarage keepside snooze"'
+                  - grid-template-columns: 1fr auto auto auto auto
+                  - column-gap: 0
                   - align-items: center
                 custom_fields:
                   body:
                     - justify-self: start
                   close:
+                    - justify-self: end
+                  keepgarage:
+                    - justify-self: end
+                  keepside:
+                    - justify-self: end
+                  snooze:
                     - justify-self: end
           - type: horizontal-stack
             grid_options:

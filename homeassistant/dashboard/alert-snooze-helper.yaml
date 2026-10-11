@@ -1,0 +1,20 @@
+# 1) Helper: add to configuration.yaml (or create it in Settings > Devices & services > Helpers > Toggle,
+#    name "Alert banner snooze" so the entity ID is input_boolean.alert_banner_snooze)
+input_boolean:
+  alert_banner_snooze:
+    name: Alert banner snooze
+    icon: mdi:bell-sleep
+
+# 2) Automation: paste in Settings > Automations > Create > Edit in YAML
+# alias: Alert banner snooze reset
+# description: Turns the banner snooze off again after 30 minutes
+# triggers:
+#   - trigger: state
+#     entity_id: input_boolean.alert_banner_snooze
+#     to: 'on'
+#     for: '00:30:00'
+# actions:
+#   - action: input_boolean.turn_off
+#     target:
+#       entity_id: input_boolean.alert_banner_snooze
+# mode: restart
