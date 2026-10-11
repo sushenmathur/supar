@@ -51,6 +51,7 @@ card:
           ['binary_sensor.side_door_contact', 'Side door', 'on'],
           ['binary_sensor.laundrydoorsensor_contact', 'Laundry door', 'on']
         ].filter(([id, , on]) => states[id]?.state === on);
+        if (!items.length) return `<div style="font-size:15px;font-weight:600;color:#fff;text-align:left">All doors closed</div>`;
         const since = Math.min(...items.map(([id]) => new Date(states[id].last_changed).getTime()));
         const mins = Math.max(0, Math.round((Date.now() - since) / 60000));
         const dur = mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${mins % 60} min`;
@@ -65,39 +66,37 @@ card:
       ]]]
     close:
       card:
-        type: conditional
-        conditions:
-          - condition: state
-            entity: cover.garage_door_v2
-            state: open
-        card:
-          type: custom:button-card
-          name: Close door
-          icon: mdi:garage-variant
-          show_icon: false
-          styles:
-            card:
-              - background: '#fff'
-              - color: '#be123c'
-              - border-radius: 18px
-              - padding: 14px 26px
-              - font-weight: 700
-              - font-size: 15px
-              - box-shadow: none
-              - border: 0
-          tap_action:
-            action: fire-dom-event
-            browser_mod:
-              service: browser_mod.popup
-              data:
-                title: Close the garage door?
-                content: The door will start closing straight away. Make sure nothing is in the way.
-                left_button: Cancel
-                right_button: Close door
-                right_button_action:
-                  service: cover.close_cover
-                  target:
-                    entity_id: cover.garage_door_v2
+        type: custom:button-card
+        entity: cover.garage_door_v2
+        name: Close door
+        show_icon: false
+        show_state: false
+        triggers_update:
+          - cover.garage_door_v2
+        styles:
+          card:
+            - display: "[[[ return entity.state === 'open' ? 'flex' : 'none'; ]]]"
+            - background: '#fff'
+            - color: '#be123c'
+            - border-radius: 18px
+            - padding: 14px 26px
+            - font-weight: 700
+            - font-size: 15px
+            - box-shadow: none
+            - border: 0
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            service: browser_mod.popup
+            data:
+              title: Close the garage door?
+              content: The door will start closing straight away. Make sure nothing is in the way.
+              left_button: Cancel
+              right_button: Close door
+              right_button_action:
+                service: cover.close_cover
+                target:
+                  entity_id: cover.garage_door_v2
   styles:
     card:
       - height: 84px
