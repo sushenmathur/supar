@@ -542,6 +542,9 @@ views:
             grid_options:
               columns: full
             conditions:
+              - condition: state
+                entity: sun.sun
+                state: below_horizon
               - condition: or
                 conditions:
                   - condition: state
