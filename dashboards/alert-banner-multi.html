@@ -1,0 +1,27 @@
+<!doctype html><meta charset=utf-8><title>Alert banner: multiple doors</title>
+<style>
+body{margin:0;padding:24px 28px;font-family:Inter,system-ui,Roboto,sans-serif;background:linear-gradient(160deg,#eef2fb,#e4eaf7);color:#14203a}
+h2{font-size:15px;margin:0 0 4px}p.n{margin:0 0 18px;font-size:12.5px;color:rgba(20,32,58,.65)}
+.lab{font-size:13px;font-weight:700;margin:16px 0 6px}.lab span{font-weight:500;color:rgba(20,32,58,.6)}
+.b{height:84px;border-radius:28px;padding:0 30px;display:flex;align-items:center;gap:0;color:#fff;border:1px solid rgba(255,255,255,.45);box-sizing:border-box;width:1180px}
+.p1{background:linear-gradient(135deg,rgba(244,63,94,.92),rgba(190,18,60,.88));box-shadow:0 0 40px rgba(244,63,94,.6)}
+.p2{background:linear-gradient(135deg,rgba(245,158,11,.92),rgba(217,119,6,.88))}
+.p3{background:linear-gradient(135deg,rgba(71,85,105,.92),rgba(51,65,85,.9))}
+.ico{width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:26px;margin-right:18px;flex:none}
+.t{font-size:22px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}.s{font-size:13px;opacity:.92;margin-top:2px;white-space:nowrap}
+.sp{flex:1}
+.btn{margin-left:10px;padding:12px 20px;border-radius:18px;font-weight:700;font-size:14px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.55);white-space:nowrap}
+.btn.w{background:#fff;color:#be123c;border:0}.btn.on{background:#fff;color:#334155}
+</style>
+<h2>Alert banner with several alerts at once</h2>
+<p class=n>The highest-priority alert is the headline. Everything else is listed after "Also". Buttons are the union of what each active alert needs.</p>
+<div id=r></div>
+<script>
+const S=[
+['Garage door + patio door open','Garage is priority 1 (red, pulsing) so it leads. Patio is priority 3, so it is listed under "Also" and gets the Snooze button.','p1','🚗','Garage door open','12 min · Also: Patio door',['Close door:w','Keep garage open','Snooze 30 min']],
+['Garage kept open + patio door open','Keep-open is on, so the garage drops to priority 3. Patio is now the same priority, so the calm slate banner shows the first one by order.','p3','🚗','Garage door kept open','12 min · Also: Patio door',['Keep garage open:on','Snooze 30 min']],
+['Side door + front door + laundry door open','Side door (P1) leads. Front is P2, laundry is P3. Keep side open plus Snooze.','p1','🚪','Side door open','8 min · Also: Front door · Laundry door',['Keep side open','Snooze 30 min']],
+['Front door only open (daytime)','One priority-2 alert: amber, no pulse. Only Snooze, since neither garage nor side door is involved.','p2','🏠','Front door open','3 min',['Snooze 30 min']],
+['Garage + side door both open','Both have keep-open buttons. Close door only applies to the garage.','p1','🚗','Garage door open','20 min · Also: Side door',['Close door:w','Keep garage open','Keep side open']]];
+r.innerHTML=S.map(s=>`<div class=lab>${s[0]} <span>${s[1]}</span></div><div class="b ${s[2]}"><div class=ico>${s[3]}</div><div><div class=t>${s[4]}</div><div class=s>${s[5]}</div></div><div class=sp></div>${s[6].map(b=>{const [n,c]=b.split(':');return `<div class="btn ${c||''}">${n}</div>`}).join('')}</div>`).join('');
+</script>
