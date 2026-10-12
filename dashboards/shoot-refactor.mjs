@@ -1,0 +1,10 @@
+import { chromium } from '/tmp/claude-0/-home-user-supar/c3967fd4-802f-5f58-9549-01e6af9f615b/scratchpad/pw/node_modules/playwright-core/index.mjs';
+import path from 'path'; import fs from 'fs'; import url from 'url';
+const here=path.dirname(url.fileURLToPath(import.meta.url));
+const exe=fs.readdirSync('/opt/pw-browsers').filter(d=>d.startsWith('chromium-'))[0];
+const b=await chromium.launch({executablePath:`/opt/pw-browsers/${exe}/chrome-linux/chrome`,args:['--no-sandbox']});
+const p=await b.newPage({viewport:{width:1200,height:900},deviceScaleFactor:1.3});
+await p.goto(`file://${here}/refactor-compare.html`); await p.waitForTimeout(3500);
+fs.mkdirSync(path.join(here,'previews/refactor'),{recursive:true});
+for (const id of ['s1','s2','s3','s4','s5']) await p.locator('#'+id).screenshot({path:path.join(here,`previews/refactor/${id}.png`)});
+await b.close();

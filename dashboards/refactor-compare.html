@@ -1,0 +1,110 @@
+<!doctype html><meta charset=utf-8><title>Refactor: before and after</title>
+<style>
+:root{--ink:#14203a;--mut:rgba(20,32,58,.62);--bd:rgba(255,255,255,.85);--hi:rgba(255,255,255,.9);--soft:rgba(255,255,255,.5);--shadow:0 12px 30px rgba(60,70,130,.2)}
+*{box-sizing:border-box}body{margin:0;padding:28px 32px 60px;font-family:Inter,system-ui,Roboto,sans-serif;color:var(--ink);background:linear-gradient(160deg,#eef2fb,#e1e8f8)}
+h1{font-size:20px;margin:0 0 4px}h2{font-size:16px;margin:0 0 4px}.n{font-size:12.5px;color:var(--mut);margin:0 0 14px;max-width:980px;line-height:1.5}
+section{margin:0 0 34px;padding:22px 24px;border-radius:26px;background:rgba(255,255,255,.45);border:1px solid var(--bd);box-shadow:var(--shadow)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:22px}.col h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}
+.flag{margin-top:12px;padding:10px 14px;border-radius:14px;background:rgba(245,158,11,.16);border:1px solid rgba(245,158,11,.5);font-size:12.5px;line-height:1.5}
+.flag b{color:#b45309}
+pre{margin:0;padding:12px 14px;border-radius:14px;background:rgba(20,32,58,.06);font:12px/1.5 ui-monospace,Menlo,monospace;overflow:auto;white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{text-align:left;padding:7px 10px;border-bottom:1px solid rgba(20,32,58,.1);vertical-align:top}th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+code{font:12px ui-monospace,Menlo,monospace;background:rgba(20,32,58,.06);padding:1px 5px;border-radius:5px}
+/* mock widgets */
+.tile{border-radius:24px;border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);background:var(--soft);color:var(--ink)}
+.act{width:96px;height:84px;display:grid;grid-template-rows:1fr auto;justify-items:center;padding:10px 4px;font-weight:600}.act svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;align-self:center}
+.rt{height:76px;width:230px;padding:0 18px;display:grid;grid-template-columns:52px 1fr;grid-template-rows:1fr 1fr;column-gap:14px;background:linear-gradient(135deg,rgba(170,185,205,.42),rgba(170,185,205,.14))}
+.rt .ib{grid-row:1/3;width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.55);align-self:center;display:grid;place-items:center}
+.rt b{align-self:end;font-size:16px}.rt span{align-self:start;color:var(--mut);white-space:nowrap}
+.chip{height:48px;width:230px;border-radius:22px;padding:0 14px;display:grid;grid-template-columns:30px 1fr;grid-template-rows:1fr 1fr;column-gap:11px;align-items:center}
+.chip>div{grid-row:1/3}.chip b{align-self:end;font-size:14px;line-height:1.1}.chip span{align-self:start;color:var(--mut);white-space:nowrap;line-height:1.2}
+.tog{width:138px;height:86px;border-radius:22px;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;font-weight:600}
+.mq{overflow:hidden;white-space:nowrap;width:150px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6px,#000 calc(100% - 10px),transparent 100%)}
+.run{display:inline-flex}.run span{padding-right:28px}
+.cur .run{animation:tick 9s linear infinite}.new .run{animation:tick 9s linear 2s 1}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.rail{width:92px;height:230px;border-radius:32px;border:1px solid var(--bd);box-shadow:var(--shadow),inset 0 1px 0 var(--hi);background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.34));display:grid;place-items:center;color:var(--mut);font-size:11px;text-align:center}
+.blurwall{position:relative;width:260px;height:250px;border-radius:24px;overflow:hidden;background:radial-gradient(90px 90px at 30% 30%,#f5a3c7,transparent 70%),radial-gradient(110px 110px at 75% 60%,#7dd3fc,transparent 70%),radial-gradient(90px 90px at 40% 90%,#c4b5fd,transparent 70%),#e8edf8}
+.blurwall i{position:absolute;left:14px;top:18px;width:90px;height:214px;border-radius:32px;border:1px solid var(--bd);background:linear-gradient(145deg,rgba(255,255,255,.55),rgba(255,255,255,.2));display:grid;place-items:center;font-size:11px;font-style:normal;color:var(--mut)}
+.sw{display:flex;gap:10px;flex-wrap:wrap}.sw div{width:158px;font-size:11.5px}.sw i{display:block;height:34px;border-radius:12px;border:1px solid rgba(20,32,58,.12);margin-bottom:5px}
+.cmp{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
+.mp{border-radius:22px;border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);background:var(--soft);padding:14px 18px;display:flex;align-items:center;gap:14px;width:420px}
+.mp.full{flex-direction:column;align-items:stretch;gap:10px;padding:16px 18px;min-height:150px}.mp .ib{width:44px;height:44px;border-radius:15px;background:rgba(255,255,255,.55);display:grid;place-items:center}
+.pw{margin-left:auto;width:38px;height:38px;border-radius:13px;background:rgba(20,32,58,.07);display:grid;place-items:center}
+.feat{display:flex;gap:8px}.feat div{flex:1;height:34px;border-radius:12px;background:rgba(20,32,58,.07);display:grid;place-items:center;font-size:12px}
+.col2{display:grid;gap:10px;grid-template-columns:420px 1fr}.stack{display:grid;gap:10px;align-content:start}
+.ghost{border:2px dashed rgba(20,32,58,.2);border-radius:22px;height:150px;width:420px;display:grid;place-items:center;color:var(--mut);font-size:12px}
+</style>
+<h1>Dashboard refactor: before and after</h1>
+<p class=n>One section per concern, in your order. Nothing has been written to <code>master.yaml</code> yet. Items marked <b style="color:#b45309">Needs your call</b> are places where doing it exactly as written would break something or cannot work, with what I suggest instead.</p>
+
+<section id=s1><h2>1. Explicit <code>triggers_update</code> lists</h2>
+<p class=n>Derived from every <code>states['…']</code> and <code>entity</code> each card reads. 18 cards and templates use <code>triggers_update: all</code> today. Below are the proposed lists for the ones with most impact.</p>
+<div class=row><div class=col><h3>Room tiles (new explicit lists)</h3><table>
+<tr><th>Card</th><th>triggers_update</th></tr>
+<tr><td>Living</td><td><code>light.dining_light</code> <code>light.kitchen_pendants</code> <code>light.kitchen_downlights</code> <code>light.kitchenled</code> <code>light.sonoff_1000dbd8b7</code> <code>switch.sonoff_100090d020</code></td></tr>
+<tr><td>Kids</td><td><code>light.aarlo_samar_cam</code> <code>light.tall_lamp</code></td></tr>
+<tr><td>Outdoor</td><td><code>switch.patio_lights</code> <code>light.backyard_light</code> <code>light.driveway_light</code> <code>light.laundry_light</code> <code>switch.sonoff_100053e676</code> <code>switch.sonoff_1000905c71</code></td></tr>
+<tr><td>Laundry</td><td><code>sensor.washer_current_status</code> <code>sensor.dryer_current_status</code></td></tr>
+<tr><td>Garage (already explicit)</td><td><code>cover.garage_door_v2</code> <code>light.garage_light</code></td></tr></table></div>
+<div class=col><h3>Other cards using <code>all</code></h3><table>
+<tr><th>Card</th><th>proposed</th></tr>
+<tr><td><code>world_clock</code></td><td><code>sensor.time</code> + its <code>daytime</code> binary sensor (<code>binary_sensor.hyd_daytime</code> / <code>austin_daytime</code>)</td></tr>
+<tr><td>Greeting card</td><td><code>sensor.time</code></td></tr>
+<tr><td><code>glass_person</code></td><td>the person, its battery and network sensors, plus <code>sensor.time</code> (for "43 min ago")</td></tr>
+<tr><td><code>glass_vehicle</code></td><td>battery, tracker, onroad, and the charging sensor</td></tr>
+<tr><td>Media room tile</td><td><code>media_player.tv</code> <code>media_player.media_apple_tv</code> <code>media_player.hubs_bedroom_apple_tv</code> <code>switch.bedroom_tv</code> (see below)</td></tr>
+<tr><td>Alert banner</td><td>the 8 alert entities plus 3 helpers and <code>sensor.time</code></td></tr></table></div></div>
+<div class=flag><b>Needs your call.</b> (a) <code>sensor.time</code> exists only if the <em>Time &amp; Date</em> integration is set up with "Time" enabled. Please confirm it exists before I switch the clocks to it. (b) The Media tile and the navbar badges read <code>Object.values(states)</code>, so they work for any media player or light. An explicit list can only cover players I know about. A new speaker that starts playing would not update the tile until another listed entity changes. (c) Alert banner "minutes open" counters also need <code>sensor.time</code> to keep ticking.</div></section>
+
+<section id=s2><h2>2. One ticker definition, once-only animation</h2>
+<p class=n>Today the <code>.mq / .run / @keyframes tick</code> block is copied into <code>glass_chip</code>, the Garage tile and the Media tile. The Laundry tile has no copy. New animation: <code>tick 9s linear 2s 1</code> (waits 2 s, scrolls once, then rests).</p>
+<div class=row><div class="col cur"><h3>Now: scrolls forever</h3><div class=tile style="padding:14px 18px;width:230px"><b>Media</b><div class=mq><span class=run><span>Media Apple TV playing · Bedroom TV on</span><span>Media Apple TV playing · Bedroom TV on</span></span></div></div></div>
+<div class="col new"><h3>Proposed: waits 2 s, scrolls once, rests</h3><div class=tile style="padding:14px 18px;width:230px"><b>Media</b><div class=mq><span class=run><span>Media Apple TV playing · Bedroom TV on</span><span>Media Apple TV playing · Bedroom TV on</span></span></div></div></div></div>
+<div class=flag><b>Needs your call.</b> Templates only reach cards that name them. <code>glass_chip</code> cards do not use <code>room_tile</code>, so they cannot "inherit" its CSS. Instead of defining it in <code>room_tile</code> and keeping a copy in <code>glass_chip</code>, I suggest a small third template, <code>ticker</code>, that both <code>room_tile</code> and <code>glass_chip</code> list as their own template. One definition, no copies. When the text rests it shows the second copy, which looks identical, so there is no jump. Each time the card re-renders (state change) it scrolls again once.</div></section>
+
+<section id=s3><h2>3. Minimum text sizes</h2>
+<p class=n>Names to at least 12 px, secondary text to at least 13 px. Heights and grid areas unchanged, so I checked that each still fits.</p>
+<div class=row><div class=col><h3>Before</h3>
+<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+<div class="tile act" style="font-size:11px"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><span>Good Night</span></div>
+<div class="tile rt"><div class=ib>⌂</div><b>Garage</b><span style="font-size:12px">Door closed · Light on</span></div>
+<div class="tile chip"><div>🚗</div><b>Sorento</b><span style="font-size:12px">Home · 82%</span></div>
+<div class="tile tog" style="font-size:14px"><span>💡</span>Kitchen Pendants</div></div></div>
+<div class=col><h3>After</h3>
+<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+<div class="tile act" style="font-size:12px"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><span>Good Night</span></div>
+<div class="tile rt"><div class=ib>⌂</div><b>Garage</b><span style="font-size:13px">Door closed · Light on</span></div>
+<div class="tile chip"><div>🚗</div><b>Sorento</b><span style="font-size:13px">Home · 82%</span></div>
+<div class="tile tog" style="font-size:14px"><span>💡</span>Kitchen Pendants</div></div></div></div>
+<div class=flag><b>Notes.</b> <code>glass_toggle</code> already uses 14 px names, and its <code>show_label</code> is off, so only its name is checked. The chip is 48 px tall. A 14 px name plus 13 px label fits, but the longest labels ("Home · 82% · charging") will scroll sooner. I will lower the ticker thresholds on chips by about 2 characters to match.</div></section>
+
+<section id=s4><h2>4. Theme variables, shared popup style, lighter rail blur</h2>
+<p class=n>Repeated colour literals become variables in the Glass theme. The navbar rail blur drops from 34 px / 190 % to 20 px / 160 %.</p>
+<div class=row><div class=col><h3>Rail blur: now → proposed</h3><div style="display:flex;gap:18px">
+<div class=blurwall><i style="backdrop-filter:blur(34px) saturate(190%)">34px / 190%</i></div>
+<div class=blurwall><i style="backdrop-filter:blur(20px) saturate(160%)">20px / 160%</i></div></div></div>
+<div class=col><h3>Proposed variables</h3><div class=sw>
+<div><i style="background:linear-gradient(145deg,rgba(255,255,255,.55),rgba(220,230,255,.35))"></i><code>--glass-popup-bg</code></div>
+<div><i style="background:rgba(255,255,255,.7)"></i><code>--glass-popup-border</code></div>
+<div><i style="background:rgba(15,20,50,.45)"></i><code>--glass-popup-scrim</code></div>
+<div><i style="background:linear-gradient(145deg,rgba(125,211,252,.30),rgba(167,139,250,.24))"></i><code>--glass-chip-blue</code></div>
+<div><i style="background:linear-gradient(135deg,#7dd3fc,#818cf8)"></i><code>--glass-accent</code></div>
+<div><i style="background:linear-gradient(135deg,rgba(244,63,94,.92),rgba(190,18,60,.88))"></i><code>--glass-alert-high</code></div>
+<div><i style="background:linear-gradient(135deg,rgba(245,158,11,.92),rgba(217,119,6,.88))"></i><code>--glass-alert-mid</code></div>
+<div><i style="background:linear-gradient(135deg,rgba(71,85,105,.92),rgba(51,65,85,.9))"></i><code>--glass-alert-low</code></div>
+<div><i style="background:#2dd4bf"></i><code>--glass-robbie</code></div>
+<div><i style="background:#10b981"></i><code>--glass-level-ok</code></div>
+<div><i style="background:#f59e0b"></i><code>--glass-level-warn</code></div>
+<div><i style="background:#ef4444"></i><code>--glass-level-low</code></div></div></div></div>
+<div class=flag><b>Needs your call.</b> (a) <b>One shared popup style.</b> The dashboard is stored as JSON, so YAML anchors (<code>&amp;</code> / <code>*</code>) are expanded the moment you save, and the "shared" definition would be copied back. The only way to truly define it once is in the theme, using the new variables. Popups can then read them. I found four copies of the popup frosted-glass block (Announce, Bluey, Kia, plus the three card_mod glass boxes inside Announce) and three Robbie keyframe copies (button, and twice in the Robbie popup). Please confirm those are the ones you meant. (b) The popup background itself may not accept a gradient from the theme, depending on browser_mod. If it does not, I will keep a solid translucent colour in the variable.</div></section>
+
+<section id=s5><h2>5. TV and Aircon: compact when off, full when on</h2>
+<p class=n>Each is wrapped in a conditional card. Off shows one slim row; on shows the full card you have today.</p>
+<div class=row><div class=col><h3>Both off (compact)</h3><div class=stack>
+<div class=mp><div class=ib>📺</div><div><b>TV</b><div style="font-size:13px;color:var(--mut)">Off</div></div><div class=pw>⏻</div></div>
+<div class=mp><div class=ib>❄</div><div><b>Aircon</b><div style="font-size:13px;color:var(--mut)">Off · Living Room</div></div><div class=pw>⏻</div></div></div></div>
+<div class=col><h3>Both on (full, as today)</h3><div class=stack>
+<div class="mp full"><div style="display:flex;gap:14px;align-items:center"><div class=ib>📺</div><div><b>TV</b><div style="font-size:13px;color:var(--mut)">Playing · Netflix</div></div><div class=pw>⏻</div></div><div class=feat><div>⏮</div><div>⏯</div><div>⏭</div></div></div>
+<div class="mp full"><div style="display:flex;gap:14px;align-items:center"><div class=ib>❄</div><div><b>Aircon</b><div style="font-size:13px;color:var(--mut)">Cooling · 24°</div></div></div><div class=feat><div>⏻</div><div>❄</div><div>☀</div><div>💧</div><div>🌀</div></div></div></div></div></div>
+<div class=flag><b>Needs your call.</b> Section grids reserve row space per card. For the freed space to be reclaimed, the wrapper must use <code>rows: auto</code>. The cards below move up when a device is off, and the layout shifts when you switch one on, because everything under it moves down. If you would rather keep the layout still, I can keep a fixed 2-row slot with the compact row centred inside it. Tell me which you want. "On" means any state other than <code>off</code>, <code>unavailable</code> or <code>unknown</code>.</div></section>
