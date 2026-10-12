@@ -1417,42 +1417,6 @@ views:
                     ]]]
       - type: grid
         cards:
-          - type: custom:wheelie-bin-card
-            title: Next Bin Collection
-            entity:
-              - sensor.general_waste
-              - sensor.garden_organics
-              - sensor.recycling
-            bins:
-              - color: red
-                icon: mdi:trash-can
-                label: General
-                match:
-                  - General Waste
-              - color: green
-                icon: mdi:leaf
-                label: Garden
-                match:
-                  - Garden Organics
-              - color: amber
-                icon: mdi:recycle
-                label: Recycling
-                match:
-                  - Recycling
-            chip_size: 22
-            chip_style: faded
-            hide_inactive: true
-            icon_size: 26
-            layout: horizontal
-            show_badges: true
-            show_labels: true
-            visibility:
-              - after: '06:00:00'
-                before: '23:59:00'
-                condition: time
-                weekdays:
-                  - mon
-                  - sun
           - type: tile
             entity: media_player.tv
             icon: mdi:television
@@ -1640,6 +1604,42 @@ views:
               rows: 1
       - type: grid
         cards:
+          - type: custom:wheelie-bin-card
+            title: Next Bin Collection
+            entity:
+              - sensor.general_waste
+              - sensor.garden_organics
+              - sensor.recycling
+            bins:
+              - color: red
+                icon: mdi:trash-can
+                label: General
+                match:
+                  - General Waste
+              - color: green
+                icon: mdi:leaf
+                label: Garden
+                match:
+                  - Garden Organics
+              - color: amber
+                icon: mdi:recycle
+                label: Recycling
+                match:
+                  - Recycling
+            chip_size: 22
+            chip_style: faded
+            hide_inactive: true
+            icon_size: 26
+            layout: horizontal
+            show_badges: true
+            show_labels: true
+            visibility:
+              - after: '06:00:00'
+                before: '23:59:00'
+                condition: time
+                weekdays:
+                  - mon
+                  - sun
           - type: custom:alert-ticker-card
             alerts:
               - entity: binary_sensor.garage_door_sensor_contact
@@ -1729,6 +1729,12 @@ views:
             overlay_scale: 1.5
             show_when_clear: false
             swipe_to_snooze: true
+            visibility:
+              - condition: template
+                value_template: |-
+                  visibility:
+                    - condition: template
+                      value_template: '{{ false }}'
           - type: custom:mushroom-alarm-control-panel-card
             entity: alarm_control_panel.home_alarm
             name: Home Alarm
