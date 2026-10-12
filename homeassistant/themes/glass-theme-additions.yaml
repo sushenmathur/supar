@@ -1,0 +1,32 @@
+# Paste the LIGHT block at the end of  Glass > modes > light:
+# and the DARK block at the end of  Glass > modes > dark:   (indent is already 6 spaces)
+
+# ---------- LIGHT ----------
+      # ---- added: shared popup, chip, accent, alert and level colours ----
+      glass-popup-bg: "linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))"
+      glass-popup-border: "rgba(255,255,255,0.80)"
+      glass-popup-scrim: "rgba(15,20,50,0.45)"
+      glass-chip-blue: "linear-gradient(145deg, rgba(125,211,252,0.30), rgba(167,139,250,0.24))"
+      glass-accent: "linear-gradient(135deg, #7dd3fc, #818cf8)"
+      glass-alert-high: "linear-gradient(135deg, rgba(244,63,94,0.92), rgba(190,18,60,0.88))"
+      glass-alert-mid: "linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.88))"
+      glass-alert-low: "linear-gradient(135deg, rgba(71,85,105,0.92), rgba(51,65,85,0.90))"
+      glass-robbie: "#2dd4bf"
+      glass-level-ok: "#10b981"
+      glass-level-warn: "#f59e0b"
+      glass-level-low: "#ef4444"
+
+# ---------- DARK ----------
+      # ---- added: shared popup, chip, accent, alert and level colours ----
+      glass-popup-bg: "linear-gradient(145deg, rgba(52,62,118,0.80), rgba(18,24,56,0.74))"
+      glass-popup-border: "rgba(255,255,255,0.22)"
+      glass-popup-scrim: "rgba(0,0,0,0.55)"
+      glass-chip-blue: "linear-gradient(145deg, rgba(125,211,252,0.22), rgba(167,139,250,0.18))"
+      glass-accent: "linear-gradient(135deg, #7dd3fc, #818cf8)"
+      glass-alert-high: "linear-gradient(135deg, rgba(244,63,94,0.92), rgba(190,18,60,0.88))"
+      glass-alert-mid: "linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.88))"
+      glass-alert-low: "linear-gradient(135deg, rgba(71,85,105,0.92), rgba(51,65,85,0.90))"
+      glass-robbie: "#2dd4bf"
+      glass-level-ok: "#10b981"
+      glass-level-warn: "#f59e0b"
+      glass-level-low: "#ef4444"
