@@ -190,6 +190,32 @@ button_card_templates:
         - color: var(--secondary-text-color)
     variables:
       hot: false
+  glass_popup_chip:
+    section_mode: true
+    show_state: false
+    show_label: true
+    variables:
+      title: ''
+      round: false
+      name_max: 13
+      label_max: 15
+    name: |
+      [[[
+        const t = String(variables.title);
+        const n = Number(variables.name_max);
+        return t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+      ]]]
+    label: |
+      [[[
+        const s = entity.state;
+        const v = parseFloat(s);
+        const u = entity.attributes.unit_of_measurement;
+        const text = (!isNaN(v) && /^-?[\d.]+$/.test(s))
+          ? (variables.round ? Math.round(v) : s) + (u ? ' ' + u : '')
+          : s.charAt(0).toUpperCase() + s.slice(1).replace('_', ' ');
+        const n = Number(variables.label_max);
+        return text.length <= n ? text : `<span class="mq"><span class="run"><span>${text}</span><span>${text}</span></span></span>`;
+      ]]]
   glass_person:
     section_mode: true
     show_icon: false
@@ -1683,116 +1709,83 @@ views:
                         tracker: device_tracker.bluey_location
                         onroad: input_boolean.tesla_onroad
                         charging: '[[[ return states["sensor.bluey_charging"]?.state === "Charging"; ]]]'
-                      styles:
-                        card:
-                        - height: 330px
+                      card_mod:
+                        style: 'ha-card { height: 330px; }'
                     - type: horizontal-stack
                       cards:
                       - type: custom:button-card
                         entity: sensor.bluey_battery_range
-                        name: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            return tick('Range', 13);
-                          ]]]
                         icon: mdi:gauge
-                        template: glass_chip
-                        label: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            const v = parseFloat(entity.state);
-                            const u = entity.attributes.unit_of_measurement;
-                            const text = isNaN(v) ? entity.state.charAt(0).toUpperCase() + entity.state.slice(1) : Math.round(v) + (u ? ' ' + u : '');
-                            return tick(text, 15);
-                          ]]]
-                        styles:
-                          card:
-                          - height: 54px
+                        template:
+                        - glass_chip
+                        - glass_popup_chip
+                        variables:
+                          title: Range
+                          name_max: 13
+                          label_max: 15
+                          round: true
+                        card_mod:
+                          style: 'ha-card { min-height: 54px; }'
                       - type: custom:button-card
                         entity: sensor.bluey_charge_energy_added
-                        name: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            return tick('Last Charge', 13);
-                          ]]]
                         icon: mdi:lightning-bolt
-                        template: glass_chip
-                        label: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            const u = entity.attributes.unit_of_measurement;
-                            const text = entity.state + (u ? ' ' + u : '');
-                            return tick(text, 15);
-                          ]]]
-                        styles:
-                          card:
-                          - height: 54px
+                        template:
+                        - glass_chip
+                        - glass_popup_chip
+                        variables:
+                          title: Last Charge
+                          name_max: 13
+                          label_max: 15
+                        card_mod:
+                          style: 'ha-card { min-height: 54px; }'
                     - type: horizontal-stack
                       cards:
                       - type: custom:button-card
                         entity: lock.bluey_lock
-                        name: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            return tick('Lock', 7);
-                          ]]]
                         icon: mdi:lock
-                        template: glass_chip
-                        label: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            const text = entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' ');
-                            return tick(text, 9);
-                          ]]]
+                        template:
+                        - glass_chip
+                        - glass_popup_chip
+                        variables:
+                          title: Lock
+                          name_max: 7
+                          label_max: 9
+                        card_mod:
+                          style: 'ha-card { min-height: 54px; }'
                         tap_action:
                           action: toggle
                           confirmation:
                             text: Lock or unlock Bluey?
-                        styles:
-                          card:
-                          - height: 54px
                       - type: custom:button-card
                         entity: cover.bluey_trunk
-                        name: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            return tick('Boot', 7);
-                          ]]]
                         icon: phu:tesla-trunk
-                        template: glass_chip
-                        label: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            const text = entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' ');
-                            return tick(text, 9);
-                          ]]]
+                        template:
+                        - glass_chip
+                        - glass_popup_chip
+                        variables:
+                          title: Boot
+                          name_max: 7
+                          label_max: 9
+                        card_mod:
+                          style: 'ha-card { min-height: 54px; }'
                         tap_action:
                           action: toggle
                           confirmation:
                             text: Open or close the boot?
-                        styles:
-                          card:
-                          - height: 54px
                       - type: custom:button-card
                         entity: switch.bluey_charge
-                        name: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            return tick('Charger', 7);
-                          ]]]
                         icon: mdi:ev-station
-                        template: glass_chip
-                        label: |
-                          [[[
-                            const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-                            const text = entity.state.charAt(0).toUpperCase() + entity.state.slice(1).replace('_', ' ');
-                            return tick(text, 9);
-                          ]]]
+                        template:
+                        - glass_chip
+                        - glass_popup_chip
+                        variables:
+                          title: Charger
+                          name_max: 7
+                          label_max: 9
+                        card_mod:
+                          style: 'ha-card { min-height: 54px; }'
                         tap_action:
                           action: toggle
-                        styles:
-                          card:
-                          - height: 54px
           - type: custom:button-card
             entity: binary_sensor.shanaya_room_occupancy_status
             name: Shanaya Room

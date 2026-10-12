@@ -1,0 +1,26 @@
+  glass_popup_chip:
+    section_mode: true
+    show_state: false
+    show_label: true
+    variables:
+      title: ''
+      round: false
+      name_max: 13
+      label_max: 15
+    name: |
+      [[[
+        const t = String(variables.title);
+        const n = Number(variables.name_max);
+        return t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
+      ]]]
+    label: |
+      [[[
+        const s = entity.state;
+        const v = parseFloat(s);
+        const u = entity.attributes.unit_of_measurement;
+        const text = (!isNaN(v) && /^-?[\d.]+$/.test(s))
+          ? (variables.round ? Math.round(v) : s) + (u ? ' ' + u : '')
+          : s.charAt(0).toUpperCase() + s.slice(1).replace('_', ' ');
+        const n = Number(variables.label_max);
+        return text.length <= n ? text : `<span class="mq"><span class="run"><span>${text}</span><span>${text}</span></span></span>`;
+      ]]]
