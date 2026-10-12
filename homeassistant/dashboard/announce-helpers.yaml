@@ -1,0 +1,48 @@
+# Helpers and script the Announce popup uses.
+# Add the helpers to configuration.yaml (or create the same three in Settings > Devices & services > Helpers),
+# then add the script under scripts.yaml (or Settings > Automations & scenes > Scripts > Edit in YAML).
+input_select:
+  announce_speaker:
+    name: Announce speaker
+    icon: mdi:speaker
+    options:
+      - Home
+      - Kitchen
+    initial: Home
+
+input_text:
+  announce_message:
+    name: Announce message
+    icon: mdi:message-text
+    max: 255
+
+input_number:
+  announce_volume:
+    name: Announce volume
+    icon: mdi:volume-high
+    min: 0
+    max: 100
+    step: 5
+    initial: 75
+    mode: slider
+    unit_of_measurement: '%'
+
+# scripts.yaml
+announce_from_helpers:
+  alias: Announce from helpers
+  icon: mdi:bullhorn
+  sequence:
+    - action: script.say_tts_message
+      data:
+        speakers: >-
+          {{ {'Home': 'media_player.home_speakers',
+              'Kitchen': 'media_player.kitchen_speaker'}.get(states('input_select.announce_speaker'),
+              'media_player.home_speakers') }}
+        message: "{{ states('input_text.announce_message') }}"
+        volume: "{{ states('input_number.announce_volume') | int(75) }}"
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.announce_message
+      data:
+        value: ''
+  mode: single
