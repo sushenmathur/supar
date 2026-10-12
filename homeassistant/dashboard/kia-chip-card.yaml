@@ -4,9 +4,9 @@ name: Sorento
 template: glass_chip
 show_icon: false
 triggers_update:
-  - device_tracker.kia_gps_location
-  - input_number.kia_battery_estimate
-  - sensor.kia_charger_power
+- device_tracker.kia_gps_location
+- input_number.kia_battery_estimate
+- sensor.kia_charger_power
 extra_styles: |
   @keyframes kia-ring-pulse {
     0%, 100% { filter: drop-shadow(0 0 0 rgba(16,185,129,0)); }
@@ -36,13 +36,124 @@ custom_fields:
     ]]]
 styles:
   grid:
-    - grid-template-areas: '"ring n" "ring l"'
-    - grid-template-columns: 36px minmax(0, 1fr)
-    - column-gap: 10px
+  - grid-template-areas: '"ring n" "ring l"'
+  - grid-template-columns: 36px minmax(0, 1fr)
+  - column-gap: 10px
   custom_fields:
     ring:
-      - justify-self: center
-      - align-self: center
+    - justify-self: center
+    - align-self: center
 grid_options:
   columns: 6
   rows: 1
+tap_action:
+  action: fire-dom-event
+  browser_mod:
+    service: browser_mod.popup
+    data:
+      title: Sorento
+      icon: mdi:car-electric
+      dismissable: true
+      size: normal
+      style:
+        .: |
+          :host {
+            --mdc-dialog-scrim-color: rgba(15, 20, 50, 0.45);
+            --popup-background-color: rgba(255, 255, 255, 0.35);
+          }
+        ha-dialog$: |
+          .mdc-dialog__surface {
+            background: linear-gradient(145deg, rgba(255,255,255,.55), rgba(220,230,255,.35)) !important;
+            backdrop-filter: blur(30px) saturate(190%);
+            -webkit-backdrop-filter: blur(30px) saturate(190%);
+            border: 1px solid rgba(255,255,255,.7);
+          }
+      content:
+        type: vertical-stack
+        cards:
+        - type: custom:button-card
+          entity: input_number.kia_battery_estimate
+          template: glass_vehicle
+          variables:
+            title: Kia
+            image: /api/image/serve/b0801eee9b5f2d6fcf7972d71f0d7711/512x512
+            battery: input_number.kia_battery_estimate
+            tracker: device_tracker.kia_gps_location
+            onroad: input_boolean.kia_onroad
+            charging: '[[[ return parseFloat(states["sensor.kia_charger_power"]?.state) > 10; ]]]'
+          card_mod:
+            style: 'ha-card { height: 330px; }'
+        - type: horizontal-stack
+          cards:
+          - type: custom:button-card
+            entity: sensor.kia_charger_power
+            icon: mdi:flash
+            template:
+            - glass_chip
+            - glass_popup_chip
+            variables:
+              title: Charge Power
+              name_max: 13
+              label_max: 15
+            card_mod:
+              style: 'ha-card { min-height: 54px; }'
+          - type: custom:button-card
+            entity: sensor.kia_last_charge_added
+            icon: mdi:lightning-bolt
+            template:
+            - glass_chip
+            - glass_popup_chip
+            variables:
+              title: Last Charge
+              name_max: 13
+              label_max: 15
+            card_mod:
+              style: 'ha-card { min-height: 54px; }'
+        - type: horizontal-stack
+          cards:
+          - type: custom:button-card
+            entity: switch.kia_charger
+            icon: mdi:ev-station
+            template:
+            - glass_chip
+            - glass_popup_chip
+            variables:
+              title: Charger
+              name_max: 7
+              label_max: 9
+            card_mod:
+              style: 'ha-card { min-height: 54px; }'
+            tap_action:
+              action: toggle
+          - type: custom:button-card
+            entity: input_boolean.kia_onroad
+            icon: mdi:road-variant
+            template:
+            - glass_chip
+            - glass_popup_chip
+            variables:
+              title: On Road
+              name_max: 7
+              label_max: 9
+              on_text: Driving
+              off_text: Parked
+            card_mod:
+              style: 'ha-card { min-height: 54px; }'
+            tap_action:
+              action: toggle
+          - type: custom:button-card
+            entity: binary_sensor.kia_at_home
+            icon: mdi:home-map-marker
+            template:
+            - glass_chip
+            - glass_popup_chip
+            variables:
+              title: Location
+              name_max: 7
+              label_max: 9
+              on_text: At home
+              off_text: Away
+            card_mod:
+              style: 'ha-card { min-height: 54px; }'
+            tap_action:
+              action: more-info

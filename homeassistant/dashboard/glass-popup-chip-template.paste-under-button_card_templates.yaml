@@ -7,6 +7,8 @@
       round: false
       name_max: 13
       label_max: 15
+      on_text: ''
+      off_text: ''
     name: |
       [[[
         const t = String(variables.title);
@@ -18,7 +20,8 @@
         const s = entity.state;
         const v = parseFloat(s);
         const u = entity.attributes.unit_of_measurement;
-        const text = (!isNaN(v) && /^-?[\d.]+$/.test(s))
+        const text = variables.on_text ? (s === 'on' ? variables.on_text : variables.off_text) :
+          (!isNaN(v) && /^-?[\d.]+$/.test(s))
           ? (variables.round ? Math.round(v) : s) + (u ? ' ' + u : '')
           : s.charAt(0).toUpperCase() + s.slice(1).replace('_', ' ');
         const n = Number(variables.label_max);
