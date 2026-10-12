@@ -8,6 +8,7 @@ input_select:
     options:
       - Home
       - Kitchen
+      - Media Room
     initial: Home
 
 input_text:
@@ -15,6 +16,7 @@ input_text:
     name: Announce message
     icon: mdi:message-text
     max: 255
+    initial: ''
 
 input_number:
   announce_volume:
@@ -36,7 +38,8 @@ announce_from_helpers:
       data:
         speakers: >-
           {{ {'Home': 'media_player.home_speakers',
-              'Kitchen': 'media_player.kitchen_speaker'}.get(states('input_select.announce_speaker'),
+              'Kitchen': 'media_player.kitchen_speaker',
+              'Media Room': 'media_player.media_room_speaker'}.get(states('input_select.announce_speaker'),
               'media_player.home_speakers') }}
         message: "{{ states('input_text.announce_message') }}"
         volume: "{{ states('input_number.announce_volume') | int(75) }}"
