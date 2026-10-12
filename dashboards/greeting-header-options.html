@@ -1,0 +1,65 @@
+<!doctype html><meta charset=utf-8><title>Home header: two options</title>
+<style>
+:root{--ink:#14203a;--mut:rgba(20,32,58,.62);--bd:rgba(255,255,255,.85);--hi:rgba(255,255,255,.92);--shadow:0 14px 34px rgba(60,70,130,.2)}
+*{box-sizing:border-box}body{margin:0;padding:26px 30px 50px;font-family:Inter,system-ui,Roboto,sans-serif;color:var(--ink);background:linear-gradient(160deg,#eef2fb,#e1e8f8)}
+h1{font-size:19px;margin:0 0 4px}.n{font-size:12.5px;color:var(--mut);margin:0 0 20px;max-width:1000px;line-height:1.5}
+.opt{margin:0 0 34px;padding:22px 24px 26px;border-radius:28px;background:rgba(255,255,255,.4);border:1px solid var(--bd);box-shadow:var(--shadow)}
+.opt h2{font-size:16px;margin:0 0 2px}.opt p{font-size:12.5px;color:var(--mut);margin:0 0 16px;max-width:1000px;line-height:1.5}
+.g{background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.4));border:1px solid var(--bd);box-shadow:var(--shadow),inset 0 1px 0 var(--hi);border-radius:28px;backdrop-filter:blur(20px)}
+.lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:700;margin:0 0 8px}
+.hdr{display:grid;gap:14px;align-items:stretch;width:1320px}
+.tm{font-weight:800;letter-spacing:-.03em;line-height:1}.sm{color:var(--mut)}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;font-size:15px;border:2px solid rgba(255,255,255,.9);flex:none}
+.qb{width:74px;height:84px;border-radius:24px;background:rgba(255,255,255,.6);border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;box-shadow:inset 0 1px 0 var(--hi)}
+.qb:first-child{background:linear-gradient(145deg,rgba(167,139,250,.75),rgba(109,40,217,.5));color:#fff}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:rgba(20,32,58,.07);font-size:13px;font-weight:600}
+.pop{width:620px;border-radius:32px;padding:24px 26px;background:linear-gradient(145deg,rgba(255,255,255,.85),rgba(228,236,255,.7));border:1px solid var(--bd);box-shadow:0 30px 70px rgba(30,40,100,.3)}
+.pop h3{margin:0;font-size:16px;display:flex;align-items:center;gap:8px}
+.fc{display:grid;gap:11px;margin-top:14px}.fc div{display:grid;grid-template-columns:54px 30px 1fr 96px;gap:12px;align-items:center;font-size:14px}.bar{height:7px;border-radius:4px;background:rgba(20,32,58,.1);position:relative}.bar i{position:absolute;top:0;bottom:0;border-radius:4px;background:linear-gradient(90deg,#7dd3fc,#fcd34d,#fb923c)}
+.cols{display:grid;grid-template-columns:1fr;gap:22px;align-items:start}
+.mid{width:300px;display:grid}.mid .blk{border-radius:22px;border:1px solid var(--bd);background:rgba(255,255,255,.55);margin-bottom:8px;display:grid;place-items:center;font-size:12px;color:var(--mut)}
+.gone{border:2px dashed rgba(239,68,68,.55)!important;background:rgba(239,68,68,.06)!important;color:#b91c1c!important}
+.up{border:2px solid rgba(16,185,129,.6)!important}
+</style>
+<h1>Home header: greeting card with details, smaller people cards, forecast on tap</h1>
+<p class=n>Both options remove the Brisbane clock-weather card and the India and Austin clock tiles from the middle column. The India and Austin times move into the greeting card. Tapping the greeting card opens a popup with the clock-weather card and the detailed forecast. The people cards get smaller to buy back width. Light mode shown; dark follows the Glass theme.</p>
+
+<div class=opt id=A>
+<h2>Option A: one wide greeting card, compact people</h2>
+<p>Matches your attached image: small date and greeting line, a big time, then one detail line. People cards keep their 84 px height but drop to a smaller avatar and tighter text, about 35% narrower. The row stays one line tall.</p>
+<div class=cols><div>
+<div class=lbl>Header row</div>
+<div class=hdr style="grid-template-columns:520px 190px 190px 330px">
+ <div class=g style="padding:14px 24px 14px;height:128px"><div class=sm style="font-size:12.5px;font-weight:600">Tue, 13 Oct · Good morning</div><div class=tm style="font-size:58px;margin:4px 0 6px">7:55 AM</div><div class=sm style="font-size:13px">25° Partly cloudy · India 3:24 am · Austin 4:54 pm</div></div>
+ <div class=g style="height:128px;align-self:center;padding:0 14px;display:flex;align-items:center;gap:10px;height:84px"><div class=av style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">S</div><div style="line-height:1.35"><b style="font-size:14px">Sushen</b><div class=sm style="font-size:11px">Office · 43 min</div><div style="font-size:11px;font-weight:700;color:#15803d">95% · WiFi</div></div></div>
+ <div class=g style="align-self:center;padding:0 14px;display:flex;align-items:center;gap:10px;height:84px"><div class=av style="background:linear-gradient(135deg,#f43f5e,#be123c)">P</div><div style="line-height:1.35"><b style="font-size:14px">Paro</b><div class=sm style="font-size:11px">Work · 3 hrs</div><div style="font-size:11px;font-weight:700;color:#15803d">86% · Cell</div></div></div>
+ <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end"><div class=qb>🌙<span>Good Night</span></div><div class=qb>📣<span>Announce</span></div><div class=qb>📱<span>Lost Phone</span></div><div class=qb>📶<span>WiFi</span></div><div class=qb>🤖<span>Robbie</span></div></div>
+</div>
+<div class=lbl style="margin-top:22px">Middle column: space reclaimed</div>
+<div class=mid><div class="blk gone" style="height:52px">India · Austin clocks (removed)</div><div class="blk gone" style="height:210px">Clock-weather card (removed)</div><div class="blk up" style="height:92px">Calendar moves up</div><div class="blk" style="height:48px">Vehicle chips</div></div>
+</div>
+<div><div class=lbl>On tap of the greeting card</div>
+<div class=pop><h3>📍 Brisbane</h3><div style="display:flex;align-items:center;gap:18px;margin-top:10px"><div class=tm style="font-size:60px">7:55 <span style="font-size:24px">AM</span></div><div style="margin-left:auto;text-align:right"><div style="font-size:46px">⛅</div><div style="font-size:30px;font-weight:700">25°</div><div class=sm style="font-size:13px">Partly cloudy · feels 26° · 63%</div></div></div>
+<div class=fc><div><span class=sm>Today</span><span>⛅</span><span class=bar><i style="left:20%;right:18%"></i></span><b>19° / 27°</b></div><div><span class=sm>Wed</span><span>☀️</span><span class=bar><i style="left:28%;right:12%"></i></span><b>20° / 28°</b></div><div><span class=sm>Thu</span><span>🌧</span><span class=bar><i style="left:14%;right:34%"></i></span><b>17° / 22°</b></div><div><span class=sm>Fri</span><span>⛅</span><span class=bar><i style="left:12%;right:24%"></i></span><b>16° / 25°</b></div><div><span class=sm>Sat</span><span>☀️</span><span class=bar><i style="left:18%;right:16%"></i></span><b>18° / 26°</b></div></div></div></div></div>
+</div>
+
+<div class=opt id=B>
+<h2>Option B: greeting card with weather, people as slim pills</h2>
+<p>The greeting card carries the time on the left and the weather and the two world clocks on the right as small chips, so the detail line is easier to scan. The people cards become two slim stacked pills in one column, which frees the most width. The popup adds the world clocks and sun times under the forecast.</p>
+<div class=cols><div>
+<div class=lbl>Header row</div>
+<div class=hdr style="grid-template-columns:600px 240px 330px">
+ <div class=g style="padding:16px 24px;height:112px;display:grid;grid-template-columns:1fr auto;align-items:center"><div><div class=sm style="font-size:12.5px;font-weight:600">Tue, 13 Oct · Good morning</div><div class=tm style="font-size:56px;margin-top:4px">7:55 AM</div></div><div style="text-align:right;display:grid;gap:6px;justify-items:end"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:30px">⛅</span><b style="font-size:26px">25°</b></div><div style="display:flex;gap:6px"><span class=pill>India 3:24 am</span><span class=pill>Austin 4:54 pm</span></div></div></div>
+ <div style="display:grid;gap:8px;height:112px"><div class=g style="border-radius:22px;padding:0 14px;display:flex;align-items:center;gap:10px"><div class=av style="width:32px;height:32px;font-size:13px;background:linear-gradient(135deg,#3b82f6,#1d4ed8)">S</div><b style="font-size:14px">Sushen</b><span class=sm style="font-size:12px">Office</span><span style="margin-left:auto;font-size:12px;font-weight:700;color:#15803d">95%</span></div>
+ <div class=g style="border-radius:22px;padding:0 14px;display:flex;align-items:center;gap:10px"><div class=av style="width:32px;height:32px;font-size:13px;background:linear-gradient(135deg,#f43f5e,#be123c)">P</div><b style="font-size:14px">Paro</b><span class=sm style="font-size:12px">Work</span><span style="margin-left:auto;font-size:12px;font-weight:700;color:#15803d">86%</span></div></div>
+ <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end"><div class=qb>🌙<span>Good Night</span></div><div class=qb>📣<span>Announce</span></div><div class=qb>📱<span>Lost Phone</span></div><div class=qb>📶<span>WiFi</span></div><div class=qb>🤖<span>Robbie</span></div></div>
+</div>
+<div class=lbl style="margin-top:22px">Middle column: space reclaimed</div>
+<div class=mid><div class="blk gone" style="height:52px">India · Austin clocks (removed)</div><div class="blk gone" style="height:210px">Clock-weather card (removed)</div><div class="blk up" style="height:92px">Calendar moves up</div><div class="blk" style="height:48px">Vehicle chips</div></div>
+</div>
+<div><div class=lbl>On tap of the greeting card</div>
+<div class=pop><h3>📍 Brisbane</h3><div style="display:flex;align-items:center;gap:18px;margin-top:10px"><div class=tm style="font-size:60px">7:55 <span style="font-size:24px">AM</span></div><div style="margin-left:auto;text-align:right"><div style="font-size:46px">⛅</div><div style="font-size:30px;font-weight:700">25°</div><div class=sm style="font-size:13px">Partly cloudy · feels 26° · 63%</div></div></div>
+<div style="display:flex;gap:8px;margin-top:12px"><span class=pill>🌅 Sunrise 5:31</span><span class=pill>🌇 Sunset 18:02</span><span class=pill>💨 14 km/h</span></div>
+<div class=fc><div><span class=sm>Today</span><span>⛅</span><span class=bar><i style="left:20%;right:18%"></i></span><b>19° / 27°</b></div><div><span class=sm>Wed</span><span>☀️</span><span class=bar><i style="left:28%;right:12%"></i></span><b>20° / 28°</b></div><div><span class=sm>Thu</span><span>🌧</span><span class=bar><i style="left:14%;right:34%"></i></span><b>17° / 22°</b></div><div><span class=sm>Fri</span><span>⛅</span><span class=bar><i style="left:12%;right:24%"></i></span><b>16° / 25°</b></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px"><div class=g style="border-radius:20px;padding:10px 14px;box-shadow:none"><b>India</b> <span class=sm style="font-size:13px">3:24 am</span> 🌙</div><div class=g style="border-radius:20px;padding:10px 14px;box-shadow:none"><b>Austin</b> <span class=sm style="font-size:13px">4:54 pm</span> ☀️</div></div></div></div></div>
+</div>
