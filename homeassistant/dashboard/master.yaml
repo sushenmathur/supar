@@ -267,6 +267,81 @@ button_card_templates:
     variables:
       battery: ''
       network: ''
+  glass_person_pill:
+    section_mode: true
+    show_icon: false
+    show_name: false
+    show_state: false
+    tap_action:
+      action: more-info
+    custom_fields:
+      body: |
+        [[[
+          const place = {
+            home: 'Home', not_home: 'Away', 'Sushen - Work': 'Office',
+            'Paro - Work': 'Work', Gym: 'Gym'
+          }[entity.state] || entity.state;
+          const batt = parseFloat(states[variables.battery]?.state);
+          const first = String(entity.attributes.friendly_name || '').split(' ')[0];
+          const pic = entity.attributes.entity_picture
+            ? `<img src="${entity.attributes.entity_picture}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--glass-hi);flex:none">`
+            : `<div style="width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--primary-color);color:#fff;flex:none">${first[0] || '?'}</div>`;
+          return `<div style="display:flex;align-items:center;gap:10px;width:100%;text-align:left">${pic}
+            <b style="font-size:14px;white-space:nowrap">${first}</b>
+            <span style="font-size:12px;color:var(--secondary-text-color);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${place}</span>
+            <b style="margin-left:auto;font-size:12px;color:${batt > 20 ? 'var(--glass-ok)' : 'var(--glass-bad)'}">${isNaN(batt) ? '' : Math.round(batt) + '%'}</b></div>`;
+        ]]]
+    styles:
+      card:
+        - height: 52px
+        - border-radius: 22px
+        - padding: 0 14px
+        - background: var(--glass-bg)
+        - border: 1px solid var(--glass-border)
+        - box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi)
+      grid:
+        - grid-template-areas: '"body"'
+      custom_fields:
+        body:
+          - width: 100%
+    variables:
+      battery: ''
+  glass_info_pill:
+    section_mode: true
+    show_state: false
+    show_label: false
+    variables:
+      kind: sunrise
+      icon_name: mdi:information-outline
+    icon: '[[[ return variables.icon_name; ]]]'
+    name: |
+      [[[
+        const fmt = iso => iso ? new Date(iso).toLocaleTimeString('en-AU', { timeZone: 'Australia/Brisbane', hour: 'numeric', minute: '2-digit', hour12: false }) : '–';
+        if (variables.kind === 'sunrise') return 'Sunrise ' + fmt(states['sun.sun']?.attributes?.next_rising);
+        if (variables.kind === 'sunset') return 'Sunset ' + fmt(states['sun.sun']?.attributes?.next_setting);
+        const a = states['weather.north_lakes_weather']?.attributes || {};
+        return a.wind_speed !== undefined ? 'Wind ' + Math.round(a.wind_speed) + ' ' + (a.wind_speed_unit || 'km/h') : 'Wind –';
+      ]]]
+    styles:
+      card:
+        - height: 40px
+        - border-radius: 20px
+        - padding: 0 14px
+        - background: var(--glass-bg-soft)
+        - border: 1px solid var(--glass-border)
+        - box-shadow: inset 0 1px 0 var(--glass-hi)
+      grid:
+        - grid-template-areas: '"i n"'
+        - grid-template-columns: 22px 1fr
+        - column-gap: 8px
+      icon:
+        - width: 18px
+        - color: var(--primary-text-color)
+      name:
+        - justify-self: start
+        - font-size: 13px
+        - font-weight: 600
+        - color: var(--primary-text-color)
   world_clock:
     icon: |-
       [[[ return states[variables.daytime]?.state === 'on'
@@ -824,52 +899,138 @@ views:
             cards:
               - type: custom:button-card
                 card_mod:
-                  style: ':host { flex: 0.6 1 0 !important; }'
-                triggers_update: all
+                  style: ':host { flex: 1.6 1 0 !important; }'
+                triggers_update:
+                - sensor.time
+                - weather.north_lakes_weather
                 show_icon: false
                 show_name: false
                 show_state: false
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    service: browser_mod.popup
+                    data:
+                      title: Brisbane
+                      icon: mdi:weather-partly-cloudy
+                      dismissable: true
+                      size: normal
+                      content:
+                        type: vertical-stack
+                        cards:
+                        - type: custom:clock-weather-card
+                          entity: weather.north_lakes_weather
+                          name: Brisbane
+                          sun_entity: sun.sun
+                          date_pattern: ccc, d MMM yyyy
+                          forecast_rows: 5
+                          show_humidity: true
+                          use_browser_time: true
+                          weather_icon_type: fill
+                        - type: horizontal-stack
+                          cards:
+                          - type: custom:button-card
+                            template: glass_info_pill
+                            variables:
+                              kind: sunrise
+                              icon_name: mdi:weather-sunset-up
+                            triggers_update:
+                            - sun.sun
+                          - type: custom:button-card
+                            template: glass_info_pill
+                            variables:
+                              kind: sunset
+                              icon_name: mdi:weather-sunset-down
+                            triggers_update:
+                            - sun.sun
+                          - type: custom:button-card
+                            template: glass_info_pill
+                            variables:
+                              kind: wind
+                              icon_name: mdi:weather-windy
+                            triggers_update:
+                            - weather.north_lakes_weather
+                        - type: horizontal-stack
+                          cards:
+                          - type: custom:button-card
+                            name: India
+                            template: world_clock
+                            variables:
+                              daytime: binary_sensor.hyd_daytime
+                              tz: Asia/Kolkata
+                          - type: custom:button-card
+                            name: Austin
+                            template: world_clock
+                            variables:
+                              daytime: binary_sensor.austin_daytime
+                              tz: America/Chicago
                 custom_fields:
                   body: |
                     [[[
-                      const d = new Date();
                       const tz = { timeZone: 'Australia/Brisbane' };
-                      const h = parseInt(d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', hour12: false }));
+                      const d = new Date();
+                      const h = parseInt(d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', hour12: false })) % 24;
                       const hello = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-                      const date = d.toLocaleDateString('en-AU', { ...tz, weekday: 'short', day: 'numeric', month: 'short' });
-                      return `<div style="text-align:left">
-                        <div style="font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--secondary-text-color)">${date}</div>
-                        <div style="font-size:20px;font-weight:600;letter-spacing:-.02em;margin-top:2px;white-space:nowrap">${hello}</div>
-                      </div>`;
+                      const wd = d.toLocaleDateString('en-AU', { ...tz, weekday: 'short' });
+                      const dm = d.toLocaleDateString('en-AU', { ...tz, day: 'numeric', month: 'short' });
+                      const clock = (zone, up) => {
+                        const t = d.toLocaleTimeString('en-AU', { timeZone: zone, hour: 'numeric', minute: '2-digit', hour12: true });
+                        return up ? t.replace(/\s?([ap])m$/i, (x, y) => ' ' + y.toUpperCase() + 'M') : t;
+                      };
+                      const w = states['weather.north_lakes_weather'];
+                      const cond = w ? w.state : '';
+                      const t = parseFloat(w?.attributes?.temperature);
+                      const icons = { sunny: ['weather-sunny', '#ffc53d'], 'clear-night': ['weather-night', '#a5b4fc'], partlycloudy: ['weather-partly-cloudy', '#ffc53d'],
+                        cloudy: ['weather-cloudy', '#94a3b8'], rainy: ['weather-rainy', '#60a5fa'], pouring: ['weather-pouring', '#3b82f6'],
+                        lightning: ['weather-lightning', '#fbbf24'], 'lightning-rainy': ['weather-lightning-rainy', '#a78bfa'], snowy: ['weather-snowy', '#7dd3fc'],
+                        fog: ['weather-fog', '#94a3b8'], hail: ['weather-hail', '#7dd3fc'], windy: ['weather-windy', '#5eead4'] };
+                      const [wi, wc] = icons[cond] || ['weather-cloudy', '#94a3b8'];
+                      const pill = s => `<span style="display:inline-flex;padding:5px 11px;border-radius:99px;background:rgba(var(--rgb-primary-text-color),0.07);font-size:13px;font-weight:600;white-space:nowrap">${s}</span>`;
+                      return `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:16px;width:100%;text-align:left">
+                        <div>
+                          <div style="font-size:12.5px;font-weight:600;color:var(--secondary-text-color);white-space:nowrap">${wd}, ${dm} · ${hello}</div>
+                          <div style="font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:4px;white-space:nowrap">${clock('Australia/Brisbane', true)}</div>
+                        </div>
+                        <div style="display:grid;gap:6px;justify-items:end">
+                          <div style="display:flex;align-items:center;gap:8px">
+                            <ha-icon icon="mdi:${wi}" style="display:block;width:32px;height:32px;--mdc-icon-size:32px;color:${wc}"></ha-icon>
+                            <b style="font-size:26px;letter-spacing:-.02em">${isNaN(t) ? '–' : Math.round(t)}°</b>
+                          </div>
+                          <div style="display:flex;gap:6px">${pill('India ' + clock('Asia/Kolkata'))}${pill('Austin ' + clock('America/Chicago'))}</div>
+                        </div></div>`;
                     ]]]
                 styles:
                   card:
-                    - height: 84px
-                    - border-radius: 28px
-                    - padding: 0 30px
+                  - height: 112px
+                  - border-radius: 28px
+                  - padding: 0 24px
                   grid:
-                    - grid-template-areas: '"body"'
+                  - grid-template-areas: '"body"'
                   custom_fields:
                     body:
-                      - width: 100%
+                    - width: 100%
               - type: grid
-                columns: 2
+                columns: 1
                 square: false
                 cards:
-                  - type: custom:button-card
-                    entity: person.sushenmathur
-                    template: glass_person
-                    variables:
-                      battery: sensor.iphone_battery_level
-                      network: sensor.iphone_connection_type
-                  - type: custom:button-card
-                    entity: person.paro
-                    template: glass_person
-                    variables:
-                      battery: sensor.paro_phone_battery
-                      network: sensor.iphone_connection_type
+                - type: custom:button-card
+                  entity: person.sushenmathur
+                  template: glass_person_pill
+                  triggers_update:
+                  - person.sushenmathur
+                  - sensor.iphone_battery_level
+                  variables:
+                    battery: sensor.iphone_battery_level
+                - type: custom:button-card
+                  entity: person.paro
+                  template: glass_person_pill
+                  triggers_update:
+                  - person.paro
+                  - sensor.paro_phone_battery
+                  variables:
+                    battery: sensor.paro_phone_battery
                 card_mod:
-                  style: ':host { flex: 1.25 1 0 !important; }'
+                  style: ':host { flex: 0.8 1 0 !important; }'
               - type: grid
                 columns: 5
                 square: false
@@ -1190,7 +1351,7 @@ views:
                                     target:
                                       entity_id: button.robbie_hallways
                 card_mod:
-                  style: ':host { flex: 1.35 1 0 !important; }'
+                  style: ':host { flex: 1.2 1 0 !important; }'
           - type: grid
             columns: 6
             square: false
@@ -1526,35 +1687,6 @@ views:
               rows: 2
       - type: grid
         cards:
-          - type: custom:button-card
-            name: India
-            template: world_clock
-            variables:
-              daytime: binary_sensor.hyd_daytime
-              tz: Asia/Kolkata
-            grid_options:
-              columns: 6
-              rows: 1
-          - type: custom:button-card
-            name: Austin
-            template: world_clock
-            variables:
-              daytime: binary_sensor.austin_daytime
-              tz: America/Chicago
-            grid_options:
-              columns: 6
-              rows: 1
-          - type: custom:clock-weather-card
-            entity: weather.north_lakes_weather
-            name: Brisbane
-            sun_entity: sun.sun
-            date_pattern: ccc, d MMM yyyy
-            forecast_rows: 3
-            show_humidity: true
-            use_browser_time: true
-            weather_icon_type: fill
-            grid_options:
-              columns: full
           - type: custom:calendar-card-pro
             entities:
               - calendar.supar_family
