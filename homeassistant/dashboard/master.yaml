@@ -1603,11 +1603,48 @@ views:
           - type: custom:button-card
             entity: device_tracker.bluey_location
             name: Bluey
-            icon: phu:tesla-icon
             template: glass_chip
-            label: >-
-              [[[ return entity.state === "home" ? "Home" : entity.state ===
-              "not_home" ? "Away" : entity.state; ]]]
+            show_icon: false
+            triggers_update:
+              - device_tracker.bluey_location
+              - sensor.bluey_battery_level
+              - sensor.bluey_charging
+            extra_styles: |
+              @keyframes bluey-ring-pulse {
+                0%, 100% { filter: drop-shadow(0 0 0 rgba(16,185,129,0)); }
+                50% { filter: drop-shadow(0 0 6px rgba(16,185,129,.9)); }
+              }
+              @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+            label: |
+              [[[
+                const place = entity.state === 'home' ? 'Home' : entity.state === 'not_home' ? 'Away' : entity.state;
+                const pct = parseFloat(states['sensor.bluey_battery_level']?.state);
+                const charging = states['sensor.bluey_charging']?.state === 'Charging';
+                if (isNaN(pct)) return place;
+                return `${place} · ${Math.round(pct)}%${charging ? ' · charging' : ''}`;
+              ]]]
+            custom_fields:
+              ring: |
+                [[[
+                  const pct = parseFloat(states['sensor.bluey_battery_level']?.state);
+                  const has = !isNaN(pct);
+                  const p = has ? Math.max(0, Math.min(100, pct)) : 0;
+                  const col = !has ? 'var(--divider-color)' : p < 20 ? '#ef4444' : p < 50 ? '#f59e0b' : '#10b981';
+                  const charging = states['sensor.bluey_charging']?.state === 'Charging';
+                  return `<div style="position:relative;width:34px;height:34px;${charging ? 'animation:bluey-ring-pulse 1.6s ease-in-out infinite' : ''}">
+                    <div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(${col} ${p * 3.6}deg, rgba(var(--rgb-primary-text-color),0.15) 0);-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px))"></div>
+                    <ha-icon icon="phu:tesla-icon" style="position:absolute;left:50%;top:50%;margin:-8px 0 0 -8px;width:16px;height:16px;--mdc-icon-size:16px;color:var(--primary-text-color);display:block"></ha-icon>
+                  </div>`;
+                ]]]
+            styles:
+              grid:
+                - grid-template-areas: '"ring n" "ring l"'
+                - grid-template-columns: 36px minmax(0, 1fr)
+                - column-gap: 10px
+              custom_fields:
+                ring:
+                  - justify-self: center
+                  - align-self: center
             grid_options:
               columns: 6
               rows: 1
