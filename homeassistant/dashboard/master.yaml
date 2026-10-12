@@ -2065,6 +2065,58 @@ views:
             grid_options:
               columns: 6
               rows: 1
+          - type: picture-entity
+            entity: camera.front_door_snapshot_2
+            name: Front Door
+            camera_view: auto
+            show_name: true
+            show_state: false
+            fit_mode: cover
+            grid_options:
+              columns: 12
+              rows: 3
+            card_mod:
+              style: 'ha-card { overflow: hidden; }'
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  title: Front Door
+                  icon: mdi:door
+                  dismissable: true
+                  size: normal
+                  content:
+                    type: vertical-stack
+                    cards:
+                    - type: picture-entity
+                      entity: camera.front_door_live_view_2
+                      camera_view: live
+                      fit_mode: cover
+                      show_name: false
+                      show_state: false
+                      tap_action:
+                        action: none
+                    - type: custom:button-card
+                      name: Open Security dashboard
+                      icon: mdi:shield-home
+                      template: glass_action
+                      tap_action:
+                        action: perform-action
+                        perform_action: browser_mod.sequence
+                        data:
+                          sequence:
+                          - service: browser_mod.close_popup
+                          - service: browser_mod.navigate
+                            data:
+                              path: /dashboard-hub/security
+                      styles:
+                        card:
+                        - height: 56px
+                        - border-radius: 20px
+                        - background: var(--glass-bg-soft)
+                        - border: 1px solid var(--glass-border)
+                        - box-shadow: inset 0 1px 0 var(--glass-hi)
       - type: grid
         cards:
           - type: custom:wheelie-bin-card
