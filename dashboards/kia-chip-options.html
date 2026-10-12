@@ -1,0 +1,40 @@
+<!doctype html><meta charset=utf-8><title>Kia chip battery options</title>
+<style>
+:root{--ink:#14203a;--mut:rgba(20,32,58,.62);--soft:rgba(255,255,255,.55);--bd:rgba(255,255,255,.85);--hi:rgba(255,255,255,.9);--ok:#15803d;--bad:#be123c;--track:rgba(20,32,58,.12)}
+.dark{--ink:#fff;--mut:rgba(255,255,255,.62);--soft:rgba(255,255,255,.1);--bd:rgba(255,255,255,.22);--hi:rgba(255,255,255,.3);--ok:#6ee7b7;--bad:#fb7185;--track:rgba(255,255,255,.16)}
+body{margin:0;padding:24px;font-family:Inter,system-ui,Roboto,sans-serif;background:#e8edf8;color:#14203a}
+h2{font-size:15px;margin:0 0 4px}.n{font-size:12.5px;color:rgba(20,32,58,.65);margin:0 0 16px}
+.grid{display:grid;grid-template-columns:150px repeat(2,1fr);gap:14px 22px;align-items:center}
+.lab{font-size:12.5px;font-weight:700}.lab span{display:block;font-weight:500;color:rgba(20,32,58,.6);margin-top:2px}
+.pan{padding:14px;border-radius:20px;background:linear-gradient(160deg,#eef2fb,#e1e8f8)}.pan.dark{background:linear-gradient(160deg,#0b1020,#14203a);}
+.chip{position:relative;height:48px;border-radius:22px;padding:0 14px;display:grid;grid-template-columns:30px 1fr auto;column-gap:11px;align-items:center;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);color:var(--ink);overflow:hidden}
+.ic{grid-row:1/3;width:22px;height:22px;display:grid;place-items:center}
+.t{font-size:14px;font-weight:700;align-self:end;line-height:1.1}.l{font-size:12px;color:var(--mut);align-self:start;line-height:1.2}
+.chip>.t,.chip>.l{grid-column:2}
+.pct{grid-column:3;grid-row:1/3;font-size:13px;font-weight:700}
+.pill{grid-column:3;grid-row:1/3;display:flex;align-items:center;gap:6px;padding:4px 9px;border-radius:12px;background:var(--track);font-size:12.5px;font-weight:700}
+.bat{width:20px;height:10px;border:1.5px solid currentColor;border-radius:3px;position:relative;opacity:.95}.bat:after{content:'';position:absolute;right:-4px;top:2px;width:2px;height:4px;background:currentColor;border-radius:0 1px 1px 0}.bat i{position:absolute;left:1px;top:1px;bottom:1px;border-radius:1px;background:currentColor}
+.bar{position:absolute;left:14px;right:14px;bottom:6px;height:4px;border-radius:2px;background:var(--track);overflow:hidden}.bar i{display:block;height:100%;border-radius:2px}
+.ring{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;grid-row:1/3;margin-left:-4px}.ring b{width:22px;height:22px;border-radius:50%;background:var(--ringbg);display:grid;place-items:center}
+.dark .ring b{--ringbg:#1b2540}.ring b{--ringbg:#f1f5fd}
+.chg{animation:sh 1.6s linear infinite;background-size:200% 100%!important}
+@keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
+.zap{font-size:11px;margin-left:2px}
+svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<h2>Kia chip: battery level options</h2>
+<p class=n>Same chip size and layout as today. The car icon, name and location stay put. Shown at 82% parked, 82% charging, and 14% low, in light and dark.</p>
+<div class=grid id=g></div>
+<script>
+const car='<svg viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5M3 16h18M7 16v2M17 16v2"/><circle cx="8" cy="13" r=".6"/><circle cx="16" cy="13" r=".6"/></svg>';
+const col=p=>p<20?'var(--bad)':p<50?'#f59e0b':'var(--ok)';
+const bat=(p,c)=>`<span class=bat style="color:${c}"><i style="width:${Math.max(6,p*.15)}px"></i></span>`;
+const S=[[82,0],[82,1],[14,0]];
+const O=[
+ ['A. Battery pill on the right','Small battery icon + %, colour by level. Layout otherwise identical.',(p,ch)=>`<div class=chip><div class=ic>${car}</div><div class=t>Sorento</div><div class=l>Home</div><div class=pill style="color:${col(p)}">${bat(p,col(p))}${p}%${ch?'<span class=zap>⚡</span>':''}</div></div>`],
+ ['B. Percent in the label','No new element. Label reads "Home · 82%", percent coloured. Charging adds a bolt.',(p,ch)=>`<div class=chip style="grid-template-columns:30px 1fr"><div class=ic>${car}</div><div class=t>Sorento</div><div class=l>Home · <b style="color:${col(p)}">${p}%${ch?' ⚡':''}</b></div></div>`],
+ ['C. Battery bar along the bottom','Thin progress line under the text with % at right. Shimmers while charging.',(p,ch)=>`<div class=chip style="padding-bottom:4px"><div class=ic>${car}</div><div class=t>Sorento</div><div class=l>Home</div><div class=pct style="color:${col(p)}">${p}%${ch?' ⚡':''}</div><div class=bar><i class="${ch?'chg':''}" style="width:${p}%;background:${ch?`linear-gradient(90deg,${col(p)},#fff8,${col(p)})`:col(p)}"></i></div></div>`],
+ ['D. Ring around the car icon','The icon sits in a circular gauge; the % is in the label. Most compact.',(p,ch)=>`<div class=chip style="grid-template-columns:34px 1fr"><div class=ring style="background:conic-gradient(${col(p)} ${p*3.6}deg,var(--track) 0)"><b>${car.replace('<svg','<svg style="width:15px;height:15px"')}</b></div><div class=t>Sorento</div><div class=l>Home · ${p}%${ch?' · charging':''}</div></div>`]
+];
+g.innerHTML=O.map(o=>`<div class=lab>${o[0]}<span>${o[1]}</span></div>`+['',' dark'].map(t=>`<div class="pan${t}"><div class="${t.trim()}" style="display:grid;gap:8px">${S.map(s=>o[2](s[0],s[1])).join('')}</div></div>`).join('')).join('');
+</script>
