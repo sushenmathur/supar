@@ -12,9 +12,9 @@ button_card_templates:
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
         mask-image: linear-gradient(90deg, transparent 0, #000 6px, #000 calc(100% - 10px), transparent 100%);
       }
-      .run { display: inline-flex; animation: tick 9s linear 2s 1; }
+      .run { display: inline-flex; animation: tick 24s linear infinite; }
       .run span { padding-right: 28px; }
-      @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      @keyframes tick { 0%, 8% { transform: translateX(0); } 45%, 100% { transform: translateX(-50%); } }
       @media (prefers-reduced-motion: reduce) {
         .run { animation: none; }
         .run span + span { display: none; }
@@ -42,6 +42,12 @@ button_card_templates:
         - font-size: 12px
         - font-weight: 600
         - color: var(--primary-text-color)
+        - white-space: normal
+        - overflow: visible
+        - text-overflow: clip
+        - text-align: center
+        - line-height: 1.1
+        - padding: 0 2px
   room_tile:
     template:
       - ticker
@@ -401,7 +407,7 @@ button_card_templates:
         [[[
           const pct = parseFloat(states[variables.battery]?.state);
           const has = !isNaN(pct);
-          const col = !has ? 'var(--divider-color)' : pct < 20 ? 'var(--glass-level-low)' : pct < 50 ? 'var(--glass-level-warn)' : 'var(--glass-level-ok)';
+          const col = !has ? 'var(--divider-color)' : pct < 20 ? 'var(--glass-level-low, #ef4444)' : pct < 50 ? 'var(--glass-level-warn, #f59e0b)' : 'var(--glass-level-ok, #10b981)';
           const loc = states[variables.tracker]?.state;
           const place = !loc || loc === 'unknown' || loc === 'unavailable' ? 'Unknown'
             : loc === 'home' ? 'Home' : loc === 'not_home' ? 'Away' : loc;
@@ -896,9 +902,9 @@ views:
                   - background: |
                       [[[
                         const p = variables.alerts[0]?.p || 3;
-                        return p === 1 ? 'var(--glass-alert-high)'
-                          : p === 2 ? 'var(--glass-alert-mid)'
-                          : 'var(--glass-alert-low)';
+                        return p === 1 ? 'var(--glass-alert-high, linear-gradient(135deg, rgba(244,63,94,0.92), rgba(190,18,60,0.88)))'
+                          : p === 2 ? 'var(--glass-alert-mid, linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.88)))'
+                          : 'var(--glass-alert-low, linear-gradient(135deg, rgba(71,85,105,0.92), rgba(51,65,85,0.90)))';
                       ]]]
                   - border: 1px solid rgba(255,255,255,.45)
                   - animation: "[[[ return (variables.alerts[0]?.p || 3) === 1 ? 'alert-pulse 2.4s ease-in-out infinite' : 'none'; ]]]"
@@ -924,7 +930,7 @@ views:
             cards:
               - type: custom:button-card
                 card_mod:
-                  style: ':host { flex: 1.6 1 0 !important; }'
+                  style: ':host { flex: 1.8 1 0 !important; }'
                 triggers_update:
                 - sensor.time
                 - weather.north_lakes_weather
@@ -1021,11 +1027,11 @@ views:
                         lightning: ['weather-lightning', '#fbbf24'], 'lightning-rainy': ['weather-lightning-rainy', '#a78bfa'], snowy: ['weather-snowy', '#7dd3fc'],
                         fog: ['weather-fog', '#94a3b8'], hail: ['weather-hail', '#7dd3fc'], windy: ['weather-windy', '#5eead4'] };
                       const [wi, wc] = icons[cond] || ['weather-cloudy', '#94a3b8'];
-                      const pill = s => `<span style="display:inline-flex;padding:5px 11px;border-radius:99px;background:rgba(var(--rgb-primary-text-color),0.07);font-size:13px;font-weight:600;white-space:nowrap">${s}</span>`;
-                      return `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:16px;width:100%;text-align:left">
+                      const pill = s => `<span style="display:inline-flex;padding:4px 10px;border-radius:99px;background:rgba(var(--rgb-primary-text-color),0.07);font-size:12.5px;font-weight:600;white-space:nowrap">${s}</span>`;
+                      return `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;width:100%;text-align:left">
                         <div>
                           <div style="font-size:12.5px;font-weight:600;color:var(--secondary-text-color);white-space:nowrap">${hello} · ${ord(dayNum)} ${month}${condText ? ' · ' + condText : ''}</div>
-                          <div style="font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:4px;white-space:nowrap">${clock('Australia/Brisbane', true)}</div>
+                          <div style="font-size:50px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:4px;white-space:nowrap">${clock('Australia/Brisbane', true)}</div>
                         </div>
                         <div style="display:grid;gap:6px;justify-items:end">
                           <div style="display:flex;align-items:center;gap:8px">
@@ -1066,7 +1072,7 @@ views:
                   variables:
                     battery: sensor.paro_phone_battery
                 card_mod:
-                  style: ':host { flex: 0.8 1 0 !important; }'
+                  style: ':host { flex: 0.78 1 0 !important; }'
               - type: grid
                 columns: 5
                 square: false
@@ -1107,14 +1113,14 @@ views:
                               style:
                                 .: |
                                   :host {
-                                    --mdc-dialog-scrim-color: var(--glass-popup-scrim);
+                                    --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
                                   }
                                 ha-dialog$: |
                                   .mdc-dialog__surface {
-                                    background: var(--glass-popup-bg) !important;
+                                    background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
                                     backdrop-filter: blur(30px) saturate(190%);
                                     -webkit-backdrop-filter: blur(30px) saturate(190%);
-                                    border: 1px solid var(--glass-popup-border);
+                                    border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
                                   }
                               content:
                                 type: vertical-stack
@@ -1130,7 +1136,7 @@ views:
                                     name: ' '
                                     icon: mdi:speaker-multiple
                                   card_mod:
-                                    style: 'ha-card { background: var(--glass-chip-blue); border: 1px solid var(--glass-popup-border); box-shadow: inset 0 1px 0 var(--glass-hi); backdrop-filter: blur(18px) saturate(180%); }'
+                                    style: 'ha-card { background: var(--glass-chip-blue, linear-gradient(145deg, rgba(125,211,252,0.30), rgba(167,139,250,0.24))); border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80)); box-shadow: inset 0 1px 0 var(--glass-hi); backdrop-filter: blur(18px) saturate(180%); }'
                                 - type: heading
                                   heading: Message
                                   heading_style: subtitle
@@ -1141,7 +1147,7 @@ views:
                                   - entity: input_text.announce_message
                                     name: ' '
                                   card_mod:
-                                    style: 'ha-card { background: var(--glass-chip-blue); border: 1px solid var(--glass-popup-border); box-shadow: inset 0 1px 0 var(--glass-hi); backdrop-filter: blur(18px) saturate(180%); }'
+                                    style: 'ha-card { background: var(--glass-chip-blue, linear-gradient(145deg, rgba(125,211,252,0.30), rgba(167,139,250,0.24))); border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80)); box-shadow: inset 0 1px 0 var(--glass-hi); backdrop-filter: blur(18px) saturate(180%); }'
                                 - type: heading
                                   heading: Volume
                                   heading_style: subtitle
@@ -1152,7 +1158,7 @@ views:
                                   - entity: input_number.announce_volume
                                     name: ' '
                                   card_mod:
-                                    style: 'ha-card { background: var(--glass-chip-blue); border: 1px solid var(--glass-popup-border); box-shadow: inset 0 1px 0 var(--glass-hi); backdrop-filter: blur(18px) saturate(180%); }'
+                                    style: 'ha-card { background: var(--glass-chip-blue, linear-gradient(145deg, rgba(125,211,252,0.30), rgba(167,139,250,0.24))); border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80)); box-shadow: inset 0 1px 0 var(--glass-hi); backdrop-filter: blur(18px) saturate(180%); }'
                                 - type: horizontal-stack
                                   cards:
                                   - type: custom:button-card
@@ -1164,8 +1170,8 @@ views:
                                       card:
                                       - height: 54px
                                       - border-radius: 20px
-                                      - background: var(--glass-chip-blue)
-                                      - border: 1px solid var(--glass-popup-border)
+                                      - background: var(--glass-chip-blue, linear-gradient(145deg, rgba(125,211,252,0.30), rgba(167,139,250,0.24)))
+                                      - border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80))
                                       - backdrop-filter: blur(18px)
                                       name:
                                       - font-weight: 700
@@ -1183,8 +1189,8 @@ views:
                                       card:
                                       - height: 54px
                                       - border-radius: 20px
-                                      - background: var(--glass-accent)
-                                      - border: 1px solid var(--glass-popup-border)
+                                      - background: var(--glass-accent, linear-gradient(135deg, #7dd3fc, #818cf8))
+                                      - border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80))
                                       - backdrop-filter: blur(18px)
                                       name:
                                       - font-weight: 700
@@ -1258,8 +1264,8 @@ views:
                       } 50% { transform: scale(1.2); } }
 
                       @keyframes robbie-glow {
-                        0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--glass-robbie) 0%, transparent), inset 0 1px 0 var(--glass-hi); }
-                        50% { box-shadow: 0 0 22px 3px color-mix(in srgb, var(--glass-robbie) 55%, transparent), inset 0 1px 0 var(--glass-hi); }
+                        0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--glass-robbie, #2dd4bf) 0%, transparent), inset 0 1px 0 var(--glass-hi); }
+                        50% { box-shadow: 0 0 22px 3px color-mix(in srgb, var(--glass-robbie, #2dd4bf) 55%, transparent), inset 0 1px 0 var(--glass-hi); }
                       }
 
                       @media (prefers-reduced-motion: reduce) { * { animation:
@@ -1272,12 +1278,12 @@ views:
                             ]]]
                         - border-color: >
                             [[[ return entity.state === 'docked' ?
-                            'var(--glass-border)' : 'color-mix(in srgb, var(--glass-robbie) 70%, transparent)'; ]]]
+                            'var(--glass-border)' : 'color-mix(in srgb, var(--glass-robbie, #2dd4bf) 70%, transparent)'; ]]]
                       icon:
                         - transform-origin: center
                         - color: >
                             [[[ return entity.state === 'docked' ?
-                            'var(--primary-text-color)' : 'var(--glass-robbie)'; ]]]
+                            'var(--primary-text-color)' : 'var(--glass-robbie, #2dd4bf)'; ]]]
                         - animation: |
                             [[[
                               const s = entity.state;
@@ -1311,9 +1317,9 @@ views:
                                     {% endif %}
 
                                     @keyframes robbie-pulse { 0%, 100% {
-                                    box-shadow: 0 0 0 0 color-mix(in srgb, var(--glass-robbie) 0%, transparent); }
+                                    box-shadow: 0 0 0 0 color-mix(in srgb, var(--glass-robbie, #2dd4bf) 0%, transparent); }
                                     50% { box-shadow: 0 0 18px 4px
-                                    color-mix(in srgb, var(--glass-robbie) 55%, transparent); } }
+                                    color-mix(in srgb, var(--glass-robbie, #2dd4bf) 55%, transparent); } }
                                   .: >
                                     {% if not is_state('vacuum.robbie',
                                     'docked') %}
@@ -1386,7 +1392,7 @@ views:
                                     target:
                                       entity_id: button.robbie_hallways
                 card_mod:
-                  style: ':host { flex: 1.2 1 0 !important; }'
+                  style: ':host { flex: 1.15 1 0 !important; }'
           - type: grid
             columns: 6
             square: false
@@ -1500,10 +1506,17 @@ views:
                   [[[ const w = states['sensor.washer_current_status']?.state;
                       const d = states['sensor.dryer_current_status']?.state;
                       const on = s => s && !['power_off','unavailable','unknown'].includes(s);
-                      if (on(w) && on(d)) return 'Washer & dryer running';
-                      if (on(w)) return 'Washer running';
-                      if (on(d)) return 'Dryer running';
-                      return 'Idle'; ]]]
+                      const text = on(w) && on(d) ? 'Washer & dryer running' : on(w) ? 'Washer running' : on(d) ? 'Dryer running' : 'Idle';
+                      if (text.length <= 11) return text;
+                      return `<span class="mq"><span class="run"><span>${text}</span><span>${text}</span></span></span>`; ]]]
+                styles:
+                  label:
+                    - width: 100%
+                    - min-width: 0
+                    - overflow: hidden
+                    - display: flex
+                    - align-items: center
+                    - white-space: nowrap
                 tap_action:
                   action: navigate
                   navigation_path: /dashboard-hub/laundry
@@ -1824,7 +1837,7 @@ views:
                   const pct = parseFloat(states['input_number.kia_battery_estimate']?.state);
                   const has = !isNaN(pct);
                   const p = has ? Math.max(0, Math.min(100, pct)) : 0;
-                  const col = !has ? 'var(--divider-color)' : p < 20 ? 'var(--glass-level-low)' : p < 50 ? 'var(--glass-level-warn)' : 'var(--glass-level-ok)';
+                  const col = !has ? 'var(--divider-color)' : p < 20 ? 'var(--glass-level-low, #ef4444)' : p < 50 ? 'var(--glass-level-warn, #f59e0b)' : 'var(--glass-level-ok, #10b981)';
                   const charging = parseFloat(states['sensor.kia_charger_power']?.state) > 10;
                   return `<div style="position:relative;width:34px;height:34px;${charging ? 'animation:kia-ring-pulse 1.6s ease-in-out infinite' : ''}">
                     <div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(${col} ${p * 3.6}deg, rgba(var(--rgb-primary-text-color),0.15) 0);-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px))"></div>
@@ -1855,14 +1868,14 @@ views:
                   style:
                     .: |
                       :host {
-                        --mdc-dialog-scrim-color: var(--glass-popup-scrim);
+                        --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
                       }
                     ha-dialog$: |
                       .mdc-dialog__surface {
-                        background: var(--glass-popup-bg) !important;
+                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
                         backdrop-filter: blur(30px) saturate(190%);
                         -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border);
+                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
                       }
                   content:
                     type: vertical-stack
@@ -1987,7 +2000,7 @@ views:
                   const pct = parseFloat(states['sensor.bluey_battery_level']?.state);
                   const has = !isNaN(pct);
                   const p = has ? Math.max(0, Math.min(100, pct)) : 0;
-                  const col = !has ? 'var(--divider-color)' : p < 20 ? 'var(--glass-level-low)' : p < 50 ? 'var(--glass-level-warn)' : 'var(--glass-level-ok)';
+                  const col = !has ? 'var(--divider-color)' : p < 20 ? 'var(--glass-level-low, #ef4444)' : p < 50 ? 'var(--glass-level-warn, #f59e0b)' : 'var(--glass-level-ok, #10b981)';
                   const charging = states['sensor.bluey_charging']?.state === 'Charging';
                   return `<div style="position:relative;width:34px;height:34px;${charging ? 'animation:bluey-ring-pulse 1.6s ease-in-out infinite' : ''}">
                     <div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(${col} ${p * 3.6}deg, rgba(var(--rgb-primary-text-color),0.15) 0);-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px))"></div>
@@ -2018,14 +2031,14 @@ views:
                   style:
                     .: |
                       :host {
-                        --mdc-dialog-scrim-color: var(--glass-popup-scrim);
+                        --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
                       }
                     ha-dialog$: |
                       .mdc-dialog__surface {
-                        background: var(--glass-popup-bg) !important;
+                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
                         backdrop-filter: blur(30px) saturate(190%);
                         -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border);
+                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
                       }
                   content:
                     type: vertical-stack
@@ -2338,6 +2351,7 @@ views:
           - type: custom:mushroom-alarm-control-panel-card
             entity: alarm_control_panel.home_alarm
             name: Home Alarm
+            icon: mdi:shield-home
             states:
               - armed_home
               - armed_away
