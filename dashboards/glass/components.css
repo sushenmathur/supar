@@ -1,0 +1,150 @@
+/* Glass components. Uses var(--glass-*) from tokens.css only: no hex, no rgba() literals except in the fallback and grain rules below. */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; }
+body {
+  font-family: var(--glass-font);
+  font-size: var(--glass-fs-body);
+  font-weight: 450;
+  color: var(--glass-ink);
+  background: var(--glass-page);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -.005em;
+  text-wrap: pretty;
+}
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* ---------- mock chrome (not part of the HA theme) ---------- */
+.bar {
+  position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: var(--glass-s2); align-items: center;
+  padding: var(--glass-s3) var(--glass-s4); background: var(--glass-solid-fallback);
+  border-bottom: 1px solid var(--glass-hairline); font-size: var(--glass-fs-label);
+}
+.bar b { font-weight: 600; margin-right: auto; }
+.bar button, .btn {
+  font: inherit; font-weight: 550; color: var(--glass-ink); cursor: pointer;
+  background: var(--glass-inset-bg); border: 1px solid var(--glass-hairline); border-radius: var(--glass-r-pill);
+  padding: 8px 14px; min-height: 36px;
+  box-shadow: inset 0 1px 0 var(--glass-specular);
+  transition: transform var(--glass-t-fast) var(--glass-ease), background var(--glass-t-base) var(--glass-ease), box-shadow var(--glass-t-base) var(--glass-ease);
+}
+.bar button[aria-pressed="true"], .btn.is-on { background: var(--glass-accent); color: var(--glass-accent-ink); border-color: transparent; box-shadow: var(--glass-accent-glow); }
+@media (hover: hover) { .bar button:hover, .btn:hover { background: var(--glass-inset-bg-hover); } .bar button[aria-pressed="true"]:hover, .btn.is-on:hover { background: var(--glass-accent); } }
+.bar button:active, .btn:active { transform: scale(.97); }
+:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--glass-accent), 0 0 0 4px var(--glass-accent-soft); }
+
+/* ---------- layers: wallpaper -> glass cards -> elevated ---------- */
+.wall {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: var(--glass-wallpaper) center / cover no-repeat, var(--glass-wallpaper-fallback);
+}
+.wall::after { /* grain: one fixed, non-interactive layer */
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: var(--glass-grain-opacity);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: soft-light;
+}
+:where(.wall > *) { position: relative; z-index: 1; }
+
+/* tier 1: glass card (the only blurring surface on a view) */
+.g {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-hairline);
+  border-radius: var(--glass-r-card);
+  box-shadow: var(--glass-shadow-1), inset 0 1px 0 var(--glass-specular), inset 0 -1px 0 var(--glass-edge-shade);
+}
+/* tier 2: elevated (rail, popups, alert banner) */
+.g-up {
+  background: var(--glass-bg-elevated);
+  -webkit-backdrop-filter: blur(var(--glass-blur-elevated)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur-elevated)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-hairline);
+  border-radius: var(--glass-r-popup);
+  box-shadow: var(--glass-shadow-2), inset 0 1px 0 var(--glass-specular), inset 0 -1px 0 var(--glass-edge-shade);
+}
+/* tier 3: inset tile (sits on a card, NO blur) */
+.inset {
+  background: var(--glass-inset-bg);
+  border: 1px solid var(--glass-hairline);
+  border-radius: var(--glass-r-tile);
+  box-shadow: inset 0 1px 0 var(--glass-specular);
+}
+
+/* fallback: no backdrop-filter support, or Lite on a weak GPU */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .g, .g-up { background: var(--glass-solid-fallback); }
+}
+:root[data-nofilter] .g, :root[data-nofilter] .g-up {
+  -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid-fallback);
+}
+
+/* ---------- interaction: pointer hover only, press everywhere, state cross-fade ---------- */
+.tap {
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--glass-t-fast) var(--glass-ease), background var(--glass-t-base) var(--glass-ease),
+              box-shadow var(--glass-t-base) var(--glass-ease), color var(--glass-t-base) var(--glass-ease);
+}
+@media (hover: hover) { .tap:hover { transform: translateY(-1px); background: var(--glass-inset-bg-hover); } }
+.tap:active, .tap.is-press { transform: scale(.98); }
+.tap.is-hover { transform: translateY(-1px); background: var(--glass-inset-bg-hover); }
+.is-focus { box-shadow: 0 0 0 1px var(--glass-accent), 0 0 0 4px var(--glass-accent-soft) !important; }
+
+/* active states: accent for on/selected, warm only for lights */
+.is-on { background: var(--glass-accent); color: var(--glass-accent-ink); border-color: transparent; box-shadow: var(--glass-accent-glow), inset 0 1px 0 var(--glass-specular); }
+.is-on .sub { color: inherit; opacity: .94; }
+.is-lit { background: var(--glass-warm); color: var(--glass-warm-ink); border-color: transparent; box-shadow: var(--glass-warm-glow), inset 0 1px 0 var(--glass-specular); }
+.is-lit .sub { color: inherit; opacity: .8; }
+.is-selected { background: var(--glass-accent-soft); border-color: var(--glass-accent); }
+@media (hover: hover) { .tap.is-on:hover { background: var(--glass-accent); } .tap.is-lit:hover { background: var(--glass-warm); } }
+
+/* ---------- type ---------- */
+.t-display { font-size: var(--glass-fs-display); font-weight: 300; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.t-title   { font-size: var(--glass-fs-title);   font-weight: 600; letter-spacing: -.025em; line-height: 1.12; }
+.t-value   { font-size: var(--glass-fs-value);   font-weight: 600; letter-spacing: -.015em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.t-body    { font-size: var(--glass-fs-body);    font-weight: 550; }
+.t-label, .sub { font-size: var(--glass-fs-label); font-weight: 500; color: var(--glass-ink-2); }
+.t-over    { font-size: var(--glass-fs-over); font-weight: 600; letter-spacing: .04em; color: var(--glass-ink-2); }
+.faint { color: var(--glass-ink-3); }
+.ic { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ic.sm { width: 18px; height: 18px; } .ic.lg { width: 30px; height: 30px; }
+
+/* ---------- small parts ---------- */
+.row { display: flex; align-items: center; gap: var(--glass-s3); }
+.col { display: flex; flex-direction: column; gap: var(--glass-s3); }
+.grow { flex: 1; min-width: 0; }
+.pill { /* full pill chips */
+  display: inline-flex; align-items: center; gap: var(--glass-s2); padding: 0 var(--glass-s4); min-height: 40px;
+  border-radius: var(--glass-r-pill); font-size: var(--glass-fs-label); font-weight: 550;
+}
+.ib { /* icon well */
+  width: 48px; height: 48px; border-radius: var(--glass-r-inner); display: grid; place-items: center; flex: none;
+  background: var(--glass-field);
+}
+.ring { /* battery ring: conic gradient, colour from tokens */
+  --p: 50; --c: var(--glass-level-ok);
+  position: relative; width: 36px; height: 36px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  background: conic-gradient(var(--c) calc(var(--p) * 3.6deg), var(--glass-field) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+}
+.ring-wrap { position: relative; width: 36px; height: 36px; display: grid; place-items: center; flex: none; }
+.ring-wrap .ring { position: absolute; inset: 0; }
+.bar-track { height: 8px; border-radius: 4px; background: var(--glass-field); overflow: hidden; }
+.bar-track i { display: block; height: 100%; border-radius: 4px; background: var(--c, var(--glass-accent)); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--glass-ok); }
+.badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--glass-bad); color: var(--glass-alert-ink); font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.switch { width: 40px; height: 24px; border-radius: 12px; background: var(--glass-field); position: relative; flex: none; transition: background var(--glass-t-base) var(--glass-ease); }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--glass-ink); opacity: .85; transition: transform var(--glass-t-base) var(--glass-ease); }
+.is-on .switch, .is-lit .switch { background: color-mix(in srgb, currentColor 28%, transparent); }
+.is-on .switch::after, .is-lit .switch::after { transform: translateX(16px); background: currentColor; opacity: 1; }
+
+/* ---------- motion that stays: charging pulse, alert pulse, spinner ---------- */
+@keyframes glass-pulse { 0%, 100% { filter: drop-shadow(0 0 0 transparent); } 50% { filter: drop-shadow(0 0 6px var(--c)); } }
+@keyframes glass-alert { 0%, 100% { box-shadow: var(--glass-shadow-2), 0 0 0 0 transparent; } 50% { box-shadow: var(--glass-shadow-2), 0 0 44px 4px color-mix(in srgb, var(--glass-bad) 60%, transparent); } }
+@keyframes glass-spin { to { transform: rotate(360deg); } }
+.charging { animation: glass-pulse 1.6s var(--glass-ease) infinite; }
+.alerting { animation: glass-alert 2.2s var(--glass-ease) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 0s !important; }
+}
+:root[data-reduce] *, :root[data-reduce] *::before, :root[data-reduce] *::after { animation: none !important; transition-duration: 0s !important; }

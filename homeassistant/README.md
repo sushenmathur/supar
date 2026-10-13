@@ -9,7 +9,15 @@ Edit this file (or paste the live raw config back over it), never a copy.
 | `dashboard/master.yaml` | Complete raw dashboard configuration (master) |
 | `dashboard/validate.py` | Checks the master parses, all templates are defined and every JS template block compiles |
 | `themes/glass.yaml` | The `Glass` theme (light and dark, follows system mode); every view sets `theme: Glass` |
-| `../dashboards/` | Design mockups (final design: `option-b5-popups.html`) |
+| `../dashboards/glass/` | **Current** Liquid Glass mockups and tokens (redesign branch) |
+| `../dashboards/` | Earlier mockups (previous final: `option-b5-popups.html`) |
+
+### Superseded drafts (kept for history, not live sources)
+
+`master.yaml` and `themes/glass.yaml` are the only live sources. These are older drafts or already merged into them:
+`themes/glass-theme-additions.yaml`, `dashboard/glass-vehicle-template.only.yaml`, `dashboard/garage-view.only.yaml`,
+`dashboard/announce-card.pills.yaml`, `dashboard/*.paste-under-button_card_templates.yaml`, `dashboard/person-pill-battery-ring.paste.yaml`,
+`dashboard/navbar-templates.snippet.yaml`. Do not paste from them.
 
 ## Install
 

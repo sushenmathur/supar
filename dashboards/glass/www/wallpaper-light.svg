@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2560 1600" preserveAspectRatio="xMidYMid slice">
+  <title>Glass wallpaper, light</title>
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#eef3fb"/><stop offset="1" stop-color="#dde7f6"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="120"/></filter>
+  </defs>
+  <rect width="2560" height="1600" fill="url(#base)"/>
+  <g filter="url(#soft)">
+    <ellipse cx="380" cy="260" rx="620" ry="420" fill="#ffd9bf" opacity=".80"/>
+    <ellipse cx="1500" cy="520" rx="720" ry="460" fill="#b7d4ff" opacity=".78"/>
+    <ellipse cx="2380" cy="240" rx="560" ry="400" fill="#c8e6e0" opacity=".70"/>
+    <ellipse cx="900" cy="1380" rx="760" ry="420" fill="#cfdcff" opacity=".70"/>
+    <ellipse cx="2200" cy="1300" rx="680" ry="400" fill="#ffe7c2" opacity=".60"/>
+  </g>
+</svg>

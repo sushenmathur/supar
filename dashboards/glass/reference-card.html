@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass reference card</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr)); }
+  .panel { padding: var(--glass-s6) var(--glass-s5) var(--glass-s7); color: var(--glass-ink); }
+  .panel h2 { margin: 0 0 var(--glass-s4) var(--glass-s2); }
+  .stack { display: grid; gap: var(--glass-s4); max-width: 560px; margin-inline: auto; }
+  .card { padding: var(--glass-s5); display: grid; gap: var(--glass-s4); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--glass-s3); }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--glass-s3); }
+  .person { height: 56px; padding: 0 var(--glass-s3); border-radius: var(--glass-r-pill); }
+  .av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 650; background: var(--glass-accent); color: var(--glass-accent-ink); flex: none; }
+  .room { height: 76px; padding: 0 var(--glass-s5); display: flex; align-items: center; gap: var(--glass-s3); background: linear-gradient(135deg, rgba(var(--tint), .30), rgba(var(--tint), .10)), var(--glass-inset-bg); }
+  .room.is-lit { background: var(--glass-warm); }
+  .light { min-height: 96px; padding: var(--glass-s4); display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--glass-r-tile); }
+  .light .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .chip { min-height: 56px; padding: var(--glass-s3) var(--glass-s4); display: flex; align-items: center; gap: var(--glass-s3); border-radius: var(--glass-r-tile); }
+  .state-label { font-size: var(--glass-fs-over); letter-spacing: .04em; font-weight: 600; color: var(--glass-ink-2); margin-bottom: var(--glass-s2); }
+  .veh { padding: var(--glass-s5); display: grid; gap: var(--glass-s3); }
+  .veh .pic { height: 92px; border-radius: var(--glass-r-inner); background: var(--glass-field); display: grid; place-items: center; color: var(--glass-ink-3); }
+</style>
+</head>
+<body>
+<div class="bar" role="toolbar" aria-label="Preview controls">
+  <b>Reference card · light and dark</b>
+  <button data-toggle="lite" aria-pressed="false">Glass Lite (no blur)</button>
+  <button data-toggle="nofilter" aria-pressed="false">No backdrop-filter</button>
+  <button data-toggle="reduce" aria-pressed="false">Reduced motion</button>
+</div>
+
+<template id="panel">
+  <div class="stack">
+    <h2 class="t-title"></h2>
+
+    <section class="g card" aria-label="People and rooms">
+      <div class="t-over">PEOPLE</div>
+      <div class="grid2">
+        <div class="inset tap person row" tabindex="0" role="button" aria-label="Sushen, Home, 82 percent, charging">
+          <div class="av">S</div>
+          <div class="grow"><div class="t-body">Sushen</div><div class="sub">Home</div></div>
+          <b class="num t-label" style="color:var(--glass-ok)">82%</b>
+          <div class="ring-wrap charging" style="--c:var(--glass-level-ok)"><div class="ring" style="--p:82;--c:var(--glass-level-ok)"></div><svg class="ic sm" aria-hidden="true"><use href="#i-phone"/></svg></div>
+        </div>
+        <div class="inset tap person row" tabindex="0" role="button" aria-label="Paro, Office, 14 percent">
+          <div class="av" style="background:var(--glass-warm);color:var(--glass-warm-ink)">P</div>
+          <div class="grow"><div class="t-body">Paro</div><div class="sub">Office</div></div>
+          <b class="num t-label" style="color:var(--glass-bad)">14%</b>
+          <div class="ring-wrap"><div class="ring" style="--p:14;--c:var(--glass-level-low)"></div><svg class="ic sm" aria-hidden="true"><use href="#i-phone"/></svg></div>
+        </div>
+      </div>
+      <div class="t-over">ROOMS</div>
+      <div class="grid3">
+        <div class="inset tap room" style="--tint:var(--glass-room-4)" tabindex="0" role="button"><div class="ib"><svg class="ic" aria-hidden="true"><use href="#i-sofa"/></svg></div><div><div class="t-body">Living</div><div class="sub">All off</div></div></div>
+        <div class="inset tap room is-lit" tabindex="0" role="button"><div class="ib"><svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg></div><div><div class="t-body">Kitchen</div><div class="sub">2 on</div></div></div>
+        <div class="inset tap room" style="--tint:var(--glass-room-3)" tabindex="0" role="button"><div class="ib"><svg class="ic" aria-hidden="true"><use href="#i-garage"/></svg></div><div><div class="t-body">Garage</div><div class="sub">All off</div></div></div>
+      </div>
+    </section>
+
+    <section class="g card" aria-label="Lights and states">
+      <div class="t-over">TILE STATES</div>
+      <div class="grid3">
+        <div><div class="state-label">Rest</div><div class="inset tap light" tabindex="0" role="button"><div class="top"><svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg><span class="switch"></span></div><div><div class="t-body">Lounge</div><div class="sub">Off</div></div></div></div>
+        <div><div class="state-label">Hover</div><div class="inset tap light is-hover"><div class="top"><svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg><span class="switch"></span></div><div><div class="t-body">Lounge</div><div class="sub">Off</div></div></div></div>
+        <div><div class="state-label">Pressed</div><div class="inset tap light is-press"><div class="top"><svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg><span class="switch"></span></div><div><div class="t-body">Lounge</div><div class="sub">Off</div></div></div></div>
+        <div><div class="state-label">Keyboard focus</div><div class="inset tap light is-focus"><div class="top"><svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg><span class="switch"></span></div><div><div class="t-body">Lounge</div><div class="sub">Off</div></div></div></div>
+        <div><div class="state-label">Light on (warm)</div><div class="inset tap light is-lit" tabindex="0" role="button"><div class="top"><svg class="ic" aria-hidden="true"><use href="#i-bulb"/></svg><span class="switch"></span></div><div><div class="t-body">Kitchen</div><div class="sub">80%</div></div></div></div>
+        <div><div class="state-label">Switch on (accent)</div><div class="inset tap light is-on" tabindex="0" role="button"><div class="top"><svg class="ic" aria-hidden="true"><use href="#i-wind"/></svg><span class="switch"></span></div><div><div class="t-body">Aircon</div><div class="sub">Cool 23°</div></div></div></div>
+      </div>
+      <div class="t-over">CHIPS</div>
+      <div class="grid2">
+        <div class="inset tap chip" tabindex="0" role="button"><svg class="ic" aria-hidden="true"><use href="#i-door"/></svg><div><div class="t-body">Front door</div><div class="sub">Closed</div></div></div>
+        <div class="inset tap chip" tabindex="0" role="button" style="color:var(--glass-bad)"><svg class="ic" aria-hidden="true"><use href="#i-garage"/></svg><div><div class="t-body" style="color:var(--glass-ink)">Garage door</div><div class="sub" style="color:inherit;font-weight:650">Open</div></div></div>
+        <div class="inset tap chip" tabindex="0" role="button"><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg><div><div class="t-body">Sunset 17:42</div><div class="sub">in 3 h 08 min</div></div></div>
+        <div class="inset tap chip is-selected" tabindex="0" role="button"><svg class="ic" aria-hidden="true"><use href="#i-snow"/></svg><div><div class="t-body">Cool</div><div class="sub">Selected mode</div></div></div>
+      </div>
+    </section>
+
+    <section class="g veh" aria-label="Vehicle">
+      <div class="row"><div class="grow t-title">Bluey</div><span class="pill inset"><svg class="ic sm" aria-hidden="true"><use href="#i-pin"/></svg>Home</span><span class="pill inset" style="color:var(--glass-ok)"><svg class="ic sm" aria-hidden="true"><use href="#i-plug"/></svg>Charging</span></div>
+      <div class="pic" aria-hidden="true"><svg class="ic lg" style="width:48px;height:48px"><use href="#i-car"/></svg></div>
+      <div class="row"><div class="bar-track grow"><i style="width:68%;--c:var(--glass-level-ok)"></i></div><span class="t-value">68%</span></div>
+      <div class="row"><span class="t-label">Range</span><b class="t-value" style="margin-left:auto">312 km</b></div>
+    </section>
+  </div>
+</template>
+
+<main class="panels">
+  <div class="wall panel" data-theme="light" id="p-light"></div>
+  <div class="wall panel" data-theme="dark" id="p-dark"></div>
+</main>
+<script src="theme.js"></script>
+<script>
+  /* Each panel scopes its own data-theme so both modes show side by side. */
+  const tpl = document.getElementById('panel');
+  [['p-light', 'Light'], ['p-dark', 'Dark']].forEach(([id, name]) => {
+    const n = tpl.content.cloneNode(true);
+    n.querySelector('h2').textContent = name;
+    document.getElementById(id).appendChild(n);
+  });
+</script>
+</body>
+</html>

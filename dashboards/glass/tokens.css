@@ -1,0 +1,129 @@
+/* Glass design tokens. Mirrors homeassistant/themes/glass.yaml (modes: light | dark) so mockups and theme cannot drift.
+   Attributes on <html>: data-theme="light|dark" (set by theme.js from the system when absent), data-lite (blur off), data-nofilter (simulate no backdrop-filter). */
+
+@font-face {
+  font-family: "Geist";
+  src: url("fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  /* shared */
+  --glass-font: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --glass-blur: 24px;
+  --glass-blur-elevated: 32px;
+  --glass-saturate: 170%;
+  --glass-r-card: 26px;
+  --glass-r-tile: 22px;
+  --glass-r-inner: 16px;
+  --glass-r-pill: 999px;
+  --glass-r-popup: 32px;
+  --glass-s1: 4px; --glass-s2: 8px; --glass-s3: 12px; --glass-s4: 16px;
+  --glass-s5: 20px; --glass-s6: 28px; --glass-s7: 40px;
+  --glass-ease: cubic-bezier(.32, .72, 0, 1);
+  --glass-t-fast: 180ms; --glass-t-base: 240ms; --glass-t-slow: 320ms;
+  --glass-fs-display: 56px; --glass-fs-title: 28px; --glass-fs-value: 22px;
+  --glass-fs-body: 15px; --glass-fs-label: 13px; --glass-fs-over: 11px;
+  --glass-grain-opacity: .035;
+}
+
+/* ---------- light ---------- */
+:root,
+[data-theme="light"] {
+  --glass-ink: #101a2e;
+  --glass-ink-2: rgba(16, 26, 46, .76);
+  --glass-ink-3: rgba(16, 26, 46, .54);
+  --glass-accent: #1d63ed;
+  --glass-accent-ink: #ffffff;
+  --glass-accent-text: #1a5ad8;
+  --glass-accent-soft: rgba(29, 99, 237, .14);
+  --glass-accent-glow: 0 8px 28px rgba(29, 99, 237, .34);
+  --glass-warm: #ffb340;
+  --glass-warm-ink: #101a2e;
+  --glass-warm-glow: 0 10px 32px rgba(255, 150, 40, .42);
+  --glass-ok: #127239;
+  --glass-warn: #975208;
+  --glass-bad: #be123c;
+  --glass-robbie: #0e7069;
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, .66), rgba(255, 255, 255, .34));
+  --glass-bg-elevated: linear-gradient(160deg, rgba(255, 255, 255, .80), rgba(255, 255, 255, .52));
+  --glass-inset-bg: rgba(255, 255, 255, .46);
+  --glass-inset-bg-hover: rgba(255, 255, 255, .62);
+  --glass-field: rgba(16, 26, 46, .07);
+  --glass-solid-fallback: rgba(246, 248, 253, .94);
+  --glass-hairline: rgba(255, 255, 255, .78);
+  --glass-specular: rgba(255, 255, 255, .95);
+  --glass-edge-shade: rgba(16, 26, 46, .05);
+  --glass-shadow-1: 0 1px 2px rgba(40, 60, 110, .06), 0 14px 38px rgba(40, 60, 110, .14);
+  --glass-shadow-2: 0 2px 4px rgba(40, 60, 110, .08), 0 28px 70px rgba(40, 60, 110, .24);
+  --glass-scrim: rgba(16, 26, 50, .38);
+  --glass-alert-high: linear-gradient(135deg, #c81e4a, #9f1239);
+  --glass-alert-mid: linear-gradient(135deg, #b45309, #92400e);
+  --glass-alert-low: linear-gradient(135deg, #475569, #334155);
+  --glass-alert-ink: #ffffff;
+  --glass-alert-btn: rgba(255, 255, 255, .22);
+  --glass-alert-btn-on: #ffffff;
+  --glass-alert-btn-on-ink: #7f1d3a;
+  --glass-level-ok: #16a34a; --glass-level-warn: #d97706; --glass-level-low: #dc2626;
+  --glass-room-1: 214, 120, 255; --glass-room-2: 190, 205, 225; --glass-room-3: 110, 231, 160;
+  --glass-room-4: 100, 190, 255; --glass-room-5: 170, 150, 255; --glass-room-6: 255, 160, 130;
+  --glass-energy-solar: #d97706; --glass-energy-grid: #6d5bd0; --glass-energy-home: #1d63ed;
+  --glass-energy-ev: #15803d; --glass-energy-kia: #0f766e;
+  --glass-wx-sun: #d97706; --glass-wx-cloud: #64748b; --glass-wx-rain: #1d63ed; --glass-wx-night: #4f46e5;
+  --glass-wallpaper: url("www/wallpaper-light.svg");
+  --glass-wallpaper-fallback: linear-gradient(160deg, #eef3fb, #dde7f6);
+  --glass-page: #e9eff9;
+}
+
+/* ---------- dark ---------- */
+[data-theme="dark"] {
+  --glass-ink: #f4f7fc;
+  --glass-ink-2: rgba(244, 247, 252, .76);
+  --glass-ink-3: rgba(244, 247, 252, .54);
+  --glass-accent: #5aa2ff;
+  --glass-accent-ink: #06121f;
+  --glass-accent-text: #87bbff;
+  --glass-accent-soft: rgba(90, 162, 255, .22);
+  --glass-accent-glow: 0 8px 30px rgba(90, 162, 255, .36);
+  --glass-warm: #ffc266;
+  --glass-warm-ink: #101a2e;
+  --glass-warm-glow: 0 10px 34px rgba(255, 170, 60, .40);
+  --glass-ok: #6ee7b7;
+  --glass-warn: #fbbf24;
+  --glass-bad: #fc9dab;
+  --glass-robbie: #2dd4bf;
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .04));
+  --glass-bg-elevated: linear-gradient(160deg, rgba(40, 56, 96, .74), rgba(18, 26, 54, .70));
+  --glass-inset-bg: rgba(255, 255, 255, .07);
+  --glass-inset-bg-hover: rgba(255, 255, 255, .11);
+  --glass-field: rgba(255, 255, 255, .10);
+  --glass-solid-fallback: rgba(22, 29, 50, .94);
+  --glass-hairline: rgba(255, 255, 255, .17);
+  --glass-specular: rgba(255, 255, 255, .34);
+  --glass-edge-shade: rgba(0, 0, 0, .28);
+  --glass-shadow-1: 0 1px 2px rgba(0, 0, 0, .30), 0 16px 40px rgba(2, 6, 20, .40);
+  --glass-shadow-2: 0 2px 4px rgba(0, 0, 0, .34), 0 30px 72px rgba(2, 6, 20, .58);
+  --glass-scrim: rgba(2, 6, 18, .58);
+  --glass-alert-high: linear-gradient(135deg, #b4163f, #8a0f33);
+  --glass-alert-mid: linear-gradient(135deg, #a1480a, #7c3a0c);
+  --glass-alert-low: linear-gradient(135deg, #3b4658, #2a3344);
+  --glass-alert-ink: #ffffff;
+  --glass-alert-btn: rgba(255, 255, 255, .18);
+  --glass-alert-btn-on: #ffffff;
+  --glass-alert-btn-on-ink: #6b1230;
+  --glass-level-ok: #34d399; --glass-level-warn: #fbbf24; --glass-level-low: #f87171;
+  --glass-room-1: 190, 110, 235; --glass-room-2: 150, 165, 190; --glass-room-3: 70, 190, 130;
+  --glass-room-4: 70, 150, 235; --glass-room-5: 140, 120, 235; --glass-room-6: 235, 130, 100;
+  --glass-energy-solar: #fbbf24; --glass-energy-grid: #a99bff; --glass-energy-home: #5aa2ff;
+  --glass-energy-ev: #6ee7b7; --glass-energy-kia: #2dd4bf;
+  --glass-wx-sun: #fbbf24; --glass-wx-cloud: #94a3b8; --glass-wx-rain: #7db6ff; --glass-wx-night: #a5b4fc;
+  --glass-wallpaper: url("www/wallpaper-dark.svg");
+  --glass-wallpaper-fallback: linear-gradient(160deg, #0a1122, #070d1a);
+  --glass-page: #070d1a;
+}
+/* Glass Lite: blur off, slightly firmer fills (wall tablet / low power) */
+:root[data-lite] {
+  --glass-blur: 0px; --glass-blur-elevated: 0px; --glass-saturate: 100%;
+  --glass-grain-opacity: 0;
+}

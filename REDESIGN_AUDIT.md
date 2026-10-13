@@ -97,13 +97,14 @@ Card-mod stays on non-Bubble cards, and the theme's own card-mod rule is the one
 | `--glass-ink` (primary text) | `#101a2e` | `#f5f7fb` | Titles, values |
 | `--glass-ink-2` (secondary) | `rgba(16,26,46,.72)` | `rgba(245,247,251,.74)` | Labels. **Raised from .62 so it clears 4.5:1** |
 | `--glass-ink-3` (tertiary, non-essential) | `rgba(16,26,46,.52)` | `rgba(245,247,251,.54)` | Timestamps, decorative only |
-| `--glass-accent` | `#2f7df6` | `#5aa2ff` | **On/active only**: toggled-on tile, selected nav, slider fill |
-| `--glass-accent-ink` | `#ffffff` | `#06121f` | Text on accent (≥4.5:1 in both) |
+| `--glass-accent` | `#1d63ed` | `#5aa2ff` | **On/active only**: toggled-on tile, selected nav, slider fill |
+| `--glass-accent-ink` | `#ffffff` | `#06121f` | Text on accent (5.17:1 / 7.22:1) |
+| `--glass-accent-text` | `#1a5ad8` | `#87bbff` | Accent used as text (separate token so contrast holds) |
 | `--glass-accent-soft` | `rgba(47,125,246,.16)` | `rgba(90,162,255,.22)` | Active chip tint |
 | `--glass-warm` | `#ffb340` | `#ffc266` | Light bulbs "on" glow only (physical metaphor, kept) |
-| `--glass-ok / -warn / -bad` | `#15803d / #b45309 / #be123c` | `#6ee7b7 / #fbbf24 / #fb7185` | Status text and rings |
+| `--glass-ok / -warn / -bad` | `#127239 / #975208 / #be123c` | `#6ee7b7 / #fbbf24 / #fc9dab` | Status text and rings (tuned by `contrast.py`) |
 | `--glass-alert-high/mid/low` | solid tinted glass | same, tuned | Alert banner (white text ≥4.5:1 checked) |
-| `--glass-robbie` | `#0f766e` | `#2dd4bf` | Fixes white-on-teal 1.9:1 |
+| `--glass-robbie` | `#0e7069` | `#2dd4bf` | Fixes white-on-teal 1.9:1 |
 | `--glass-weather-*`, `--glass-energy-*` | tokenised palette | tokenised palette | Replaces inline hex in JS templates |
 
 Decision for you: the current violet/indigo accent is replaced by a single iOS-style blue. Amber stays **only** as
@@ -231,7 +232,7 @@ approval → Phase 3 per-view commits → Phase 4 verification.
 
 ## 6. Decisions I need from you
 
-### 6.1 Typeface (the one real conflict between your brief and the skills)
+### 6.1 Typeface (RESOLVED: Geist, vendored under SIL OFL; see 6.3 answers) (the one real conflict between your brief and the skills)
 Your brief asks for Inter "or similar". The `high-end-visual-design` skill bans Inter, Roboto, Arial and Helvetica.
 Recommendation: **Geist** (SF-like grotesk, tabular figures, open licence), loaded by a small `extra_module_url`
 JS file that injects the `@font-face` rules from `/local/glass/fonts/`, with the system stack `-apple-system,
@@ -248,7 +249,11 @@ Fonts must be self-hosted (the sandbox cannot fetch them, so you would drop the 
 | Large entry animations | "State-change feedback only" | No scroll or load entrance animation |
 | Grain overlay | Perf constraint | One fixed layer, 3% opacity, removable by theme variable |
 
-### 6.3 Questions
+### 6.3 Questions (ANSWERED)
+
+**Answers:** 1 blue accent (yes) · 2 Geist (ok) · 3 `Glass Lite` theme (yes) · 4 mark drafts superseded (done in `homeassistant/README.md`).
+
+Original questions:
 1. **Accent:** blue (my proposal) or keep amber as the primary "on" colour?
 2. **Font:** Geist (recommended), Inter Tight, or Inter anyway?
 3. **Tablet saver:** want the optional `Glass Lite` (no blur) theme for the wall tablet?
@@ -266,4 +271,26 @@ Fonts must be self-hosted (the sandbox cannot fetch them, so you would drop the 
 - Contrast (≥4.5:1) will be computed by script against the wallpaper SVG at its worst-case regions, in both modes.
 - `/local/` assets cache hard: Phase 4 includes a hard-refresh reminder and a `?v=` query on the font loader URL.
 
-**STOP. Awaiting your approval (and answers to 6.3) before building mockups.**
+**Status:** mockups built in `dashboards/glass/` (see section 8). **STOP. Awaiting approval before Phase 2.**
+
+---
+
+## 8. Mockup results (Phase 1b)
+
+Open `dashboards/glass/index.html`. Previews are in `dashboards/glass/previews/`.
+
+| Check | Result |
+|---|---|
+| Contrast (`contrast.py`, real wallpapers, worst-case region, both modes) | **Pass**: all body-text pairs ≥ 4.5:1. The first run failed 19 pairs, so I darkened the dark wallpaper, lowered the dark glass alphas, and tuned `ok`, `warn`, `bad`, `robbie`, `accent-text` |
+| Blur layers | Section cards 24px, rail and popups 32px, **no blur on inset tiles**. At most two stacked |
+| Fallbacks | `@supports not (backdrop-filter)` → solid fill; `data-lite` → blur 0; toggles in every mock toolbar |
+| Reduced motion | All animations and transitions removed (media query and toolbar toggle) |
+| Motion | `cubic-bezier(.32,.72,0,1)`, 180/240/320ms; hover only on pointer devices, press on touch; charging pulse and alert pulse kept |
+| Hardcoded colours in components | None, apart from `rgba(var(--tint), …)` for room tints (tint is a token) |
+| Fonts and assets | Geist variable font vendored from `@fontsource-variable/geist` (OFL); wallpapers are generated SVG |
+
+Known gaps in the mockups (not in the final build): icons are simple hand-drawn line icons standing in for MDI; the
+garage-card area is a labelled placeholder because its layers live outside this repo.
+
+**Next (Phase 2, on approval):** `themes/glass.yaml` rewrite (+ `Glass Lite`), `www/glass/` assets and font loader
+(`extra_module_url`), shared button-card templates, one reference card in live YAML.

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass Home view</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  body { overflow-x: hidden; }
+  .holder { position: relative; width: 100%; overflow: hidden; }
+  #stage { position: absolute; left: 50%; top: 0; transform-origin: top center; margin-left: calc(var(--w) / -2); --w: 1600px; }
+  #stage { width: 1600px; height: 1000px; }
+  .rail { position: absolute; left: 28px; top: 28px; bottom: 28px; width: 96px; padding: var(--glass-s4) 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: var(--glass-r-popup); }
+  .nv { position: relative; width: 76px; height: 66px; border-radius: var(--glass-r-tile); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 550; color: var(--glass-ink-2); background: transparent; border: 1px solid transparent; }
+  .nv.act { color: var(--glass-ink); background: var(--glass-inset-bg); border-color: var(--glass-hairline); box-shadow: inset 0 1px 0 var(--glass-specular); }
+  .nv .badge { position: absolute; top: 4px; right: 10px; }
+  main { position: absolute; left: 152px; right: 28px; top: 28px; bottom: 28px; display: flex; flex-direction: column; gap: var(--glass-s4); }
+  .alert { display: flex; align-items: center; gap: var(--glass-s4); padding: 0 var(--glass-s6); height: 72px; border-radius: var(--glass-r-card); color: var(--glass-alert-ink); background: var(--glass-alert-high); border: 1px solid var(--glass-hairline); box-shadow: var(--glass-shadow-2), inset 0 1px 0 var(--glass-specular); }
+  .alert[hidden] { display: none; }
+  .alert .ib { background: var(--glass-alert-btn); width: 48px; height: 48px; }
+  .alert .btn { background: var(--glass-alert-btn); color: var(--glass-alert-ink); border-color: transparent; box-shadow: none; }
+  .alert .btn.on { background: var(--glass-alert-btn-on); color: var(--glass-alert-btn-on-ink); }
+  .alert .sub { color: var(--glass-alert-ink); opacity: .94; }
+  .hd { display: grid; grid-template-columns: 1fr auto auto; gap: var(--glass-s4); }
+  .hello { padding: var(--glass-s5) var(--glass-s6); display: flex; align-items: center; justify-content: space-between; }
+  .people { padding: var(--glass-s4) var(--glass-s5); display: grid; align-content: center; gap: var(--glass-s2); min-width: 300px; }
+  .person { height: 48px; padding: 0 var(--glass-s3); border-radius: var(--glass-r-pill); }
+  .av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 650; font-size: 13px; background: var(--glass-accent); color: var(--glass-accent-ink); flex: none; }
+  .qa { padding: var(--glass-s4); display: flex; gap: var(--glass-s3); align-items: center; }
+  .qb { width: 84px; padding: var(--glass-s3) 2px; border-radius: var(--glass-r-tile); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; text-align: center; line-height: 1.1; }
+  .rooms { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--glass-s3); }
+  .room { height: 80px; padding: 0 var(--glass-s4); display: flex; align-items: center; gap: var(--glass-s3); background: linear-gradient(135deg, rgba(var(--tint), .30), rgba(var(--tint), .10)), var(--glass-inset-bg); border-radius: var(--glass-r-tile); }
+  .room.is-lit { background: var(--glass-warm); }
+  .room .ib { width: 46px; height: 46px; }
+  .body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.12fr 1fr .9fr; gap: var(--glass-s4); }
+  .colm { display: flex; flex-direction: column; gap: var(--glass-s4); min-height: 0; }
+  .card { padding: var(--glass-s5); display: grid; gap: var(--glass-s3); align-content: start; }
+  .card.fill { flex: 1; min-height: 0; }
+  .lights { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--glass-s3); }
+  .light { min-height: 92px; padding: var(--glass-s3) var(--glass-s4); display: flex; flex-direction: column; justify-content: space-between; }
+  .light .top { display: flex; justify-content: space-between; align-items: center; }
+  .modes { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--glass-s2); }
+  .modes .inset { height: 44px; display: grid; place-items: center; border-radius: var(--glass-r-pill); }
+  .stat { display: grid; gap: 2px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--glass-s3); }
+  .fc { display: grid; grid-template-columns: 44px 22px 1fr 78px; gap: var(--glass-s3); align-items: center; font-size: var(--glass-fs-label); }
+  .range { height: 6px; border-radius: 3px; background: var(--glass-field); position: relative; }
+  .range i { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: var(--glass-accent); opacity: .8; }
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: var(--glass-s2); text-align: center; }
+  .wire { height: 5px; border-radius: 3px; background: var(--glass-field); position: relative; overflow: hidden; }
+  .wire i { position: absolute; top: 0; bottom: 0; width: 34%; border-radius: 3px; background: var(--c); animation: run 2.6s var(--glass-ease) infinite; }
+  @keyframes run { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+  .evt { display: flex; gap: var(--glass-s3); align-items: center; }
+  .date { width: 52px; height: 56px; border-radius: var(--glass-r-inner); background: var(--glass-field); display: grid; align-content: center; text-align: center; }
+  .date span { font-size: 10px; font-weight: 700; color: var(--glass-bad); letter-spacing: .06em; } .date b { font-size: 21px; line-height: 1; font-weight: 600; }
+  .chips { display: grid; grid-template-columns: 1fr 1fr; gap: var(--glass-s3); }
+  .chip { min-height: 60px; padding: var(--glass-s3) var(--glass-s4); display: flex; align-items: center; gap: var(--glass-s3); border-radius: var(--glass-r-tile); }
+  .chip .t-body { white-space: nowrap; }
+  .scrim { position: absolute; inset: 0; background: var(--glass-scrim); z-index: 5; display: grid; place-items: center; animation: fadein var(--glass-t-slow) var(--glass-ease); }
+  .scrim[hidden] { display: none; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+  .pop { width: 620px; padding: var(--glass-s6); display: grid; gap: var(--glass-s4); animation: rise var(--glass-t-slow) var(--glass-ease); }
+  .pop .chips { grid-template-columns: repeat(3, 1fr); }
+  .big-batt { display: grid; grid-template-columns: 1fr auto; gap: var(--glass-s3); align-items: center; }
+  .big-batt .bar-track { height: 14px; border-radius: 7px; } .big-batt .bar-track i { border-radius: 7px; }
+</style>
+</head>
+<body>
+<div class="bar" role="toolbar" aria-label="Preview controls">
+  <b>Home · 1600×1000 wall tablet</b>
+  <button data-toggle="theme:light" aria-pressed="false">Light</button>
+  <button data-toggle="theme:dark" aria-pressed="false">Dark</button>
+  <button data-toggle="theme:auto" aria-pressed="true">System</button>
+  <button data-pop="alert" aria-pressed="false" id="b-alert">Alert banner</button>
+  <button data-pop="pop" aria-pressed="false" id="b-pop">Bluey popup</button>
+  <button data-toggle="lite" aria-pressed="false">Glass Lite</button>
+  <button data-toggle="nofilter" aria-pressed="false">No backdrop-filter</button>
+  <button data-toggle="reduce" aria-pressed="false">Reduced motion</button>
+</div>
+<div class="holder">
+<div id="stage" class="wall" data-stage data-w="1600" data-h="1000">
+
+  <nav class="rail g-up" aria-label="Main">
+    <div class="nv act" tabindex="0"><span data-i="home"></span>Home</div>
+    <div class="nv tap" tabindex="0"><span data-i="grid"></span>Rooms</div>
+    <div class="nv tap" tabindex="0"><span data-i="bulb"></span>Lights<span class="badge num">3</span></div>
+    <div class="nv tap" tabindex="0"><span data-i="therm"></span>Climate</div>
+    <div class="nv tap" tabindex="0"><span data-i="shield"></span>Security</div>
+    <div class="nv tap" tabindex="0"><span data-i="music"></span>Music</div>
+    <div class="nv tap" tabindex="0"><span data-i="more"></span>More</div>
+  </nav>
+
+  <main>
+    <section class="alert alerting" id="alert" hidden aria-live="polite">
+      <div class="ib"><span data-i="garage"></span></div>
+      <div class="grow"><div class="t-body">Garage door has been open for 12 min</div><div class="sub">Side door also open · after sunset</div></div>
+      <button class="btn on">Keep garage open</button><button class="btn">Snooze</button>
+    </section>
+
+    <header class="hd">
+      <section class="g hello">
+        <div class="col" style="gap:4px"><div class="t-over">TUESDAY 13 OCTOBER · PARTLY CLOUDY</div><h1 class="t-title" style="font-size:40px;letter-spacing:-.03em">Good afternoon</h1></div>
+        <div class="t-display num" style="font-size:72px">3:47<small class="t-value" style="margin-left:6px;color:var(--glass-ink-2)">pm</small></div>
+      </section>
+      <section class="g people" aria-label="People">
+        <div class="inset tap person row" tabindex="0" role="button"><div class="av">S</div><div class="grow"><div class="t-body" style="font-size:14px">Sushen</div><div class="sub" style="font-size:12px">Home</div></div><b class="num t-label" style="color:var(--glass-ok)">82%</b><div class="ring-wrap charging" style="--c:var(--glass-level-ok);width:32px;height:32px"><div class="ring" style="--p:82;--c:var(--glass-level-ok);width:32px;height:32px"></div><span data-i="phone" data-c="sm"></span></div></div>
+        <div class="inset tap person row" tabindex="0" role="button"><div class="av" style="background:var(--glass-warm);color:var(--glass-warm-ink)">P</div><div class="grow"><div class="t-body" style="font-size:14px">Paro</div><div class="sub" style="font-size:12px">Office</div></div><b class="num t-label">64%</b><div class="ring-wrap" style="width:32px;height:32px"><div class="ring" style="--p:64;--c:var(--glass-level-warn);width:32px;height:32px"></div><span data-i="phone" data-c="sm"></span></div></div>
+      </section>
+      <section class="g qa" aria-label="Quick actions">
+        <div class="inset tap is-on qb" tabindex="0" role="button" style="box-shadow:var(--glass-accent-glow)"><span data-i="moon"></span>Good night</div>
+        <div class="inset tap qb" tabindex="0" role="button"><span data-i="lock"></span>Lock up</div>
+        <div class="inset tap qb" tabindex="0" role="button"><span data-i="power"></span>All off</div>
+        <div class="inset tap qb" tabindex="0" role="button"><span data-i="bell"></span>Announce</div>
+      </section>
+    </header>
+
+    <div class="rooms" role="group" aria-label="Rooms">
+      <div class="inset tap room" style="--tint:var(--glass-room-5)" tabindex="0" role="button"><div class="ib"><span data-i="sofa"></span></div><div><div class="t-body">Living</div><div class="sub">All off</div></div></div>
+      <div class="inset tap room is-lit" tabindex="0" role="button"><div class="ib"><span data-i="bulb"></span></div><div><div class="t-body">Kitchen</div><div class="sub">2 on</div></div></div>
+      <div class="inset tap room" style="--tint:var(--glass-room-2)" tabindex="0" role="button"><div class="ib"><span data-i="garage"></span></div><div><div class="t-body">Garage</div><div class="sub">All off</div></div></div>
+      <div class="inset tap room" style="--tint:var(--glass-room-3)" tabindex="0" role="button"><div class="ib"><span data-i="sun"></span></div><div><div class="t-body">Outdoor</div><div class="sub">All off</div></div></div>
+      <div class="inset tap room" style="--tint:var(--glass-room-4)" tabindex="0" role="button"><div class="ib"><span data-i="drop"></span></div><div><div class="t-body">Laundry</div><div class="sub">All off</div></div></div>
+      <div class="inset tap room" style="--tint:var(--glass-room-6)" tabindex="0" role="button"><div class="ib"><span data-i="bulb"></span></div><div><div class="t-body">Kids</div><div class="sub">All off</div></div></div>
+    </div>
+
+    <div class="body">
+      <div class="colm">
+        <section class="g card" aria-label="Favourites">
+          <div class="t-over">FAVOURITES</div>
+          <div class="lights">
+            <div class="inset tap light is-lit" tabindex="0" role="button"><div class="top"><span data-i="bulb"></span><span class="switch"></span></div><div><div class="t-body">Kitchen</div><div class="sub">80%</div></div></div>
+            <div class="inset tap light" tabindex="0" role="button"><div class="top"><span data-i="bulb"></span><span class="switch"></span></div><div><div class="t-body">Lounge</div><div class="sub">Off</div></div></div>
+            <div class="inset tap light" tabindex="0" role="button"><div class="top"><span data-i="bulb"></span><span class="switch"></span></div><div><div class="t-body">Hallway</div><div class="sub">Off</div></div></div>
+            <div class="inset tap light is-lit" tabindex="0" role="button"><div class="top"><span data-i="bulb"></span><span class="switch"></span></div><div><div class="t-body">Dining</div><div class="sub">55%</div></div></div>
+            <div class="inset tap light" tabindex="0" role="button"><div class="top"><span data-i="bulb"></span><span class="switch"></span></div><div><div class="t-body">Patio</div><div class="sub">Off</div></div></div>
+            <div class="inset tap light" tabindex="0" role="button"><div class="top"><span data-i="bulb"></span><span class="switch"></span></div><div><div class="t-body">Study</div><div class="sub">Off</div></div></div>
+          </div>
+        </section>
+        <section class="g card" aria-label="Aircon and TV">
+          <div class="row"><div class="ib"><span data-i="snow"></span></div><div class="grow"><div class="t-body">Aircon</div><div class="sub">Living room · Cool</div></div><div class="t-display num" style="font-size:44px">23<small class="t-value">°</small></div></div>
+          <div class="modes" role="group" aria-label="Aircon mode">
+            <div class="inset tap is-selected" tabindex="0" role="button" aria-label="Cool"><span data-i="snow"></span></div>
+            <div class="inset tap" tabindex="0" role="button" aria-label="Heat"><span data-i="sun"></span></div>
+            <div class="inset tap" tabindex="0" role="button" aria-label="Fan"><span data-i="wind"></span></div>
+            <div class="inset tap" tabindex="0" role="button" aria-label="Dry"><span data-i="drop"></span></div>
+            <div class="inset tap" tabindex="0" role="button" aria-label="Off"><span data-i="power"></span></div>
+          </div>
+          <div class="row" style="margin-top:var(--glass-s2)"><div class="ib"><span data-i="tv"></span></div><div class="grow"><div class="t-body">TV</div><div class="sub">Off</div></div><div class="inset tap pill" tabindex="0" role="button" style="min-height:44px"><span data-i="power" data-c="sm"></span>On</div></div>
+        </section>
+        <section class="g card fill" aria-label="Now playing">
+          <div class="row"><div class="ib"><span data-i="music"></span></div><div class="grow"><div class="t-body">Kitchen speaker</div><div class="sub">Triple J · Live</div></div><div class="inset tap pill is-on" tabindex="0" role="button" aria-label="Pause" style="min-height:44px;width:44px;padding:0;justify-content:center"><span data-i="pause" data-c="sm"></span></div></div>
+        </section>
+      </div>
+
+      <div class="colm">
+        <section class="g card" aria-label="Weather">
+          <div class="row"><div class="grow"><div class="t-over">NORTH LAKES</div><div class="t-display num" style="font-size:64px;margin-top:6px">26<small class="t-value">°</small></div><div class="sub">Partly cloudy · feels like 28°</div></div><span data-i="cloudsun" data-c="lg" ></span></div>
+          <div class="col" style="gap:10px;margin-top:var(--glass-s2)">
+            <div class="fc"><span class="t-label">Wed</span><span data-i="sun" data-c="sm"></span><div class="range"><i style="left:22%;right:18%"></i></div><b class="num t-label" style="color:var(--glass-ink)">18° 29°</b></div>
+            <div class="fc"><span class="t-label">Thu</span><span data-i="cloud" data-c="sm"></span><div class="range"><i style="left:16%;right:30%"></i></div><b class="num t-label" style="color:var(--glass-ink)">17° 27°</b></div>
+            <div class="fc"><span class="t-label">Fri</span><span data-i="drop" data-c="sm"></span><div class="range"><i style="left:12%;right:42%"></i></div><b class="num t-label" style="color:var(--glass-ink)">16° 24°</b></div>
+                      </div>
+        </section>
+        <section class="g card" aria-label="Calendar">
+          <div class="t-over">UP NEXT</div>
+          <div class="evt"><div class="date"><span>OCT</span><b class="num">14</b></div><div class="grow"><div class="t-body">Bin day · yellow lid</div><div class="sub">All day</div></div></div>
+          <div class="evt"><div class="date"><span>OCT</span><b class="num">16</b></div><div class="grow"><div class="t-body">Dentist, Samar</div><div class="sub">9:30 am</div></div></div>
+        </section>
+        <section class="g card fill" aria-label="Energy">
+          <div class="t-over">ENERGY NOW</div>
+          <div class="stats">
+            <div class="stat"><span class="t-label">Solar</span><span class="t-value" style="color:var(--glass-energy-solar)">4.8 kW</span></div>
+            <div class="stat"><span class="t-label">Home</span><span class="t-value" style="color:var(--glass-energy-home)">1.2 kW</span></div>
+            <div class="stat"><span class="t-label">Grid</span><span class="t-value" style="color:var(--glass-energy-grid)">−3.6 kW</span></div>
+            <div class="stat"><span class="t-label">Tesla</span><span class="t-value" style="color:var(--glass-energy-ev)">7.2 kW</span></div>
+          </div>
+          <div class="flow"><div><span data-i="sun"></span></div><div class="wire" style="width:80px;--c:var(--glass-energy-solar)"><i></i></div><div><span data-i="home"></span></div><div class="wire" style="width:80px;--c:var(--glass-energy-ev)"><i></i></div><div><span data-i="car"></span></div></div>
+          <div class="row"><span class="t-label">Self-powered</span><div class="bar-track grow"><i style="width:91%;--c:var(--glass-energy-solar)"></i></div><b class="num t-label" style="color:var(--glass-ink)">91%</b></div>
+        </section>
+      </div>
+
+      <div class="colm">
+        <section class="g card" aria-label="Security">
+          <div class="t-over">SECURITY</div>
+          <div class="chips">
+            <div class="inset tap chip" tabindex="0" role="button"><span data-i="door"></span><div><div class="t-body">Front door</div><div class="sub">Closed</div></div></div>
+            <div class="inset tap chip" tabindex="0" role="button" style="color:var(--glass-bad)"><span data-i="garage"></span><div><div class="t-body" style="color:var(--glass-ink)">Garage</div><div class="sub" style="color:inherit;font-weight:650">Open</div></div></div>
+            <div class="inset tap chip" tabindex="0" role="button"><span data-i="lock"></span><div><div class="t-body">Alarm</div><div class="sub">Disarmed</div></div></div>
+            <div class="inset tap chip" tabindex="0" role="button"><span data-i="camera"></span><div><div class="t-body">Front cam</div><div class="sub">No motion</div></div></div>
+          </div>
+        </section>
+        <section class="g card" aria-label="Vehicles">
+          <div class="t-over">VEHICLES</div>
+          <div class="inset tap chip" tabindex="0" role="button"><span class="ring-wrap charging" style="--c:var(--glass-level-ok)"><span class="ring" style="--p:68;--c:var(--glass-level-ok)"></span><span data-i="car" data-c="sm"></span></span><div class="grow"><div class="t-body">Bluey</div><div class="sub">Charging · 312 km</div></div><b class="num t-value">68%</b></div>
+          <div class="inset tap chip" tabindex="0" role="button"><span class="ring-wrap"><span class="ring" style="--p:41;--c:var(--glass-level-warn)"></span><span data-i="car" data-c="sm"></span></span><div class="grow"><div class="t-body">Kia</div><div class="sub">Parked · 188 km</div></div><b class="num t-value">41%</b></div>
+        </section>
+        <section class="g card fill" aria-label="Robbie">
+          <div class="row"><div class="ib" style="color:var(--glass-robbie)"><span data-i="bot"></span></div><div class="grow"><div class="t-body">Robbie</div><div class="sub">Cleaning · kitchen</div></div><span class="dot" style="background:var(--glass-robbie)"></span></div>
+          <div class="row"><div class="bar-track grow"><i style="width:57%;--c:var(--glass-robbie)"></i></div><b class="num t-label" style="color:var(--glass-ink)">57%</b></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="scrim" id="pop" hidden>
+    <section class="pop g-up" role="dialog" aria-label="Bluey">
+      <div class="row"><div class="grow t-title">Bluey</div><span class="pill inset"><span data-i="pin" data-c="sm"></span>Home</span><span class="pill inset" style="color:var(--glass-ok)"><span data-i="plug" data-c="sm"></span>Charging</span></div>
+      <div class="big-batt"><div class="bar-track"><i style="width:68%;--c:var(--glass-level-ok)"></i></div><span class="t-title num">68%</span></div>
+      <div class="chips">
+        <div class="inset tap chip" tabindex="0" role="button"><span data-i="bolt"></span><div><div class="t-body num">7.2 kW</div><div class="sub">Charge rate</div></div></div>
+        <div class="inset tap chip" tabindex="0" role="button"><span data-i="car"></span><div><div class="t-body num">312 km</div><div class="sub">Range</div></div></div>
+        <div class="inset tap chip" tabindex="0" role="button"><span data-i="therm"></span><div><div class="t-body num">22°</div><div class="sub">Cabin</div></div></div>
+        <div class="inset tap chip" tabindex="0" role="button"><span data-i="lock"></span><div><div class="t-body">Locked</div><div class="sub">Doors</div></div></div>
+        <div class="inset tap chip is-on" tabindex="0" role="button"><span data-i="wind"></span><div><div class="t-body">Climate on</div><div class="sub">Pre-cooling</div></div></div>
+        <div class="inset tap chip" tabindex="0" role="button"><span data-i="plug"></span><div><div class="t-body num">24.6 kWh</div><div class="sub">Added today</div></div></div>
+      </div>
+      <button class="btn" style="justify-self:end" data-pop="pop">Close</button>
+    </section>
+  </div>
+</div>
+</div>
+<script src="theme.js"></script>
+<script>
+  /* alert + popup toggles reflect state on the buttons */
+  document.querySelectorAll('[data-pop]').forEach(b => b.addEventListener('click', () => {
+    const t = document.getElementById(b.dataset.pop);
+    const btn = document.querySelector('.bar [data-pop="' + b.dataset.pop + '"]');
+    if (btn) btn.setAttribute('aria-pressed', String(!t.hidden));
+  }));
+</script>
+</body>
+</html>
