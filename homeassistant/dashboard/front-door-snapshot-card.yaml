@@ -7,7 +7,7 @@ show_state: false
 fit_mode: cover
 grid_options:
   columns: 12
-  rows: 3
+  rows: 5
 card_mod:
   style: 'ha-card { overflow: hidden; }'
 tap_action:
