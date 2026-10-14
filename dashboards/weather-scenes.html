@@ -1,0 +1,68 @@
+<!doctype html><meta charset="utf-8"><title>Weather scenes</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px Poppins,system-ui,sans-serif;background:radial-gradient(700px 520px at 8% 8%,rgba(255,150,130,.8),transparent 62%),radial-gradient(640px 500px at 60% 12%,rgba(90,200,250,.75),transparent 62%),radial-gradient(620px 520px at 98% 70%,rgba(179,136,255,.75),transparent 62%),radial-gradient(520px 420px at 12% 98%,rgba(255,211,110,.7),transparent 62%),#eaf0ff;padding:18px}
+.grid{display:grid;grid-template-columns:repeat(2,560px);gap:14px}
+.lab{font-size:11px;font-weight:600;color:#14203a;opacity:.7;margin:0 0 4px 6px;text-transform:uppercase;letter-spacing:.06em}
+/* the card */
+.wc{position:relative;height:112px;border-radius:28px;overflow:hidden;isolation:isolate;border:1px solid rgba(255,255,255,.7);
+ box-shadow:inset 0 1.5px 1px -1px rgba(255,255,255,.95),inset 1.5px 0 1px -1px rgba(255,255,255,.55),inset 0 -1.5px 1px -1px rgba(255,255,255,.3),0 14px 32px rgba(50,60,120,.2);color:#14203a;background:rgba(255,255,255,.3)}
+.wc.light{color:#fff}
+.wc .body{position:relative;z-index:2;height:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;padding:0 24px;text-align:left}
+.wc .sub{font-size:12.5px;font-weight:600;opacity:.8;white-space:nowrap}
+.wc .clk{font-size:50px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:4px}
+.wc .tmp{font-size:26px;font-weight:700;letter-spacing:-.02em;text-align:right}
+.wc .tmp small{display:block;font-size:12px;font-weight:600;opacity:.8}
+/* scene layer */
+.sc{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+.sc>*{position:absolute;pointer-events:none;will-change:transform,opacity}
+.sc.sunny{background:linear-gradient(135deg,rgba(255,214,102,.60),rgba(255,150,90,.28))}
+.sc.partly{background:linear-gradient(135deg,rgba(140,205,255,.6),rgba(255,226,150,.30))}
+.sc.cloudy{background:linear-gradient(135deg,rgba(150,165,190,.65),rgba(190,200,220,.35))}
+.sc.rainy{background:linear-gradient(135deg,rgba(55,70,100,.82),rgba(85,100,130,.60))}
+.sc.storm{background:linear-gradient(135deg,rgba(30,38,66,.92),rgba(60,52,100,.72))}
+.sc.night{background:linear-gradient(135deg,rgba(14,20,64,.86),rgba(60,40,120,.62))}
+.sc.snowy{background:linear-gradient(135deg,rgba(170,195,230,.70),rgba(220,232,250,.45))}
+.sc.fog{background:linear-gradient(135deg,rgba(175,182,196,.70),rgba(205,210,222,.45))}
+.sun{right:70px;top:-60px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,190,.95) 0%,rgba(255,210,100,.55) 38%,transparent 70%);animation:sunpulse 5s ease-in-out infinite}
+.flare{right:-40px;top:20px;width:260px;height:60px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:rotate(-18deg);animation:flare 9s ease-in-out infinite}
+.cl{height:46px;border-radius:46px;background:rgba(255,255,255,.62);filter:blur(7px);animation:drift linear infinite}
+.cl.d{background:rgba(70,80,100,.55)}
+.drop{top:-22px;width:1.6px;height:18px;background:linear-gradient(transparent,rgba(200,222,255,.85));animation:fall linear infinite;transform:rotate(12deg)}
+.flake{top:-8px;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.9);animation:snow linear infinite}
+.star{width:2.5px;height:2.5px;border-radius:50%;background:#fff;animation:twinkle ease-in-out infinite}
+.moon{right:90px;top:14px;width:34px;height:34px;border-radius:50%;box-shadow:inset -9px -3px 0 0 rgba(255,246,214,.92);filter:drop-shadow(0 0 10px rgba(255,246,214,.6));transform:rotate(-20deg)}
+.band{left:-30%;width:160%;height:34px;border-radius:34px;background:rgba(255,255,255,.4);filter:blur(10px);animation:slide ease-in-out infinite alternate}
+.flash{inset:0;background:rgba(255,255,255,.85);opacity:0;animation:flash 7s infinite}
+@keyframes sunpulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.12);opacity:1}}
+@keyframes flare{0%,100%{transform:translateX(30px) rotate(-18deg);opacity:.2}50%{transform:translateX(-60px) rotate(-18deg);opacity:.6}}
+@keyframes drift{from{transform:translateX(-200px)}to{transform:translateX(640px)}}
+@keyframes fall{from{transform:translate3d(0,0,0) rotate(12deg)}to{transform:translate3d(-30px,150px,0) rotate(12deg)}}
+@keyframes snow{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(14px,65px,0)}100%{transform:translate3d(-6px,130px,0)}}
+@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:1}}
+@keyframes slide{from{transform:translateX(-9%)}to{transform:translateX(9%)}}
+@keyframes flash{0%,86%,100%{opacity:0}87%{opacity:.75}89%{opacity:.1}91%{opacity:.6}95%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.sc *{animation:none!important}}
+</style>
+<body><div class="grid" id="g"></div>
+<script>
+// deterministic pseudo-random so every redraw gives the same layout
+const r=(i,s)=>{const x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x)};
+const n=(c,f)=>Array.from({length:c},(_,i)=>f(i)).join('');
+function scene(k){
+ const clouds=(c,dark)=>n(c,i=>`<i class="cl ${dark?'d':''}" style="top:${-6+r(i,1)*50}px;width:${110+r(i,2)*90}px;animation-duration:${(dark?26:34)+r(i,3)*22}s;animation-delay:-${r(i,4)*40}s"></i>`);
+ const rain=(c,dur)=>n(c,i=>`<i class="drop" style="left:${r(i,5)*105}%;animation-duration:${dur*(.7+r(i,6)*.6)}s;animation-delay:-${r(i,7)*2}s;opacity:${.45+r(i,8)*.5}"></i>`);
+ const snow=c=>n(c,i=>`<i class="flake" style="left:${r(i,9)*100}%;animation-duration:${5+r(i,10)*5}s;animation-delay:-${r(i,11)*8}s;transform:scale(${.6+r(i,12)})"></i>`);
+ const stars=c=>n(c,i=>`<i class="star" style="left:${r(i,13)*100}%;top:${r(i,14)*100}%;animation-duration:${2+r(i,15)*3}s;animation-delay:-${r(i,16)*4}s"></i>`);
+ return ({
+  sunny:`<div class="sc sunny"><i class="sun"></i><i class="flare"></i></div>`,
+  partly:`<div class="sc partly"><i class="sun"></i>${clouds(3)}</div>`,
+  cloudy:`<div class="sc cloudy">${clouds(5)}</div>`,
+  rainy:`<div class="sc rainy">${clouds(3,1)}${rain(26,.9)}</div>`,
+  storm:`<div class="sc storm">${clouds(4,1)}${rain(46,.6)}<i class="flash"></i></div>`,
+  night:`<div class="sc night">${stars(26)}<i class="moon"></i></div>`,
+  snowy:`<div class="sc snowy">${snow(26)}</div>`,
+  fog:`<div class="sc fog"><i class="band" style="top:14px;animation-duration:11s"></i><i class="band" style="top:48px;animation-duration:15s;animation-delay:-5s"></i><i class="band" style="top:80px;animation-duration:13s;animation-delay:-8s"></i></div>`
+ })[k]}
+const items=[['sunny','Sunny','24°',0],['partly','Partly cloudy','23°',0],['cloudy','Cloudy','21°',0],['rainy','Rainy','18°',1],['storm','Thunderstorms','19°',1],['night','Clear night','16°',1],['snowy','Snowy','2°',0],['fog','Fog','12°',0]];
+document.getElementById('g').innerHTML=items.map(([k,t,d,l])=>`<div><div class="lab">${t}</div><div class="wc ${l?'light':''}">${scene(k)}<div class="body"><div><div class="sub">Good afternoon · 14th October · ${t}</div><div class="clk">12:19 PM</div></div><div class="tmp">${d}<small>India 7:49 am</small></div></div></div></div>`).join('');
+</script>
