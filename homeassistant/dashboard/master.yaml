@@ -637,23 +637,7 @@ views:
       size: cover
       repeat: repeat
       attachment: fixed
-    badges:
-      - color: red
-        content: Side Camera Battery Low
-        entity: sensor.side_battery
-        icon: mdi:battery-20
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-badge
-        visibility:
-          - below: 20
-            condition: numeric_state
-            entity: sensor.side_battery
     dense_section_placement: true
-    header:
-      badges_position: top
-      badges_wrap: scroll
-      layout: center
     icon: mdi:home-assistant
     max_columns: 3
     path: hubhome
@@ -668,9 +652,6 @@ views:
             grid_options:
               columns: full
             conditions:
-              - condition: state
-                entity: sun.sun
-                state: below_horizon
               - condition: or
                 conditions:
                   - condition: state
@@ -687,6 +668,31 @@ views:
                       - condition: state
                         entity: input_boolean.alert_banner_snooze
                         state: 'off'
+                      - condition: numeric_state
+                        entity: sensor.side_battery
+                        below: 20
+                  - condition: and
+                    conditions:
+                      - condition: state
+                        entity: input_boolean.alert_banner_snooze
+                        state: 'off'
+                      - condition: state
+                        entity: sensor.robbie_dock_dock_error
+                        state_not: ok
+                      - condition: state
+                        entity: sensor.robbie_dock_dock_error
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.robbie_dock_dock_error
+                        state_not: unknown
+                  - condition: and
+                    conditions:
+                      - condition: state
+                        entity: input_boolean.alert_banner_snooze
+                        state: 'off'
+                      - condition: state
+                        entity: sun.sun
+                        state: below_horizon
                       - condition: or
                         conditions:
                           - condition: state
@@ -698,17 +704,6 @@ views:
                           - condition: state
                             entity: binary_sensor.laundrydoorsensor_contact
                             state: 'on'
-                          - condition: and
-                            conditions:
-                              - condition: state
-                                entity: sensor.robbie_dock_dock_error
-                                state_not: ok
-                              - condition: state
-                                entity: sensor.robbie_dock_dock_error
-                                state_not: unavailable
-                              - condition: state
-                                entity: sensor.robbie_dock_dock_error
-                                state_not: unknown
             card:
               type: custom:button-card
               show_icon: false
@@ -728,6 +723,7 @@ views:
                 - cover.garage_door_v2
                 - sun.sun
                 - sensor.time
+                - sensor.side_battery
               tap_action:
                 action: navigate
                 navigation_path: /dashboard-hub/security
@@ -761,15 +757,20 @@ views:
                       list.push({ p: 1, id: 'binary_sensor.crimsafe_door_contact', msg: front ? 'Front and security doors open' : 'Security door open', icon: 'mdi:shield-home' });
                     }
                     // Everything below can be snoozed. Front door is medium (amber); the rest is low (slate).
+                    // Front, patio and laundry doors only alert after dark. Robbie and the camera battery alert at any time.
                     if (!snoozed) {
-                      if (front && !screen)
+                      const night = s('sun.sun') === 'below_horizon';
+                      if (night && front && !screen)
                         list.push({ p: 2, id: 'binary_sensor.front_door_contact', msg: 'Front door open', icon: 'mdi:home-alert' });
-                      if (on('binary_sensor.patio_door_contact'))
+                      if (night && on('binary_sensor.patio_door_contact'))
                         list.push({ p: 3, id: 'binary_sensor.patio_door_contact', msg: 'Patio door open', icon: 'mdi:door-open' });
-                      if (on('binary_sensor.laundrydoorsensor_contact'))
+                      if (night && on('binary_sensor.laundrydoorsensor_contact'))
                         list.push({ p: 3, id: 'binary_sensor.laundrydoorsensor_contact', msg: 'Laundry door open', icon: 'mdi:door-open' });
                       if (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie))
                         list.push({ p: 3, id: 'sensor.robbie_dock_dock_error', msg: 'Roborock water tank empty', icon: 'mdi:water-alert' });
+                      const bat = parseFloat(s('sensor.side_battery'));
+                      if (!isNaN(bat) && bat < 20)
+                        list.push({ p: 3, id: 'sensor.side_battery', msg: 'Side camera battery low', icon: 'mdi:battery-20' });
                     }
                     return list.sort((a, b) => a.p - b.p);
                   ]]]
@@ -887,6 +888,8 @@ views:
                       - binary_sensor.patio_door_contact
                       - binary_sensor.laundrydoorsensor_contact
                       - sensor.robbie_dock_dock_error
+                      - sun.sun
+                      - sensor.side_battery
                     tap_action:
                       action: toggle
                     styles:
@@ -895,9 +898,12 @@ views:
                             [[[
                               const on = id => states[id]?.state === 'on';
                               const robbie = states['sensor.robbie_dock_dock_error']?.state;
-                              const any = on('binary_sensor.front_door_contact')
-                                || on('binary_sensor.patio_door_contact') || on('binary_sensor.laundrydoorsensor_contact')
-                                || (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie));
+                              const night = states['sun.sun']?.state === 'below_horizon';
+                              const bat = parseFloat(states['sensor.side_battery']?.state);
+                              const any = (night && (on('binary_sensor.front_door_contact')
+                                  || on('binary_sensor.patio_door_contact') || on('binary_sensor.laundrydoorsensor_contact')))
+                                || (robbie && !['ok', 'unavailable', 'unknown'].includes(robbie))
+                                || (!isNaN(bat) && bat < 20);
                               return any && !on('input_boolean.alert_banner_snooze') ? 'flex' : 'none';
                             ]]]
                         - margin-left: 10px
