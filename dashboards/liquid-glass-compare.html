@@ -1,0 +1,51 @@
+<!doctype html><meta charset="utf-8"><title>Liquid glass compare</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px Poppins,system-ui,sans-serif}
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.pane{position:relative;padding:18px 20px;overflow:hidden;min-height:430px}
+.pane::before,.pane::after{content:'';position:absolute;border-radius:50%;z-index:0;filter:blur(2px)}.pane::before{width:150px;height:150px;left:330px;top:40px;background:#ff5e7e}.pane::after{width:120px;height:120px;left:120px;top:250px;background:#ffd23f}.pane>*{position:relative;z-index:1}.pane h4{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+/* wallpapers: vivid so glass has something to refract */
+.light{--amb:#b45309;--t:#10192e;--s:rgba(16,25,46,.62);color:var(--t);
+ background:radial-gradient(420px 320px at 8% 10%,#ff9a8b,transparent 70%),radial-gradient(460px 360px at 70% 20%,#5ac8fa,transparent 70%),radial-gradient(420px 360px at 95% 85%,#b388ff,transparent 70%),radial-gradient(380px 300px at 20% 95%,#ffd36e,transparent 70%),#e8eefc}
+.dark{--amb:#fbbf24;--t:#fff;--s:rgba(255,255,255,.66);color:var(--t);
+ background:radial-gradient(420px 320px at 8% 10%,#5b3df5,transparent 70%),radial-gradient(460px 360px at 70% 20%,#0aa7a0,transparent 70%),radial-gradient(420px 360px at 95% 85%,#c026d3,transparent 70%),radial-gradient(380px 300px at 20% 95%,#1e40af,transparent 70%),#0a1022}
+.row{display:flex;gap:10px;margin-bottom:10px}
+.g{border-radius:24px}
+.cur{background:var(--cbg);border:1px solid var(--cbd);box-shadow:var(--csh),inset 0 1px 0 var(--chi);backdrop-filter:blur(34px) saturate(190%)}
+.light .cur{--cbg:linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.34));--cbd:rgba(255,255,255,.85);--csh:0 16px 40px rgba(60,70,130,.22);--chi:rgba(255,255,255,.9)}
+.dark .cur{--cbg:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));--cbd:rgba(255,255,255,.22);--csh:0 18px 44px rgba(0,0,0,.38);--chi:rgba(255,255,255,.35)}
+/* liquid glass */
+.lg{position:relative;isolation:isolate;border:1px solid var(--lb);
+ background:var(--lbg);
+ backdrop-filter:blur(14px) saturate(230%) brightness(var(--lbr));-webkit-backdrop-filter:blur(14px) saturate(230%) brightness(var(--lbr));
+ box-shadow:inset 0 2px 1px -1px var(--l1),inset 2px 0 1px -1px var(--l2),inset 0 -2px 1px -1px var(--l3),inset 0 0 0 1px var(--lb),inset 0 12px 24px -12px var(--lg),inset 0 -14px 24px -14px rgba(0,0,0,.10),0 18px 36px var(--ls)}
+.lg::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+ background:radial-gradient(120% 90% at 0% 0%,var(--sh1),transparent 55%),linear-gradient(160deg,transparent 55%,var(--sh2))}
+.light .lg{--lb:rgba(255,255,255,.65);--lbg:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.04));--lbr:1.06;--l1:rgba(255,255,255,.95);--l2:rgba(255,255,255,.55);--l3:rgba(255,255,255,.25);--lg:rgba(255,255,255,.22);--ls:rgba(40,50,110,.20);--sh1:rgba(255,255,255,.7);--sh2:rgba(255,255,255,.20)}
+.dark .lg{--lb:rgba(255,255,255,.30);--lbg:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.02));--lbr:1.1;--l1:rgba(255,255,255,.55);--l2:rgba(255,255,255,.28);--l3:rgba(255,255,255,.10);--lg:rgba(255,255,255,.10);--ls:rgba(0,0,0,.45);--sh1:rgba(255,255,255,.34);--sh2:rgba(255,255,255,.08)}
+.pill{height:48px;border-radius:24px;padding:0 12px;display:flex;align-items:center;gap:9px;width:220px;font-weight:600}
+.av{width:28px;height:28px;border-radius:50%;background:#7c8cf8;color:#fff;display:grid;place-items:center;font-size:12px}
+.pill small{display:block;font-size:11px;font-weight:500;color:var(--s)}
+.qa{width:88px;height:84px;border-radius:24px;display:grid;place-items:center;text-align:center;font-size:12px;font-weight:600;padding-top:8px}
+.qa i{display:block;width:24px;height:24px;border-radius:7px;background:currentColor;opacity:.75;margin:0 auto 6px}
+.tile{width:262px;height:76px;border-radius:24px;padding:0 16px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:16px;position:relative}
+.tile .ic{width:46px;height:46px;border-radius:16px;background:rgba(255,255,255,.35);flex:none}
+.tile small{display:block;font-weight:500;font-size:12.5px;color:var(--s)}
+.pop{width:420px;border-radius:32px;padding:18px 20px;margin-top:6px}
+.pop b{font-size:17px}.fld{height:42px;border-radius:14px;margin-top:10px;background:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.4);display:flex;align-items:center;padding:0 12px;color:var(--s)}
+.dark .fld{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18)}
+.btns{display:flex;gap:10px;margin-top:12px}.btn{flex:1;height:44px;border-radius:22px;display:grid;place-items:center;font-weight:700}
+.btn.p{background:linear-gradient(135deg,#7dd3fc,#818cf8);color:#0b1020}
+</style>
+<body><div id=root></div>
+<script>
+const card=(c)=>`
+<div class="row"><div class="g ${c} pill"><div class="av">S</div><div>Sushen<small>Home</small></div><b style="margin-left:auto;font-size:12px">95%</b></div>
+<div class="g ${c} qa"><div><i></i>Good Night</div></div><div class="g ${c} qa"><div><i></i>Announce</div></div><div class="g ${c} qa"><div><i></i>Robbie</div></div></div>
+<div class="row"><div class="g ${c} tile" style="background-image:none"><div class="ic"></div><div>Living<small>All off</small></div></div>
+<div class="g ${c} tile"><div class="ic"></div><div>Kids<small><b style="color:var(--amb)">Shanaya in room</b> · All off</small></div></div></div>
+<div class="g ${c} pop"><b>Announce</b><div class="fld">Home</div><div class="fld">(empty value)</div>
+<div class="btns"><div class="btn g ${c}">Cancel</div><div class="btn p">Announce</div></div></div>`;
+const pane=(m,k,t)=>`<div class="pane ${m}"><h4>${t} · ${m}</h4>${card(k)}</div>`;
+document.getElementById('root').innerHTML=['light','dark'].map(m=>`<div class="stage">${pane(m,'cur','Current')}${pane(m,'lg','Liquid Glass')}</div>`).join('');
+</script>
