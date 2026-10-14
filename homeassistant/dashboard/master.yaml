@@ -126,7 +126,7 @@ button_card_templates:
       action: more-info
     label: |-
       [[[
-      const s = entity.state;
+      const s = entity?.state;
       return s === 'unavailable' ? 'unavailable' : s === 'on' ? 'On' : 'Off';
       ]]]
     styles:
@@ -215,8 +215,8 @@ button_card_templates:
     label: |-
       [[[
       const place = { home: 'Home', not_home: 'Away', 'Sushen - Work': 'Office', 'Paro - Work': 'Work', Gym: 'Gym' };
-      const first = String(entity.attributes.friendly_name || '').split(' ')[0];
-      return `<b style="font-weight:var(--fw-semibold);color:var(--text-1)">${first}</b><br>${place[entity.state] || entity.state}`;
+      const first = String(entity?.attributes?.friendly_name || '').split(' ')[0];
+      return `<b style="font-weight:var(--fw-semibold);color:var(--text-1)">${first}</b><br>${place[entity?.state] || entity?.state}`;
       ]]]
     custom_fields:
       dot: <i></i>
@@ -595,7 +595,7 @@ views:
                           ]]]
             name: |-
               [[[
-              const t = parseFloat(entity.attributes.temperature);
+              const t = parseFloat(entity?.attributes?.temperature);
               return isNaN(t) ? '–' : Math.round(t) + '°';
               ]]]
             styles:
@@ -1242,7 +1242,7 @@ views:
                   rows: 1
       label: |-
         [[[
-        return ({ armed_home: 'Armed · home', armed_away: 'Armed · away', armed_night: 'Armed · night', arming: 'Arming', pending: 'Pending', triggered: 'Triggered' })[entity.state] || entity.state;
+        return ({ armed_home: 'Armed · home', armed_away: 'Armed · away', armed_night: 'Armed · night', arming: 'Arming', pending: 'Pending', triggered: 'Triggered' })[entity?.state] || entity?.state;
         ]]]
       state:
       - value: triggered
@@ -1706,7 +1706,7 @@ views:
                       entity_id: button.robbie_hallways
       label: |-
         [[[
-        return ({ cleaning: 'Cleaning', returning: 'Returning to dock', paused: 'Paused', error: 'Needs attention' })[entity.state] || entity.state;
+        return ({ cleaning: 'Cleaning', returning: 'Returning to dock', paused: 'Paused', error: 'Needs attention' })[entity?.state] || entity?.state;
         ]]]
       state:
       - value: error
@@ -3393,7 +3393,7 @@ views:
                     show_temp: true
       label: |-
         [[[
-        const a = entity.attributes;
+        const a = entity?.attributes || {};
         if (!a.message || !a.start_time) return 'Next event';
         const start = new Date(String(a.start_time).replace(' ', 'T'));
         const day = new Date(start).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0);
@@ -3403,7 +3403,7 @@ views:
         ]]]
       name: |-
         [[[
-        return entity.attributes.message || 'No upcoming events';
+        return entity?.attributes?.message || 'No upcoming events';
         ]]]
       styles:
         grid:
