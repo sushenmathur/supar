@@ -2,16 +2,16 @@
 # Follows the device light/dark mode. Every colour, radius, size, shadow and duration used by
 # dashboard/master.yaml lives here as a CSS variable. master.yaml contains no hex / rgba literals.
 #
-# Install: copy to /config/themes/glass.yaml (configuration.yaml needs
+# Install: copy to /config/themes/glass-2.yaml (configuration.yaml needs
 #   frontend:
 #     themes: !include_dir_merge_named themes
 # ), Developer tools > YAML > "Reload themes", then profile: Theme "Glass", Dark mode "Auto".
 # Fonts: see README (Inter is loaded by www/quiet-glass-fonts.js; falls back to system-ui).
 #
-# Two themes are defined: "Glass" (day/night, follows system) and "Glass Saver" (always near-black,
+# Two themes are defined: "Glass 2" (day/night, follows system) and "Glass 2 Saver" (always near-black,
 # used only by the screensaver view).
 
-Glass:
+Glass 2:
   # ------------------------------------------------------------------ tokens (both modes)
   # Spacing
   space-1: 4px
@@ -171,7 +171,7 @@ Glass:
       scrim: "rgba(0, 0, 0, 0.60)"
 
 # Screensaver: always near-black, low luminance, regardless of the system mode.
-Glass Saver:
+Glass 2 Saver:
   space-1: 4px
   space-2: 8px
   space-3: 12px

@@ -3,14 +3,14 @@
 Wall-panel dashboard for a Lenovo Idea Tab Pro 12.7" (16:10, landscape, viewed from 0.5–2 m). Calm by default: neutral flat cards, colour only when something is on or wrong, glass only on layered surfaces (navbar, pop-ups, scrim).
 
 **`dashboard/master.yaml` is the single source of truth.** It is the complete raw dashboard configuration: 8 button-card templates (`qg_*`), the navbar template, the Home view, eight other views and the screensaver.
-Edit this file (or paste the live raw config back over it), never a copy. Every colour, radius, size, shadow and duration is a CSS variable from `themes/glass.yaml`; `master.yaml` contains no hex or rgba literals and `validate.py` enforces that.
+Edit this file (or paste the live raw config back over it), never a copy. Every colour, radius, size, shadow and duration is a CSS variable from `themes/glass-2.yaml`; `master.yaml` contains no hex or rgba literals and `validate.py` enforces that.
 
 | File | What it is |
 |---|---|
 | `dashboard/master.yaml` | Complete raw dashboard configuration (master) |
 | `dashboard/validate.py` | Checks YAML, JavaScript blocks, templates, token use, literals, type/radius scale, contrast, card budget and the "Everything's calm" rule |
 | `dashboard/alert-snooze-helper.yaml` | Helper for the alert snooze toggle (unchanged) |
-| `themes/glass.yaml` | Themes `Glass` (light and dark, follows the system) and `Glass Saver` (always near-black) |
+| `themes/glass-2.yaml` | Themes `Glass 2` (light and dark, follows the system) and `Glass 2 Saver` (always near-black) |
 | `www/quiet-glass-fonts.js`, `www/install-fonts.sh` | Loads Inter (400/500/600); falls back to system-ui if absent |
 | `_archive/` | The previous `master.yaml` and `glass.yaml` (rollback) and the old paste-in fragments |
 | `../docs/redesign-audit.md` | Card-by-card audit (KEEP / MOVE / MERGE / DROP), reachability, acceptance results |
@@ -20,7 +20,7 @@ Edit this file (or paste the live raw config back over it), never a copy. Every 
 ## Install
 
 1. **Fonts.** On the Home Assistant host run `sh homeassistant/www/install-fonts.sh /config/www` (downloads Inter, SIL Open Font License, into `/config/www/fonts/` and copies the loader). Then Settings > Dashboards > Resources > add `/local/quiet-glass-fonts.js` as a **JavaScript module**. Skip this and the dashboard simply uses the system font.
-2. **Theme.** Copy `themes/glass.yaml` to `/config/themes/glass.yaml` (needs `frontend: themes: !include_dir_merge_named themes` in `configuration.yaml`). Developer tools > YAML > **Reload themes**. On the tablet's profile choose Theme **Glass** and Dark mode **Auto**. Auto follows the device, so set the tablet's own dark schedule (Android Settings > Display > Dark theme > Schedule > sunset to sunrise): that is what turns night mode on.
+2. **Theme.** Copy `themes/glass-2.yaml` to `/config/themes/glass-2.yaml` (needs `frontend: themes: !include_dir_merge_named themes` in `configuration.yaml`). Developer tools > YAML > **Reload themes**. On the tablet's profile choose Theme **Glass 2** and Dark mode **Auto**. Auto follows the device, so set the tablet's own dark schedule (Android Settings > Display > Dark theme > Schedule > sunset to sunrise): that is what turns night mode on.
 3. **Cards (HACS).** Needed: button-card, navbar-card, browser_mod, kiosk-mode, advanced-camera-card, garage-card, washing-machine-card, wheelie-bin-card, alert-ticker-card, calendar-card-pro, clock-weather-card, homeii-music-flow. **No longer needed by this dashboard:** card-mod and the mushroom cards.
 4. **Dashboard.** Settings > Dashboards > Add dashboard > New dashboard from scratch, title "Home 2.0", URL **`home-2-0`** (all internal links use `/home-2-0/...`; Home is `/home-2-0/hubhome`, so it runs beside the existing `dashboard-hub`). Then open it > pencil > three dots > *Raw configuration editor* > select all > paste `master.yaml` > save.
 5. **Kiosk.** `master.yaml` already carries `kiosk_mode` for user `suparhome` (header and sidebar hidden), so no extra step. For another user add them to `kiosk_mode: user_settings`.
@@ -33,7 +33,7 @@ After changing the dashboard in Home Assistant, copy the raw config back into `d
 
 ## Rolling back
 
-Paste `_archive/master.yaml` into the raw editor and copy `_archive/glass.yaml` over `/config/themes/glass.yaml`, then Reload themes and refresh.
+Paste `_archive/master.yaml` into the raw editor and copy `_archive/glass.yaml` over `/config/themes/glass-2.yaml`, then Reload themes and refresh.
 
 ## Mock-up
 

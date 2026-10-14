@@ -457,7 +457,7 @@ views:
   max_columns: 3
   dense_section_placement: true
   top_margin: false
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     column_span: 3
@@ -3621,7 +3621,7 @@ views:
   type: sections
   max_columns: 3
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -3771,7 +3771,7 @@ views:
   type: sections
   max_columns: 3
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -3910,7 +3910,7 @@ views:
   type: sections
   max_columns: 4
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -4068,7 +4068,7 @@ views:
   type: sections
   max_columns: 3
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -4255,7 +4255,7 @@ views:
   type: sections
   max_columns: 3
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -4429,7 +4429,7 @@ views:
   type: sections
   max_columns: 2
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -4538,7 +4538,7 @@ views:
   type: sections
   max_columns: 3
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -4640,7 +4640,7 @@ views:
   type: sections
   max_columns: 2
   subview: true
-  theme: Glass
+  theme: Glass 2
   sections:
   - type: grid
     cards:
@@ -4723,7 +4723,7 @@ views:
   type: panel
   show_icon_and_title: true
   subview: true
-  theme: Glass
+  theme: Glass 2
   cards:
   - action_menu_labels: true
     active_player_helper_entity: ''
@@ -4909,7 +4909,7 @@ views:
   icon: mdi:clock-outline
   type: panel
   subview: true
-  theme: Glass Saver
+  theme: Glass 2 Saver
   cards:
   - type: custom:button-card
     template: qg_card

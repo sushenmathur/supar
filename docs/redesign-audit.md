@@ -1,6 +1,6 @@
 # Quiet Glass redesign: audit
 
-Scope: `homeassistant/dashboard/master.yaml` and `homeassistant/themes/glass.yaml`.
+Scope: `homeassistant/dashboard/master.yaml` and `homeassistant/themes/glass-2.yaml`.
 Rollback copies of both files are in `homeassistant/_archive/` (paste `_archive/master.yaml` into the raw editor and copy `_archive/glass.yaml` over the theme).
 
 Verdicts: **KEEP** (same job, restyled), **MOVE** (leaves Home, still one tap away), **MERGE** (two or more cards become one), **DROP** (duplicate or decoration, nothing lost).
@@ -17,7 +17,7 @@ Verdicts: **KEEP** (same job, restyled), **MOVE** (leaves Home, still one tap aw
 How to verify on the tablet (30 seconds): add a temporary button-card to any view with
 `name: "[[[ return innerWidth + ' × ' + innerHeight + ' @' + devicePixelRatio ]]]"` and read it, then delete it.
 The companion app or a browser with system bars visible will report a smaller height (typically 48–72 px less). The Home layout needs 712 px of the 800 (see section 7), so it keeps about 88 px of slack for that.
-If the reading is far from 1280 × 800, tune the two sections-view variables at the top of `glass.yaml` (`ha-view-sections-row-gap`, `ha-view-sections-column-gap`); nothing else depends on the viewport.
+If the reading is far from 1280 × 800, tune the two sections-view variables at the top of `glass-2.yaml` (`ha-view-sections-row-gap`, `ha-view-sections-column-gap`); nothing else depends on the viewport.
 
 ## 2. Old Home view: every card
 
@@ -82,7 +82,7 @@ Duplicates found on the old Home view: TV tile twice (on/off), aircon tile twice
 | **Outdoor** | markdown header; 3 headings; 12 tiles | KEEP | Unchanged content, tokens only. |
 | **Laundry** | markdown header; mushroom "drying" badge; water-leak and door badges; 2 × washing-machine-card | KEEP / MERGE | washing-machine-card kept (no tile equivalent, rich data). Drying advisory becomes a `qg_chip` with the same rule; water-leak and door move to heading badges. |
 | **Media** | homeii-music-flow panel | KEEP | Unchanged except `mobile_custom_color` (a hex literal, inert while `mobile_dynamic_theme_mode: auto`) removed. |
-| **Screensaver** (new) | n/a | NEW | `saver` view, `Glass Saver` theme. |
+| **Screensaver** (new) | n/a | NEW | `saver` view, `Glass 2 Saver` theme. |
 
 ## 4. Consolidation
 
@@ -133,7 +133,7 @@ Custom cards kept, each with no native equivalent: button-card, navbar-card, adv
 | 0 hex / rgba literals in `master.yaml` | **0** (checked by `validate.py`, which fails the build on any). |
 | ≤ 2 radii, ≤ 6 font sizes, 1 font family | **2 + pill, 6, 1** (checked by `validate.py`). |
 | Every entity from the old Home view reachable within 1 tap | **Yes: 107 of 107** (67 on Home, 38 in pop-ups, 2 via the Security view on the rail). Appendix below. Entities that only appear while active (bin sensors, `alert_banner_snooze`, `robbie_dock_dock_error`, alert-ticker internals) are conditional by design. |
-| Text contrast ≥ 4.5:1 body, ≥ 7:1 primary labels, both modes | **Pass.** Primary text (`text-1`) is 14.6–17.9:1 in light and 11.3–17.7:1 in dark on every surface and state tint; secondary text (`text-2`) is 6.2–7.6:1 light and 5.8–9.2:1 dark; state "ink" colours on their tints are ≥ 5.6:1 (light) and ≥ 7.2:1 (dark). `Glass Saver` (low luminance by design): `text-1` ≥ 7.5:1, `text-2` ≥ 5.0:1. 66 pairs are checked by `validate.py`, which fails below target; `validate.py -v` prints them all. |
+| Text contrast ≥ 4.5:1 body, ≥ 7:1 primary labels, both modes | **Pass.** Primary text (`text-1`) is 14.6–17.9:1 in light and 11.3–17.7:1 in dark on every surface and state tint; secondary text (`text-2`) is 6.2–7.6:1 light and 5.8–9.2:1 dark; state "ink" colours on their tints are ≥ 5.6:1 (light) and ≥ 7.2:1 (dark). `Glass 2 Saver` (low luminance by design): `text-1` ≥ 7.5:1, `text-2` ≥ 5.0:1. 66 pairs are checked by `validate.py`, which fails below target; `validate.py -v` prints them all. |
 | Touch targets ≥ 48 × 48 px | **Pass for every Quiet Glass card** (`min-height: var(--tap)`; rows are 56 px and up; the Home mock-up was measured in headless Chromium: every card, chip, nav item, scene, toggle, person and bin button is ≥ 48 px). **Exceptions** (native HA controls, not restyled): heading badges (≈ 28–32 px, informational), tile feature buttons (≈ 40 px), the hvac-mode segmented control inside tiles. |
 | ≤ ~35 cards on Home | **26 at rest, 35 with everything active** |
 | Backdrop blur: at most the navbar on Home | **Yes** (the navbar only; pop-ups while open) |

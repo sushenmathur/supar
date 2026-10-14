@@ -17,7 +17,7 @@ import os, re, subprocess, sys, tempfile, yaml
 here = os.path.dirname(os.path.abspath(__file__))
 text = open(os.path.join(here, 'master.yaml')).read()
 d = yaml.safe_load(text)
-theme = yaml.safe_load(open(os.path.join(here, '..', 'themes', 'glass.yaml')).read())
+theme = yaml.safe_load(open(os.path.join(here, '..', 'themes', 'glass-2.yaml')).read())
 errors, warnings = [], []
 
 def strings(o):
@@ -86,14 +86,14 @@ used = set(re.findall(r'var\(\s*--([\w-]+)', body))
 for u in sorted(used):
     if u not in theme_keys and f'--{u}' not in local_props and u not in ('primary-text-color',) and not u.startswith('qg-'):
         errors.append(f'var(--{u}) is not defined in themes/glass.yaml')
-# every theme must define the tokens its views use (Glass: all views; Glass Saver: the saver view only)
+# every theme must define the tokens its views use (Glass 2: all views; Glass 2 Saver: the saver view only)
 def used_in(view): return set(re.findall(r'var\(\s*--([\w-]+)', yaml.dump(view)))
 view_theme = {}
-for v in d['views']: view_theme.setdefault(v.get('theme', 'Glass'), []).append(v)
+for v in d['views']: view_theme.setdefault(v.get('theme', 'Glass 2'), []).append(v)
 for name, th in theme.items():
     keys = set(th) | {k for m in (th.get('modes') or {}).values() for k in m}
-    need = set().union(*[used_in(v) for v in view_theme.get(name, [])]) if name != 'Glass' else used
-    if name == 'Glass':   # navbar / templates are shared
+    need = set().union(*[used_in(v) for v in view_theme.get(name, [])]) if name != 'Glass 2' else used
+    if name == 'Glass 2':   # navbar / templates are shared
         need = used
     else:
         need = need | {u for tpl in ('qg_card',) for u in used_in(d['button_card_templates'][tpl])}
@@ -129,8 +129,8 @@ def mix(a, b, p):
 def gradient_stops(v): return re.findall(r'#[0-9a-fA-F]{6}', v)
 contrast_report = []
 sets = []
-for mode, vals in theme['Glass']['modes'].items(): sets.append((f'Glass/{mode}', vals))
-sets.append(('Glass Saver', theme['Glass Saver']))
+for mode, vals in theme['Glass 2']['modes'].items(): sets.append((f'Glass 2/{mode}', vals))
+sets.append(('Glass 2 Saver', theme['Glass 2 Saver']))
 for label, v in sets:
     s0 = gradient_stops(v['surface-0']) if v['surface-0'].startswith('linear') else [v['surface-0']]
     bgs = {'surface-0': s0[0], 'surface-0b': s0[-1], 'surface-1': v['surface-1'], 'surface-2': v['surface-2']}

@@ -6,9 +6,9 @@ Open the page with  ?theme=light|dark  &scene=calm|busy|popup|energy|saver  (&sh
 import json, os, re, yaml
 
 here = os.path.dirname(os.path.abspath(__file__))
-theme = yaml.safe_load(open(os.path.join(here, '..', 'homeassistant', 'themes', 'glass.yaml')))['Glass']
+theme = yaml.safe_load(open(os.path.join(here, '..', 'homeassistant', 'themes', 'glass-2.yaml')))['Glass 2']
 modes = theme['modes']
-saver = yaml.safe_load(open(os.path.join(here, '..', 'homeassistant', 'themes', 'glass.yaml')))['Glass Saver']
+saver = yaml.safe_load(open(os.path.join(here, '..', 'homeassistant', 'themes', 'glass-2.yaml')))['Glass 2 Saver']
 TOKEN_KEYS = [k for k in theme if k.split('-')[0] in ('space', 'radius', 'fs', 'fw', 'lh', 'tap', 'disc', 'dot', 'bar', 'icon', 'ring', 'popup', 'saver', 'opacity', 'dur', 'ease') or k in ('font-sans',)]
 shared = '\n'.join(f'  --{k}: {theme[k]};' for k in TOKEN_KEYS if not str(theme[k]).startswith('var('))
 def block(sel, vals):

@@ -6,7 +6,7 @@ Nothing here was written into the repository as an automation. These are the beh
 
 ### A1. Idle screensaver (after N minutes)
 
-The `saver` view and the near-black `Glass Saver` theme are in `master.yaml`. Nothing switches to it yet.
+The `saver` view and the near-black `Glass 2 Saver` theme are in `master.yaml`. Nothing switches to it yet.
 
 | | |
 |---|---|
@@ -42,10 +42,10 @@ I have not checked which of these your tablet exposes; use whichever matches how
 
 ### A3. Day and night theme ("follow system")
 
-The theme itself needs nothing: `Glass` defines light and dark and follows the device.
+The theme itself needs nothing: `Glass 2` defines light and dark and follows the device.
 
 * Driving setting: **Android Settings > Display > Dark theme > Schedule > "Sunset to sunrise"** on the tablet.
-* In Home Assistant, on the tablet's profile: **Theme: Glass, Dark mode: Auto** (not "Dark" or "Light").
+* In Home Assistant, on the tablet's profile: **Theme: Glass 2, Dark mode: Auto** (not "Dark" or "Light").
 * The Good Night scene cannot flip the device to dark by itself. If you want that, it needs a device command (companion app or Fully Kiosk) in an automation; I did not assume one exists.
 * Night look (reduced accent saturation, no bright surfaces) is just the dark palette: accent `#9ab4ee`, amber `#f2b84b`, card `#161c28`. The saver is darker again.
 
@@ -102,7 +102,7 @@ The Media Now item uses an explicit list (`media_player.tv`, `media_apple_tv`, `
 | Cost, tariff, rate and EV charging moved into the Energy pop-up; the animated flow is static. | `energy_popup()` | As requested; looping animation removed. |
 | Next event reads the calendar entity's own attributes. | `next_event()` | Avoids a custom card on Home. If `calendar.supar_family` only exposes the next event while one is active or imminent, the tile will read "No upcoming events" until then; check on the device. |
 | Garage pop-up is long (door, controls, two cars). | `room_popup('garage')` | Everything the old car pop-ups held stays one tap from Home; the pop-up scrolls. |
-| The `Glass Saver` clock is the 72 px token scaled with CSS `zoom` (2.6×). | `glass.yaml`, `saver_view()` | Keeps the type scale at six sizes. |
+| The `Glass 2 Saver` clock is the 72 px token scaled with CSS `zoom` (2.6×). | `glass-2.yaml`, `saver_view()` | Keeps the type scale at six sizes. |
 
 ## C. Not verified: checklist for the first run on the tablet
 
@@ -110,12 +110,12 @@ I could not run this against a live Home Assistant (no instance, no tablet). Wha
 
 1. **Viewport.** Read `innerWidth × innerHeight` on the tablet (snippet in `redesign-audit.md` section 1). Expected about 1280 × 800.
 2. **Fonts.** Run `homeassistant/www/install-fonts.sh`, add the `quiet-glass-fonts.js` resource, hard refresh. Without them the dashboard uses system-ui and looks fine, just not Inter.
-3. **Home scroll.** Home should not scroll in calm or in a typical busy evening. If it does, lower `ha-view-sections-row-gap` or `ha-view-sections-column-gap` in `glass.yaml` (these variable names are from the HA sections-view source as I remember it; if they have no effect on your version, the layout still works but the spacing is HA's default).
+3. **Home scroll.** Home should not scroll in calm or in a typical busy evening. If it does, lower `ha-view-sections-row-gap` or `ha-view-sections-column-gap` in `glass-2.yaml` (these variable names are from the HA sections-view source as I remember it; if they have no effect on your version, the layout still works but the spacing is HA's default).
 4. **Pop-up width.** The pop-up style sets `--mdc-dialog-min-width`, `--mdc-dialog-max-width` and `--ha-dialog-width-md` to 560 px. Which one your HA and browser_mod version honours may vary; a pop-up that is not about 560 px wide means one of the three needs changing in `POPUP_STYLE` (it is repeated verbatim in each pop-up).
 5. **Native tile features.** `alarm-modes`, `vacuum-commands`, `target-temperature`, `climate-hvac-modes`, `lock-commands`, `cover-open-close` need a recent Home Assistant (2025.x). A tile that shows no feature row means that feature name is not supported on your version.
 6. **Heading badges** (entity badges inside `heading`) and **`visibility`** with `or`, `and`, `numeric_state` and `time` conditions on cards: the old config already used `visibility` with a time rule, so these should work, but the Now column depends on them.
 7. **Navbar badge colour.** I target `.badge` in the navbar styles. If the badge keeps its default colour the class name differs in your navbar-card version.
-8. **Native tile state colours.** `glass.yaml` sets `state-light-active-color`, `state-switch-active-color`, `state-lock-unlocked-color`, `state-cover-open-color` and the generic active colour to the warm amber "ink". Native tiles may still pick other colours for some domains; check a light, a switch and a door.
+8. **Native tile state colours.** `glass-2.yaml` sets `state-light-active-color`, `state-switch-active-color`, `state-lock-unlocked-color`, `state-cover-open-color` and the generic active colour to the warm amber "ink". Native tiles may still pick other colours for some domains; check a light, a switch and a door.
 9. **`color-mix()` and `zoom`.** `color-mix()` needs Chromium / Android System WebView 111 or newer. If it is older, the tint declarations are ignored and cards fall back to the plain surface (each has a plain `var(--…)` declaration just before its `color-mix()` one), so you lose the amber and alert tints but nothing breaks.
 10. **Alert ticker.** It must stay invisible. If you see an empty card in the Now column, its `visibility` rule is not being honoured.
 11. **Other things to look for:** a room tile that never lights (its `watch` list needs a missing entity), the aircon Now item listing a zone you did not expect, the status sentence reading "Lights off" while a light is on (the status counts `light.*` only, not switches).
