@@ -959,6 +959,8 @@ views:
                 triggers_update:
                 - sensor.time
                 - weather.north_lakes_weather
+                - sun.sun
+                - input_boolean.weather_animations
                 show_icon: false
                 show_name: false
                 show_state: false
@@ -1031,6 +1033,38 @@ views:
                               daytime: binary_sensor.austin_daytime
                               tz: America/Chicago
                 custom_fields:
+                  scene: |
+                    [[[
+                      const cond = states['weather.north_lakes_weather']?.state || '';
+                      const night = states['sun.sun']?.state === 'below_horizon';
+                      const animOff = states['input_boolean.weather_animations']?.state === 'off';
+                      const kmap = { sunny: night ? 'night' : 'sunny', 'clear-night': 'night', partlycloudy: night ? 'nightcloud' : 'partly',
+                        cloudy: night ? 'nightcloud' : 'cloudy', windy: 'cloudy', 'windy-variant': 'cloudy', exceptional: 'cloudy',
+                        rainy: 'rainy', pouring: 'pour', hail: 'pour', lightning: 'storm', 'lightning-rainy': 'storm',
+                        snowy: 'snowy', 'snowy-rainy': 'snowy', fog: 'fog' };
+                      const key = animOff ? '' : (kmap[cond] || '');
+                      if (!key) return '';
+                      const r = (i, s) => { const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return x - Math.floor(x); };
+                      const n = (c, f) => Array.from({ length: c }, (_, i) => f(i)).join('');
+                      const clouds = (c, dark) => n(c, i => `<i class="ws-cl ${dark ? 'ws-d' : ''}" style="top:${-6 + r(i, 1) * 50}px;width:${110 + r(i, 2) * 90}px;animation-duration:${(dark ? 26 : 34) + r(i, 3) * 22}s;animation-delay:-${r(i, 4) * 40}s"></i>`);
+                      const rain = (c, dur) => n(c, i => `<i class="ws-drop" style="left:${r(i, 5) * 105}%;animation-duration:${dur * (0.7 + r(i, 6) * 0.6)}s;animation-delay:-${r(i, 7) * 2}s;opacity:${0.45 + r(i, 8) * 0.5}"></i>`);
+                      const snow = c => n(c, i => `<i class="ws-flake" style="left:${r(i, 9) * 100}%;animation-duration:${5 + r(i, 10) * 5}s;animation-delay:-${r(i, 11) * 8}s;transform:scale(${0.6 + r(i, 12)})"></i>`);
+                      const stars = c => n(c, i => `<i class="ws-star" style="left:${r(i, 13) * 100}%;top:${r(i, 14) * 100}%;animation-duration:${2 + r(i, 15) * 3}s;animation-delay:-${r(i, 16) * 4}s"></i>`);
+                      const inner = {
+                        sunny: '<i class="ws-sun"></i><i class="ws-flare"></i>',
+                        partly: '<i class="ws-sun"></i>' + clouds(3),
+                        cloudy: clouds(5),
+                        rainy: clouds(3, 1) + rain(26, 0.9),
+                        pour: clouds(4, 1) + rain(46, 0.6),
+                        storm: clouds(4, 1) + rain(46, 0.6) + '<i class="ws-flash"></i>',
+                        night: stars(26) + '<i class="ws-moon"></i>',
+                        nightcloud: stars(14) + '<i class="ws-moon"></i>' + clouds(2, 1),
+                        snowy: snow(26),
+                        fog: '<i class="ws-band" style="top:14px;animation-duration:11s"></i><i class="ws-band" style="top:48px;animation-duration:15s;animation-delay:-5s"></i><i class="ws-band" style="top:80px;animation-duration:13s;animation-delay:-8s"></i>'
+                      }[key];
+                      const cls = { pour: 'rainy', nightcloud: 'night' }[key] || key;
+                      return `<div class="ws-sc ws-${cls}">${inner}</div>`;
+                    ]]]
                   body: |
                     [[[
                       const tz = { timeZone: 'Australia/Brisbane' };
@@ -1050,16 +1084,23 @@ views:
                         'lightning-rainy': 'Thunderstorms', partlycloudy: 'Partly Cloudy', pouring: 'Pouring', rainy: 'Rainy', snowy: 'Snowy',
                         'snowy-rainy': 'Sleet', sunny: 'Sunny', windy: 'Windy', 'windy-variant': 'Windy' };
                       const condText = names[cond] || (cond && cond !== 'unavailable' && cond !== 'unknown' ? cond.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '');
+                      const night = states['sun.sun']?.state === 'below_horizon';
+                      const animOff = states['input_boolean.weather_animations']?.state === 'off';
+                      const kmap = { sunny: night ? 'night' : 'sunny', 'clear-night': 'night', partlycloudy: night ? 'nightcloud' : 'partly',
+                        cloudy: night ? 'nightcloud' : 'cloudy', windy: 'cloudy', 'windy-variant': 'cloudy', exceptional: 'cloudy',
+                        rainy: 'rainy', pouring: 'pour', hail: 'pour', lightning: 'storm', 'lightning-rainy': 'storm',
+                        snowy: 'snowy', 'snowy-rainy': 'snowy', fog: 'fog' };
+                      const light = !animOff && ['rainy', 'pour', 'storm', 'night', 'nightcloud'].includes(kmap[cond]);
                       const t = parseFloat(w?.attributes?.temperature);
                       const icons = { sunny: ['weather-sunny', '#ffc53d'], 'clear-night': ['weather-night', '#a5b4fc'], partlycloudy: ['weather-partly-cloudy', '#ffc53d'],
                         cloudy: ['weather-cloudy', '#94a3b8'], rainy: ['weather-rainy', '#60a5fa'], pouring: ['weather-pouring', '#3b82f6'],
                         lightning: ['weather-lightning', '#fbbf24'], 'lightning-rainy': ['weather-lightning-rainy', '#a78bfa'], snowy: ['weather-snowy', '#7dd3fc'],
                         fog: ['weather-fog', '#94a3b8'], hail: ['weather-hail', '#7dd3fc'], windy: ['weather-windy', '#5eead4'] };
                       const [wi, wc] = icons[cond] || ['weather-cloudy', '#94a3b8'];
-                      const pill = s => `<span style="display:inline-flex;padding:4px 10px;border-radius:99px;background:rgba(var(--rgb-primary-text-color),0.07);font-size:12.5px;font-weight:600;white-space:nowrap">${s}</span>`;
-                      return `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;width:100%;text-align:left">
+                      const pill = s => `<span style="display:inline-flex;padding:4px 10px;border-radius:99px;background:${light ? 'rgba(255,255,255,0.18)' : 'rgba(var(--rgb-primary-text-color),0.07)'};font-size:12.5px;font-weight:600;white-space:nowrap">${s}</span>`;
+                      return `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;width:100%;text-align:left;color:${light ? '#fff' : 'inherit'}">
                         <div>
-                          <div style="font-size:12.5px;font-weight:600;color:var(--secondary-text-color);white-space:nowrap">${hello} · ${ord(dayNum)} ${month}${condText ? ' · ' + condText : ''}</div>
+                          <div style="font-size:12.5px;font-weight:600;color:${light ? 'rgba(255,255,255,0.85)' : 'var(--secondary-text-color)'};white-space:nowrap">${hello} · ${ord(dayNum)} ${month}${condText ? ' · ' + condText : ''}</div>
                           <div style="font-size:50px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:4px;white-space:nowrap">${clock('Australia/Brisbane', true)}</div>
                         </div>
                         <div style="display:grid;gap:6px;justify-items:end">
@@ -1070,15 +1111,58 @@ views:
                           <div style="display:flex;gap:6px">${pill('India ' + clock('Asia/Kolkata'))}${pill('Austin ' + clock('America/Chicago'))}</div>
                         </div></div>`;
                     ]]]
+                extra_styles: |
+                  .ws-sc { position: absolute; inset: 0; overflow: hidden; border-radius: 28px; pointer-events: none; }
+                  .ws-sc > * { position: absolute; pointer-events: none; will-change: transform, opacity; }
+                  .ws-sunny { background: linear-gradient(135deg, rgba(255,214,102,0.60), rgba(255,150,90,0.28)); }
+                  .ws-partly { background: linear-gradient(135deg, rgba(140,205,255,0.60), rgba(255,226,150,0.30)); }
+                  .ws-cloudy { background: linear-gradient(135deg, rgba(150,165,190,0.65), rgba(190,200,220,0.35)); }
+                  .ws-rainy { background: linear-gradient(135deg, rgba(55,70,100,0.82), rgba(85,100,130,0.60)); }
+                  .ws-storm { background: linear-gradient(135deg, rgba(30,38,66,0.92), rgba(60,52,100,0.72)); }
+                  .ws-night { background: linear-gradient(135deg, rgba(14,20,64,0.86), rgba(60,40,120,0.62)); }
+                  .ws-snowy { background: linear-gradient(135deg, rgba(170,195,230,0.70), rgba(220,232,250,0.45)); }
+                  .ws-fog { background: linear-gradient(135deg, rgba(175,182,196,0.70), rgba(205,210,222,0.45)); }
+                  .ws-sun { right: 70px; top: -60px; width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle, rgba(255,244,190,0.95) 0%, rgba(255,210,100,0.55) 38%, transparent 70%); animation: ws-sunpulse 5s ease-in-out infinite; }
+                  .ws-flare { right: -40px; top: 20px; width: 260px; height: 60px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent); transform: rotate(-18deg); animation: ws-flare 9s ease-in-out infinite; }
+                  .ws-cl { height: 46px; border-radius: 46px; background: rgba(255,255,255,0.62); filter: blur(7px); animation: ws-drift linear infinite; }
+                  .ws-cl.ws-d { background: rgba(70,80,100,0.55); }
+                  .ws-drop { top: -22px; width: 1.6px; height: 18px; background: linear-gradient(transparent, rgba(200,222,255,0.85)); animation: ws-fall linear infinite; transform: rotate(12deg); }
+                  .ws-flake { top: -8px; width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.9); animation: ws-snow linear infinite; }
+                  .ws-star { width: 2.5px; height: 2.5px; border-radius: 50%; background: #fff; animation: ws-twinkle ease-in-out infinite; }
+                  .ws-moon { right: 90px; top: 14px; width: 34px; height: 34px; border-radius: 50%; box-shadow: inset -9px -3px 0 0 rgba(255,246,214,0.92); filter: drop-shadow(0 0 10px rgba(255,246,214,0.6)); transform: rotate(-20deg); }
+                  .ws-band { left: -30%; width: 160%; height: 34px; border-radius: 34px; background: rgba(255,255,255,0.4); filter: blur(10px); animation: ws-slide ease-in-out infinite alternate; }
+                  .ws-flash { inset: 0; background: rgba(255,255,255,0.85); opacity: 0; animation: ws-flash 7s infinite; }
+                  @keyframes ws-sunpulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.12); opacity: 1; } }
+                  @keyframes ws-flare { 0%, 100% { transform: translateX(30px) rotate(-18deg); opacity: 0.2; } 50% { transform: translateX(-60px) rotate(-18deg); opacity: 0.6; } }
+                  @keyframes ws-drift { from { transform: translateX(-200px); } to { transform: translateX(640px); } }
+                  @keyframes ws-fall { from { transform: translate3d(0, 0, 0) rotate(12deg); } to { transform: translate3d(-30px, 150px, 0) rotate(12deg); } }
+                  @keyframes ws-snow { 0% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(14px, 65px, 0); } 100% { transform: translate3d(-6px, 130px, 0); } }
+                  @keyframes ws-twinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 1; } }
+                  @keyframes ws-slide { from { transform: translateX(-9%); } to { transform: translateX(9%); } }
+                  @keyframes ws-flash { 0%, 86%, 100% { opacity: 0; } 87% { opacity: 0.75; } 89% { opacity: 0.1; } 91% { opacity: 0.6; } 95% { opacity: 0; } }
+                  @media (prefers-reduced-motion: reduce) { .ws-sc * { animation: none !important; } }
                 styles:
                   card:
                   - height: 112px
                   - border-radius: 28px
                   - padding: 0 24px
+                  - position: relative
+                  - overflow: hidden
                   grid:
-                  - grid-template-areas: '"body"'
+                  - grid-template-areas: '"stack"'
                   custom_fields:
+                    scene:
+                    - grid-area: stack
+                    - margin: 0 -24px
+                    - width: calc(100% + 48px)
+                    - height: 112px
+                    - align-self: center
+                    - justify-self: stretch
+                    - pointer-events: none
                     body:
+                    - grid-area: stack
+                    - position: relative
+                    - z-index: 2
                     - width: 100%
               - type: grid
                 columns: 1
