@@ -819,30 +819,10 @@ views:
                       browser_mod:
                         service: browser_mod.popup
                         data:
-                          style:
-                            .: |
-                              :host {
-                                --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                                --dialog-backdrop-filter: blur(10px);
-                                --ha-dialog-scrim-backdrop-filter: blur(10px);
-                                --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                                --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                                --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                              }
-                            ha-dialog$: |
-                              .mdc-dialog__surface {
-                                background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                                backdrop-filter: blur(30px) saturate(190%);
-                                -webkit-backdrop-filter: blur(30px) saturate(190%);
-                                border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                              }
-                            ha-wa-dialog$: |
-                              wa-dialog::part(dialog) {
-                                background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                                backdrop-filter: blur(30px) saturate(190%);
-                                -webkit-backdrop-filter: blur(30px) saturate(190%);
-                                border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                              }
+                          style: |
+                            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                            --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                           title: Close the garage door?
                           content: The door will start closing straight away. Make sure nothing is in the way.
                           left_button: Cancel
@@ -987,30 +967,10 @@ views:
                   browser_mod:
                     service: browser_mod.popup
                     data:
-                      style:
-                        .: |
-                          :host {
-                            --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                            --dialog-backdrop-filter: blur(10px);
-                            --ha-dialog-scrim-backdrop-filter: blur(10px);
-                            --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                            --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                          }
-                        ha-dialog$: |
-                          .mdc-dialog__surface {
-                            background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                            backdrop-filter: blur(30px) saturate(190%);
-                            -webkit-backdrop-filter: blur(30px) saturate(190%);
-                            border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                          }
-                        ha-wa-dialog$: |
-                          wa-dialog::part(dialog) {
-                            background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                            backdrop-filter: blur(30px) saturate(190%);
-                            -webkit-backdrop-filter: blur(30px) saturate(190%);
-                            border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                          }
+                      style: |
+                        --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                        --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                        --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                       title: Brisbane
                       icon: mdi:weather-partly-cloudy
                       dismissable: true
@@ -1179,30 +1139,10 @@ views:
                               value: ''
                           - service: browser_mod.popup
                             data:
-                              style:
-                                .: |
-                                  :host {
-                                    --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                                    --dialog-backdrop-filter: blur(10px);
-                                    --ha-dialog-scrim-backdrop-filter: blur(10px);
-                                    --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                                    --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                                    --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                                  }
-                                ha-dialog$: |
-                                  .mdc-dialog__surface {
-                                    background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                                    backdrop-filter: blur(30px) saturate(190%);
-                                    -webkit-backdrop-filter: blur(30px) saturate(190%);
-                                    border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                                  }
-                                ha-wa-dialog$: |
-                                  wa-dialog::part(dialog) {
-                                    background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                                    backdrop-filter: blur(30px) saturate(190%);
-                                    -webkit-backdrop-filter: blur(30px) saturate(190%);
-                                    border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                                  }
+                              style: |
+                                --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                                --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                                --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                               title: Announce
                               icon: mdi:bullhorn
                               dismissable: true
@@ -1292,30 +1232,10 @@ views:
                       browser_mod:
                         service: browser_mod.popup
                         data:
-                          style:
-                            .: |
-                              :host {
-                                --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                                --dialog-backdrop-filter: blur(10px);
-                                --ha-dialog-scrim-backdrop-filter: blur(10px);
-                                --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                                --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                                --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                              }
-                            ha-dialog$: |
-                              .mdc-dialog__surface {
-                                background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                                backdrop-filter: blur(30px) saturate(190%);
-                                -webkit-backdrop-filter: blur(30px) saturate(190%);
-                                border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                              }
-                            ha-wa-dialog$: |
-                              wa-dialog::part(dialog) {
-                                background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                                backdrop-filter: blur(30px) saturate(190%);
-                                -webkit-backdrop-filter: blur(30px) saturate(190%);
-                                border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                              }
+                          style: |
+                            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                            --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                           title: Lost Phone
                           content:
                             - default: Sushen
@@ -1347,30 +1267,10 @@ views:
                       action: perform-action
                       perform_action: browser_mod.popup
                       data:
-                        style:
-                          .: |
-                            :host {
-                              --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                              --dialog-backdrop-filter: blur(10px);
-                              --ha-dialog-scrim-backdrop-filter: blur(10px);
-                              --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                              --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                              --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                            }
-                          ha-dialog$: |
-                            .mdc-dialog__surface {
-                              background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                              backdrop-filter: blur(30px) saturate(190%);
-                              -webkit-backdrop-filter: blur(30px) saturate(190%);
-                              border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                            }
-                          ha-wa-dialog$: |
-                            wa-dialog::part(dialog) {
-                              background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                              backdrop-filter: blur(30px) saturate(190%);
-                              -webkit-backdrop-filter: blur(30px) saturate(190%);
-                              border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                            }
+                        style: |
+                          --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                          --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                          --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                         title: Scan for WiFi
                         content:
                           type: picture
@@ -1427,30 +1327,10 @@ views:
                       action: perform-action
                       perform_action: browser_mod.popup
                       data:
-                        style:
-                          .: |
-                            :host {
-                              --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                              --dialog-backdrop-filter: blur(10px);
-                              --ha-dialog-scrim-backdrop-filter: blur(10px);
-                              --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                              --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                              --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                            }
-                          ha-dialog$: |
-                            .mdc-dialog__surface {
-                              background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                              backdrop-filter: blur(30px) saturate(190%);
-                              -webkit-backdrop-filter: blur(30px) saturate(190%);
-                              border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                            }
-                          ha-wa-dialog$: |
-                            wa-dialog::part(dialog) {
-                              background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                              backdrop-filter: blur(30px) saturate(190%);
-                              -webkit-backdrop-filter: blur(30px) saturate(190%);
-                              border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                            }
+                        style: |
+                          --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                          --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                          --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                         title: Robbie
                         content:
                           type: vertical-stack
@@ -1752,30 +1632,10 @@ views:
                   browser_mod:
                     service: browser_mod.popup
                     data:
-                      style:
-                        .: |
-                          :host {
-                            --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                            --dialog-backdrop-filter: blur(10px);
-                            --ha-dialog-scrim-backdrop-filter: blur(10px);
-                            --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                            --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                          }
-                        ha-dialog$: |
-                          .mdc-dialog__surface {
-                            background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                            backdrop-filter: blur(30px) saturate(190%);
-                            -webkit-backdrop-filter: blur(30px) saturate(190%);
-                            border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                          }
-                        ha-wa-dialog$: |
-                          wa-dialog::part(dialog) {
-                            background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                            backdrop-filter: blur(30px) saturate(190%);
-                            -webkit-backdrop-filter: blur(30px) saturate(190%);
-                            border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                          }
+                      style: |
+                        --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                        --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                        --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                       title: Media
                       dismissable: true
                       size: normal
@@ -2068,30 +1928,10 @@ views:
               browser_mod:
                 service: browser_mod.popup
                 data:
-                  style:
-                    .: |
-                      :host {
-                        --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                        --dialog-backdrop-filter: blur(10px);
-                        --ha-dialog-scrim-backdrop-filter: blur(10px);
-                        --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                        --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                        --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                      }
-                    ha-dialog$: |
-                      .mdc-dialog__surface {
-                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                        backdrop-filter: blur(30px) saturate(190%);
-                        -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                      }
-                    ha-wa-dialog$: |
-                      wa-dialog::part(dialog) {
-                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                        backdrop-filter: blur(30px) saturate(190%);
-                        -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                      }
+                  style: |
+                    --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                    --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                    --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                   title: Sorento
                   icon: mdi:car-electric
                   dismissable: true
@@ -2243,30 +2083,10 @@ views:
               browser_mod:
                 service: browser_mod.popup
                 data:
-                  style:
-                    .: |
-                      :host {
-                        --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                        --dialog-backdrop-filter: blur(10px);
-                        --ha-dialog-scrim-backdrop-filter: blur(10px);
-                        --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                        --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                        --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                      }
-                    ha-dialog$: |
-                      .mdc-dialog__surface {
-                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                        backdrop-filter: blur(30px) saturate(190%);
-                        -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                      }
-                    ha-wa-dialog$: |
-                      wa-dialog::part(dialog) {
-                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                        backdrop-filter: blur(30px) saturate(190%);
-                        -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                      }
+                  style: |
+                    --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                    --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                    --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                   title: Bluey
                   icon: mdi:car-electric
                   dismissable: true
@@ -2383,30 +2203,10 @@ views:
               browser_mod:
                 service: browser_mod.popup
                 data:
-                  style:
-                    .: |
-                      :host {
-                        --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15,20,50,0.45));
-                        --dialog-backdrop-filter: blur(10px);
-                        --ha-dialog-scrim-backdrop-filter: blur(10px);
-                        --ha-dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                        --dialog-surface-background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50)));
-                        --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                      }
-                    ha-dialog$: |
-                      .mdc-dialog__surface {
-                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                        backdrop-filter: blur(30px) saturate(190%);
-                        -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                      }
-                    ha-wa-dialog$: |
-                      wa-dialog::part(dialog) {
-                        background: var(--glass-popup-bg, linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))) !important;
-                        backdrop-filter: blur(30px) saturate(190%);
-                        -webkit-backdrop-filter: blur(30px) saturate(190%);
-                        border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80));
-                      }
+                  style: |
+                    --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62));
+                    --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                    --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                   title: Front Door
                   icon: mdi:door
                   dismissable: true
