@@ -1274,7 +1274,7 @@ views:
                                       card:
                                       - height: 54px
                                       - border-radius: 20px
-                                      - background: var(--glass-accent, linear-gradient(135deg, #7dd3fc, #818cf8))
+                                      - background: 'var(--glass-accent, linear-gradient(135deg, #7dd3fc, #818cf8))'
                                       - border: 1px solid var(--glass-popup-border, rgba(255,255,255,0.80))
                                       - backdrop-filter: blur(18px)
                                       name:
