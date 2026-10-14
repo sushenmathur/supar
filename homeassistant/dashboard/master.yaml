@@ -324,34 +324,34 @@ navbar-templates:
     routes:
     - icon: mdi:home
       label: Home
-      url: /dashboard-hub/hubhome
+      url: /home-2-0/hubhome
     - icon: mdi:floor-plan
       label: Rooms
       popup:
       - icon: mdi:sofa
         label: Living
-        url: /dashboard-hub/living-room
+        url: /home-2-0/living-room
       - icon: mdi:teddy-bear
         label: Kids
-        url: /dashboard-hub/kidsroom
+        url: /home-2-0/kidsroom
       - icon: mdi:garage-variant
         label: Garage
-        url: /dashboard-hub/garage
+        url: /home-2-0/garage
       - icon: mdi:gate
         label: Outdoor
-        url: /dashboard-hub/outdoor
+        url: /home-2-0/outdoor
       - icon: mdi:washing-machine
         label: Laundry
-        url: /dashboard-hub/laundry
+        url: /home-2-0/laundry
       tap_action:
         action: open-popup
     - icon: mdi:lightbulb-outline
       icon_selected: mdi:lightbulb-on
       label: Lights
-      url: /dashboard-hub/lights
+      url: /home-2-0/lights
     - icon: mdi:thermometer
       label: Climate
-      url: /dashboard-hub/homeclimate
+      url: /home-2-0/homeclimate
     - badge:
         count: |-
           [[[
@@ -373,10 +373,10 @@ navbar-templates:
           ]]]
       icon: mdi:security
       label: Security
-      url: /dashboard-hub/security
+      url: /home-2-0/security
     - icon: mdi:music
       label: Music
-      url: /dashboard-hub/music
+      url: /home-2-0/music
     - icon: mdi:dots-horizontal
       label: More
       popup:
@@ -527,7 +527,7 @@ views:
         rows: 2
       tap_action:
         action: navigate
-        navigation_path: /dashboard-hub/security
+        navigation_path: /home-2-0/security
       name: |-
         [[[
         const on = id => states[id]?.state === 'on';
@@ -956,7 +956,7 @@ views:
       - sensor.time
       tap_action:
         action: navigate
-        navigation_path: /dashboard-hub/security
+        navigation_path: /home-2-0/security
       variables:
         alerts: |-
           [[[
@@ -1191,7 +1191,7 @@ views:
       - sun.sun
       tap_action:
         action: navigate
-        navigation_path: /dashboard-hub/security
+        navigation_path: /home-2-0/security
       label: |-
         [[[
         const d = { 'binary_sensor.hallwaydoorsensor_contact': 'Hallway', 'binary_sensor.front_door_contact': 'Front', 'binary_sensor.patio_door_contact': 'Patio', 'binary_sensor.laundrydoorsensor_contact': 'Laundry' };
@@ -1255,7 +1255,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/security
+                  navigation_path: /home-2-0/security
                 grid_options:
                   columns: full
                   rows: 1
@@ -1503,7 +1503,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/homeclimate
+                  navigation_path: /home-2-0/homeclimate
                 grid_options:
                   columns: full
                   rows: 1
@@ -1599,7 +1599,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/laundry
+                  navigation_path: /home-2-0/laundry
                 grid_options:
                   columns: full
                   rows: 1
@@ -1880,7 +1880,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/kidsroom
+                  navigation_path: /home-2-0/kidsroom
                 grid_options:
                   columns: full
                   rows: 1
@@ -2451,7 +2451,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/living-room
+                  navigation_path: /home-2-0/living-room
                 grid_options:
                   columns: full
                   rows: 1
@@ -2586,7 +2586,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/kidsroom
+                  navigation_path: /home-2-0/kidsroom
                 grid_options:
                   columns: full
                   rows: 1
@@ -2760,7 +2760,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/garage
+                  navigation_path: /home-2-0/garage
                 grid_options:
                   columns: full
                   rows: 1
@@ -2884,7 +2884,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/outdoor
+                  navigation_path: /home-2-0/outdoor
                 grid_options:
                   columns: full
                   rows: 1
@@ -2961,7 +2961,7 @@ views:
                 icon: mdi:open-in-new
                 tap_action:
                   action: navigate
-                  navigation_path: /dashboard-hub/laundry
+                  navigation_path: /home-2-0/laundry
                 grid_options:
                   columns: full
                   rows: 1
@@ -4784,7 +4784,7 @@ views:
     mobile_footer_mode: icon
     mobile_footer_search_enabled: false
     mobile_home_shortcut: true
-    mobile_home_shortcut_path: /dashboard-hub/hubhome
+    mobile_home_shortcut_path: /home-2-0/hubhome
     mobile_icon_scale: 1
     mobile_layout_mode: auto
     mobile_library_default_layout: grid
@@ -4929,7 +4929,7 @@ views:
     - vacuum.robbie
     tap_action:
       action: navigate
-      navigation_path: /dashboard-hub/hubhome
+      navigation_path: /home-2-0/hubhome
     show_name: false
     custom_fields:
       body: |-

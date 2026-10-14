@@ -12,7 +12,7 @@ The `saver` view and the near-black `Glass Saver` theme are in `master.yaml`. No
 |---|---|
 | Entity | browser_mod's per-device activity sensor, `binary_sensor.<tablet>_activity` (turns off after the browser_mod activity timeout; check the exact id under Settings > Devices > Browser Mod) |
 | Trigger | that sensor `off` for N minutes (suggest 5) |
-| Service | `browser_mod.navigate` with `path: /dashboard-hub/saver`, target the tablet's browser |
+| Service | `browser_mod.navigate` with `path: /home-2-0/saver`, target the tablet's browser |
 | Return | tap anywhere (built into the saver card, navigates to Home); touching the screen also turns the activity sensor back on |
 
 ```yaml
@@ -25,7 +25,7 @@ triggers:
 actions:
   - action: browser_mod.navigate
     data:
-      path: /dashboard-hub/saver
+      path: /home-2-0/saver
     target:
       device_id: <browser_mod device id>
 ```
