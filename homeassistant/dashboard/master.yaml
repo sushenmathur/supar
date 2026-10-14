@@ -1097,19 +1097,20 @@ views:
                         lightning: ['weather-lightning', '#fbbf24'], 'lightning-rainy': ['weather-lightning-rainy', '#a78bfa'], snowy: ['weather-snowy', '#7dd3fc'],
                         fog: ['weather-fog', '#94a3b8'], hail: ['weather-hail', '#7dd3fc'], windy: ['weather-windy', '#5eead4'] };
                       const [wi, wc] = icons[cond] || ['weather-cloudy', '#94a3b8'];
-                      const pill = s => `<span style="display:inline-flex;padding:4px 10px;border-radius:99px;background:${light ? 'rgba(255,255,255,0.18)' : 'rgba(var(--rgb-primary-text-color),0.07)'};font-size:12.5px;font-weight:600;white-space:nowrap">${s}</span>`;
+                      const pill = (label, zone) => `<span data-tz="${zone}" data-pre="${label} " style="display:inline-flex;padding:4px 10px;border-radius:99px;background:${light ? 'rgba(255,255,255,0.18)' : 'rgba(var(--rgb-primary-text-color),0.07)'};font-size:12.5px;font-weight:600;white-space:nowrap">${label} ${clock(zone)}</span>`;
                       return `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;width:100%;text-align:left;color:${light ? '#fff' : 'inherit'}">
                         <div>
                           <div style="font-size:12.5px;font-weight:600;color:${light ? 'rgba(255,255,255,0.85)' : 'var(--secondary-text-color)'};white-space:nowrap">${hello} · ${ord(dayNum)} ${month}${condText ? ' · ' + condText : ''}</div>
-                          <div style="font-size:50px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:4px;white-space:nowrap">${clock('Australia/Brisbane', true)}</div>
+                          <div data-tz="Australia/Brisbane" data-up="1" style="font-size:50px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:4px;white-space:nowrap">${clock('Australia/Brisbane', true)}</div>
                         </div>
                         <div style="display:grid;gap:6px;justify-items:end">
                           <div style="display:flex;align-items:center;gap:8px">
                             <ha-icon icon="mdi:${wi}" style="display:block;width:32px;height:32px;--mdc-icon-size:32px;color:${wc}"></ha-icon>
                             <b style="font-size:26px;letter-spacing:-.02em">${isNaN(t) ? '–' : Math.round(t)}°</b>
                           </div>
-                          <div style="display:flex;gap:6px">${pill('India ' + clock('Asia/Kolkata'))}${pill('Austin ' + clock('America/Chicago'))}</div>
-                        </div></div>`;
+                          <div style="display:flex;gap:6px">${pill('India', 'Asia/Kolkata')}${pill('Austin', 'America/Chicago')}</div>
+                        </div>
+                        <img src="data:," alt="" style="display:none" onerror="const r=this.parentNode;const f=()=>{if(!this.isConnected){clearInterval(i);return}r.querySelectorAll('[data-tz]').forEach(e=>{let s=new Date().toLocaleTimeString('en-AU',{timeZone:e.dataset.tz,hour:'numeric',minute:'2-digit',hour12:true});if(e.dataset.up)s=s.replace(/\\s?([ap])m$/i,(x,y)=>' '+y.toUpperCase()+'M');const t=(e.dataset.pre||'')+s;if(e.textContent!==t)e.textContent=t})};const i=setInterval(f,1000);f();this.onerror=null"></div>`;
                     ]]]
                 extra_styles: |
                   .ws-sc { position: absolute; inset: 0; overflow: hidden; border-radius: 28px; pointer-events: none; }
