@@ -1386,27 +1386,48 @@ views:
                         50% { box-shadow: 0 0 22px 3px color-mix(in srgb, var(--glass-robbie, #2dd4bf) 55%, transparent), inset 0 1px 0 var(--glass-hi); }
                       }
 
+                      @keyframes robbie-alert {
+                        0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0), inset 0 1px 0 var(--glass-hi); filter: brightness(1); }
+                        50% { box-shadow: 0 0 26px 5px rgba(239,68,68,0.80), inset 0 1px 0 var(--glass-hi); filter: brightness(1.15); }
+                      }
+
                       @media (prefers-reduced-motion: reduce) { * { animation:
                       none !important; } }
                     styles:
                       card:
-                        - animation: >
-                            [[[ return entity.state === 'cleaning' ?
-                            'robbie-glow 2.4s ease-in-out infinite' : 'none';
+                        - animation: |
+                            [[[
+                              const s = entity.state;
+                              return s === 'cleaning' ? 'robbie-glow 2.4s ease-in-out infinite'
+                                : s === 'error' ? 'robbie-alert 1.3s ease-in-out infinite' : 'none';
                             ]]]
-                        - border-color: >
-                            [[[ return entity.state === 'docked' ?
-                            'var(--glass-border)' : 'color-mix(in srgb, var(--glass-robbie, #2dd4bf) 70%, transparent)'; ]]]
+                        - background: |
+                            [[[
+                              return entity.state === 'error'
+                                ? 'linear-gradient(145deg, rgba(239,68,68,0.62), rgba(190,18,60,0.42))'
+                                : 'var(--glass-bg-soft)';
+                            ]]]
+                        - border-color: |
+                            [[[
+                              const s = entity.state;
+                              return s === 'docked' ? 'var(--glass-border)'
+                                : s === 'error' ? 'rgba(239,68,68,0.95)'
+                                : 'color-mix(in srgb, var(--glass-robbie, #2dd4bf) 70%, transparent)';
+                            ]]]
                       icon:
                         - transform-origin: center
-                        - color: >
-                            [[[ return entity.state === 'docked' ?
-                            'var(--primary-text-color)' : 'var(--glass-robbie, #2dd4bf)'; ]]]
+                        - color: |
+                            [[[
+                              const s = entity.state;
+                              return s === 'docked' ? 'var(--primary-text-color)'
+                                : s === 'error' ? '#ffffff' : 'var(--glass-robbie, #2dd4bf)';
+                            ]]]
                         - animation: |
                             [[[
                               const s = entity.state;
                               return s === 'cleaning' ? 'robbie-spin 3s linear infinite'
-                                : s === 'returning' ? 'robbie-pulse 1.4s ease-in-out infinite' : 'none';
+                                : s === 'returning' ? 'robbie-pulse 1.4s ease-in-out infinite'
+                                : s === 'error' ? 'robbie-pulse 1.0s ease-in-out infinite' : 'none';
                             ]]]
                     tap_action:
                       action: perform-action
