@@ -1,109 +1,246 @@
-# Glass theme: frosted-glass cards that follow the system light/dark mode.
-# Needs card-mod (HACS). Copy to /config/themes/glass.yaml, make sure configuration.yaml has
+# Quiet Glass: calm, flat content cards; glass only on layered surfaces (navbar, pop-ups, scrim).
+# Follows the device light/dark mode. Every colour, radius, size, shadow and duration used by
+# dashboard/master.yaml lives here as a CSS variable. master.yaml contains no hex / rgba literals.
+#
+# Install: copy to /config/themes/glass.yaml (configuration.yaml needs
 #   frontend:
 #     themes: !include_dir_merge_named themes
-# then Developer tools > YAML > "Reload themes" and pick "Glass" in your profile
-# (Theme: Glass, Dark mode: Auto) so it follows the device setting.
+# ), Developer tools > YAML > "Reload themes", then profile: Theme "Glass", Dark mode "Auto".
+# Fonts: see README (Inter is loaded by www/quiet-glass-fonts.js; falls back to system-ui).
 #
-# The wallpaper is NOT set here. Your view keeps its own background image, so the glass blurs
-# whatever the system/background provides. The gradients below are only a fallback.
-Glass:
-  # ---- shared (both modes) ----
-  primary-color: "#5b8cff"
-  accent-color: "#a78bfa"
-  state-icon-active-color: "#fbbf24"
-  ha-card-border-radius: 28px
-  ha-card-border-width: 0px
-  ha-card-box-shadow: none
-  ha-card-background: transparent
-  # browser_mod popups read these variables
-  popup-border-radius: 32px
-  popup-padding-x: 28px
-  popup-padding-y: 24px
-  # dialog / popup surfaces (browser_mod + more-info), old and new HA dialog implementations
-  mdc-dialog-scrim-color: "rgba(15,20,50,0.45)"
-  dialog-backdrop-filter: "blur(10px)"
-  ha-dialog-scrim-backdrop-filter: "blur(10px)"
-  ha-dialog-surface-backdrop-filter: "blur(30px) saturate(190%)"
+# Two themes are defined: "Glass" (day/night, follows system) and "Glass Saver" (always near-black,
+# used only by the screensaver view).
 
-  # Applies to every card (ha-card). Inline styles from button-card templates win over these
-  # because the rules below are not !important.
-  card-mod-theme: Glass
-  card-mod-card: |
-    ha-card {
-      background: var(--glass-bg);
-      -webkit-backdrop-filter: blur(22px) saturate(200%) brightness(1.04);
-      backdrop-filter: blur(22px) saturate(200%) brightness(1.04);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-    }
+Glass:
+  # ------------------------------------------------------------------ tokens (both modes)
+  # Spacing
+  space-1: 4px
+  space-2: 8px
+  space-3: 12px
+  space-4: 16px
+  space-5: 24px
+  space-6: 32px
+  # Radius: two values, plus pill
+  radius-sm: 14px
+  radius-lg: 24px
+  radius-pill: 999px
+  # Type: one family, six sizes, three weights
+  font-sans: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+  fs-caption: 12px
+  fs-secondary: 14px
+  fs-body: 16px
+  fs-title: 20px
+  fs-hero: 28px
+  fs-clock: 72px
+  fw-regular: 400
+  fw-medium: 500
+  fw-semibold: 600
+  lh-tight: 1.15
+  lh-body: 1.35
+  # Component sizes
+  tap: 48px
+  disc: 40px
+  dot: 10px
+  bar: 8px
+  icon-sm: 20px
+  icon-md: 24px
+  icon-lg: 28px
+  ring-size: 6px
+  popup-width: 560px
+  saver-scale: 2.6
+  opacity-dim: 0.55
+  # Motion: nothing slower than 300ms. The pulse is the one looping animation (active alerts only).
+  dur-fast: 150ms
+  dur-base: 220ms
+  dur-pulse: 2400ms
+  ease: ease-out
+
+  # ------------------------------------------------------------------ Home Assistant mapping
+  primary-font-family: var(--font-sans)
+  paper-font-body1_-_font-family: var(--font-sans)
+  paper-font-common-base_-_font-family: var(--font-sans)
+  ha-font-family-body: var(--font-sans)
+  ha-font-family-heading: var(--font-sans)
+  mdc-typography-font-family: var(--font-sans)
+  primary-text-color: var(--text-1)
+  secondary-text-color: var(--text-2)
+  disabled-text-color: var(--text-2)
+  divider-color: var(--hairline)
+  card-background-color: var(--surface-1)
+  secondary-background-color: var(--surface-2)
+  ha-card-background: var(--surface-1)
+  ha-card-border-radius: var(--radius-lg)
+  ha-card-border-width: 1px
+  ha-card-border-color: var(--hairline)
+  ha-card-box-shadow: var(--shadow-card)
+  state-icon-color: var(--text-2)
+  state-icon-active-color: var(--state-on-ink)
+  state-active-color: var(--state-on-ink)
+  state-light-active-color: var(--state-on-ink)
+  state-switch-active-color: var(--state-on-ink)
+  state-lock-unlocked-color: var(--state-alert-ink)
+  state-cover-open-color: var(--state-warn-ink)
+  # sections view geometry (tune here if the Home view scrolls; see README)
+  ha-view-sections-column-gap: var(--space-4)
+  ha-view-sections-row-gap: var(--space-2)
+  # dialogs / pop-ups (browser_mod passes the same variables per pop-up)
+  popup-border-radius: var(--radius-lg)
+  popup-padding-x: var(--space-5)
+  popup-padding-y: var(--space-4)
+  popup-background-color: var(--popup-bg)
+  ha-dialog-surface-background: var(--popup-bg)
+  ha-dialog-surface-backdrop-filter: var(--glass-blur)
+  ha-dialog-scrim-backdrop-filter: none
+  ha-dialog-border-radius: var(--radius-lg)
+  mdc-dialog-scrim-color: var(--scrim)
+  dialog-backdrop-filter: none
+  lovelace-background: var(--surface-0)
 
   modes:
     light:
-      primary-text-color: "#14203a"
-      secondary-text-color: "rgba(20,32,58,0.62)"
-      text-primary-color: "#14203a"
-      rgb-primary-text-color: "20,32,58"
-      divider-color: "rgba(20,32,58,0.12)"
-      glass-bg: "radial-gradient(120% 90% at 0% 0%, rgba(255,255,255,0.40), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.50), rgba(255,255,255,0.20))"
-      glass-bg-soft: "rgba(255,255,255,0.34)"
-      glass-border: "rgba(255,255,255,0.70)"
-      glass-hi: "rgba(255,255,255,0.95)"
-      glass-shadow: "inset 0 1.5px 1px -1px rgba(255,255,255,0.95), inset 1.5px 0 1px -1px rgba(255,255,255,0.55), inset 0 -1.5px 1px -1px rgba(255,255,255,0.30), inset 0 10px 22px -12px rgba(255,255,255,0.35), 0 14px 32px rgba(50,60,120,0.20)"
-      glass-field: "rgba(255,255,255,0.55)"
-      glass-on-bg: "linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75))"
-      glass-on-glow: "0 0 34px rgba(255,170,60,0.5)"
-      glass-ok: "#15803d"
-      glass-bad: "#be123c"
-      glass-link: "#1d4ed8"
-      popup-background-color: "rgba(255,255,255,0.86)"
-      ha-dialog-surface-background: "rgba(236,242,255,0.62)"
-      glass-popup-fill: "rgba(236,242,255,0.62)"
-      lovelace-background: "radial-gradient(900px 640px at 6% 8%, rgba(255,150,130,0.80), transparent 62%), radial-gradient(820px 600px at 60% 12%, rgba(90,200,250,0.75), transparent 62%), radial-gradient(760px 620px at 98% 70%, rgba(179,136,255,0.75), transparent 62%), radial-gradient(700px 520px at 12% 98%, rgba(255,211,110,0.70), transparent 62%), linear-gradient(160deg, #eef3ff, #e6ecfa)"
-      # ---- added: shared popup, chip, accent, alert and level colours ----
-      glass-popup-bg: "linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))"
-      glass-popup-border: "rgba(255,255,255,0.80)"
-      glass-popup-scrim: "rgba(15,20,50,0.45)"
-      glass-chip-blue: "linear-gradient(145deg, rgba(125,211,252,0.30), rgba(167,139,250,0.24))"
-      glass-accent: "linear-gradient(135deg, #7dd3fc, #818cf8)"
-      glass-alert-high: "linear-gradient(135deg, rgba(244,63,94,0.92), rgba(190,18,60,0.88))"
-      glass-alert-mid: "linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.88))"
-      glass-alert-low: "linear-gradient(135deg, rgba(71,85,105,0.92), rgba(51,65,85,0.90))"
-      glass-robbie: "#2dd4bf"
-      glass-level-ok: "#10b981"
-      glass-level-warn: "#f59e0b"
-      glass-level-low: "#ef4444"
-    dark:
-      primary-text-color: "#ffffff"
-      secondary-text-color: "rgba(255,255,255,0.62)"
+      primary-color: "#1f4fd1"
+      accent-color: "#1f4fd1"
       text-primary-color: "#ffffff"
-      rgb-primary-text-color: "255,255,255"
-      divider-color: "rgba(255,255,255,0.14)"
-      glass-bg: "radial-gradient(120% 90% at 0% 0%, rgba(255,255,255,0.20), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.04))"
-      glass-bg-soft: "rgba(255,255,255,0.09)"
-      glass-border: "rgba(255,255,255,0.26)"
-      glass-hi: "rgba(255,255,255,0.45)"
-      glass-shadow: "inset 0 1.5px 1px -1px rgba(255,255,255,0.50), inset 1.5px 0 1px -1px rgba(255,255,255,0.26), inset 0 -1.5px 1px -1px rgba(255,255,255,0.10), inset 0 10px 22px -12px rgba(255,255,255,0.12), 0 18px 40px rgba(0,0,0,0.42)"
-      glass-field: "rgba(255,255,255,0.10)"
-      glass-on-bg: "linear-gradient(145deg, rgba(255,214,102,0.55), rgba(255,150,60,0.35))"
-      glass-on-glow: "0 0 36px rgba(255,180,60,0.45)"
-      glass-ok: "#6ee7b7"
-      glass-bad: "#fb7185"
-      glass-link: "#bae6fd"
-      popup-background-color: "rgba(24,30,58,0.88)"
-      ha-dialog-surface-background: "rgba(30,38,78,0.62)"
-      glass-popup-fill: "rgba(30,38,78,0.62)"
-      lovelace-background: "radial-gradient(900px 640px at 6% 8%, rgba(91,61,245,0.55), transparent 62%), radial-gradient(820px 600px at 60% 12%, rgba(10,167,160,0.45), transparent 62%), radial-gradient(760px 620px at 98% 70%, rgba(192,38,211,0.45), transparent 62%), radial-gradient(700px 520px at 12% 98%, rgba(30,64,175,0.50), transparent 62%), linear-gradient(160deg, #080d1e, #0f1730 55%, #0a1a26)"
-      # ---- added: shared popup, chip, accent, alert and level colours ----
-      glass-popup-bg: "linear-gradient(145deg, rgba(52,62,118,0.80), rgba(18,24,56,0.74))"
-      glass-popup-border: "rgba(255,255,255,0.22)"
-      glass-popup-scrim: "rgba(0,0,0,0.55)"
-      glass-chip-blue: "linear-gradient(145deg, rgba(125,211,252,0.22), rgba(167,139,250,0.18))"
-      glass-accent: "linear-gradient(135deg, #7dd3fc, #818cf8)"
-      glass-alert-high: "linear-gradient(135deg, rgba(244,63,94,0.92), rgba(190,18,60,0.88))"
-      glass-alert-mid: "linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.88))"
-      glass-alert-low: "linear-gradient(135deg, rgba(71,85,105,0.92), rgba(51,65,85,0.90))"
-      glass-robbie: "#2dd4bf"
-      glass-level-ok: "#10b981"
-      glass-level-warn: "#f59e0b"
-      glass-level-low: "#ef4444"
+      rgb-primary-text-color: "15,23,42"
+      rgb-card-background-color: "255,255,255"
+      # colour
+      surface-0: "linear-gradient(160deg, #f3f5fa 0%, #e6ebf5 100%)"
+      surface-1: "#ffffff"
+      surface-2: "#e9edf5"
+      text-1: "#0f172a"
+      text-2: "#475569"
+      hairline: "rgba(15, 23, 42, 0.10)"
+      accent: "#1f4fd1"
+      on-accent: "#ffffff"
+      # semantic state colours. "ink" = readable on surfaces and tints; plain = fill / large glyph.
+      state-on: "#f5a524"
+      state-on-ink: "#8a4a00"
+      state-on-tint: "color-mix(in srgb, var(--state-on) 18%, var(--surface-1))"
+      state-alert: "#c4182f"
+      state-alert-ink: "#b4132a"
+      state-alert-tint: "color-mix(in srgb, var(--state-alert) 12%, var(--surface-1))"
+      on-alert: "#ffffff"
+      state-warn: "#c2570c"
+      state-warn-ink: "#9a3f00"
+      state-warn-tint: "color-mix(in srgb, var(--state-warn) 14%, var(--surface-1))"
+      state-ok: "#15803d"
+      state-ok-ink: "#136c34"
+      state-ok-tint: "color-mix(in srgb, var(--state-ok) 12%, var(--surface-1))"
+      # elevation
+      shadow-card: "0 4px 14px rgba(15, 23, 42, 0.08)"
+      shadow-pop: "0 24px 48px rgba(15, 23, 42, 0.22)"
+      # glass (navbar, pop-ups, scrim only)
+      glass-bg: "rgba(255, 255, 255, 0.72)"
+      glass-border: "rgba(15, 23, 42, 0.08)"
+      glass-blur: "blur(24px) saturate(140%)"
+      popup-bg: "rgba(255, 255, 255, 0.82)"
+      scrim: "rgba(15, 23, 42, 0.40)"
+    dark:
+      primary-color: "#9ab4ee"
+      accent-color: "#9ab4ee"
+      text-primary-color: "#0b0f17"
+      rgb-primary-text-color: "244,246,251"
+      rgb-card-background-color: "22,28,40"
+      surface-0: "linear-gradient(160deg, #0b0f17 0%, #121826 100%)"
+      surface-1: "#161c28"
+      surface-2: "#212a3b"
+      text-1: "#f4f6fb"
+      text-2: "#a9b4c7"
+      hairline: "rgba(255, 255, 255, 0.10)"
+      accent: "#9ab4ee"
+      on-accent: "#0b0f17"
+      state-on: "#f2b84b"
+      state-on-ink: "#ffd27a"
+      state-on-tint: "color-mix(in srgb, var(--state-on) 16%, var(--surface-1))"
+      state-alert: "#d02a42"
+      state-alert-ink: "#ff9aa6"
+      state-alert-tint: "color-mix(in srgb, var(--state-alert) 22%, var(--surface-1))"
+      on-alert: "#ffffff"
+      state-warn: "#f0a24a"
+      state-warn-ink: "#ffc27a"
+      state-warn-tint: "color-mix(in srgb, var(--state-warn) 16%, var(--surface-1))"
+      state-ok: "#3dbb7a"
+      state-ok-ink: "#7fe0aa"
+      state-ok-tint: "color-mix(in srgb, var(--state-ok) 14%, var(--surface-1))"
+      shadow-card: "0 4px 14px rgba(0, 0, 0, 0.35)"
+      shadow-pop: "0 24px 48px rgba(0, 0, 0, 0.55)"
+      glass-bg: "rgba(22, 28, 40, 0.72)"
+      glass-border: "rgba(255, 255, 255, 0.10)"
+      glass-blur: "blur(24px) saturate(120%)"
+      popup-bg: "rgba(22, 28, 40, 0.84)"
+      scrim: "rgba(0, 0, 0, 0.60)"
+
+# Screensaver: always near-black, low luminance, regardless of the system mode.
+Glass Saver:
+  space-1: 4px
+  space-2: 8px
+  space-3: 12px
+  space-4: 16px
+  space-5: 24px
+  space-6: 32px
+  radius-sm: 14px
+  radius-lg: 24px
+  radius-pill: 999px
+  font-sans: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+  fs-caption: 12px
+  fs-secondary: 14px
+  fs-body: 16px
+  fs-title: 20px
+  fs-hero: 28px
+  fs-clock: 72px
+  fw-regular: 400
+  fw-medium: 500
+  fw-semibold: 600
+  lh-tight: 1.15
+  lh-body: 1.35
+  tap: 48px
+  disc: 40px
+  dot: 10px
+  bar: 8px
+  icon-sm: 20px
+  icon-md: 24px
+  icon-lg: 28px
+  ring-size: 6px
+  popup-width: 560px
+  saver-scale: 2.6
+  opacity-dim: 0.55
+  dur-fast: 150ms
+  dur-base: 220ms
+  dur-pulse: 2400ms
+  ease: ease-out
+  primary-font-family: var(--font-sans)
+  primary-color: "#9ab4ee"
+  accent-color: "#9ab4ee"
+  text-primary-color: "#05070b"
+  primary-text-color: var(--text-1)
+  secondary-text-color: var(--text-2)
+  rgb-primary-text-color: "168,178,196"
+  divider-color: var(--hairline)
+  card-background-color: var(--surface-1)
+  ha-card-background: var(--surface-1)
+  ha-card-border-radius: var(--radius-lg)
+  ha-card-border-width: 0px
+  ha-card-box-shadow: none
+  lovelace-background: var(--surface-0)
+  surface-0: "#05070b"
+  surface-1: "#0b0f17"
+  surface-2: "#121826"
+  text-1: "#a8b2c4"
+  text-2: "#8591a6"
+  hairline: "rgba(255, 255, 255, 0.08)"
+  accent: "#9ab4ee"
+  on-accent: "#05070b"
+  state-on: "#c9993f"
+  state-on-ink: "#e6bf75"
+  state-on-tint: "color-mix(in srgb, var(--state-on) 12%, var(--surface-1))"
+  state-alert: "#b02a3c"
+  state-alert-ink: "#ff9aa6"
+  state-alert-tint: "color-mix(in srgb, var(--state-alert) 22%, var(--surface-1))"
+  on-alert: "#ffffff"
+  state-warn: "#c98a42"
+  state-warn-ink: "#e6b27a"
+  state-warn-tint: "color-mix(in srgb, var(--state-warn) 14%, var(--surface-1))"
+  state-ok: "#3a9a68"
+  state-ok-ink: "#7fcfa5"
+  state-ok-tint: "color-mix(in srgb, var(--state-ok) 12%, var(--surface-1))"
+  shadow-card: "none"
