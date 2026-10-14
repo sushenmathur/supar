@@ -1600,6 +1600,7 @@ views:
                   - media_player.media_apple_tv
                   - media_player.hubs_bedroom_apple_tv
                   - media_player.bedroom_apple_tv
+                  - media_player.spotify
                   - switch.bedroom_tv
                 label: |
                   [[[
@@ -1679,6 +1680,19 @@ views:
                             state_content:
                               - state
                               - app_name
+                              - media_title
+                            features:
+                              - type: media-player-playback
+                              - type: media-player-volume-slider
+                            features_position: bottom
+                          - type: tile
+                            entity: media_player.spotify
+                            name: Spotify
+                            icon: mdi:spotify
+                            vertical: false
+                            state_content:
+                              - state
+                              - media_artist
                               - media_title
                             features:
                               - type: media-player-playback
