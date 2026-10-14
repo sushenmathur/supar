@@ -15,3 +15,10 @@ vehicle and room-occupancy badges, calendar, rooms, favourites (TV, Aircon, 6 li
 front door, energy (stats, flow, Tesla/Kia, self-powered) and Robbie. Navigation keeps the same seven routes.
 Conditional items (bin collection, washer/dryer, alert ticker, low-battery camera badge) are not shown at rest;
 they would appear as pills or overlays in the same space.
+
+## Quiet Glass (current design)
+
+`redesign-quiet-glass.html` is the 1280×800 mock-up of the redesigned Home view (flat cards, glass only on the navbar and pop-ups).
+Open it with `?theme=light|dark&scene=calm|busy|popup|energy|saver` (add `&shot` to hide the controls).
+`python3 build-quiet-glass.py` regenerates it from `../homeassistant/themes/glass.yaml`; `./shoot-quiet-glass.sh` writes `previews/redesign-quiet-glass-*.png`.
+Design notes, audit and acceptance results: `../docs/redesign-audit.md`.
