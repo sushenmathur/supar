@@ -160,8 +160,10 @@ def baseline(card):
     if card.get('visibility') and card.get('type') != 'custom:alert-ticker-card' and 'Everything' not in str(card.get('name')): return 0
     return 1
 home_cards = [c for s in home['sections'] for c in s['cards']]
-base = sum(baseline(c) for c in home_cards)
-busy = sum(1 for c in home_cards)
+hdr = home['header']['card']
+hdr_n = 1 + sum(1 for f in hdr.get('custom_fields', {}).values() if isinstance(f, dict))
+base = sum(baseline(c) for c in home_cards) + hdr_n
+busy = sum(1 for c in home_cards) + hdr_n
 if base > 35: errors.append(f'Home baseline renders {base} cards (budget ~35)')
 
 # ---------------------------------------------------------------- 7b. "Everything's calm" must mirror the Now items
@@ -193,7 +195,7 @@ def gather(c, pool):
         vals = c.get('state', c.get('state_not')); pool.setdefault(c['entity'], set()).update([vals] if isinstance(vals, str) else vals)
     elif c['condition'] == 'numeric_state':
         t = c.get('below', c.get('above')); pool.setdefault(c['entity'], set()).update([t - 1, t, t + 1])
-now_sec = home['sections'][1]['cards']
+now_sec = next(sec['cards'] for sec in home['sections'] if any("Everything" in str(c.get('name')) for c in sec['cards']))
 calm = next((c for c in now_sec if "Everything" in str(c.get('name'))), None)
 items = [c for c in now_sec if c is not calm and c.get('type') != 'custom:alert-ticker-card' and c.get('visibility')]
 if calm is None: errors.append('Home has no "Everything\'s calm" item')

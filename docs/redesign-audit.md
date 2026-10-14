@@ -113,13 +113,13 @@ Custom cards kept, each with no native equivalent: button-card, navbar-card, adv
 | Font families | 1 (unset, theme default) | 1 (`Inter`, system-ui fallback) |
 | Looping animations | 11 | **1** keyframe (`qg-pulse`), used on priority-1 alerts and a triggered alarm |
 | `backdrop-filter` elements on Home | every card (19 declarations) | **1** (the navbar); pop-ups and the navbar pop-out only while open |
-| Home cards rendered at rest | 47 nodes (all always on) | **26** (budget ~35; verified by `validate.py`) |
+| Home cards rendered at rest | 47 nodes (all always on) | **25** (budget ~35; verified by `validate.py`) |
 | Home cards with every item active | n/a | 35 top-level (an active alert adds up to 9 nested cards (its stack, four conditionals and up to four chips)) |
 | `master.yaml` lines | 4 014 | 4 976 (longer because each room, person, energy and alarm pop-up is fully expanded; plain YAML, no anchors, because the raw editor drops them) |
 
 ## 6. Home information architecture (as built)
 
-* **Top bar** (2 rows): time 72 px + date · status sentence (`All secure · 1 light on · Off-peak`, warning icon and text if a door is open or the front door is unlocked) · weather · two people.
+* **Top bar** (one flat header card, 88 px, in the view header so it never depends on section column spans): time 72 px + date · status sentence (`All secure · 1 light on · Off-peak`, warning icon and text if a door is open or the front door is unlocked) · weather · two people.
 * **Now** (column 1, conditional, priority order): alerts, doors open by day, alarm (armed or triggered), media, aircon, laundry, Robbie, kids in room after 20:00, bins, otherwise "Everything's calm". `validate.py` simulates 20 000 random states and fails if "calm" ever disagrees with the other items.
 * **Rooms** (column 2): six tiles (2 × 3), then six favourite lights.
 * **Home** (column 3): energy hero, next event, four scene buttons.
@@ -135,7 +135,7 @@ Custom cards kept, each with no native equivalent: button-card, navbar-card, adv
 | Every entity from the old Home view reachable within 1 tap | **Yes: 107 of 107** (67 on Home, 38 in pop-ups, 2 via the Security view on the rail). Appendix below. Entities that only appear while active (bin sensors, `alert_banner_snooze`, `robbie_dock_dock_error`, alert-ticker internals) are conditional by design. |
 | Text contrast ≥ 4.5:1 body, ≥ 7:1 primary labels, both modes | **Pass.** Primary text (`text-1`) is 14.6–17.9:1 in light and 11.3–17.7:1 in dark on every surface and state tint; secondary text (`text-2`) is 6.2–7.6:1 light and 5.8–9.2:1 dark; state "ink" colours on their tints are ≥ 5.6:1 (light) and ≥ 7.2:1 (dark). `Glass 2 Saver` (low luminance by design): `text-1` ≥ 7.5:1, `text-2` ≥ 5.0:1. 66 pairs are checked by `validate.py`, which fails below target; `validate.py -v` prints them all. |
 | Touch targets ≥ 48 × 48 px | **Pass for every Quiet Glass card** (`min-height: var(--tap)`; rows are 56 px and up; the Home mock-up was measured in headless Chromium: every card, chip, nav item, scene, toggle, person and bin button is ≥ 48 px). **Exceptions** (native HA controls, not restyled): heading badges (≈ 28–32 px, informational), tile feature buttons (≈ 40 px), the hvac-mode segmented control inside tiles. |
-| ≤ ~35 cards on Home | **26 at rest, 35 with everything active** |
+| ≤ ~35 cards on Home | **25 at rest, 34 with everything active** |
 | Backdrop blur: at most the navbar on Home | **Yes** (the navbar only; pop-ups while open) |
 | No transition > 300 ms; `prefers-reduced-motion` honoured | **Yes** (150 ms / 220 ms tokens; reduced-motion rule in `qg_card`; pulse is the sole exception, 2.4 s, only for a priority-1 alert or a triggered alarm) |
 

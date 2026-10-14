@@ -290,6 +290,7 @@ button_card_templates:
       - text-align: center
       - font-size: var(--fs-secondary)
       - font-weight: var(--fw-medium)
+      - white-space: normal
   qg_now_item:
     template: qg_card
     show_icon: true
@@ -324,34 +325,34 @@ navbar-templates:
     routes:
     - icon: mdi:home
       label: Home
-      url: /home-2-0/hubhome
+      url: /dashboard-hub/hubhome
     - icon: mdi:floor-plan
       label: Rooms
       popup:
       - icon: mdi:sofa
         label: Living
-        url: /home-2-0/living-room
+        url: /dashboard-hub/living-room
       - icon: mdi:teddy-bear
         label: Kids
-        url: /home-2-0/kidsroom
+        url: /dashboard-hub/kidsroom
       - icon: mdi:garage-variant
         label: Garage
-        url: /home-2-0/garage
+        url: /dashboard-hub/garage
       - icon: mdi:gate
         label: Outdoor
-        url: /home-2-0/outdoor
+        url: /dashboard-hub/outdoor
       - icon: mdi:washing-machine
         label: Laundry
-        url: /home-2-0/laundry
+        url: /dashboard-hub/laundry
       tap_action:
         action: open-popup
     - icon: mdi:lightbulb-outline
       icon_selected: mdi:lightbulb-on
       label: Lights
-      url: /home-2-0/lights
+      url: /dashboard-hub/lights
     - icon: mdi:thermometer
       label: Climate
-      url: /home-2-0/homeclimate
+      url: /dashboard-hub/homeclimate
     - badge:
         count: |-
           [[[
@@ -373,10 +374,10 @@ navbar-templates:
           ]]]
       icon: mdi:security
       label: Security
-      url: /home-2-0/security
+      url: /dashboard-hub/security
     - icon: mdi:music
       label: Music
-      url: /home-2-0/music
+      url: /dashboard-hub/music
     - icon: mdi:dots-horizontal
       label: More
       popup:
@@ -458,46 +459,13 @@ views:
   dense_section_placement: true
   top_margin: false
   theme: Glass 2
-  sections:
-  - type: grid
-    column_span: 3
-    cards:
-    - type: custom:button-card
-      template: qg_stat
-      triggers_update:
-      - sensor.time
-      grid_options:
-        columns: 3
-        rows: 2
+  header:
+    card:
+      type: custom:button-card
+      template: qg_card
+      show_name: false
       tap_action:
         action: none
-      name: |-
-        [[[
-        const t = new Date().toLocaleTimeString('en-AU', { timeZone: 'Australia/Brisbane', hour: 'numeric', minute: '2-digit', hour12: true }).split(/\s+/);
-        return `${t[0]}<span style="font-size:var(--fs-title);font-weight:var(--fw-medium);color:var(--text-2);margin-left:var(--space-2)">${(t[1] || '').toUpperCase()}</span>`;
-        ]]]
-      label: |-
-        [[[
-        return new Date().toLocaleDateString('en-AU', { timeZone: 'Australia/Brisbane', weekday: 'long', day: 'numeric', month: 'long' });
-        ]]]
-      styles:
-        card:
-        - background: transparent
-        - border: none
-        - box-shadow: none
-        - padding: var(--space-2) var(--space-3)
-        name:
-        - font-size: var(--fs-clock)
-        - font-weight: var(--fw-medium)
-        - line-height: 1
-        - letter-spacing: -0.02em
-        - overflow: visible
-        label:
-        - font-size: var(--fs-body)
-        - color: var(--text-2)
-    - type: custom:button-card
-      template: qg_stat
-      show_label: false
       triggers_update:
       - sensor.time
       - input_boolean.front_door
@@ -522,372 +490,385 @@ views:
       - light.driveway_light
       - light.backyard_light
       - light.laundry_light
-      grid_options:
-        columns: 5
-        rows: 2
-      tap_action:
-        action: navigate
-        navigation_path: /home-2-0/security
-      name: |-
-        [[[
-        const on = id => states[id]?.state === 'on';
-        const doors = { 'binary_sensor.front_door_contact': 'Front door', 'binary_sensor.crimsafe_door_contact': 'Security door', 'binary_sensor.garage_door_sensor_contact': 'Garage door',
-          'binary_sensor.hallwaydoorsensor_contact': 'Hallway door', 'binary_sensor.patio_door_contact': 'Patio door', 'binary_sensor.side_door_contact': 'Side door', 'binary_sensor.laundrydoorsensor_contact': 'Laundry door' };
-        const issues = Object.entries(doors).filter(([id]) => on(id)).map(([, n]) => n + ' open');
-        if (on('input_boolean.front_door')) issues.push('Front door unlocked');
-        const lights = Object.values(states).filter(e => e.entity_id.startsWith('light.') && !e.entity_id.startsWith('light.browser') && e.state === 'on').length;
-        const tariff = states['select.grid_import_tariff']?.state;
-        const parts = [issues.length ? issues[0] + (issues.length > 1 ? ` +${issues.length - 1}` : '') : 'All secure',
-          lights ? `${lights} light${lights === 1 ? '' : 's'} on` : 'Lights off'];
-        if (tariff && !['unknown', 'unavailable'].includes(tariff)) parts.push(tariff);
-        const icon = issues.length ? 'mdi:shield-alert-outline' : 'mdi:shield-check-outline';
-        const ink = issues.length ? 'var(--state-warn-ink)' : 'var(--state-ok-ink)';
-        return `<ha-icon icon="${icon}" style="--mdc-icon-size:var(--icon-md);color:${ink};vertical-align:middle;margin-right:var(--space-2)"></ha-icon>${parts.join(' · ')}`;
-        ]]]
+      custom_fields:
+        clock: |-
+          [[[
+          const tz = { timeZone: 'Australia/Brisbane' };
+          const d = new Date();
+          const t = d.toLocaleTimeString('en-AU', { ...tz, hour: 'numeric', minute: '2-digit', hour12: true }).split(/\s+/);
+          return `<div style="display:flex;align-items:center;gap:var(--space-3)">
+            <div style="font-size:var(--fs-clock);font-weight:var(--fw-medium);line-height:1;letter-spacing:-0.02em;white-space:nowrap">${t[0]}<span style="font-size:var(--fs-title);font-weight:var(--fw-medium);color:var(--text-2);margin-left:var(--space-2)">${(t[1] || '').toUpperCase()}</span></div>
+            <div style="font-size:var(--fs-body);font-weight:var(--fw-regular);color:var(--text-2);line-height:var(--lh-body);text-align:left">${d.toLocaleDateString('en-AU', { ...tz, weekday: 'long' })}<br>${d.toLocaleDateString('en-AU', { ...tz, day: 'numeric', month: 'long' })}</div>
+          </div>`;
+          ]]]
+        status: |-
+          [[[
+          const on = id => states[id]?.state === 'on';
+          const doors = { 'binary_sensor.front_door_contact': 'Front door', 'binary_sensor.crimsafe_door_contact': 'Security door', 'binary_sensor.garage_door_sensor_contact': 'Garage door',
+            'binary_sensor.hallwaydoorsensor_contact': 'Hallway door', 'binary_sensor.patio_door_contact': 'Patio door', 'binary_sensor.side_door_contact': 'Side door', 'binary_sensor.laundrydoorsensor_contact': 'Laundry door' };
+          const issues = Object.entries(doors).filter(([id]) => on(id)).map(([, n]) => n + ' open');
+          if (on('input_boolean.front_door')) issues.push('Front door unlocked');
+          const lights = Object.values(states).filter(e => e.entity_id.startsWith('light.') && !e.entity_id.startsWith('light.browser') && e.state === 'on').length;
+          const tariff = states['select.grid_import_tariff']?.state;
+          const parts = [issues.length ? issues[0] + (issues.length > 1 ? ` +${issues.length - 1}` : '') : 'All secure',
+            lights ? `${lights} light${lights === 1 ? '' : 's'} on` : 'Lights off'];
+          if (tariff && !['unknown', 'unavailable'].includes(tariff)) parts.push(tariff);
+          const icon = issues.length ? 'mdi:shield-alert-outline' : 'mdi:shield-check-outline';
+          const ink = issues.length ? 'var(--state-warn-ink)' : 'var(--state-ok-ink)';
+          return `<div style="display:flex;align-items:center;justify-content:center;gap:var(--space-2);font-size:var(--fs-title);font-weight:var(--fw-medium);text-align:center;line-height:var(--lh-tight)"><ha-icon icon="${icon}" style="--mdc-icon-size:var(--icon-md);color:${ink};flex:none"></ha-icon><span>${parts.join(' · ')}</span></div>`;
+          ]]]
+        wx:
+          card:
+            type: custom:button-card
+            template: qg_chip
+            entity: weather.north_lakes_weather
+            show_icon: true
+            show_state: true
+            triggers_update:
+            - weather.north_lakes_weather
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  style: |
+                    --ha-dialog-surface-background: var(--popup-bg);
+                    --ha-dialog-surface-backdrop-filter: var(--glass-blur);
+                    --mdc-dialog-scrim-color: var(--scrim);
+                    --ha-dialog-border-radius: var(--radius-lg);
+                    --mdc-dialog-min-width: min(var(--popup-width), 92vw);
+                    --mdc-dialog-max-width: min(var(--popup-width), 92vw);
+                    --ha-dialog-width-md: min(var(--popup-width), 92vw);
+                  dismissable: true
+                  size: normal
+                  content:
+                    type: vertical-stack
+                    cards:
+                    - type: heading
+                      heading: Brisbane
+                      heading_style: title
+                      icon: mdi:weather-partly-cloudy
+                    - type: custom:clock-weather-card
+                      entity: weather.north_lakes_weather
+                      name: Brisbane
+                      sun_entity: sun.sun
+                      date_pattern: ccc, d MMM yyyy
+                      forecast_rows: 5
+                      show_humidity: true
+                      use_browser_time: true
+                      weather_icon_type: fill
+                    - type: grid
+                      columns: 3
+                      square: false
+                      cards:
+                      - type: custom:button-card
+                        template: qg_chip
+                        name: |-
+                          [[[
+                          const f = iso => iso ? new Date(iso).toLocaleTimeString('en-AU', { timeZone: 'Australia/Brisbane', hour: 'numeric', minute: '2-digit', hour12: false }) : '–';
+                          return 'Sunrise ' + f(states['sun.sun']?.attributes?.next_rising);
+                          ]]]
+                        icon: mdi:weather-sunset-up
+                        triggers_update:
+                        - sun.sun
+                        show_name: true
+                      - type: custom:button-card
+                        template: qg_chip
+                        name: |-
+                          [[[
+                          const f = iso => iso ? new Date(iso).toLocaleTimeString('en-AU', { timeZone: 'Australia/Brisbane', hour: 'numeric', minute: '2-digit', hour12: false }) : '–';
+                          return 'Sunset ' + f(states['sun.sun']?.attributes?.next_setting);
+                          ]]]
+                        icon: mdi:weather-sunset-down
+                        triggers_update:
+                        - sun.sun
+                        show_name: true
+                      - type: custom:button-card
+                        template: qg_chip
+                        icon: mdi:weather-windy
+                        triggers_update:
+                        - weather.north_lakes_weather
+                        name: |-
+                          [[[
+                          const a = states['weather.north_lakes_weather']?.attributes || {};
+                          return a.wind_speed !== undefined ? 'Wind ' + Math.round(a.wind_speed) + ' ' + (a.wind_speed_unit || 'km/h') : 'Wind –';
+                          ]]]
+            name: |-
+              [[[
+              const t = parseFloat(entity.attributes.temperature);
+              return isNaN(t) ? '–' : Math.round(t) + '°';
+              ]]]
+            styles:
+              card:
+              - background: transparent
+              - border: none
+              - box-shadow: none
+              - padding: 0 var(--space-3)
+              grid:
+              - grid-template-areas: '"i n" "i s"'
+              - grid-template-columns: var(--icon-lg) auto
+              - column-gap: var(--space-3)
+              - justify-content: center
+              icon:
+              - width: var(--icon-lg)
+              - color: var(--text-1)
+              name:
+              - font-size: var(--fs-hero)
+              - font-weight: var(--fw-semibold)
+              state:
+              - justify-self: start
+              - font-size: var(--fs-secondary)
+              - color: var(--text-2)
+        p1:
+          card:
+            type: custom:button-card
+            template: qg_person
+            entity: person.sushenmathur
+            triggers_update:
+            - person.sushenmathur
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  style: |
+                    --ha-dialog-surface-background: var(--popup-bg);
+                    --ha-dialog-surface-backdrop-filter: var(--glass-blur);
+                    --mdc-dialog-scrim-color: var(--scrim);
+                    --ha-dialog-border-radius: var(--radius-lg);
+                    --mdc-dialog-min-width: min(var(--popup-width), 92vw);
+                    --mdc-dialog-max-width: min(var(--popup-width), 92vw);
+                    --ha-dialog-width-md: min(var(--popup-width), 92vw);
+                  dismissable: true
+                  size: normal
+                  content:
+                    type: vertical-stack
+                    cards:
+                    - type: heading
+                      heading: Sushen
+                      heading_style: title
+                      icon: mdi:account
+                      badges:
+                      - type: entity
+                        entity: person.sushenmathur
+                      - type: entity
+                        entity: sensor.iphone_battery_level
+                    - type: tile
+                      entity: person.sushenmathur
+                      name: Sushen
+                      show_entity_picture: true
+                    - type: grid
+                      columns: 2
+                      square: false
+                      cards:
+                      - type: tile
+                        entity: sensor.iphone_battery_level
+                        name: Phone battery
+                      - type: tile
+                        entity: sensor.iphone_battery_state
+                        name: Charging
+                        icon: mdi:battery-charging
+                    - type: heading
+                      heading: Their time
+                      heading_style: subtitle
+                    - type: grid
+                      columns: 2
+                      square: false
+                      cards:
+                      - type: custom:button-card
+                        template: qg_stat
+                        entity: binary_sensor.hyd_daytime
+                        icon: mdi:weather-night
+                        label: India
+                        triggers_update:
+                        - sensor.time
+                        - binary_sensor.hyd_daytime
+                        variables:
+                          tz: Asia/Kolkata
+                        name: |-
+                          [[[
+                          return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
+                          ]]]
+                        state:
+                        - value: 'on'
+                          icon: mdi:weather-sunny
+                          styles:
+                            card:
+                            - --qg-on: 1
+                        styles:
+                          grid:
+                          - grid-template-areas: '"i l" "i n"'
+                          - grid-template-columns: var(--disc) 1fr
+                          - column-gap: var(--space-3)
+                          icon:
+                          - width: var(--icon-md)
+                        show_icon: true
+                      - type: custom:button-card
+                        template: qg_stat
+                        entity: binary_sensor.austin_daytime
+                        icon: mdi:weather-night
+                        label: Austin
+                        triggers_update:
+                        - sensor.time
+                        - binary_sensor.austin_daytime
+                        variables:
+                          tz: America/Chicago
+                        name: |-
+                          [[[
+                          return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
+                          ]]]
+                        state:
+                        - value: 'on'
+                          icon: mdi:weather-sunny
+                          styles:
+                            card:
+                            - --qg-on: 1
+                        styles:
+                          grid:
+                          - grid-template-areas: '"i l" "i n"'
+                          - grid-template-columns: var(--disc) 1fr
+                          - column-gap: var(--space-3)
+                          icon:
+                          - width: var(--icon-md)
+                        show_icon: true
+        p2:
+          card:
+            type: custom:button-card
+            template: qg_person
+            entity: person.paro
+            triggers_update:
+            - person.paro
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  style: |
+                    --ha-dialog-surface-background: var(--popup-bg);
+                    --ha-dialog-surface-backdrop-filter: var(--glass-blur);
+                    --mdc-dialog-scrim-color: var(--scrim);
+                    --ha-dialog-border-radius: var(--radius-lg);
+                    --mdc-dialog-min-width: min(var(--popup-width), 92vw);
+                    --mdc-dialog-max-width: min(var(--popup-width), 92vw);
+                    --ha-dialog-width-md: min(var(--popup-width), 92vw);
+                  dismissable: true
+                  size: normal
+                  content:
+                    type: vertical-stack
+                    cards:
+                    - type: heading
+                      heading: Paro
+                      heading_style: title
+                      icon: mdi:account
+                      badges:
+                      - type: entity
+                        entity: person.paro
+                      - type: entity
+                        entity: sensor.paro_phone_battery
+                    - type: tile
+                      entity: person.paro
+                      name: Paro
+                      show_entity_picture: true
+                    - type: grid
+                      columns: 2
+                      square: false
+                      cards:
+                      - type: tile
+                        entity: sensor.paro_phone_battery
+                        name: Phone battery
+                      - type: tile
+                        entity: sensor.paro_iphone_battery_state
+                        name: Charging
+                        icon: mdi:battery-charging
+                    - type: heading
+                      heading: Their time
+                      heading_style: subtitle
+                    - type: grid
+                      columns: 2
+                      square: false
+                      cards:
+                      - type: custom:button-card
+                        template: qg_stat
+                        entity: binary_sensor.austin_daytime
+                        icon: mdi:weather-night
+                        label: Austin
+                        triggers_update:
+                        - sensor.time
+                        - binary_sensor.austin_daytime
+                        variables:
+                          tz: America/Chicago
+                        name: |-
+                          [[[
+                          return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
+                          ]]]
+                        state:
+                        - value: 'on'
+                          icon: mdi:weather-sunny
+                          styles:
+                            card:
+                            - --qg-on: 1
+                        styles:
+                          grid:
+                          - grid-template-areas: '"i l" "i n"'
+                          - grid-template-columns: var(--disc) 1fr
+                          - column-gap: var(--space-3)
+                          icon:
+                          - width: var(--icon-md)
+                        show_icon: true
+                      - type: custom:button-card
+                        template: qg_stat
+                        entity: binary_sensor.hyd_daytime
+                        icon: mdi:weather-night
+                        label: India
+                        triggers_update:
+                        - sensor.time
+                        - binary_sensor.hyd_daytime
+                        variables:
+                          tz: Asia/Kolkata
+                        name: |-
+                          [[[
+                          return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
+                          ]]]
+                        state:
+                        - value: 'on'
+                          icon: mdi:weather-sunny
+                          styles:
+                            card:
+                            - --qg-on: 1
+                        styles:
+                          grid:
+                          - grid-template-areas: '"i l" "i n"'
+                          - grid-template-columns: var(--disc) 1fr
+                          - column-gap: var(--space-3)
+                          icon:
+                          - width: var(--icon-md)
+                        show_icon: true
       styles:
         card:
         - background: transparent
         - border: none
         - box-shadow: none
-        - align-content: center
+        - padding: 0 var(--space-3)
+        - height: var(--topbar)
+        - min-height: 0
         grid:
-        - grid-template-areas: '"n"'
-        - justify-items: center
-        - align-content: center
-        name:
-        - font-size: var(--fs-title)
-        - font-weight: var(--fw-medium)
-        - white-space: normal
-        - text-align: center
-        - justify-self: center
-    - type: custom:button-card
-      template: qg_chip
-      entity: weather.north_lakes_weather
-      show_icon: true
-      show_state: true
-      triggers_update:
-      - weather.north_lakes_weather
-      grid_options:
-        columns: 2
-        rows: 2
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          service: browser_mod.popup
-          data:
-            style: |
-              --ha-dialog-surface-background: var(--popup-bg);
-              --ha-dialog-surface-backdrop-filter: var(--glass-blur);
-              --mdc-dialog-scrim-color: var(--scrim);
-              --ha-dialog-border-radius: var(--radius-lg);
-              --mdc-dialog-min-width: min(var(--popup-width), 92vw);
-              --mdc-dialog-max-width: min(var(--popup-width), 92vw);
-              --ha-dialog-width-md: min(var(--popup-width), 92vw);
-            dismissable: true
-            size: normal
-            content:
-              type: vertical-stack
-              cards:
-              - type: heading
-                heading: Brisbane
-                heading_style: title
-                icon: mdi:weather-partly-cloudy
-              - type: custom:clock-weather-card
-                entity: weather.north_lakes_weather
-                name: Brisbane
-                sun_entity: sun.sun
-                date_pattern: ccc, d MMM yyyy
-                forecast_rows: 5
-                show_humidity: true
-                use_browser_time: true
-                weather_icon_type: fill
-              - type: grid
-                columns: 3
-                square: false
-                cards:
-                - type: custom:button-card
-                  template: qg_chip
-                  name: |-
-                    [[[
-                    const f = iso => iso ? new Date(iso).toLocaleTimeString('en-AU', { timeZone: 'Australia/Brisbane', hour: 'numeric', minute: '2-digit', hour12: false }) : '–';
-                    return 'Sunrise ' + f(states['sun.sun']?.attributes?.next_rising);
-                    ]]]
-                  icon: mdi:weather-sunset-up
-                  triggers_update:
-                  - sun.sun
-                  show_name: true
-                - type: custom:button-card
-                  template: qg_chip
-                  name: |-
-                    [[[
-                    const f = iso => iso ? new Date(iso).toLocaleTimeString('en-AU', { timeZone: 'Australia/Brisbane', hour: 'numeric', minute: '2-digit', hour12: false }) : '–';
-                    return 'Sunset ' + f(states['sun.sun']?.attributes?.next_setting);
-                    ]]]
-                  icon: mdi:weather-sunset-down
-                  triggers_update:
-                  - sun.sun
-                  show_name: true
-                - type: custom:button-card
-                  template: qg_chip
-                  icon: mdi:weather-windy
-                  triggers_update:
-                  - weather.north_lakes_weather
-                  name: |-
-                    [[[
-                    const a = states['weather.north_lakes_weather']?.attributes || {};
-                    return a.wind_speed !== undefined ? 'Wind ' + Math.round(a.wind_speed) + ' ' + (a.wind_speed_unit || 'km/h') : 'Wind –';
-                    ]]]
-      name: |-
-        [[[
-        const t = parseFloat(entity.attributes.temperature);
-        return isNaN(t) ? '–' : Math.round(t) + '°';
-        ]]]
-      styles:
-        card:
-        - background: transparent
-        - border: none
-        - box-shadow: none
-        grid:
-        - grid-template-areas: '"i n" "i s"'
-        - grid-template-columns: var(--icon-lg) 1fr
-        - column-gap: var(--space-3)
-        - justify-content: center
-        icon:
-        - width: var(--icon-lg)
-        - color: var(--text-1)
-        name:
-        - font-size: var(--fs-hero)
-        - font-weight: var(--fw-semibold)
-        state:
-        - justify-self: start
-        - font-size: var(--fs-secondary)
-        - color: var(--text-2)
-    - type: custom:button-card
-      template: qg_person
-      entity: person.sushenmathur
-      triggers_update:
-      - person.sushenmathur
-      grid_options:
-        columns: 1
-        rows: 2
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          service: browser_mod.popup
-          data:
-            style: |
-              --ha-dialog-surface-background: var(--popup-bg);
-              --ha-dialog-surface-backdrop-filter: var(--glass-blur);
-              --mdc-dialog-scrim-color: var(--scrim);
-              --ha-dialog-border-radius: var(--radius-lg);
-              --mdc-dialog-min-width: min(var(--popup-width), 92vw);
-              --mdc-dialog-max-width: min(var(--popup-width), 92vw);
-              --ha-dialog-width-md: min(var(--popup-width), 92vw);
-            dismissable: true
-            size: normal
-            content:
-              type: vertical-stack
-              cards:
-              - type: heading
-                heading: Sushen
-                heading_style: title
-                icon: mdi:account
-                badges:
-                - type: entity
-                  entity: person.sushenmathur
-                - type: entity
-                  entity: sensor.iphone_battery_level
-              - type: tile
-                entity: person.sushenmathur
-                name: Sushen
-                show_entity_picture: true
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                - type: tile
-                  entity: sensor.iphone_battery_level
-                  name: Phone battery
-                - type: tile
-                  entity: sensor.iphone_battery_state
-                  name: Charging
-                  icon: mdi:battery-charging
-              - type: heading
-                heading: Their time
-                heading_style: subtitle
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                - type: custom:button-card
-                  template: qg_stat
-                  entity: binary_sensor.hyd_daytime
-                  icon: mdi:weather-night
-                  label: India
-                  triggers_update:
-                  - sensor.time
-                  - binary_sensor.hyd_daytime
-                  variables:
-                    tz: Asia/Kolkata
-                  name: |-
-                    [[[
-                    return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
-                    ]]]
-                  state:
-                  - value: 'on'
-                    icon: mdi:weather-sunny
-                    styles:
-                      card:
-                      - --qg-on: 1
-                  styles:
-                    grid:
-                    - grid-template-areas: '"i l" "i n"'
-                    - grid-template-columns: var(--disc) 1fr
-                    - column-gap: var(--space-3)
-                    icon:
-                    - width: var(--icon-md)
-                  show_icon: true
-                - type: custom:button-card
-                  template: qg_stat
-                  entity: binary_sensor.austin_daytime
-                  icon: mdi:weather-night
-                  label: Austin
-                  triggers_update:
-                  - sensor.time
-                  - binary_sensor.austin_daytime
-                  variables:
-                    tz: America/Chicago
-                  name: |-
-                    [[[
-                    return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
-                    ]]]
-                  state:
-                  - value: 'on'
-                    icon: mdi:weather-sunny
-                    styles:
-                      card:
-                      - --qg-on: 1
-                  styles:
-                    grid:
-                    - grid-template-areas: '"i l" "i n"'
-                    - grid-template-columns: var(--disc) 1fr
-                    - column-gap: var(--space-3)
-                    icon:
-                    - width: var(--icon-md)
-                  show_icon: true
-    - type: custom:button-card
-      template: qg_person
-      entity: person.paro
-      triggers_update:
-      - person.paro
-      grid_options:
-        columns: 1
-        rows: 2
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          service: browser_mod.popup
-          data:
-            style: |
-              --ha-dialog-surface-background: var(--popup-bg);
-              --ha-dialog-surface-backdrop-filter: var(--glass-blur);
-              --mdc-dialog-scrim-color: var(--scrim);
-              --ha-dialog-border-radius: var(--radius-lg);
-              --mdc-dialog-min-width: min(var(--popup-width), 92vw);
-              --mdc-dialog-max-width: min(var(--popup-width), 92vw);
-              --ha-dialog-width-md: min(var(--popup-width), 92vw);
-            dismissable: true
-            size: normal
-            content:
-              type: vertical-stack
-              cards:
-              - type: heading
-                heading: Paro
-                heading_style: title
-                icon: mdi:account
-                badges:
-                - type: entity
-                  entity: person.paro
-                - type: entity
-                  entity: sensor.paro_phone_battery
-              - type: tile
-                entity: person.paro
-                name: Paro
-                show_entity_picture: true
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                - type: tile
-                  entity: sensor.paro_phone_battery
-                  name: Phone battery
-                - type: tile
-                  entity: sensor.paro_iphone_battery_state
-                  name: Charging
-                  icon: mdi:battery-charging
-              - type: heading
-                heading: Their time
-                heading_style: subtitle
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                - type: custom:button-card
-                  template: qg_stat
-                  entity: binary_sensor.austin_daytime
-                  icon: mdi:weather-night
-                  label: Austin
-                  triggers_update:
-                  - sensor.time
-                  - binary_sensor.austin_daytime
-                  variables:
-                    tz: America/Chicago
-                  name: |-
-                    [[[
-                    return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
-                    ]]]
-                  state:
-                  - value: 'on'
-                    icon: mdi:weather-sunny
-                    styles:
-                      card:
-                      - --qg-on: 1
-                  styles:
-                    grid:
-                    - grid-template-areas: '"i l" "i n"'
-                    - grid-template-columns: var(--disc) 1fr
-                    - column-gap: var(--space-3)
-                    icon:
-                    - width: var(--icon-md)
-                  show_icon: true
-                - type: custom:button-card
-                  template: qg_stat
-                  entity: binary_sensor.hyd_daytime
-                  icon: mdi:weather-night
-                  label: India
-                  triggers_update:
-                  - sensor.time
-                  - binary_sensor.hyd_daytime
-                  variables:
-                    tz: Asia/Kolkata
-                  name: |-
-                    [[[
-                    return new Date().toLocaleTimeString('en-AU', { timeZone: variables.tz, hour: 'numeric', minute: '2-digit' });
-                    ]]]
-                  state:
-                  - value: 'on'
-                    icon: mdi:weather-sunny
-                    styles:
-                      card:
-                      - --qg-on: 1
-                  styles:
-                    grid:
-                    - grid-template-areas: '"i l" "i n"'
-                    - grid-template-columns: var(--disc) 1fr
-                    - column-gap: var(--space-3)
-                    icon:
-                    - width: var(--icon-md)
-                  show_icon: true
+        - grid-template-areas: '"clock status wx p1 p2"'
+        - grid-template-columns: auto minmax(0, 1fr) auto auto auto
+        - column-gap: var(--space-4)
+        - align-items: center
+        custom_fields:
+          clock:
+          - justify-self: start
+          status:
+          - justify-self: stretch
+          wx:
+          - justify-self: end
+          p1:
+          - justify-self: end
+          p2:
+          - justify-self: end
+    layout: responsive
+  sections:
   - type: grid
     cards:
     - type: custom:button-card
@@ -4784,7 +4765,7 @@ views:
     mobile_footer_mode: icon
     mobile_footer_search_enabled: false
     mobile_home_shortcut: true
-    mobile_home_shortcut_path: /home-2-0/hubhome
+    mobile_home_shortcut_path: /dashboard-hub/hubhome
     mobile_icon_scale: 1
     mobile_layout_mode: auto
     mobile_library_default_layout: grid

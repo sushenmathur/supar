@@ -39,6 +39,7 @@ Glass 2:
   lh-body: 1.35
   # Component sizes
   tap: 48px
+  topbar: 88px
   disc: 40px
   dot: 10px
   bar: 8px
@@ -94,6 +95,16 @@ Glass 2:
   ha-dialog-border-radius: var(--radius-lg)
   mdc-dialog-scrim-color: var(--scrim)
   dialog-backdrop-filter: none
+  # HA chrome (toolbar, sidebar) follows the theme too
+  app-header-background-color: var(--surface-1)
+  app-header-text-color: var(--text-1)
+  app-header-border-bottom: 1px solid var(--hairline)
+  sidebar-background-color: var(--surface-1)
+  sidebar-text-color: var(--text-1)
+  sidebar-icon-color: var(--text-2)
+  sidebar-selected-background-color: var(--surface-2)
+  sidebar-selected-text-color: var(--text-1)
+  sidebar-selected-icon-color: var(--accent)
   lovelace-background: var(--surface-0)
 
   modes:
@@ -194,6 +205,7 @@ Glass 2 Saver:
   lh-tight: 1.15
   lh-body: 1.35
   tap: 48px
+  topbar: 88px
   disc: 40px
   dot: 10px
   bar: 8px
