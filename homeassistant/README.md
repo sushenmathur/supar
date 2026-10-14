@@ -33,7 +33,7 @@ After changing the dashboard in Home Assistant, copy the raw config back into `d
 
 ## Rolling back
 
-Paste `_archive/master.yaml` into the raw editor and copy `_archive/glass.yaml` over `/config/themes/glass-2.yaml`, then Reload themes and refresh.
+Paste `_archive/master.yaml` into the raw editor of the dashboard you want to restore. The original `Glass` theme (`_archive/glass.yaml`) is not touched by this one, which installs separately as `Glass 2`.
 
 ## Mock-up
 
