@@ -1444,10 +1444,36 @@ views:
               - type: custom:button-card
                 icon: mdi:teddy-bear
                 name: Kids
+                label: |
+                  [[[
+                    const on = id => states[id]?.state === 'on';
+                    const n = ['light.aarlo_samar_cam', 'light.tall_lamp'].filter(e => states[e]?.state === 'on').length;
+                    const rooms = [];
+                    if (on('binary_sensor.shanaya_room_occupancy_status')) rooms.push('Shanaya');
+                    if (on('binary_sensor.samar_room_occupancy_new')) rooms.push('Samar');
+                    const lights = n ? `${n} on` : 'All off';
+                    if (!rooms.length) return lights;
+                    const text = `<b style="color:var(--glass-level-warn, #f59e0b)">${rooms.join(' & ')} in room</b> · ${lights}`;
+                    return `<span class="mq"><span class="run"><span>${text}</span><span>${text}</span></span></span>`;
+                  ]]]
                 template: room_tile
+                styles:
+                  label:
+                    - justify-self: start
+                    - align-self: start
+                    - font-size: 13px
+                    - color: var(--secondary-text-color)
+                    - width: 100%
+                    - min-width: 0
+                    - overflow: hidden
+                    - display: flex
+                    - align-items: center
+                    - white-space: nowrap
                 triggers_update:
                   - light.aarlo_samar_cam
                   - light.tall_lamp
+                  - binary_sensor.shanaya_room_occupancy_status
+                  - binary_sensor.samar_room_occupancy_new
                 tap_action:
                   action: navigate
                   navigation_path: /dashboard-hub/kidsroom
@@ -2154,34 +2180,6 @@ views:
                           style: 'ha-card { min-height: 54px; }'
                         tap_action:
                           action: toggle
-          - type: custom:button-card
-            entity: binary_sensor.shanaya_room_occupancy_status
-            name: Shanaya Room
-            icon: mdi:cradle
-            template: glass_chip
-            label: '[[[ return entity.state === "on" ? "Occupied" : "Clear"; ]]]'
-            variables:
-              hot: >-
-                [[[ return
-                states["binary_sensor.shanaya_room_occupancy_status"]?.state ===
-                "on"; ]]]
-            grid_options:
-              columns: 6
-              rows: 1
-          - type: custom:button-card
-            entity: binary_sensor.samar_room_occupancy_new
-            name: Samar Room
-            icon: mdi:bed
-            template: glass_chip
-            label: '[[[ return entity.state === "on" ? "Occupied" : "Clear"; ]]]'
-            variables:
-              hot: >-
-                [[[ return
-                states["binary_sensor.samar_room_occupancy_new"]?.state ===
-                "on"; ]]]
-            grid_options:
-              columns: 6
-              rows: 1
           - type: picture-entity
             entity: camera.front_door_snapshot_2
             name: Front Door
