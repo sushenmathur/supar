@@ -1,0 +1,42 @@
+<!doctype html><meta charset="utf-8"><title>Kids tile occupancy</title>
+<style>
+:root{--t:#14203a;--s:rgba(20,32,58,.62);--rgb:20,32,58;--bd:rgba(255,255,255,.85);--fld:rgba(255,255,255,.55);--hi:rgba(255,255,255,.9);--amb:#b45309;--ambbg:rgba(245,158,11,.22);
+--wall:radial-gradient(700px 520px at 10% 8%,rgba(255,190,150,.65),transparent 70%),radial-gradient(640px 500px at 62% 30%,rgba(150,200,255,.6),transparent 70%),linear-gradient(160deg,#eef2fb,#e4eaf7)}
+.dark{--t:#fff;--s:rgba(255,255,255,.62);--rgb:255,255,255;--bd:rgba(255,255,255,.22);--fld:rgba(255,255,255,.10);--hi:rgba(255,255,255,.35);--amb:#fbbf24;--ambbg:rgba(251,191,36,.22);
+--wall:radial-gradient(620px 480px at 12% 8%,rgba(80,110,255,.35),transparent 70%),linear-gradient(160deg,#0b1020,#10182f 50%,#0a1a26)}
+body{margin:0;font:14px Poppins,system-ui,sans-serif}
+.panel{background:var(--wall);color:var(--t);padding:18px 22px}
+h3{margin:16px 0 8px;font-size:13px;color:var(--s)}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.lab{font-size:11px;color:var(--s);text-align:center;margin-top:4px}
+.tile{width:250px;height:76px;border-radius:24px;box-sizing:border-box;padding:0 16px;display:grid;grid-template-columns:52px 1fr;column-gap:12px;align-items:center;
+ background:linear-gradient(135deg,rgba(255,196,110,.42),rgba(255,196,110,.14));border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);position:relative}
+.ic{width:48px;height:48px;border-radius:16px;background:var(--fld);display:grid;place-items:center}
+.ic svg{width:26px;height:26px;fill:var(--t)}
+.nm{font-weight:700;font-size:16px;line-height:1.1}.lb{font-size:12.5px;color:var(--s);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.in{color:var(--amb);font-weight:700}
+/* B: badges */
+.bd{position:absolute;right:10px;top:10px;display:flex;gap:4px}
+.dot{height:20px;min-width:20px;border-radius:10px;font-size:10.5px;font-weight:700;display:grid;place-items:center;padding:0 6px;background:var(--fld);color:var(--s)}
+.dot.on{background:var(--ambbg);color:var(--amb);box-shadow:0 0 0 1px var(--amb) inset}
+.dot i{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;margin-right:4px}
+/* C: two-line */
+.rows{display:flex;flex-direction:column;gap:1px;margin-top:2px;font-size:12px;line-height:1.25}
+.rows span{white-space:nowrap}.rows .c{color:var(--s)}
+.ring{position:absolute;inset:-1px;border-radius:24px;box-shadow:0 0 0 2px var(--amb) inset;opacity:.0}
+</style>
+<body><script>
+const ICON='<svg viewBox="0 0 24 24"><path d="M12,2A3,3 0 0,1 15,5A3,3 0 0,1 12,8A3,3 0 0,1 9,5A3,3 0 0,1 12,2M12,9C15,9 21,10.5 21,13.5V16H3V13.5C3,10.5 9,9 12,9Z"/></svg>';
+const cases=[['Shanaya in room',1,0,'All off'],['Both clear',0,0,'All off'],['Both in room',1,1,'Lamp on']];
+const A=(s,m,l)=>{const p=[];if(s)p.push('<span class="in">Shanaya in room</span>');if(m)p.push('<span class="in">Samar in room</span>');
+ return `<div class="lb">${p.length?p.join(' · ')+' · ':''}${l}</div>`};
+const tile={
+A:(s,m,l)=>`<div class="tile"><div class="ic">${ICON}</div><div><div class="nm">Kids</div>${A(s,m,l)}</div></div>`,
+B:(s,m,l)=>`<div class="tile"><div class="ic">${ICON}</div><div><div class="nm">Kids</div><div class="lb">${l}</div></div>
+ <div class="bd"><span class="dot ${s?'on':''}"><i></i>Sh</span><span class="dot ${m?'on':''}"><i></i>Sa</span></div></div>`,
+C:(s,m,l)=>`<div class="tile"><div class="ic">${ICON}</div><div><div class="nm">Kids <span style="font-weight:500;font-size:12px;color:var(--s)">· ${l}</span></div>
+ <div class="rows"><span class="${s?'in':'c'}">Shanaya · ${s?'in room':'clear'}</span><span class="${m?'in':'c'}">Samar · ${m?'in room':'clear'}</span></div></div></div>`};
+const names={A:'A: status in the label line (ticker scrolls if long)',B:'B: occupancy badges top-right (lit amber when in room)',C:'C: two status lines like Mobilehub (taller text block, same 76px tile)'};
+const block=m=>`<div class="panel ${m}"><b>${m}</b>`+['A','B','C'].map(o=>`<h3>${names[o]}</h3><div class="row">${cases.map(c=>`<div>${tile[o](c[1],c[2],c[3])}<div class="lab">${c[0]}</div></div>`).join('')}</div>`).join('')+'</div>';
+document.body.innerHTML=block('light')+block('dark');
+</script>
