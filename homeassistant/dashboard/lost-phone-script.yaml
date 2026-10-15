@@ -1,0 +1,50 @@
+lost_phone:
+  alias: Lost Phone
+  description: Play an alert tone on a lost iPhone (requires passcode)
+  icon: mdi:cellphone-arrow-down
+  fields:
+    phone:
+      name: Phone
+      required: true
+      default: Sushen
+      selector:
+        select:
+          options:
+            - Paro
+            - Sushen
+          multiple: false
+    passcode:
+      name: Passcode
+      required: true
+      selector:
+        text:
+          type: password
+    browser_id:
+      name: Browser ID
+      description: Sent by the dashboard keypad (optional)
+      required: false
+      selector:
+        text:
+  sequence:
+    - variables:
+        paro_code: !secret paro_lost_phone
+        sushen_code: !secret sushen_lost_phone
+    - if:
+        - condition: template
+          value_template: >-
+            {% if (phone | lower) == 'paro' %}
+              {{ (passcode | default('') | string) != (paro_code | string) }}
+            {% else %}
+              {{ (passcode | default('') | string) != (sushen_code | string) }}
+            {% endif %}
+      then:
+        # Failing the script makes the dashboard keypad show "Access denied".
+        - stop: Incorrect passcode
+          error: true
+    - action: icloud3.find_iphone_alert
+      data:
+        device_name: >-
+          {{ '1ff71fcd1fb9dfa21717952630c8f773'
+             if (phone | lower) == 'paro'
+             else 'b4c6338c2f8906f56d55bb1d873be555' }}
+  mode: single
