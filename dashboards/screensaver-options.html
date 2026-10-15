@@ -1,0 +1,62 @@
+<!doctype html><meta charset="utf-8"><title>Screensaver options</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:Poppins,Inter,system-ui,sans-serif;color:#fff;background:#05070f}
+.scr{position:relative;width:1472px;height:920px;overflow:hidden;background:
+ radial-gradient(900px 640px at 8% 10%,rgba(91,61,245,.34),transparent 62%),radial-gradient(820px 600px at 70% 14%,rgba(10,167,160,.26),transparent 62%),radial-gradient(760px 620px at 98% 78%,rgba(192,38,211,.26),transparent 62%),radial-gradient(700px 520px at 10% 100%,rgba(30,64,175,.34),transparent 62%),linear-gradient(160deg,#060a18,#0b1226 55%,#08141f)}
+.g{background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(22px) saturate(200%);
+ box-shadow:inset 0 1.5px 1px -1px rgba(255,255,255,.5),inset 1.5px 0 1px -1px rgba(255,255,255,.26),0 18px 40px rgba(0,0,0,.42)}
+.s{color:rgba(255,255,255,.66)}.ok{color:#6ee7b7}.warn{color:#fbbf24}
+svg{width:1em;height:1em;fill:currentColor;vertical-align:-.12em}
+.chip{display:inline-flex;align-items:center;gap:10px;height:56px;padding:0 22px;border-radius:28px;font-size:20px;font-weight:600}
+.hint{position:absolute;bottom:22px;left:0;right:0;text-align:center;font-size:15px;letter-spacing:.04em;color:rgba(255,255,255,.4)}
+.tag{position:absolute;top:18px;left:22px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.dim{opacity:.0}
+</style>
+<body><div id=root></div>
+<script>
+const I={shield:'M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H19C18.47,16.11 15.72,19.78 12,20.93V12H5V6.3L12,3.19V11.99Z',
+door:'M19,19V5A2,2 0 0,0 17,3H7A2,2 0 0,0 5,5V19H3V21H21V19H19M15,13H13V11H15V13Z',
+bulb:'M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z',
+cal:'M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z',
+car:'M18.92,6C18.72,5.42 18.16,5 17.5,5H6.5C5.84,5 5.28,5.42 5.08,6L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6M6.5,16A1.5,1.5 0 0,1 5,14.5A1.5,1.5 0 0,1 6.5,13A1.5,1.5 0 0,1 8,14.5A1.5,1.5 0 0,1 6.5,16M17.5,16A1.5,1.5 0 0,1 16,14.5A1.5,1.5 0 0,1 17.5,13A1.5,1.5 0 0,1 19,14.5A1.5,1.5 0 0,1 17.5,16M5,11L6.5,6.5H17.5L19,11H5Z',
+sun:'M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2Z',
+home:'M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z'};
+const ic=k=>`<svg viewBox="0 0 24 24"><path d="${I[k]}"/></svg>`;
+const A=`<div class="scr">
+<div class="tag">Option A · Ambient clock</div>
+<div style="position:absolute;left:0;right:0;top:150px;text-align:center">
+ <div class="s" style="font-size:26px;font-weight:600;letter-spacing:.02em">Wednesday 14 October &nbsp;·&nbsp; ${ic('sun')} 24° Partly cloudy</div>
+ <div style="font-size:250px;font-weight:800;letter-spacing:-.05em;line-height:1;margin-top:6px">12:19<span style="font-size:80px;margin-left:12px;letter-spacing:0;font-weight:700" class="s">PM</span></div>
+</div>
+<div style="position:absolute;left:0;right:0;top:560px;display:flex;justify-content:center;gap:16px">
+ <div class="g chip ok">${ic('shield')} Alarm disarmed</div><div class="g chip">${ic('door')} All doors closed</div><div class="g chip">${ic('car')} Garage closed</div><div class="g chip">${ic('bulb')} 2 lights on</div></div>
+<div class="g" style="position:absolute;left:50%;transform:translateX(-50%);top:660px;width:760px;border-radius:30px;padding:20px 28px;display:flex;align-items:center;gap:20px">
+ <div style="font-size:34px" class="s">${ic('cal')}</div><div><div class="s" style="font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Next today</div><div style="font-size:24px;font-weight:700;margin-top:2px">4:30 PM &nbsp;Samar Shanaya Swim Class</div></div></div>
+<div class="hint">Tap or walk past to wake</div></div>`;
+const B=`<div class="scr">
+<div class="tag">Option B · Clock + dashboard glance</div>
+<div style="position:absolute;left:70px;top:200px;width:640px">
+ <div class="s" style="font-size:26px;font-weight:600">Wednesday 14 October</div>
+ <div style="font-size:200px;font-weight:800;letter-spacing:-.05em;line-height:1;margin-top:8px">12:19</div>
+ <div style="font-size:44px;font-weight:700;margin-top:-4px" class="s">PM</div>
+ <div class="g" style="margin-top:46px;border-radius:30px;padding:20px 26px;display:flex;align-items:center;gap:20px;width:520px"><div style="font-size:54px" class="warn">${ic('sun')}</div><div><div style="font-size:42px;font-weight:700">24°</div><div class="s" style="font-size:18px">Partly cloudy · Feels 25° · Rain 10%</div></div></div></div>
+<div style="position:absolute;right:70px;top:150px;width:640px;display:grid;gap:18px">
+ <div class="g" style="border-radius:32px;padding:26px 28px"><div style="display:flex;align-items:center;gap:18px"><div style="width:68px;height:68px;border-radius:22px;background:rgba(110,231,183,.2);display:grid;place-items:center;font-size:36px" class="ok">${ic('shield')}</div><div><div class="s" style="font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Security</div><div style="font-size:32px;font-weight:700" class="ok">Alarm disarmed</div></div></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;font-size:17px;font-weight:600"><div class="g" style="border-radius:18px;padding:12px 14px">${ic('door')} Front <span class="ok">closed</span></div><div class="g" style="border-radius:18px;padding:12px 14px">${ic('car')} Garage <span class="ok">closed</span></div><div class="g" style="border-radius:18px;padding:12px 14px">${ic('door')} Patio <span class="ok">closed</span></div></div></div>
+ <div class="g" style="border-radius:32px;padding:24px 28px"><div class="s" style="font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">${ic('cal')} Today</div>
+  <div style="display:grid;gap:12px;font-size:21px;font-weight:600"><div style="display:flex;gap:18px"><span class="s" style="width:100px">4:30 PM</span>Samar Shanaya Swim Class</div><div style="display:flex;gap:18px"><span class="s" style="width:100px">6:30 PM</span>Parent teacher interview</div><div class="s" style="display:flex;gap:18px"><span style="width:100px">All day</span>Bin night (green)</div></div></div>
+ <div style="display:flex;gap:14px"><div class="g chip" style="flex:1;justify-content:center">${ic('bulb')} 2 lights on</div><div class="g chip" style="flex:1;justify-content:center">${ic('car')} Kia 100% · Bluey 72%</div></div></div>
+<div class="hint">Tap or walk past to wake</div></div>`;
+const C=`<div class="scr" style="background:#000">
+<div class="tag">Option C · Minimal night (OLED-safe, drifts to avoid burn-in)</div>
+<div style="position:absolute;left:230px;top:250px;opacity:.82">
+ <div style="font-size:190px;font-weight:300;letter-spacing:-.04em;line-height:1;color:rgba(255,255,255,.92)">12:19</div>
+ <div class="s" style="font-size:24px;margin-top:6px;color:rgba(255,255,255,.45)">Wed 14 Oct &nbsp;·&nbsp; 24°</div>
+ <div style="display:flex;gap:22px;margin-top:40px;font-size:28px;color:rgba(255,255,255,.55);align-items:center">
+  <span class="ok" style="display:inline-flex;align-items:center;gap:10px;font-size:22px;font-weight:600">${ic('shield')} Disarmed</span><span>${ic('door')}</span><span>${ic('car')}</span><span style="font-size:18px;color:rgba(255,255,255,.45)">&middot; 4:30 PM Swim class</span></div></div>
+<div style="position:absolute;right:80px;bottom:80px;width:12px;height:12px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 18px #6ee7b7"></div>
+<div class="hint">Moves a few pixels every minute · very dim · tap or motion wakes</div></div>`;
+const which=new URLSearchParams(location.search).get('o')||'A';
+document.getElementById('root').innerHTML={A,B,C}[which];
+</script>
