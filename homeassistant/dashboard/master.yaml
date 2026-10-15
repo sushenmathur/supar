@@ -98,6 +98,13 @@ button_card_templates:
           const msg = root.querySelector('.lpmsg');
           const say = (t, c) => { msg.textContent = t; msg.className = 'lpmsg ' + (c || ''); };
           const draw = () => { dots.textContent = s.code.length ? '● '.repeat(s.code.length).trim() : '– – – –'; };
+          const deny = (text) => {
+            say(text, 'bad');
+            void dots.offsetWidth;
+            dots.classList.add('shake');
+            s.code = '';
+            draw();
+          };
           const k = variables.k;
           dots.classList.remove('shake');
           if (/^[0-9]$/.test(k)) {
@@ -119,20 +126,19 @@ button_card_templates:
                 service_data: { browser_id: bid, passcode: s.code, phone: s.phone },
                 return_response: true
               });
-              if (res && res.response && res.response.ok === true) {
+              const r = res && res.response;
+              if (r && r.ok === true) {
                 say('Alert sent to ' + s.phone, 'good');
                 setTimeout(() => { try { h.callService('browser_mod', 'close_popup', { browser_id: bid }); } catch (e) {} }, 1500);
+              } else if (r && r.ok === false) {
+                deny('Access Denied - Wrong passcode');
               } else {
-                say('Not confirmed - update the lost_phone script', 'bad');
+                deny('Not confirmed - update script');
               }
             } catch (e) {
               const m = String((e && (e.message || e.error && e.error.message)) || e || '');
-              if (/passcode|denied/i.test(m)) say('Access denied', 'bad');
-              else say('Error: ' + m.slice(0, 48), 'bad');
-              void dots.offsetWidth;
-              dots.classList.add('shake');
-              s.code = '';
-              draw();
+              if (/passcode|denied/i.test(m)) deny('Access Denied - Wrong passcode');
+              else deny('Error: ' + m.slice(0, 40));
             }
             s.busy = false;
           })();

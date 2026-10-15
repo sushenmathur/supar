@@ -38,9 +38,13 @@ lost_phone:
               {{ (passcode | default('') | string) != (sushen_code | string) }}
             {% endif %}
       then:
-        # Failing the script makes the dashboard keypad show "Access denied".
+        # Tell the dashboard keypad the passcode was wrong.
+        - variables:
+            result:
+              ok: false
+              reason: Incorrect passcode
         - stop: Incorrect passcode
-          error: true
+          response_variable: result
     - action: icloud3.find_iphone_alert
       data:
         device_name: >-
