@@ -112,11 +112,23 @@ button_card_templates:
           const bid = (window.browser_mod && window.browser_mod.browserID) || 'THIS';
           (async () => {
             try {
-              await h.callService('script', 'lost_phone', { browser_id: bid, passcode: s.code, phone: s.phone });
-              say('Alert sent to ' + s.phone, 'good');
-              setTimeout(() => { try { h.callService('browser_mod', 'close_popup', { browser_id: bid }); } catch (e) {} }, 1500);
+              const res = await h.callWS({
+                type: 'call_service',
+                domain: 'script',
+                service: 'lost_phone',
+                service_data: { browser_id: bid, passcode: s.code, phone: s.phone },
+                return_response: true
+              });
+              if (res && res.response && res.response.ok === true) {
+                say('Alert sent to ' + s.phone, 'good');
+                setTimeout(() => { try { h.callService('browser_mod', 'close_popup', { browser_id: bid }); } catch (e) {} }, 1500);
+              } else {
+                say('Not confirmed - update the lost_phone script', 'bad');
+              }
             } catch (e) {
-              say('Access denied', 'bad');
+              const m = String((e && (e.message || e.error && e.error.message)) || e || '');
+              if (/passcode|denied/i.test(m)) say('Access denied', 'bad');
+              else say('Error: ' + m.slice(0, 48), 'bad');
               void dots.offsetWidth;
               dots.classList.add('shake');
               s.code = '';

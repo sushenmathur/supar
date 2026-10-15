@@ -47,4 +47,10 @@ lost_phone:
           {{ '1ff71fcd1fb9dfa21717952630c8f773'
              if (phone | lower) == 'paro'
              else 'b4c6338c2f8906f56d55bb1d873be555' }}
+    # Tell the dashboard keypad the alert was sent.
+    - variables:
+        result:
+          ok: true
+    - stop: Alert sent
+      response_variable: result
   mode: single
