@@ -142,6 +142,147 @@ button_card_templates:
         - font-weight: 500
         - color: |
             [[[ return variables.k === 'x' ? '#be123c' : variables.k === 'ok' ? '#15803d' : 'var(--primary-text-color)'; ]]]
+  lp_pad:
+    show_icon: false
+    show_name: false
+    show_state: false
+    tap_action:
+      action: none
+    custom_fields:
+      disp:
+        card:
+          type: custom:button-card
+          template: lp_display
+      sh:
+        card:
+          type: custom:button-card
+          template: lp_phone
+          variables:
+            p: Sushen
+      pa:
+        card:
+          type: custom:button-card
+          template: lp_phone
+          variables:
+            p: Paro
+      k1:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '1'
+      k2:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '2'
+      k3:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '3'
+      k4:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '4'
+      k5:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '5'
+      k6:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '6'
+      k7:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '7'
+      k8:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '8'
+      k9:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '9'
+      kx:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: 'x'
+      k0:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: '0'
+      ko:
+        card:
+          type: custom:button-card
+          template: lp_key
+          variables:
+            k: 'ok'
+    styles:
+      card:
+        - background: none
+        - border: none
+        - box-shadow: none
+        - backdrop-filter: none
+        - padding: 0
+      grid:
+        - grid-template-areas: '"disp disp disp disp disp disp" "sh sh sh pa pa pa" "k1 k1 k2 k2 k3 k3" "k4 k4 k5 k5 k6 k6" "k7 k7 k8 k8 k9 k9" "kx kx k0 k0 ko ko"'
+        - grid-template-columns: repeat(6, 36px)
+        - row-gap: 12px
+        - justify-content: center
+        - padding: 4px 0 8px
+      custom_fields:
+        disp:
+          - justify-self: stretch
+        sh:
+          - justify-self: stretch
+          - margin: 0 4px
+        pa:
+          - justify-self: stretch
+          - margin: 0 4px
+        k1:
+          - justify-self: center
+        k2:
+          - justify-self: center
+        k3:
+          - justify-self: center
+        k4:
+          - justify-self: center
+        k5:
+          - justify-self: center
+        k6:
+          - justify-self: center
+        k7:
+          - justify-self: center
+        k8:
+          - justify-self: center
+        k9:
+          - justify-self: center
+        kx:
+          - justify-self: center
+        k0:
+          - justify-self: center
+        ko:
+          - justify-self: center
   ticker:
     extra_styles: |
       .mq {
@@ -1461,75 +1602,8 @@ views:
                           title: Lost Phone
                           dismissable: true
                           content:
-                            type: vertical-stack
-                            card_mod:
-                              style: |
-                                :host { display: block; max-width: 300px; margin: 0 auto; }
-                            cards:
-                              - type: custom:button-card
-                                template: lp_display
-                              - type: horizontal-stack
-                                cards:
-                                  - type: custom:button-card
-                                    template: lp_phone
-                                    variables:
-                                      p: Sushen
-                                  - type: custom:button-card
-                                    template: lp_phone
-                                    variables:
-                                      p: Paro
-                              - type: grid
-                                columns: 3
-                                square: false
-                                cards:
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '1'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '2'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '3'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '4'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '5'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '6'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '7'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '8'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '9'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: 'x'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: '0'
-                                  - type: custom:button-card
-                                    template: lp_key
-                                    variables:
-                                      k: 'ok'
+                            type: custom:button-card
+                            template: lp_pad
                   - type: custom:button-card
                     icon: mdi:wifi
                     name: WiFi
