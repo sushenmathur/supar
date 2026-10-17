@@ -1,0 +1,98 @@
+# Dashboard-Hub: four energy cost tiles (Today / Sold / Bill to date / Est. bill)
+# Replaces the single four-value row above the Solar card.
+# Requires: custom:button-card
+#
+# 1) Add this template under `button_card_templates:` in the Hub raw config.
+button_card_templates:
+  energy_tile:
+    show_name: false
+    show_icon: false
+    show_state: false
+    tap_action:
+      action: more-info
+    variables:
+      label: ''
+      icon: mdi:cash
+      color: '#43A047'
+      value_color: var(--primary-text-color)
+      sub: ''
+      progress_of: ''
+    styles:
+      card:
+        - padding: 12px
+        - height: 100%
+      grid:
+        - grid-template-areas: '"tile"'
+        - grid-template-columns: 1fr
+      custom_fields:
+        tile:
+          - width: 100%
+    custom_fields:
+      tile: |
+        [[[
+          const v = parseFloat(entity ? entity.state : NaN);
+          const val = isNaN(v) ? '—' : '$' + v.toFixed(2);
+          const c = variables.color;
+          let extra = `<div style="font-size:11px;color:var(--secondary-text-color);opacity:.8;">${variables.sub}</div>`;
+          if (variables.progress_of) {
+            const tot = parseFloat(states[variables.progress_of] ? states[variables.progress_of].state : NaN);
+            const pct = (!isNaN(v) && tot > 0) ? Math.min(100, (v / tot) * 100) : 0;
+            extra = `
+              <div style="width:100%;height:5px;border-radius:3px;background:${c}26;overflow:hidden;margin-top:2px;">
+                <div style="width:${pct.toFixed(1)}%;height:100%;border-radius:3px;background:${c};"></div>
+              </div>
+              <div style="font-size:11px;color:var(--secondary-text-color);opacity:.8;">${pct.toFixed(0)}% of estimate</div>`;
+          }
+          return `
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;">
+              <div style="width:32px;height:32px;border-radius:50%;background:${c}22;
+                          display:flex;align-items:center;justify-content:center;margin-bottom:2px;">
+                <ha-icon icon="${variables.icon}" style="--mdc-icon-size:18px;color:${c};display:flex;"></ha-icon>
+              </div>
+              <div style="font-size:20px;font-weight:700;line-height:1.1;color:${variables.value_color};">${val}</div>
+              <div style="font-size:12px;font-weight:600;color:var(--primary-text-color);">${variables.label}</div>
+              ${extra}
+            </div>`;
+        ]]]
+
+# 2) Replace the existing four-value card on the Hub with this grid.
+card:
+  type: grid
+  columns: 2          # set to 4 for a single row where the column is wider
+  square: false
+  cards:
+    - type: custom:button-card
+      template: energy_tile
+      entity: sensor.daily_import_cost
+      variables:
+        label: Today
+        icon: mdi:cash-minus
+        color: '#E53935'
+        sub: Grid import cost
+    - type: custom:button-card
+      template: energy_tile
+      entity: sensor.daily_solar_credit
+      variables:
+        label: Sold
+        icon: mdi:cash-plus
+        color: '#43A047'
+        value_color: '#43A047'
+        sub: Solar export credit
+    - type: custom:button-card
+      template: energy_tile
+      entity: sensor.electricity_bill_to_date
+      triggers_update:
+        - sensor.electricity_estimated_bill
+      variables:
+        label: Bill to date
+        icon: mdi:receipt-text
+        color: '#1E88E5'
+        progress_of: sensor.electricity_estimated_bill
+    - type: custom:button-card
+      template: energy_tile
+      entity: sensor.electricity_estimated_bill
+      variables:
+        label: Est. bill
+        icon: mdi:calendar-clock
+        color: '#8E24AA'
+        sub: This billing period
