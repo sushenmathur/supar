@@ -159,12 +159,25 @@ views:
               };
 
               /* ---------- flows (photo coordinates, 1600 x 1000) ---------- */
-              let flows = '';
-              if (solar > 50) flows += flow('M 640 300 C 680 318, 718 326, 742 340', C.solar, solar - exp);
+              // Card-to-card links are always drawn; the animated flow sits on top when power is moving.
+              const P_SOLAR_HOME = 'M 720 226 C 720 276, 754 296, 754 340';
+              const P_HOME_TESLA = 'M 762 500 C 772 530, 800 552, 830 574';
+              const P_HOME_KIA   = 'M 868 432 C 985 436, 1100 456, 1150 506';
+              const link = (d, c) => {
+                const [x1, y1] = d.match(/M ([\d.]+) ([\d.]+)/).slice(1);
+                const pts = d.match(/[\d.]+ [\d.]+$/)[0].split(' ');
+                return `
+                  <path d="${d}" fill="none" stroke="${c}" stroke-opacity=".15" stroke-width="7" stroke-linecap="round"/>
+                  <path d="${d}" fill="none" stroke="${c}" stroke-opacity=".85" stroke-width="2.2" stroke-dasharray="6 6" filter="url(#glow)"/>
+                  <circle cx="${x1}" cy="${y1}" r="4.5" fill="#04091A" stroke="${c}" stroke-width="2"/>
+                  <circle cx="${pts[0]}" cy="${pts[1]}" r="4.5" fill="#04091A" stroke="${c}" stroke-width="2"/>`;
+              };
+              let flows = link(P_SOLAR_HOME, C.solar) + link(P_HOME_TESLA, C.ev) + link(P_HOME_KIA, C.ev);
+              if (solar > 50) flows += flow(P_SOLAR_HOME, C.solar, solar - exp);
               if (exp   > 50) flows += flow('M 630 300 C 560 292, 450 256, 354 248', C.solar, exp);
               if (imp   > 50) flows += flow('M 354 252 C 450 282, 580 384, 640 420', C.grid, imp);
-              if (tesla > 50) flows += flow('M 762 500 C 772 530, 800 552, 830 574', C.ev, tesla);
-              if (kia   > 50) flows += flow('M 868 432 C 985 436, 1100 456, 1150 506', C.ev, kia);
+              if (tesla > 50) flows += flow(P_HOME_TESLA, C.ev, tesla);
+              if (kia   > 50) flows += flow(P_HOME_KIA, C.ev, kia);
 
               /* ---------- conditions (top right) ---------- */
               const conditions = `
