@@ -1,0 +1,142 @@
+# EV grid-charging cost: Tesla (Bluey) and Kia
+#
+# Put this file in /config/packages/ and make sure configuration.yaml has:
+#   homeassistant:
+#     packages: !include_dir_named packages
+# Then restart Home Assistant.
+#
+# How it works
+#   1. Grid charging power: the share of each car's charging power that came
+#      from the grid right now. Every watt in the house is treated as the same
+#      mix of solar and grid: car W x (grid import W / total house W).
+#   2. Grid charging energy: that power integrated into kWh.
+#   3. Grid charging cost: each new kWh is priced at the tariff in force at
+#      that moment (sensor.current_energy_rate, $/kWh), so peak, shoulder and
+#      off-peak are all costed correctly.
+#   4. Daily and monthly totals via utility_meter.
+#
+# Power sensors may report in W or kW; values between 0 and 50 are treated as
+# kW, the same rule the dashboard uses.
+
+template:
+  - sensor:
+      - name: Tesla Grid Charging Power
+        unique_id: tesla_grid_charging_power
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        availability: "{{ has_value('sensor.bluey_charger_power') }}"
+        state: >
+          {% set c = states('sensor.bluey_charger_power') | float(0) %}
+          {% set car = c * 1000 if 0 < c | abs < 50 else c %}
+          {% set i = states('sensor.sh50rs_a21c2106894_purchased_power') | float(0) %}
+          {% set imp = i * 1000 if 0 < i | abs < 50 else i %}
+          {% set t = states('sensor.home_power_consumption') | float(0) %}
+          {% set total = t * 1000 if 0 < t | abs < 50 else t %}
+          {% if car > 50 and imp > 50 and total > 0 %}
+            {{ (car * ([imp / total, 1] | min)) | round(0) }}
+          {% else %}0{% endif %}
+
+      - name: Kia Grid Charging Power
+        unique_id: kia_grid_charging_power
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        availability: "{{ has_value('sensor.kia_charger_power') }}"
+        state: >
+          {% set c = states('sensor.kia_charger_power') | float(0) %}
+          {% set car = c * 1000 if 0 < c | abs < 50 else c %}
+          {% set i = states('sensor.sh50rs_a21c2106894_purchased_power') | float(0) %}
+          {% set imp = i * 1000 if 0 < i | abs < 50 else i %}
+          {% set t = states('sensor.home_power_consumption') | float(0) %}
+          {% set total = t * 1000 if 0 < t | abs < 50 else t %}
+          {% if car > 50 and imp > 50 and total > 0 %}
+            {{ (car * ([imp / total, 1] | min)) | round(0) }}
+          {% else %}0{% endif %}
+
+  # Running cost: add (new kWh - previous kWh) x tariff at that moment.
+  - triggers:
+      - trigger: state
+        entity_id: sensor.tesla_grid_charging_energy
+    sensor:
+      - name: Tesla Grid Charging Cost
+        unique_id: tesla_grid_charging_cost
+        unit_of_measurement: AUD
+        device_class: monetary
+        state_class: total
+        state: >
+          {% set prev = this.state | float(0) %}
+          {% set old = trigger.from_state.state | float(none) if trigger.from_state else none %}
+          {% set new = trigger.to_state.state | float(none) %}
+          {% if old is none or new is none or new < old %}
+            {{ prev }}
+          {% else %}
+            {{ (prev + (new - old) * (states('sensor.current_energy_rate') | float(0))) | round(4) }}
+          {% endif %}
+
+  - triggers:
+      - trigger: state
+        entity_id: sensor.kia_grid_charging_energy
+    sensor:
+      - name: Kia Grid Charging Cost
+        unique_id: kia_grid_charging_cost
+        unit_of_measurement: AUD
+        device_class: monetary
+        state_class: total
+        state: >
+          {% set prev = this.state | float(0) %}
+          {% set old = trigger.from_state.state | float(none) if trigger.from_state else none %}
+          {% set new = trigger.to_state.state | float(none) %}
+          {% if old is none or new is none or new < old %}
+            {{ prev }}
+          {% else %}
+            {{ (prev + (new - old) * (states('sensor.current_energy_rate') | float(0))) | round(4) }}
+          {% endif %}
+
+sensor:
+  - platform: integration
+    source: sensor.tesla_grid_charging_power
+    name: Tesla Grid Charging Energy
+    unique_id: tesla_grid_charging_energy
+    unit_prefix: k
+    round: 3
+    method: left
+    max_sub_interval:
+      minutes: 1
+
+  - platform: integration
+    source: sensor.kia_grid_charging_power
+    name: Kia Grid Charging Energy
+    unique_id: kia_grid_charging_energy
+    unit_prefix: k
+    round: 3
+    method: left
+    max_sub_interval:
+      minutes: 1
+
+utility_meter:
+  tesla_grid_charging_cost_daily:
+    name: Tesla Grid Charging Cost Today
+    source: sensor.tesla_grid_charging_cost
+    cycle: daily
+  tesla_grid_charging_cost_monthly:
+    name: Tesla Grid Charging Cost This Month
+    source: sensor.tesla_grid_charging_cost
+    cycle: monthly
+  tesla_grid_charging_energy_daily:
+    name: Tesla Grid Charging Energy Today
+    source: sensor.tesla_grid_charging_energy
+    cycle: daily
+
+  kia_grid_charging_cost_daily:
+    name: Kia Grid Charging Cost Today
+    source: sensor.kia_grid_charging_cost
+    cycle: daily
+  kia_grid_charging_cost_monthly:
+    name: Kia Grid Charging Cost This Month
+    source: sensor.kia_grid_charging_cost
+    cycle: monthly
+  kia_grid_charging_energy_daily:
+    name: Kia Grid Charging Energy Today
+    source: sensor.kia_grid_charging_energy
+    cycle: daily
