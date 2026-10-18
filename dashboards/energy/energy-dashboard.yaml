@@ -1,487 +1,317 @@
-# Energy New dashboard (raw configuration)
-# Requires: custom:button-card, card-mod, kiosk-mode (HACS)
+# Energy New dashboard: HUD layout over the house photo (raw configuration)
+# Requires: custom:button-card, kiosk-mode (HACS)
+# The previous layout is kept in energy-dashboard-classic.yaml.
+#
+# Everything is drawn in one 1600 x 1000 SVG (same 16:10 shape as the photo),
+# so the panels and flow lines stay locked to the house at any screen size.
+# Tap a panel for its sensor details; tap HOME to go back to the Hub.
 kiosk_mode:
   user_settings:
     - users:
         - suparhome
       kiosk: true
-button_card_templates:
-  glass:
-    show_icon: false
-    tap_action:
-      action: more-info
-    styles:
-      card:
-        - background: rgba(8, 16, 32, 0.60)
-        - backdrop-filter: blur(14px)
-        - -webkit-backdrop-filter: blur(14px)
-        - border: 1px solid rgba(255, 255, 255, 0.18)
-        - border-radius: 16px
-        - box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45)
-        - padding: 10px 16px
-        - width: max-content
-        - color: '#ffffff'
-        - font-family: Roboto, sans-serif
-      name:
-        - font-size: 11px
-        - letter-spacing: 2px
-        - text-transform: uppercase
-        - opacity: '0.75'
-        - justify-self: start
-      label:
-        - justify-self: start
-  glass_metric:
-    template: glass
-    show_label: true
-    styles:
-      card:
-        - padding: 14px 20px
-        - min-width: 160px
-      name:
-        - font-size: 13px
-        - letter-spacing: 2px
-      label:
-        - font-size: 30px
-        - font-weight: '700'
-        - padding-top: 4px
-  side_chip:
-    template: glass
-    show_label: true
-    styles:
-      card:
-        - padding: 7px 14px
-        - border-radius: 12px
-        - width: 160px
-      name:
-        - font-size: 10px
-        - letter-spacing: 1.5px
-      label:
-        - font-size: 16px
-        - font-weight: '600'
 views:
   - title: Home Energy
     path: energy
     type: panel
     cards:
-      - type: picture-elements
-        image: /local/images/energy-dashboard-bg1.png
-        elements:
-          - type: image
-            entity: sensor.dashboard_night_mode
-            image: /local/images/energy-dashboard-bg-night.png
-            state_filter:
-              'on': opacity(1)
-              'off': opacity(0)
-            style:
-              top: 50%
-              left: 50%
-              width: 100%
-              height: 100%
-              z-index: 0
-              pointer-events: none
-          - type: custom:button-card
-            show_name: false
-            show_icon: false
-            tap_action:
-              action: none
-            triggers_update:
-              - sensor.sh50rs_a21c2106894_mppt_total_power
-              - sensor.sh50rs_a21c2106894_purchased_power
-              - sensor.sh50rs_a21c2106894_total_export_active_power
-              - sensor.bluey_charger_power
-              - sensor.kia_charger_power
-            styles:
-              card:
-                - background: none
-                - border: none
-                - box-shadow: none
-                - pointer-events: none
-                - width: 100%
-                - height: 100%
-                - padding: '0'
-              custom_fields:
-                flows:
-                  - position: relative
-                  - overflow: visible
-                  - top: '0'
-                  - left: '0'
-                  - width: 1600px
-                  - height: 1000px
-                  - z-index: 10
-            custom_fields:
-              flows: |
-                [[[
-                  const num = (e) => {
-                    const s = states[e]; if (!s) return 0;
-                    const v = parseFloat(s.state); return isNaN(v) ? 0 : v;
-                  };
-                  const watts = (v) => (Math.abs(v) > 0 && Math.abs(v) < 50) ? v * 1000 : v;
-                  const solar = watts(num('sensor.sh50rs_a21c2106894_mppt_total_power'));
-                  const imp   = watts(num('sensor.sh50rs_a21c2106894_purchased_power'));
-                  const exp   = watts(num('sensor.sh50rs_a21c2106894_total_export_active_power'));
-                  const tesla = watts(num('sensor.bluey_charger_power'));
-                  const kia   = watts(num('sensor.kia_charger_power'));
-
-                  const dot = (path, color, dur, reverse) => `
-                    <path d="${path}" fill="none" stroke="${color}" stroke-opacity="0.65"
-                          stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round"/>
-                    ${[0, dur/3, (2*dur)/3].map(b => `
-                      <circle r="7" fill="${color}">
-                        <animateMotion dur="${dur}s" begin="${b}s" repeatCount="indefinite"
-                          path="${path}" ${reverse ? 'keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : ''}/>
-                      </circle>
-                      <circle r="11" fill="${color}" opacity="0.45">
-                        <animateMotion dur="${dur}s" begin="${b}s" repeatCount="indefinite"
-                          path="${path}" ${reverse ? 'keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : ''}/>
-                      </circle>`).join('')}`;
-
-                const P_SOLAR_HOME = 'M 650 200 C 690 220, 710 290, 745 417';
-                const P_SOLAR_GRID = 'M 650 200 C 580 200, 470 240, 340 270';
-                const P_GRID_HOME  = 'M 340 270 C 450 300, 600 350, 745 417';
-                const P_HOME_TESLA = 'M 745 417 C 750 470, 770 565, 850 665';
-                const P_HOME_KIA   = 'M 744 417 C 880 430, 995 510, 1110 595';
-
-                  let svg = '';
-                  if (solar > 50) svg += dot(P_SOLAR_HOME, '#FFC107', 2.4, false);
-                  if (imp   > 50) svg += dot(P_GRID_HOME,  '#2196F3', 2.4, false);
-                  if (exp   > 50) svg += dot(P_SOLAR_GRID,  '#2196F3', 2.4, false);
-                  if (tesla > 50) svg += dot(P_HOME_TESLA, '#42A5F5', 2.0, false);
-                  if (kia   > 50) svg += dot(P_HOME_KIA,   '#42A5F5', 2.0, false);
-
-                  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"
-                    style="position:absolute;top:0;left:0;width:100%;height:100%;">${svg}</svg>`;
-                ]]]
-            style:
-              top: 50%
-              left: 50%
-              width: 1600px
-              height: 1000px
-          - type: custom:button-card
-            template: glass
-            entity: weather.north_lakes_weather
-            show_name: false
-            show_label: true
-            triggers_update:
-              - sensor.time
-              - sensor.current_energy_rate
-            label: |
+      - type: custom:button-card
+        entity: sensor.sh50rs_a21c2106894_mppt_total_power
+        show_name: false
+        show_icon: false
+        show_state: false
+        show_label: false
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        triggers_update:
+          - sensor.sh50rs_a21c2106894_mppt_total_power
+          - sensor.sh50rs_a21c2106894_purchased_power
+          - sensor.sh50rs_a21c2106894_total_export_active_power
+          - sensor.home_power_consumption
+          - sensor.bluey_charger_power
+          - sensor.kia_charger_power
+          - sensor.sh50rs_a21c2106894_daily_self_consumption_rate
+          - sensor.bluey_battery_level
+          - sensor.bluey_battery_range
+          - input_number.kia_battery_estimate
+          - sensor.daily_import_cost
+          - sensor.daily_solar_credit
+          - sensor.daily_energy_net
+          - sensor.sh50rs_a21c2106894_daily_grid_import
+          - sensor.solar_export_energy_daily
+          - sensor.electricity_bill_to_date
+          - sensor.electricity_estimated_bill
+          - sensor.current_energy_rate
+          - sensor.dashboard_night_mode
+          - weather.north_lakes_weather
+          - sensor.time
+          - sensor.date_time_iso
+        styles:
+          card:
+            - padding: '0'
+            - border: none
+            - border-radius: '0'
+            - background: '#04091A'
+            - height: 100vh
+            - overflow: hidden
+          grid:
+            - grid-template-areas: '"hud"'
+            - grid-template-columns: 1fr
+            - grid-template-rows: 1fr
+            - height: 100%
+          custom_fields:
+            hud:
+              - position: relative
+              - width: 100%
+              - height: 100%
+        custom_fields:
+          hud: |
               [[[
-                const w = states['weather.north_lakes_weather'];
-                const cond = w ? w.state.replace(/-/g, ' ') : '—';
-                const temp = w && w.attributes.temperature !== undefined
-                  ? `${w.attributes.temperature}°` : '—';
-                const t = states['sensor.time'] ? states['sensor.time'].state : '';
-                const d = states['sensor.date_time_iso']
-                  ? new Date(states['sensor.date_time_iso'].state)
-                      .toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' })
-                  : '';
-                const tariff = states['sensor.current_energy_rate']
-                  ? (parseFloat(states['sensor.current_energy_rate'].state) || 0).toFixed(4)
-                  : '—';
+              /* ---------- fonts (loaded once into the main document) ---------- */
+              if (!document.getElementById('hud-fonts')) {
+                const l = document.createElement('link');
+                l.id = 'hud-fonts'; l.rel = 'stylesheet';
+                l.href = 'https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap';
+                document.head.appendChild(l);
+              }
+
+              /* ---------- data ---------- */
+              const st  = (e) => states[e] ? states[e].state : undefined;
+              const num = (e) => { const v = parseFloat(st(e)); return isNaN(v) ? 0 : v; };
+              const watts = (v) => (Math.abs(v) > 0 && Math.abs(v) < 50) ? v * 1000 : v;
+              const kw  = (w) => Math.abs(w) >= 1000 ? (w / 1000).toFixed(2) + ' kW' : Math.round(w) + ' W';
+              const usd = (v) => '$' + Math.abs(v).toFixed(2);
+
+              const solar = watts(num('sensor.sh50rs_a21c2106894_mppt_total_power'));
+              const imp   = watts(num('sensor.sh50rs_a21c2106894_purchased_power'));
+              const exp   = watts(num('sensor.sh50rs_a21c2106894_total_export_active_power'));
+              const total = watts(num('sensor.home_power_consumption'));
+              const tesla = watts(num('sensor.bluey_charger_power'));
+              const kia   = watts(num('sensor.kia_charger_power'));
+              const home  = Math.max(0, total - tesla - kia);
+              const selfUse = num('sensor.sh50rs_a21c2106894_daily_self_consumption_rate');
+              const teslaBatt = Math.round(num('sensor.bluey_battery_level'));
+              const teslaRange = Math.round(num('sensor.bluey_battery_range'));
+              const kiaBatt = Math.round(Math.abs(num('input_number.kia_battery_estimate')));
+              const cost = num('sensor.daily_import_cost');
+              const credit = num('sensor.daily_solar_credit');
+              const net = num('sensor.daily_energy_net');
+              const kwhIn = num('sensor.sh50rs_a21c2106894_daily_grid_import');
+              const kwhOut = num('sensor.solar_export_energy_daily');
+              const billToDate = num('sensor.electricity_bill_to_date');
+              const billEst = num('sensor.electricity_estimated_bill');
+              const billPct = billEst > 0 ? Math.min(100, billToDate / billEst * 100) : 0;
+              const rate = num('sensor.current_energy_rate');
+              const rateC = rate < 5 ? rate * 100 : rate;              // $/kWh -> c/kWh
+              const night = st('sensor.dashboard_night_mode') === 'on';
+              const SOLAR_MAX = 5000;                                   // inverter rating (W) for the solar ring
+
+              const w = states['weather.north_lakes_weather'];
+              const temp = w && w.attributes.temperature !== undefined ? w.attributes.temperature + '°' : '—';
+              const cond = w ? w.state.replace('partlycloudy', 'partly cloudy').replace(/-/g, ' ') : '';
+              const time = st('sensor.time') || '';
+              const date = st('sensor.date_time_iso')
+                ? new Date(st('sensor.date_time_iso')).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase()
+                : '';
+
+              /* ---------- palette ---------- */
+              const C = { solar: '#FFB547', grid: '#22D3EE', home: '#B388FF', ev: '#4D9FFF',
+                          cost: '#FF5C7A', credit: '#4DFFB8', text: '#E6F1FF', muted: '#9DB0CF' };
+              const battC = (b) => b > 50 ? C.credit : b > 20 ? C.solar : C.cost;
+
+              /* ---------- actions ---------- */
+              const info = (e) => `class="tap" onclick="this.dispatchEvent(new CustomEvent('hass-more-info',{bubbles:true,composed:true,detail:{entityId:'${e}'}}))"`;
+              const go = (p) => `class="tap" onclick="history.pushState(null,'','${p}');window.dispatchEvent(new CustomEvent('location-changed'))"`;
+
+              /* ---------- drawing helpers ---------- */
+              const BOXES = [];
+              const glass = (x, y, w, h, c, a = .28) => {
+                BOXES.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16"/>`);
                 return `
-                  <div style="text-align:right; line-height:1.5;">
-                    <div style="font-size:22px; font-weight:600;">${temp}
-                      <span style="font-size:12px; opacity:.75; text-transform:capitalize;">${cond}</span>
-                    </div>
-                    <div style="font-size:12px; opacity:.85;">${d} &nbsp;·&nbsp; ${t}</div>
-                    <div style="font-size:11px; color:#8BC34A;">Tariff: ${tariff} ¢/kWh</div>
-                  </div>`;
-              ]]]
-            style:
-              top: 12%
-              left: 85%
-          - type: custom:button-card
-            template: glass_metric
-            entity: sensor.sh50rs_a21c2106894_mppt_total_power
-            name: ☀️ Solar
-            label: |
-              [[[
-                const v = parseFloat(entity.state) || 0;
-                const w = (v > 0 && v < 50) ? v * 1000 : v;
-                return w >= 1000 ? (w/1000).toFixed(2) + ' kW' : Math.round(w) + ' W';
-              ]]]
-            custom_fields:
-              self_use: |
-                [[[
-                  const pct = parseFloat(
-                  states['sensor.sh50rs_a21c2106894_daily_self_consumption_rate']?.state || 0
-                  );
-
-                  const color =
-                    pct >= 80 ? '#66BB6A' :
-                    pct >= 50 ? '#FFC107' :
-                  '#EF5350';
-
-                  return `
-                    <div style="
-                      font-size:12px;
-                      color:${color};
-                      font-weight:500;
-                    ">
-                      Self Use ${pct.toFixed(0)}%
-                  </div>
-                `;
-                ]]]
-            styles:
-              card:
-                - border-color: rgba(255, 193, 7, 0.55)
-                - width: 190px
-              label:
-                - color: '#FFC107'
-              custom_fields:
-                self_use:
-                  - position: absolute
-                  - bottom: 8px
-                  - left: 75%
-                  - transform: translateX(-50%)
-            style:
-              top: 15%
-              left: 42%
-          - type: custom:button-card
-            template: glass_metric
-            entity: sensor.grid_direction
-            name: ⚡ Grid
-            triggers_update:
-              - sensor.sh50rs_a21c2106894_purchased_power
-              - sensor.sh50rs_a21c2106894_total_export_active_power
-            label: |
-              [[[
-                const num = (e) => parseFloat(states[e] ? states[e].state : 0) || 0;
-                const watts = (v) => (v > 0 && v < 50) ? v * 1000 : v;
-                const imp = watts(num('sensor.sh50rs_a21c2106894_purchased_power'));
-                const exp = watts(num('sensor.sh50rs_a21c2106894_total_export_active_power'));
-                const fmt = (w) => w >= 1000 ? (w/1000).toFixed(2) + ' kW' : Math.round(w) + ' W';
-                if (imp > 50) return `<span style="color:#EF5350;">▼ ${fmt(imp)}</span>`;
-                if (exp > 50) return `<span style="color:#66BB6A;">▲ ${fmt(exp)}</span>`;
-                return `<span style="opacity:.7;">Idle</span>`;
-              ]]]
-            styles:
-              card:
-                - border-color: rgba(33, 150, 243, 0.55)
-              label:
-                - font-size: 24px
-            style:
-              top: 24%
-              left: 14%
-          - type: custom:button-card
-            template: glass_metric
-            entity: sensor.home_power_consumption
-            name: 🏠 Home
-            tap_action:
-              action: navigate
-              navigation_path: /dashboard-hub/hubhome
-            hold_action:
-              action: more-info
-            triggers_update:
-              - sensor.home_power_consumption
-              - sensor.bluey_charger_power
-              - sensor.kia_charger_power
-            label: |
-              [[[
-                const num = (e) => parseFloat(states[e] ? states[e].state : 0) || 0;
-                const watts = (v) => (Math.abs(v) > 0 && Math.abs(v) < 50) ? v * 1000 : v;
-                const total = watts(num('sensor.home_power_consumption'));
-                const tesla = watts(num('sensor.bluey_charger_power'));
-                const kia   = watts(num('sensor.kia_charger_power'));
-                const net   = Math.max(0, total - tesla - kia);
-                return net >= 1000 ? (net/1000).toFixed(2) + ' kW' : Math.round(net) + ' W';
-              ]]]
-            styles:
-              card:
-                - border-color: rgba(255, 179, 0, 0.55)
-                - cursor: pointer
-              label:
-                - color: '#FFB300'
-            style:
-              top: 42%
-              left: 47%
-          - type: custom:button-card
-            template: glass
-            entity: sensor.bluey_battery_level
-            name: 🔌 Tesla
-            icon: phu:tesla-logo
-            show_label: true
-            triggers_update:
-              - sensor.bluey_charger_power
-              - sensor.bluey_battery_range
-            label: |
-              [[[
-                const num = (e) => parseFloat(states[e] ? states[e].state : 0) || 0;
-                const pwr = num('sensor.bluey_charger_power');
-                const w = (pwr > 0 && pwr < 50) ? pwr * 1000 : pwr;
-                const batt = num('sensor.bluey_battery_level');
-                const range = num('sensor.bluey_battery_range');
-                const charging = w > 50
-                  ? `<span style="color:#42A5F5;">⚡ ${(w/1000).toFixed(1)} kW</span>`
-                  : `<span style="opacity:.6;">Not charging</span>`;
-                const battColor = batt > 50 ? '#66BB6A' : (batt > 20 ? '#FFC107' : '#EF5350');
+                  <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="rgba(6,14,34,.58)" stroke="${c}" stroke-opacity="${a}"/>
+                  <path d="M${x} ${y + 18} V${y + 8} Q${x} ${y} ${x + 8} ${y} H${x + 18}" fill="none" stroke="${c}" stroke-width="2"/>
+                  <path d="M${x + w} ${y + h - 18} V${y + h - 8} Q${x + w} ${y + h} ${x + w - 8} ${y + h} H${x + w - 18}" fill="none" stroke="${c}" stroke-width="2"/>`;
+              };
+              const ring = (cx, cy, r, c, pct, sw = 7) => {
+                const L = 2 * Math.PI * r;
                 return `
-                  <div style="line-height:1.6;">
-                    <div>${charging}</div>
-                    <div style="font-size:18px;font-weight:600;color:${battColor};">${batt}%
-                      <span style="font-size:12px;opacity:.75;color:#fff;">· ${Math.round(range)} km</span>
-                    </div>
-                  </div>`;
-              ]]]
-            styles:
-              card:
-                - border-color: rgba(66, 165, 245, 0.55)
-            style:
-              top: 67%
-              left: 52%
-          - type: custom:button-card
-            template: glass
-            entity: input_number.kia_battery_estimate
-            name: 🔌   Kia
-            show_label: true
-            triggers_update:
-              - sensor.kia_charger_power
-            label: |
-              [[[
-                const num = (e) => parseFloat(states[e] ? states[e].state : 0) || 0;
-                const pwr = num('sensor.kia_charger_power');
-                const w = (pwr > 0 && pwr < 50) ? pwr * 1000 : pwr;
-                const batt = Math.round(Math.abs(num('input_number.kia_battery_estimate')));
-                const charging = w > 50
-                  ? `<span style="color:#42A5F5;">⚡ ${(w/1000).toFixed(1)} kW</span>`
-                  : `<span style="opacity:.6;">Not charging</span>`;
-                const battColor = batt > 50 ? '#66BB6A' : (batt > 20 ? '#FFC107' : '#EF5350');
+                  <circle cx="${cx}" cy="${cy}" r="${r + 9}" fill="none" stroke="${c}" stroke-opacity=".35" stroke-dasharray="2 6" class="spin"/>
+                  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-opacity=".18" stroke-width="${sw}"/>
+                  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"
+                          stroke-dasharray="${(L * Math.max(0, Math.min(1, pct))).toFixed(1)} ${L.toFixed(1)}"
+                          transform="rotate(-90 ${cx} ${cy})" filter="url(#glow)"/>`;
+              };
+              const t = (x, y, s, c, txt, o = {}) =>
+                `<text x="${x}" y="${y}" font-size="${s}" fill="${c}" class="${o.mono ? 'mono' : 'ui'}"
+                       ${o.end ? 'text-anchor="end"' : o.mid ? 'text-anchor="middle"' : ''}
+                       ${o.ls ? `letter-spacing="${o.ls}"` : ''} font-weight="${o.wt || 600}">${txt}</text>`;
+              const lbl = (x, y, txt, o = {}) => t(x, y, 13, C.muted, txt, { ls: 2.5, ...o });
+              const bar = (x, y, w, pct, c, h = 7) =>
+                `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" fill="rgba(157,176,207,.18)"/>
+                 <rect x="${x}" y="${y}" width="${Math.max(h, w * pct / 100).toFixed(1)}" height="${h}" rx="${h / 2}" fill="${c}" filter="url(#glow)"/>`;
+              const flow = (d, c, pw) => {
+                const sw = (2 + Math.min(5, pw / 1000)).toFixed(1);
                 return `
-                  <div style="line-height:1.6;">
-                    <div>${charging}</div>
-                    <div style="font-size:18px;font-weight:600;color:${battColor};">${batt}%</div>
-                  </div>`;
+                  <path d="${d}" fill="none" stroke="${c}" stroke-opacity=".22" stroke-width="${+sw + 7}" stroke-linecap="round"/>
+                  <path d="${d}" fill="none" stroke="${c}" stroke-width="${sw}" class="flow" filter="url(#glow)"/>`;
+              };
+
+              /* ---------- flows (photo coordinates, 1600 x 1000) ---------- */
+              let flows = '';
+              if (solar > 50) flows += flow('M 640 300 C 680 318, 718 326, 742 340', C.solar, solar - exp);
+              if (exp   > 50) flows += flow('M 630 302 C 565 322, 505 360, 482 412', C.solar, exp);
+              if (imp   > 50) flows += flow('M 570 462 C 598 456, 616 444, 640 432', C.grid, imp);
+              if (tesla > 50) flows += flow('M 762 500 C 772 530, 800 552, 830 574', C.ev, tesla);
+              if (kia   > 50) flows += flow('M 868 432 C 985 436, 1100 456, 1150 506', C.ev, kia);
+
+              /* ---------- conditions (top right) ---------- */
+              const conditions = `
+                <g ${info('weather.north_lakes_weather')}>
+                  ${glass(1252, 44, 316, 150, C.grid)}
+                  ${t(1274, 108, 44, C.text, time, { mono: 1, wt: 700 })}
+                  ${lbl(1276, 136, date)}
+                  ${t(1546, 100, 32, C.text, temp, { mono: 1, end: 1, wt: 700 })}
+                  ${t(1546, 126, 15, C.muted, cond.toUpperCase(), { end: 1, ls: 2 })}
+                  <rect x="1274" y="152" width="272" height="28" rx="14" fill="rgba(255,181,71,.10)" stroke="${C.solar}" stroke-opacity=".5"/>
+                  ${t(1290, 171, 13, C.muted, 'TARIFF NOW', { ls: 2.5 })}
+                  ${t(1530, 171, 14, C.solar, rateC.toFixed(2) + ' ¢/kWh', { mono: 1, end: 1, wt: 700 })}
+                </g>`;
+
+              /* ---------- left rail: today ---------- */
+              const netC = net >= 0 ? C.credit : C.cost;
+              const inPct = kwhIn + kwhOut > 0 ? kwhIn / (kwhIn + kwhOut) * 100 : 50;
+              const today = `
+                <g>
+                  ${glass(32, 196, 320, 360, C.grid)}
+                  ${lbl(54, 228, 'TODAY')}${lbl(330, 228, 'SINCE 00:00', { end: 1 })}
+                  <g ${info('sensor.sh50rs_a21c2106894_daily_self_consumption_rate')}>
+                    ${ring(108, 312, 50, C.solar, selfUse / 100)}
+                    ${t(108, 318, 26, C.text, selfUse.toFixed(0) + '%', { mono: 1, mid: 1, wt: 700 })}
+                    ${t(108, 338, 11, C.muted, 'SELF USE', { mid: 1, ls: 2 })}
+                  </g>
+                  <g ${info('sensor.daily_energy_net')}>
+                    ${lbl(188, 292, 'NET TODAY')}
+                    ${t(186, 334, 36, netC, (net >= 0 ? '+' : '−') + usd(net), { mono: 1, wt: 700 })}
+                  </g>
+                  <line x1="54" y1="388" x2="330" y2="388" stroke="${C.muted}" stroke-opacity=".18"/>
+                  <g ${info('sensor.daily_import_cost')}>
+                    ${lbl(54, 418, 'GRID COST')}${t(330, 420, 20, C.cost, usd(cost), { mono: 1, end: 1, wt: 700 })}
+                  </g>
+                  <line x1="54" y1="436" x2="330" y2="436" stroke="${C.muted}" stroke-opacity=".18"/>
+                  <g ${info('sensor.daily_solar_credit')}>
+                    ${lbl(54, 466, 'SOLAR CREDIT')}${t(330, 468, 20, C.credit, usd(credit), { mono: 1, end: 1, wt: 700 })}
+                  </g>
+                  <line x1="54" y1="484" x2="330" y2="484" stroke="${C.muted}" stroke-opacity=".18"/>
+                  <g ${info('sensor.sh50rs_a21c2106894_daily_grid_import')}>
+                    ${lbl(54, 512, 'IN')}${t(80, 513, 16, C.grid, kwhIn.toFixed(1), { mono: 1, wt: 700 })}
+                    ${lbl(282, 512, 'OUT', { end: 1 })}${t(330, 513, 16, C.solar, kwhOut.toFixed(1), { mono: 1, end: 1, wt: 700 })}
+                    <rect x="54" y="526" width="${(276 * inPct / 100 - 3).toFixed(1)}" height="8" rx="4" fill="${C.grid}" filter="url(#glow)"/>
+                    <rect x="${(54 + 276 * inPct / 100 + 3).toFixed(1)}" y="526" width="${(276 * (100 - inPct) / 100 - 3).toFixed(1)}" height="8" rx="4" fill="${C.solar}" filter="url(#glow)"/>
+                    ${t(192, 548, 11, C.muted, 'kWh GRID IMPORT · SOLAR EXPORT', { mid: 1, ls: 1.5 })}
+                  </g>
+                </g>`;
+
+              /* ---------- left rail: billing ---------- */
+              const billing = `
+                <g>
+                  ${glass(32, 576, 320, 214, C.grid)}
+                  ${lbl(54, 608, 'BILLING PERIOD')}
+                  <g ${info('sensor.electricity_bill_to_date')}>
+                    ${lbl(54, 642, 'BILL TO DATE')}
+                    ${t(52, 688, 42, C.text, usd(billToDate), { mono: 1, wt: 700 })}
+                    ${t(330, 686, 14, C.muted, billPct.toFixed(0) + '% OF EST.', { end: 1, ls: 1.5 })}
+                    ${bar(54, 704, 276, billPct, C.ev, 8)}
+                  </g>
+                  <line x1="54" y1="732" x2="330" y2="732" stroke="${C.muted}" stroke-opacity=".18"/>
+                  <g ${info('sensor.electricity_estimated_bill')}>
+                    ${lbl(54, 766, 'ESTIMATED BILL')}${t(330, 768, 22, C.home, usd(billEst), { mono: 1, end: 1, wt: 700 })}
+                  </g>
+                </g>`;
+
+              /* ---------- node cards over the photo ---------- */
+              const solarNode = `
+                <g ${info('sensor.sh50rs_a21c2106894_mppt_total_power')}>
+                  ${glass(560, 70, 264, 156, C.solar, .45)}
+                  ${ring(624, 148, 40, C.solar, solar / SOLAR_MAX)}
+                  <path d="M624 134 L614 152 H623 L619 166 L634 144 H625 Z" fill="${C.solar}"/>
+                  ${lbl(682, 118, 'SOLAR')}
+                  ${t(680, 158, 32, C.solar, kw(solar), { mono: 1, wt: 700 })}
+                  ${t(682, 186, 13, selfUse >= 80 ? C.credit : selfUse >= 50 ? C.solar : C.cost, 'SELF USE ' + selfUse.toFixed(0) + '%', { ls: 1.5 })}
+                </g>
+                <path d="M690 226 L642 295" stroke="${C.solar}" stroke-dasharray="3 4" stroke-opacity=".8"/>
+                <circle cx="640" cy="298" r="5" fill="none" stroke="${C.solar}" stroke-width="2"/>`;
+
+              const gridState = imp > 50 ? ['IMPORTING', C.cost, '▼ ' + kw(imp)]
+                              : exp > 50 ? ['EXPORTING', C.credit, '▲ ' + kw(exp)]
+                              : ['IDLE', C.muted, '—'];
+              const gridNode = `
+                <g ${info('sensor.grid_direction')}>
+                  ${glass(372, 412, 198, 104, C.grid, .45)}
+                  <g transform="translate(392 432)" stroke="${C.grid}" stroke-width="1.6" fill="none" stroke-linecap="round">
+                    <path d="M6 44 L14 4 L18 4 L26 44 M2 10 H30 M4 18 H28 M9 30 L23 18 M23 30 L9 18"/></g>
+                  ${lbl(440, 446, 'GRID')}
+                  ${t(438, 480, 24, gridState[1], gridState[2], { mono: 1, wt: 700 })}
+                  ${t(440, 502, 11, C.muted, gridState[0], { ls: 2 })}
+                </g>`;
+
+              const solarShare = total > 0 ? Math.min(1, Math.max(0, (solar - exp) / total)) : 0;
+              const homeNode = `
+                <g ${go('/dashboard-hub/hubhome')}>
+                  ${glass(640, 340, 228, 160, C.home, .5)}
+                  ${ring(700, 420, 38, C.home, solarShare)}
+                  <path d="M686 424 L700 410 L714 424 M690 420 V434 H710 V420" fill="none" stroke="${C.home}" stroke-width="2" stroke-linejoin="round"/>
+                  ${lbl(752, 392, 'HOME')}
+                  ${t(750, 432, 30, C.home, kw(home), { mono: 1, wt: 700 })}
+                  ${t(752, 458, 11, C.muted, (solarShare * 100).toFixed(0) + '% FROM SOLAR', { ls: 1.5 })}
+                  ${t(752, 480, 11, C.home, 'OPEN HUB ›', { ls: 2 })}
+                </g>`;
+
+              const evNode = (x, y, name, eid, batt, pw, sub) => `
+                <g ${info(eid)}>
+                  ${glass(x, y, 188, 188, C.ev, pw > 50 ? .7 : .35)}
+                  ${lbl(x + 20, y + 30, name)}
+                  ${t(x + 168, y + 30, 12, pw > 50 ? C.ev : C.muted, pw > 50 ? '⚡ ' + (pw / 1000).toFixed(1) + ' kW' : 'IDLE', { end: 1, ls: 1.5, mono: pw > 50 })}
+                  ${ring(x + 94, y + 104, 44, battC(batt), batt / 100, 8)}
+                  ${t(x + 94, y + 112, 26, C.text, batt + '%', { mono: 1, mid: 1, wt: 700 })}
+                  ${t(x + 94, y + 176, 12, C.muted, sub, { mid: 1, ls: 1.5 })}
+                </g>`;
+
+              const nodes = solarNode + gridNode + homeNode
+                + evNode(738, 574, 'TESLA', 'sensor.bluey_battery_level', teslaBatt, tesla, tesla > 50 ? teslaRange + ' KM · CHARGING' : teslaRange + ' KM RANGE')
+                + evNode(1058, 506, 'KIA', 'input_number.kia_battery_estimate', kiaBatt, kia, kia > 50 ? 'CHARGING' : 'ESTIMATED');
+
+              /* ---------- assemble ---------- */
+              const bg = night ? '/local/images/energy-dashboard-bg-night.png' : '/local/images/energy-dashboard-bg1.png';
+              const body = conditions + today + billing + flows + nodes;   // fills BOXES for the frosted-glass clip
+              return `
+              <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"
+                   style="position:absolute;inset:0;width:100%;height:100%;display:block;background:#04091A;">
+                <style>
+                  .ui   { font-family: Rajdhani, Roboto, sans-serif; }
+                  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+                  .tap  { cursor: pointer; }
+                  .tap:hover > rect:first-child { stroke-opacity: .9; }
+                  .flow { stroke-dasharray: 2 14; stroke-linecap: round; animation: hudDash 1s linear infinite; }
+                  .spin { transform-box: fill-box; transform-origin: center; animation: hudSpin 24s linear infinite; }
+                  @keyframes hudDash { to { stroke-dashoffset: -16; } }
+                  @keyframes hudSpin { to { transform: rotate(360deg); } }
+                </style>
+                <defs>
+                  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2.5" result="b"/>
+                    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  <filter id="frost" x="0" y="0" width="100%" height="100%"><feGaussianBlur stdDeviation="14"/></filter>
+                  <clipPath id="glassClip">${BOXES.join('')}</clipPath>
+                  <linearGradient id="vignette" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#04091A" stop-opacity=".55"/><stop offset=".3" stop-color="#04091A" stop-opacity="0"/>
+                    <stop offset=".8" stop-color="#04091A" stop-opacity="0"/><stop offset="1" stop-color="#04091A" stop-opacity=".35"/></linearGradient>
+                </defs>
+                <image href="${bg}" x="0" y="0" width="1600" height="1000" preserveAspectRatio="xMidYMid slice"/>
+                <rect width="1600" height="1000" fill="url(#vignette)"/>
+                <image href="${bg}" x="0" y="0" width="1600" height="1000" preserveAspectRatio="xMidYMid slice"
+                       filter="url(#frost)" clip-path="url(#glassClip)"/>
+                ${body}
+              </svg>`;
               ]]]
-            styles:
-              card:
-                - border-color: rgba(66, 165, 245, 0.55)
-            style:
-              top: 60%
-              left: 72%
-          - type: custom:button-card
-            template: side_chip
-            entity: sensor.daily_import_cost
-            name: |
-              [[[
-                return `<ha-icon icon="mdi:cash-minus" style="width:20px;height:20px;color:#EF5350;vertical-align:middle;margin-right:4px;"></ha-icon>TODAY'S COST`;
-              ]]]
-            label: '[[[ return ''$'' + (parseFloat(entity.state) || 0).toFixed(2); ]]]'
-            styles:
-              label:
-                - color: '#EF5350'
-            style:
-              top: 37%
-              left: 14%
-          - type: custom:button-card
-            template: side_chip
-            entity: sensor.daily_solar_credit
-            name: |
-              [[[
-                return `<ha-icon icon="mdi:cash-plus" style="width:20px;height:20px;color:#FFC107;vertical-align:middle;margin-right:4px;"></ha-icon>SOLAR CREDIT`;
-              ]]]
-            label: '[[[ return ''$'' + (parseFloat(entity.state) || 0).toFixed(2); ]]]'
-            styles:
-              label:
-                - color: '#FFC107'
-            style:
-              top: 45.75%
-              left: 14%
-          - type: custom:button-card
-            template: side_chip
-            entity: sensor.daily_energy_net
-            name: |
-              [[[
-                const color = (parseFloat(entity.state) || 0) >= 0 ? '#66BB6A' : '#EF5350';
-                return `<ha-icon icon="mdi:chart-line" style="width:20px;height:20px;color:${color};vertical-align:middle;margin-right:4px;"></ha-icon>NET TODAY`;
-              ]]]
-            label: |
-              [[[
-                const v = parseFloat(entity.state) || 0;
-                const sign = v >= 0 ? '+' : '−';
-                return sign + '$' + Math.abs(v).toFixed(2);
-              ]]]
-            styles:
-              label:
-                - color: >
-                    [[[ return (parseFloat(entity.state) || 0) >= 0 ? '#66BB6A'
-                    : '#EF5350'; ]]]
-            style:
-              top: 54.5%
-              left: 14%
-          - type: custom:button-card
-            template: side_chip
-            entity: sensor.sh50rs_a21c2106894_daily_grid_import
-            name: |
-              [[[
-                return `<ha-icon icon="mdi:transmission-tower-export" style="width:20px;height:20px;color:#2196F3;vertical-align:middle;margin-right:4px;"></ha-icon>GRID IMPORT`;
-              ]]]
-            label: >-
-              [[[ return (parseFloat(entity.state) || 0).toFixed(1) + ' kWh';
-              ]]]
-            styles:
-              label:
-                - color: '#2196F3'
-            style:
-              top: 63.25%
-              left: 14%
-          - type: custom:button-card
-            template: side_chip
-            entity: sensor.solar_export_energy_daily
-            name: |
-              [[[
-                return `<ha-icon icon="mdi:transmission-tower-import" style="width:20px;height:20px;color:#FFC107;vertical-align:middle;margin-right:4px;"></ha-icon>SOLAR EXPORT`;
-              ]]]
-            label: >-
-              [[[ return (parseFloat(entity.state) || 0).toFixed(1) + ' kWh';
-              ]]]
-            styles:
-              label:
-                - color: '#FFC107'
-            style:
-              top: 72%
-              left: 14%
-          - type: custom:button-card
-            template: side_chip
-            entity: sensor.electricity_bill_to_date
-            triggers_update:
-              - sensor.electricity_estimated_bill
-            name: |
-              [[[
-                return `<ha-icon icon="mdi:receipt-text" style="width:20px;height:20px;color:#42A5F5;vertical-align:middle;margin-right:4px;"></ha-icon>BILL TO DATE`;
-              ]]]
-            label: |
-              [[[
-                const v = parseFloat(entity.state) || 0;
-                const est = parseFloat(states['sensor.electricity_estimated_bill']?.state) || 0;
-                const pct = est > 0 ? Math.min(100, (v / est) * 100) : 0;
-                return '$' + v.toFixed(2) +
-                  `<span style="font-size:11px;font-weight:400;color:#fff;opacity:.6;margin-left:6px;">${pct.toFixed(0)}% of est.</span>`;
-              ]]]
-            styles:
-              label:
-                - color: '#42A5F5'
-            style:
-              top: 80.75%
-              left: 14%
-          - type: custom:button-card
-            template: side_chip
-            entity: sensor.electricity_estimated_bill
-            name: |
-              [[[
-                return `<ha-icon icon="mdi:calendar-clock" style="width:20px;height:20px;color:#AB47BC;vertical-align:middle;margin-right:4px;"></ha-icon>EST. BILL`;
-              ]]]
-            label: '[[[ return ''$'' + (parseFloat(entity.state) || 0).toFixed(2); ]]]'
-            styles:
-              label:
-                - color: '#AB47BC'
-            style:
-              top: 89.5%
-              left: 14%
-        card_mod:
-          style: |
-            ha-card {
-              border-radius: 0 !important;
-              border: none !important;
-              height: 100vh !important;
-              overflow: hidden !important;
-            }
