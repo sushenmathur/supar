@@ -48,6 +48,8 @@ views:
           - weather.north_lakes_weather
           - sensor.time
           - sensor.date_time_iso
+          - sensor.tesla_grid_charging_cost_daily
+          - sensor.kia_grid_charging_cost_daily
         styles:
           card:
             - padding: '0'
@@ -282,19 +284,27 @@ views:
                   ${t(752, 480, 11, C.home, 'OPEN HUB ›', { ls: 2 })}
                 </g>`;
 
-              const evNode = (x, y, name, eid, batt, pw, sub) => `
+              const evNode = (x, y, name, eid, batt, pw, sub, costEid) => {
+                const gridCost = num(costEid);
+                return `
                 <g ${info(eid)}>
-                  ${glass(x, y, 188, 188, C.ev, pw > 50 ? .7 : .35)}
+                  ${glass(x, y, 188, 220, C.ev, pw > 50 ? .7 : .35)}
                   ${lbl(x + 20, y + 30, name)}
                   ${t(x + 168, y + 30, 12, pw > 50 ? C.ev : C.muted, pw > 50 ? '⚡ ' + (pw / 1000).toFixed(1) + ' kW' : 'IDLE', { end: 1, ls: 1.5, mono: pw > 50 })}
                   ${ring(x + 94, y + 104, 44, battC(batt), batt / 100, 8)}
                   ${t(x + 94, y + 112, 26, C.text, batt + '%', { mono: 1, mid: 1, wt: 700 })}
                   ${t(x + 94, y + 176, 12, C.muted, sub, { mid: 1, ls: 1.5 })}
+                </g>
+                <g ${info(costEid)}>
+                  <line x1="${x + 20}" y1="${y + 188}" x2="${x + 168}" y2="${y + 188}" stroke="${C.muted}" stroke-opacity=".18"/>
+                  ${t(x + 20, y + 209, 11, C.muted, 'GRID TODAY', { ls: 2 })}
+                  ${t(x + 168, y + 210, 15, gridCost > 0 ? C.cost : C.muted, usd(gridCost), { mono: 1, end: 1, wt: 700 })}
                 </g>`;
+              };
 
               const nodes = solarNode + gridNode + homeNode
-                + evNode(738, 574, 'TESLA', 'sensor.bluey_battery_level', teslaBatt, tesla, tesla > 50 ? teslaRange + ' KM · CHARGING' : teslaRange + ' KM RANGE')
-                + evNode(1058, 506, 'KIA', 'input_number.kia_battery_estimate', kiaBatt, kia, kia > 50 ? 'CHARGING' : 'ESTIMATED');
+                + evNode(738, 574, 'TESLA', 'sensor.bluey_battery_level', teslaBatt, tesla, tesla > 50 ? teslaRange + ' KM · CHARGING' : teslaRange + ' KM RANGE', 'sensor.tesla_grid_charging_cost_daily')
+                + evNode(1058, 506, 'KIA', 'input_number.kia_battery_estimate', kiaBatt, kia, kia > 50 ? 'CHARGING' : 'ESTIMATED', 'sensor.kia_grid_charging_cost_daily');
 
               /* ---------- assemble ---------- */
               const bg = night ? '/local/images/energy-dashboard-bg-night.png' : '/local/images/energy-dashboard-bg1.png';
