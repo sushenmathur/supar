@@ -127,8 +127,8 @@ views:
 
               /* ---------- drawing helpers ---------- */
               const BOXES = [];
-              const glass = (x, y, w, h, c, a = .28) => {
-                BOXES.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16"/>`);
+              const glass = (x, y, w, h, c, a = .28, dy = 0) => {
+                BOXES.push(`<rect x="${x}" y="${y + dy}" width="${w}" height="${h}" rx="16"/>`);
                 return `
                   <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="rgba(6,14,34,.58)" stroke="${c}" stroke-opacity="${a}"/>
                   <path d="M${x} ${y + 18} V${y + 8} Q${x} ${y} ${x + 8} ${y} H${x + 18}" fill="none" stroke="${c}" stroke-width="2"/>
@@ -161,8 +161,8 @@ views:
               /* ---------- flows (photo coordinates, 1600 x 1000) ---------- */
               let flows = '';
               if (solar > 50) flows += flow('M 640 300 C 680 318, 718 326, 742 340', C.solar, solar - exp);
-              if (exp   > 50) flows += flow('M 630 302 C 565 322, 505 360, 482 412', C.solar, exp);
-              if (imp   > 50) flows += flow('M 570 462 C 598 456, 616 444, 640 432', C.grid, imp);
+              if (exp   > 50) flows += flow('M 630 300 C 560 292, 450 256, 354 248', C.solar, exp);
+              if (imp   > 50) flows += flow('M 354 252 C 450 282, 580 384, 640 420', C.grid, imp);
               if (tesla > 50) flows += flow('M 762 500 C 772 530, 800 552, 830 574', C.ev, tesla);
               if (kia   > 50) flows += flow('M 868 432 C 985 436, 1100 456, 1150 506', C.ev, kia);
 
@@ -182,9 +182,10 @@ views:
               /* ---------- left rail: today ---------- */
               const netC = net >= 0 ? C.credit : C.cost;
               const inPct = kwhIn + kwhOut > 0 ? kwhIn / (kwhIn + kwhOut) * 100 : 50;
+              const DY = 124;                                           // Today + Billing sit below the Grid card
               const today = `
-                <g>
-                  ${glass(32, 196, 320, 360, C.grid)}
+                <g transform="translate(0 ${DY})">
+                  ${glass(32, 196, 320, 360, C.grid, .28, DY)}
                   ${lbl(54, 228, 'TODAY')}${lbl(330, 228, 'SINCE 00:00', { end: 1 })}
                   <g ${info('sensor.sh50rs_a21c2106894_daily_self_consumption_rate')}>
                     ${ring(108, 312, 50, C.solar, selfUse / 100)}
@@ -215,8 +216,8 @@ views:
 
               /* ---------- left rail: billing ---------- */
               const billing = `
-                <g>
-                  ${glass(32, 576, 320, 214, C.grid)}
+                <g transform="translate(0 ${DY})">
+                  ${glass(32, 576, 320, 214, C.grid, .28, DY)}
                   ${lbl(54, 608, 'BILLING PERIOD')}
                   <g ${info('sensor.electricity_bill_to_date')}>
                     ${lbl(54, 642, 'BILL TO DATE')}
@@ -248,12 +249,12 @@ views:
                               : ['IDLE', C.muted, '—'];
               const gridNode = `
                 <g ${info('sensor.grid_direction')}>
-                  ${glass(372, 412, 198, 104, C.grid, .45)}
-                  <g transform="translate(392 432)" stroke="${C.grid}" stroke-width="1.6" fill="none" stroke-linecap="round">
-                    <path d="M6 44 L14 4 L18 4 L26 44 M2 10 H30 M4 18 H28 M9 30 L23 18 M23 30 L9 18"/></g>
-                  ${lbl(440, 446, 'GRID')}
-                  ${t(438, 480, 24, gridState[1], gridState[2], { mono: 1, wt: 700 })}
-                  ${t(440, 502, 11, C.muted, gridState[0], { ls: 2 })}
+                  ${glass(32, 190, 320, 114, C.grid, .45)}
+                  <g transform="translate(56 214)" stroke="${C.grid}" stroke-width="1.8" fill="none" stroke-linecap="round" filter="url(#glow)">
+                    <path d="M8 66 L20 6 L26 6 L38 66 M2 14 H44 M5 26 H41 M12 44 L34 26 M34 44 L12 26 M14 58 L32 44 M32 58 L14 44"/></g>
+                  ${lbl(122, 230, 'GRID')}
+                  ${t(120, 272, 32, gridState[1], gridState[2], { mono: 1, wt: 700 })}
+                  ${t(122, 292, 11, C.muted, gridState[0], { ls: 2 })}
                 </g>`;
 
               const solarShare = total > 0 ? Math.min(1, Math.max(0, (solar - exp) / total)) : 0;
