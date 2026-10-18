@@ -15,6 +15,11 @@
 #      off-peak are all costed correctly.
 #   4. Daily and monthly totals via utility_meter.
 #
+# Entity IDs come from each `name:`, so the meters are:
+#   sensor.tesla_grid_charging_cost_today / sensor.kia_grid_charging_cost_today
+#   sensor.tesla_grid_charging_cost_this_month / sensor.kia_grid_charging_cost_this_month
+#   sensor.tesla_grid_charging_energy_today / sensor.kia_grid_charging_energy_today
+#
 # Power sensors may report in W or kW; values between 0 and 50 are treated as
 # kW, the same rule the dashboard uses.
 

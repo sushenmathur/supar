@@ -48,6 +48,8 @@ views:
           - weather.north_lakes_weather
           - sensor.time
           - sensor.date_time_iso
+          - sensor.tesla_grid_charging_cost_today
+          - sensor.kia_grid_charging_cost_today
           - sensor.tesla_grid_charging_cost_daily
           - sensor.kia_grid_charging_cost_daily
         styles:
@@ -284,6 +286,8 @@ views:
                   ${t(752, 480, 11, C.home, 'OPEN HUB ›', { ls: 2 })}
                 </g>`;
 
+              // Daily grid-cost meters: HA names them from `name:` (..._today); fall back to the key (..._daily).
+              const pick = (...ids) => ids.find((e) => states[e]) || ids[0];
               const evNode = (x, y, name, eid, batt, pw, sub, costEid) => {
                 const gridCost = num(costEid);
                 return `
@@ -303,8 +307,8 @@ views:
               };
 
               const nodes = solarNode + gridNode + homeNode
-                + evNode(738, 574, 'TESLA', 'sensor.bluey_battery_level', teslaBatt, tesla, tesla > 50 ? teslaRange + ' KM · CHARGING' : teslaRange + ' KM RANGE', 'sensor.tesla_grid_charging_cost_daily')
-                + evNode(1058, 506, 'KIA', 'input_number.kia_battery_estimate', kiaBatt, kia, kia > 50 ? 'CHARGING' : 'ESTIMATED', 'sensor.kia_grid_charging_cost_daily');
+                + evNode(738, 574, 'TESLA', 'sensor.bluey_battery_level', teslaBatt, tesla, tesla > 50 ? teslaRange + ' KM · CHARGING' : teslaRange + ' KM RANGE', pick('sensor.tesla_grid_charging_cost_today', 'sensor.tesla_grid_charging_cost_daily'))
+                + evNode(1058, 506, 'KIA', 'input_number.kia_battery_estimate', kiaBatt, kia, kia > 50 ? 'CHARGING' : 'ESTIMATED', pick('sensor.kia_grid_charging_cost_today', 'sensor.kia_grid_charging_cost_daily'));
 
               /* ---------- assemble ---------- */
               const bg = night ? '/local/images/energy-dashboard-bg-night.png' : '/local/images/energy-dashboard-bg1.png';
