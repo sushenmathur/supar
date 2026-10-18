@@ -58,57 +58,6 @@ button_card_templates:
       label:
         - font-size: 16px
         - font-weight: '600'
-  bill_tile:
-    template: glass
-    show_name: false
-    show_label: false
-    variables:
-      label: ''
-      icon: mdi:cash
-      color: '#66BB6A'
-      sub: ''
-      progress_of: ''
-    styles:
-      card:
-        - padding: 8px 10px
-        - border-radius: 14px
-        - width: 96px
-        - border-color: '[[[ return variables.color + "8C"; ]]]'
-      grid:
-        - grid-template-areas: '"tile"'
-        - grid-template-columns: 1fr
-      custom_fields:
-        tile:
-          - width: 100%
-    custom_fields:
-      tile: |
-        [[[
-          const v = parseFloat(entity ? entity.state : NaN);
-          const val = isNaN(v) ? '—' : '$' + v.toFixed(2);
-          const c = variables.color;
-          let extra = `<div style="font-size:9px;opacity:.6;white-space:nowrap;">${variables.sub}</div>`;
-          if (variables.progress_of) {
-            const tot = parseFloat(states[variables.progress_of] ? states[variables.progress_of].state : NaN);
-            const pct = (!isNaN(v) && tot > 0) ? Math.min(100, (v / tot) * 100) : 0;
-            extra = `
-              <div style="width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden;margin-top:2px;">
-                <div style="width:${pct.toFixed(1)}%;height:100%;border-radius:2px;background:${c};"></div>
-              </div>
-              <div style="font-size:9px;opacity:.6;white-space:nowrap;">${pct.toFixed(0)}% of estimate</div>`;
-          }
-          return `
-            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;">
-              <div style="display:flex;align-items:center;gap:5px;">
-                <div style="width:20px;height:20px;border-radius:50%;background:${c}33;
-                            display:flex;align-items:center;justify-content:center;">
-                  <ha-icon icon="${variables.icon}" style="--mdc-icon-size:13px;color:${c};display:flex;"></ha-icon>
-                </div>
-                <div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;opacity:.75;white-space:nowrap;">${variables.label}</div>
-              </div>
-              <div style="font-size:17px;font-weight:700;line-height:1.2;color:${c};">${val}</div>
-              ${extra}
-            </div>`;
-        ]]]
 views:
   - title: Home Energy
     path: energy
@@ -421,7 +370,7 @@ views:
               label:
                 - color: '#EF5350'
             style:
-              top: 41%
+              top: 37%
               left: 14%
           - type: custom:button-card
             template: side_chip
@@ -435,7 +384,7 @@ views:
               label:
                 - color: '#FFC107'
             style:
-              top: 49%
+              top: 44.5%
               left: 14%
           - type: custom:button-card
             template: side_chip
@@ -457,7 +406,7 @@ views:
                     [[[ return (parseFloat(entity.state) || 0) >= 0 ? '#66BB6A'
                     : '#EF5350'; ]]]
             style:
-              top: 57%
+              top: 52%
               left: 14%
           - type: custom:button-card
             template: side_chip
@@ -475,7 +424,7 @@ views:
               label:
                 - color: '#8BC34A'
             style:
-              top: 65%
+              top: 59.5%
               left: 14%
           - type: custom:button-card
             template: side_chip
@@ -491,7 +440,7 @@ views:
               label:
                 - color: '#2196F3'
             style:
-              top: 73%
+              top: 67%
               left: 14%
           - type: custom:button-card
             template: side_chip
@@ -507,71 +456,45 @@ views:
               label:
                 - color: '#FFC107'
             style:
-              top: 81%
+              top: 74.5%
               left: 14%
           - type: custom:button-card
-            show_name: false
-            show_icon: false
-            tap_action:
-              action: none
+            template: side_chip
+            entity: sensor.electricity_bill_to_date
+            triggers_update:
+              - sensor.electricity_estimated_bill
+            name: |
+              [[[
+                return `<ha-icon icon="mdi:receipt-text" style="width:20px;height:20px;color:#42A5F5;vertical-align:middle;margin-right:4px;"></ha-icon>BILL TO DATE`;
+              ]]]
+            label: |
+              [[[
+                const v = parseFloat(entity.state) || 0;
+                const est = parseFloat(states['sensor.electricity_estimated_bill']?.state) || 0;
+                const pct = est > 0 ? Math.min(100, (v / est) * 100) : 0;
+                return '$' + v.toFixed(2) +
+                  `<span style="font-size:11px;font-weight:400;color:#fff;opacity:.6;margin-left:6px;">${pct.toFixed(0)}% of est.</span>`;
+              ]]]
             styles:
-              card:
-                - background: none
-                - border: none
-                - box-shadow: none
-                - padding: '0'
-                - width: max-content
-                - overflow: visible
-              grid:
-                - grid-template-areas: '"today sold todate est"'
-                - grid-template-columns: repeat(4, max-content)
-                - column-gap: 8px
-            custom_fields:
-              today:
-                card:
-                  type: custom:button-card
-                  template: bill_tile
-                  entity: sensor.daily_import_cost
-                  variables:
-                    label: Today
-                    icon: mdi:cash-minus
-                    color: '#EF5350'
-                    sub: Grid import cost
-              sold:
-                card:
-                  type: custom:button-card
-                  template: bill_tile
-                  entity: sensor.daily_solar_credit
-                  variables:
-                    label: Sold
-                    icon: mdi:cash-plus
-                    color: '#66BB6A'
-                    sub: Solar export credit
-              todate:
-                card:
-                  type: custom:button-card
-                  template: bill_tile
-                  entity: sensor.electricity_bill_to_date
-                  triggers_update:
-                    - sensor.electricity_estimated_bill
-                  variables:
-                    label: Bill to date
-                    icon: mdi:receipt-text
-                    color: '#42A5F5'
-                    progress_of: sensor.electricity_estimated_bill
-              est:
-                card:
-                  type: custom:button-card
-                  template: bill_tile
-                  entity: sensor.electricity_estimated_bill
-                  variables:
-                    label: Est. bill
-                    icon: mdi:calendar-clock
-                    color: '#AB47BC'
-                    sub: This billing period
+              label:
+                - color: '#42A5F5'
             style:
-              top: 94%
-              left: 36.5%
+              top: 82%
+              left: 14%
+          - type: custom:button-card
+            template: side_chip
+            entity: sensor.electricity_estimated_bill
+            name: |
+              [[[
+                return `<ha-icon icon="mdi:calendar-clock" style="width:20px;height:20px;color:#AB47BC;vertical-align:middle;margin-right:4px;"></ha-icon>EST. BILL`;
+              ]]]
+            label: '[[[ return ''$'' + (parseFloat(entity.state) || 0).toFixed(2); ]]]'
+            styles:
+              label:
+                - color: '#AB47BC'
+            style:
+              top: 89.5%
+              left: 14%
         card_mod:
           style: |
             ha-card {
