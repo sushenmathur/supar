@@ -1580,6 +1580,7 @@ views:
                     - overflow: hidden
                   grid:
                     - grid-template-areas: '"stack"'
+                    - grid-template-columns: minmax(0, 1fr)
                   custom_fields:
                     scene:
                       - grid-area: stack
@@ -1594,6 +1595,7 @@ views:
                       - position: relative
                       - z-index: 2
                       - width: 100%
+                      - justify-self: stretch
               - type: grid
                 columns: 1
                 square: false
