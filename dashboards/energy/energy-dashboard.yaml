@@ -2,8 +2,8 @@
 # Requires: custom:button-card, kiosk-mode (HACS)
 # The previous layout is kept in energy-dashboard-classic.yaml.
 #
-# Everything is drawn in one 1600 x 1000 SVG (same 16:10 shape as the photo),
-# so the panels and flow lines stay locked to the house at any screen size.
+# Everything is drawn in one 1600 x 1000 SVG (same 16:10 shape as the photo), fitted to the
+# screen width, so the panels and flow lines stay locked to the house at any screen size.
 # Tap a panel for its sensor details; tap HOME to go back to the Hub. Taps are handled by
 # invisible button-cards (hotspot_*) laid over the panels, positioned in the same 16:10 space.
 # The hotspots set pointer-events: auto because the parent card (no tap action) disables input.
@@ -85,7 +85,10 @@ views:
             - border: none
             - border-radius: '0'
             - background: '#04091A'
-            - height: calc(100dvh - var(--header-height, 56px))   # screen minus HA header (0 in kiosk mode)
+            # Full screen for the kiosk user (header hidden by kiosk-mode); everyone else loses the HA header.
+            - height: >-
+                [[[ return (user && user.name && user.name.toLowerCase() === 'suparhome')
+                  ? '100dvh' : 'calc(100dvh - var(--header-height, 56px))'; ]]]
             - overflow: hidden
             - position: relative
             - container-type: size
@@ -106,136 +109,139 @@ views:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.78250)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.02750)
-              - width: calc(min(100cqw, 160cqh) * 0.19750)
-              - height: calc(min(100cqw, 160cqh) * 0.09375)
+              - left: calc(100cqw * 0.78250)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.02750)
+              - width: calc(100cqw * 0.19750)
+              - height: calc(100cqw * 0.09375)
             hotspot_grid:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.11875)
-              - width: calc(min(100cqw, 160cqh) * 0.20000)
-              - height: calc(min(100cqw, 160cqh) * 0.07125)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.11875)
+              - width: calc(100cqw * 0.20000)
+              - height: calc(100cqw * 0.07125)
             hotspot_selfuse:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.20000)
-              - width: calc(min(100cqw, 160cqh) * 0.09000)
-              - height: calc(min(100cqw, 160cqh) * 0.12000)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.20000)
+              - width: calc(100cqw * 0.09000)
+              - height: calc(100cqw * 0.12000)
             hotspot_net:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.11000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.20000)
-              - width: calc(min(100cqw, 160cqh) * 0.11000)
-              - height: calc(min(100cqw, 160cqh) * 0.12000)
+              - left: calc(100cqw * 0.11000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.20000)
+              - width: calc(100cqw * 0.11000)
+              - height: calc(100cqw * 0.12000)
             hotspot_cost:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.32000)
-              - width: calc(min(100cqw, 160cqh) * 0.20000)
-              - height: calc(min(100cqw, 160cqh) * 0.03000)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.32000)
+              - width: calc(100cqw * 0.20000)
+              - height: calc(100cqw * 0.03000)
             hotspot_credit:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.35000)
-              - width: calc(min(100cqw, 160cqh) * 0.20000)
-              - height: calc(min(100cqw, 160cqh) * 0.03000)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.35000)
+              - width: calc(100cqw * 0.20000)
+              - height: calc(100cqw * 0.03000)
             hotspot_inout:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.38000)
-              - width: calc(min(100cqw, 160cqh) * 0.20000)
-              - height: calc(min(100cqw, 160cqh) * 0.04500)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.38000)
+              - width: calc(100cqw * 0.20000)
+              - height: calc(100cqw * 0.04500)
             hotspot_billtodate:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.43750)
-              - width: calc(min(100cqw, 160cqh) * 0.20000)
-              - height: calc(min(100cqw, 160cqh) * 0.09750)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.43750)
+              - width: calc(100cqw * 0.20000)
+              - height: calc(100cqw * 0.09750)
             hotspot_billest:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.53500)
-              - width: calc(min(100cqw, 160cqh) * 0.20000)
-              - height: calc(min(100cqw, 160cqh) * 0.03250)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.53500)
+              - width: calc(100cqw * 0.20000)
+              - height: calc(100cqw * 0.03250)
             hotspot_lastbill:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.56750)
-              - width: calc(min(100cqw, 160cqh) * 0.20000)
-              - height: calc(min(100cqw, 160cqh) * 0.03375)
+              - left: calc(100cqw * 0.02000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.56750)
+              - width: calc(100cqw * 0.20000)
+              - height: calc(100cqw * 0.03375)
             hotspot_solar:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.35000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.04375)
-              - width: calc(min(100cqw, 160cqh) * 0.16500)
-              - height: calc(min(100cqw, 160cqh) * 0.09750)
+              - left: calc(100cqw * 0.35000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.04375)
+              - width: calc(100cqw * 0.16500)
+              - height: calc(100cqw * 0.09750)
             hotspot_home:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.40000)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.21250)
-              - width: calc(min(100cqw, 160cqh) * 0.15750)
-              - height: calc(min(100cqw, 160cqh) * 0.10000)
+              - left: calc(100cqw * 0.40000)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.21250)
+              - width: calc(100cqw * 0.15750)
+              - height: calc(100cqw * 0.10000)
             hotspot_tesla:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.46125)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.35875)
-              - width: calc(min(100cqw, 160cqh) * 0.11750)
-              - height: calc(min(100cqw, 160cqh) * 0.11750)
+              - left: calc(100cqw * 0.46125)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.35875)
+              - width: calc(100cqw * 0.11750)
+              - height: calc(100cqw * 0.11750)
             hotspot_teslacost:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.46125)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.47625)
-              - width: calc(min(100cqw, 160cqh) * 0.11750)
-              - height: calc(min(100cqw, 160cqh) * 0.02000)
+              - left: calc(100cqw * 0.46125)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.47625)
+              - width: calc(100cqw * 0.11750)
+              - height: calc(100cqw * 0.02000)
             hotspot_kia:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.66125)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.31625)
-              - width: calc(min(100cqw, 160cqh) * 0.11750)
-              - height: calc(min(100cqw, 160cqh) * 0.11750)
+              - left: calc(100cqw * 0.66125)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.31625)
+              - width: calc(100cqw * 0.11750)
+              - height: calc(100cqw * 0.11750)
             hotspot_kiacost:
               - position: absolute
               - z-index: 2
               - pointer-events: auto
-              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.66125)
-              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.43375)
-              - width: calc(min(100cqw, 160cqh) * 0.11750)
-              - height: calc(min(100cqw, 160cqh) * 0.02000)
+              - left: calc(100cqw * 0.66125)
+              - top: calc((100cqh - 62.5cqw) / 2 + 100cqw * 0.43375)
+              - width: calc(100cqw * 0.11750)
+              - height: calc(100cqw * 0.02000)
             homebtn:
               - position: absolute
               - right: 20px
               - bottom: 20px
+              - width: 150px
+              - height: 56px
               - z-index: 3
               - pointer-events: auto
+              - overflow: visible
         custom_fields:
           hotspot_weather:
             card:
@@ -368,7 +374,8 @@ views:
                 card:
                   - pointer-events: auto
                   - height: 56px
-                  - width: max-content
+                  - width: 100%
+                  - box-sizing: border-box
                   - padding: 0 22px 0 16px
                   - border-radius: 28px
                   - background: rgba(6, 14, 34, 0.62)
@@ -690,13 +697,15 @@ views:
               /* ---------- assemble ---------- */
               const bg = night ? '/local/images/energy-dashboard-bg-night.png' : '/local/images/energy-dashboard-bg1.png';
               const body = conditions + today + billing + flows + nodes;   // fills BOXES for the frosted-glass clip
-              // The whole HUD is fitted inside the screen ("meet") so nothing is ever cropped on
-              // tablets or phones; any spare space shows a blurred, dimmed copy of the photo.
+              // The HUD is fitted to the screen WIDTH and centred vertically: on wide screens a sliver of
+              // sky/lawn is cropped top and bottom (all panels sit inside y 44..962), on narrower screens
+              // the spare space above and below shows a blurred, dimmed copy of the photo.
               return `
               <div style="position:absolute;inset:-40px;background:#04091A url('${bg}') center / cover no-repeat;
                           filter:blur(28px) brightness(.45) saturate(1.2);"></div>
               <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet"
-                   style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden;pointer-events:none;">
+                   style="position:absolute;left:0;top:50%;width:100%;height:auto;aspect-ratio:1600 / 1000;transform:translateY(-50%);
+                          display:block;overflow:hidden;pointer-events:none;">
                 <style>
                   .ui   { font-family: Rajdhani, Roboto, sans-serif; }
                   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
