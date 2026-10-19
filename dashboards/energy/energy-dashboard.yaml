@@ -147,10 +147,15 @@ views:
                           stroke-dasharray="${(L * Math.max(0, Math.min(1, pct))).toFixed(1)} ${L.toFixed(1)}"
                           transform="rotate(-90 ${cx} ${cy})" filter="url(#glow)"/>`;
               };
-              const t = (x, y, s, c, txt, o = {}) =>
-                `<text x="${x}" y="${y}" font-size="${s}" fill="${c}" class="${o.mono ? 'mono' : 'ui'}"
-                       ${o.end ? 'text-anchor="end"' : o.mid ? 'text-anchor="middle"' : ''}
+              // o.max: widest the text may be; if a value would overflow its card it is squeezed to fit
+              // (covers wider fallback fonts and long readings like "10.25 kW").
+              const t = (x, y, s, c, txt, o = {}) => {
+                const est = String(txt).length * s * (o.mono ? .62 : .52);
+                const fit = o.max && est > o.max ? `textLength="${o.max}" lengthAdjust="spacingAndGlyphs"` : '';
+                return `<text x="${x}" y="${y}" font-size="${s}" fill="${c}" class="${o.mono ? 'mono' : 'ui'}"
+                       ${o.end ? 'text-anchor="end"' : o.mid ? 'text-anchor="middle"' : ''} ${fit}
                        ${o.ls ? `letter-spacing="${o.ls}"` : ''} font-weight="${o.wt || 600}">${txt}</text>`;
+              };
               const lbl = (x, y, txt, o = {}) => t(x, y, 13, C.muted, txt, { ls: 2.5, ...o });
               const bar = (x, y, w, pct, c, h = 7) =>
                 `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" fill="rgba(157,176,207,.18)"/>
@@ -166,7 +171,7 @@ views:
               // Card-to-card links are always drawn; the animated flow sits on top when power is moving.
               const P_SOLAR_HOME = 'M 720 226 C 720 276, 754 296, 754 340';
               const P_HOME_TESLA = 'M 762 500 C 772 530, 800 552, 830 574';
-              const P_HOME_KIA   = 'M 868 432 C 985 436, 1100 456, 1150 506';
+              const P_HOME_KIA   = 'M 892 432 C 985 436, 1100 456, 1150 506';
               const link = (d, c) => {
                 const [x1, y1] = d.match(/M ([\d.]+) ([\d.]+)/).slice(1);
                 const pts = d.match(/[\d.]+ [\d.]+$/)[0].split(' ');
@@ -255,7 +260,7 @@ views:
                   ${ring(624, 148, 40, C.solar, solar / SOLAR_MAX)}
                   <path d="M624 134 L614 152 H623 L619 166 L634 144 H625 Z" fill="${C.solar}"/>
                   ${lbl(682, 118, 'SOLAR')}
-                  ${t(680, 158, 32, C.solar, kw(solar), { mono: 1, wt: 700 })}
+                  ${t(680, 158, 32, C.solar, kw(solar), { mono: 1, wt: 700, max: 126 })}
                   ${t(682, 186, 13, selfUse >= 80 ? C.credit : selfUse >= 50 ? C.solar : C.cost, 'SELF USE ' + selfUse.toFixed(0) + '%', { ls: 1.5 })}
                 </g>
                 <path d="M690 226 L642 295" stroke="${C.solar}" stroke-dasharray="3 4" stroke-opacity=".8"/>
@@ -270,18 +275,18 @@ views:
                   <g transform="translate(56 214)" stroke="${C.grid}" stroke-width="1.8" fill="none" stroke-linecap="round" filter="url(#glow)">
                     <path d="M8 66 L20 6 L26 6 L38 66 M2 14 H44 M5 26 H41 M12 44 L34 26 M34 44 L12 26 M14 58 L32 44 M32 58 L14 44"/></g>
                   ${lbl(122, 230, 'GRID')}
-                  ${t(120, 272, 32, gridState[1], gridState[2], { mono: 1, wt: 700 })}
+                  ${t(120, 272, 32, gridState[1], gridState[2], { mono: 1, wt: 700, max: 210 })}
                   ${t(122, 292, 11, C.muted, gridState[0], { ls: 2 })}
                 </g>`;
 
               const solarShare = total > 0 ? Math.min(1, Math.max(0, (solar - exp) / total)) : 0;
               const homeNode = `
                 <g ${go('/dashboard-hub/hubhome')}>
-                  ${glass(640, 340, 228, 160, C.home, .5)}
+                  ${glass(640, 340, 252, 160, C.home, .5)}
                   ${ring(700, 420, 38, C.home, solarShare)}
                   <path d="M686 424 L700 410 L714 424 M690 420 V434 H710 V420" fill="none" stroke="${C.home}" stroke-width="2" stroke-linejoin="round"/>
                   ${lbl(752, 392, 'HOME')}
-                  ${t(750, 432, 30, C.home, kw(home), { mono: 1, wt: 700 })}
+                  ${t(750, 432, 28, C.home, kw(home), { mono: 1, wt: 700, max: 122 })}
                   ${t(752, 458, 11, C.muted, (solarShare * 100).toFixed(0) + '% FROM SOLAR', { ls: 1.5 })}
                   ${t(752, 480, 11, C.home, 'OPEN HUB ›', { ls: 2 })}
                 </g>`;
