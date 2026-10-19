@@ -1,7 +1,10 @@
 # Electricity bill history: keeps the previous period's bill for comparison.
 #
-# The billing period runs from the 16th to the 15th. Just before midnight on
-# the 15th, the final bill-to-date is copied into input_number.electricity_last_bill.
+# The billing period runs from the 16th to the 15th. At 00:00 on the 16th the
+# "Reset Monthly Billing Data" automation zeroes input_number.billing_import_total,
+# billing_solar_credit and the previous_daily_* helpers. One minute earlier
+# (23:59 on the 15th), this package copies the final bill-to-date into
+# input_number.electricity_last_bill, so it is saved before anything resets.
 # The Energy dashboard compares the current estimated bill against it.
 #
 # Seed it once with your last actual bill: set input_number.electricity_last_bill
