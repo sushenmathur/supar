@@ -6,6 +6,7 @@
 # so the panels and flow lines stay locked to the house at any screen size.
 # Tap a panel for its sensor details; tap HOME to go back to the Hub. Taps are handled by
 # invisible button-cards (hotspot_*) laid over the panels, positioned in the same 16:10 space.
+# The hotspots set pointer-events: auto because the parent card (no tap action) disables input.
 kiosk_mode:
   user_settings:
     - users:
@@ -29,6 +30,9 @@ button_card_templates:
         - padding: '0'
         - height: 100%
         - cursor: pointer
+        # The parent card has no tap/hold action, so button-card marks it non-clickable and sets
+        # pointer-events: none, which every child inherits. Switch input back on for the hotspots.
+        - pointer-events: auto
 views:
   - title: Home Energy
     path: energy
@@ -97,6 +101,7 @@ views:
             hotspot_weather:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.78250)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.02750)
               - width: calc(min(100cqw, 160cqh) * 0.19750)
@@ -104,6 +109,7 @@ views:
             hotspot_grid:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.11875)
               - width: calc(min(100cqw, 160cqh) * 0.20000)
@@ -111,6 +117,7 @@ views:
             hotspot_selfuse:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.20000)
               - width: calc(min(100cqw, 160cqh) * 0.09000)
@@ -118,6 +125,7 @@ views:
             hotspot_net:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.11000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.20000)
               - width: calc(min(100cqw, 160cqh) * 0.11000)
@@ -125,6 +133,7 @@ views:
             hotspot_cost:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.32000)
               - width: calc(min(100cqw, 160cqh) * 0.20000)
@@ -132,6 +141,7 @@ views:
             hotspot_credit:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.35000)
               - width: calc(min(100cqw, 160cqh) * 0.20000)
@@ -139,6 +149,7 @@ views:
             hotspot_inout:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.38000)
               - width: calc(min(100cqw, 160cqh) * 0.20000)
@@ -146,6 +157,7 @@ views:
             hotspot_billtodate:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.43750)
               - width: calc(min(100cqw, 160cqh) * 0.20000)
@@ -153,6 +165,7 @@ views:
             hotspot_billest:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.53500)
               - width: calc(min(100cqw, 160cqh) * 0.20000)
@@ -160,6 +173,7 @@ views:
             hotspot_lastbill:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.56750)
               - width: calc(min(100cqw, 160cqh) * 0.20000)
@@ -167,6 +181,7 @@ views:
             hotspot_solar:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.35000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.04375)
               - width: calc(min(100cqw, 160cqh) * 0.16500)
@@ -174,6 +189,7 @@ views:
             hotspot_home:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.40000)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.21250)
               - width: calc(min(100cqw, 160cqh) * 0.15750)
@@ -181,6 +197,7 @@ views:
             hotspot_tesla:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.46125)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.35875)
               - width: calc(min(100cqw, 160cqh) * 0.11750)
@@ -188,6 +205,7 @@ views:
             hotspot_teslacost:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.46125)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.47625)
               - width: calc(min(100cqw, 160cqh) * 0.11750)
@@ -195,6 +213,7 @@ views:
             hotspot_kia:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.66125)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.31625)
               - width: calc(min(100cqw, 160cqh) * 0.11750)
@@ -202,6 +221,7 @@ views:
             hotspot_kiacost:
               - position: absolute
               - z-index: 2
+              - pointer-events: auto
               - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.66125)
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.43375)
               - width: calc(min(100cqw, 160cqh) * 0.11750)
