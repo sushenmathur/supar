@@ -58,7 +58,7 @@ views:
             - border: none
             - border-radius: '0'
             - background: '#04091A'
-            - height: 100vh
+            - height: calc(100dvh - var(--header-height, 56px))   # screen minus HA header (0 in kiosk mode)
             - overflow: hidden
           grid:
             - grid-template-areas: '"hud"'
@@ -313,9 +313,13 @@ views:
               /* ---------- assemble ---------- */
               const bg = night ? '/local/images/energy-dashboard-bg-night.png' : '/local/images/energy-dashboard-bg1.png';
               const body = conditions + today + billing + flows + nodes;   // fills BOXES for the frosted-glass clip
+              // The whole HUD is fitted inside the screen ("meet") so nothing is ever cropped on
+              // tablets or phones; any spare space shows a blurred, dimmed copy of the photo.
               return `
-              <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"
-                   style="position:absolute;inset:0;width:100%;height:100%;display:block;background:#04091A;">
+              <div style="position:absolute;inset:-40px;background:#04091A url('${bg}') center / cover no-repeat;
+                          filter:blur(28px) brightness(.45) saturate(1.2);"></div>
+              <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet"
+                   style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden;">
                 <style>
                   .ui   { font-family: Rajdhani, Roboto, sans-serif; }
                   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
