@@ -4,12 +4,31 @@
 #
 # Everything is drawn in one 1600 x 1000 SVG (same 16:10 shape as the photo),
 # so the panels and flow lines stay locked to the house at any screen size.
-# Tap a panel for its sensor details; tap HOME to go back to the Hub.
+# Tap a panel for its sensor details; tap HOME to go back to the Hub. Taps are handled by
+# invisible button-cards (hotspot_*) laid over the panels, positioned in the same 16:10 space.
 kiosk_mode:
   user_settings:
     - users:
         - suparhome
       kiosk: true
+button_card_templates:
+  hud_hotspot:
+    # Invisible tap target laid over a HUD panel; button-card does the tap action.
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    hold_action:
+      action: none
+    styles:
+      card:
+        - background: transparent
+        - border: none
+        - box-shadow: none
+        - border-radius: 16px
+        - padding: '0'
+        - height: 100%
+        - cursor: pointer
 views:
   - title: Home Energy
     path: energy
@@ -60,6 +79,8 @@ views:
             - background: '#04091A'
             - height: calc(100dvh - var(--header-height, 56px))   # screen minus HA header (0 in kiosk mode)
             - overflow: hidden
+            - position: relative
+            - container-type: size
           grid:
             - grid-template-areas: '"hud"'
             - grid-template-columns: 1fr
@@ -70,7 +91,217 @@ views:
               - position: relative
               - width: 100%
               - height: 100%
+            hotspot_weather:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.78250)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.02750)
+              - width: calc(min(100cqw, 160cqh) * 0.19750)
+              - height: calc(min(100cqw, 160cqh) * 0.09375)
+            hotspot_grid:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.11875)
+              - width: calc(min(100cqw, 160cqh) * 0.20000)
+              - height: calc(min(100cqw, 160cqh) * 0.07125)
+            hotspot_selfuse:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.20000)
+              - width: calc(min(100cqw, 160cqh) * 0.09000)
+              - height: calc(min(100cqw, 160cqh) * 0.12000)
+            hotspot_net:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.11000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.20000)
+              - width: calc(min(100cqw, 160cqh) * 0.11000)
+              - height: calc(min(100cqw, 160cqh) * 0.12000)
+            hotspot_cost:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.32000)
+              - width: calc(min(100cqw, 160cqh) * 0.20000)
+              - height: calc(min(100cqw, 160cqh) * 0.03000)
+            hotspot_credit:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.35000)
+              - width: calc(min(100cqw, 160cqh) * 0.20000)
+              - height: calc(min(100cqw, 160cqh) * 0.03000)
+            hotspot_inout:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.38000)
+              - width: calc(min(100cqw, 160cqh) * 0.20000)
+              - height: calc(min(100cqw, 160cqh) * 0.04500)
+            hotspot_billtodate:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.43750)
+              - width: calc(min(100cqw, 160cqh) * 0.20000)
+              - height: calc(min(100cqw, 160cqh) * 0.09750)
+            hotspot_billest:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.02000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.53500)
+              - width: calc(min(100cqw, 160cqh) * 0.20000)
+              - height: calc(min(100cqw, 160cqh) * 0.03625)
+            hotspot_solar:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.35000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.04375)
+              - width: calc(min(100cqw, 160cqh) * 0.16500)
+              - height: calc(min(100cqw, 160cqh) * 0.09750)
+            hotspot_home:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.40000)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.21250)
+              - width: calc(min(100cqw, 160cqh) * 0.15750)
+              - height: calc(min(100cqw, 160cqh) * 0.10000)
+            hotspot_tesla:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.46125)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.35875)
+              - width: calc(min(100cqw, 160cqh) * 0.11750)
+              - height: calc(min(100cqw, 160cqh) * 0.11750)
+            hotspot_teslacost:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.46125)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.47625)
+              - width: calc(min(100cqw, 160cqh) * 0.11750)
+              - height: calc(min(100cqw, 160cqh) * 0.02000)
+            hotspot_kia:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.66125)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.31625)
+              - width: calc(min(100cqw, 160cqh) * 0.11750)
+              - height: calc(min(100cqw, 160cqh) * 0.11750)
+            hotspot_kiacost:
+              - position: absolute
+              - z-index: 2
+              - left: calc((100cqw - min(100cqw, 160cqh)) / 2 + min(100cqw, 160cqh) * 0.66125)
+              - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.43375)
+              - width: calc(min(100cqw, 160cqh) * 0.11750)
+              - height: calc(min(100cqw, 160cqh) * 0.02000)
         custom_fields:
+          hotspot_weather:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: weather.north_lakes_weather
+              tap_action:
+                action: more-info
+          hotspot_grid:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.grid_direction
+              tap_action:
+                action: more-info
+          hotspot_selfuse:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.sh50rs_a21c2106894_daily_self_consumption_rate
+              tap_action:
+                action: more-info
+          hotspot_net:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.daily_energy_net
+              tap_action:
+                action: more-info
+          hotspot_cost:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.daily_import_cost
+              tap_action:
+                action: more-info
+          hotspot_credit:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.daily_solar_credit
+              tap_action:
+                action: more-info
+          hotspot_inout:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.sh50rs_a21c2106894_daily_grid_import
+              tap_action:
+                action: more-info
+          hotspot_billtodate:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.electricity_bill_to_date
+              tap_action:
+                action: more-info
+          hotspot_billest:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.electricity_estimated_bill
+              tap_action:
+                action: more-info
+          hotspot_solar:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.sh50rs_a21c2106894_mppt_total_power
+              tap_action:
+                action: more-info
+          hotspot_home:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              tap_action:
+                action: navigate
+                navigation_path: /dashboard-hub/hubhome
+          hotspot_tesla:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.bluey_battery_level
+              tap_action:
+                action: more-info
+          hotspot_teslacost:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.tesla_grid_charging_cost_today
+              tap_action:
+                action: more-info
+          hotspot_kia:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: input_number.kia_battery_estimate
+              tap_action:
+                action: more-info
+          hotspot_kiacost:
+            card:
+              type: custom:button-card
+              template: hud_hotspot
+              entity: sensor.kia_grid_charging_cost_today
+              tap_action:
+                action: more-info
           hud: |
               [[[
               /* ---------- fonts (loaded once into the main document) ---------- */
@@ -126,11 +357,10 @@ views:
               const battC = (b) => b > 50 ? C.credit : b > 20 ? C.solar : C.cost;
 
               /* ---------- actions ---------- */
-              // Taps use pointerup, not onclick: on touchscreens button-card's own tap handler cancels the
-              // browser's synthetic click, so onclick never fires on the tablet. Navigation mirrors HA's
-              // navigate(): pushState, then location-changed with a { replace } detail.
-              const info = (e) => `class="tap" onpointerup="event.stopPropagation();this.dispatchEvent(new CustomEvent('hass-more-info',{bubbles:true,composed:true,detail:{entityId:'${e}'}}))"`;
-              const go = (p) => `class="tap" onpointerup="event.stopPropagation();history.pushState(null,'','${p}');window.dispatchEvent(new CustomEvent('location-changed',{detail:{replace:false}}))"`;
+              // Taps are handled by invisible button-cards laid over each panel (see the hotspot_* custom
+              // fields in the card config), because button-card strips inline event handlers from HTML.
+              const info = () => '';
+              const go = () => '';
 
               /* ---------- drawing helpers ---------- */
               const BOXES = [];
@@ -327,12 +557,10 @@ views:
               <div style="position:absolute;inset:-40px;background:#04091A url('${bg}') center / cover no-repeat;
                           filter:blur(28px) brightness(.45) saturate(1.2);"></div>
               <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet"
-                   style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden;">
+                   style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden;pointer-events:none;">
                 <style>
                   .ui   { font-family: Rajdhani, Roboto, sans-serif; }
                   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-                  .tap  { cursor: pointer; }
-                  .tap:hover > rect:first-child { stroke-opacity: .9; }
                   .flow { stroke-dasharray: 2 14; stroke-linecap: round; animation: hudDash 1s linear infinite; }
                   .spin { transform-box: fill-box; transform-origin: center; animation: hudSpin 24s linear infinite; }
                   @keyframes hudDash { to { stroke-dashoffset: -16; } }
