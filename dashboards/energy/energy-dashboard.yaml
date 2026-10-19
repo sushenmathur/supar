@@ -342,6 +342,30 @@ views:
               const rateC = rate < 5 ? rate * 100 : rate;              // $/kWh -> c/kWh
               const night = st('sensor.dashboard_night_mode') === 'on';
               const SOLAR_MAX = 5000;                                   // inverter rating (W) for the solar ring
+              const BILL_START_DAY = 1;                                 // fallback: billing period starts on this day each month
+
+              /* billing period: use dates from the bill sensors' attributes when present, else BILL_START_DAY */
+              const billAttr = { ...((states['sensor.electricity_estimated_bill'] || {}).attributes || {}),
+                                 ...((states['sensor.electricity_bill_to_date'] || {}).attributes || {}) };
+              const attrDate = (...keys) => {
+                for (const k of keys) { const d = billAttr[k] ? new Date(billAttr[k]) : null; if (d && !isNaN(d)) return d; }
+                return null;
+              };
+              const DAY_MS = 86400000;
+              const now = st('sensor.date_time_iso') ? new Date(st('sensor.date_time_iso')) : new Date();
+              let pStart = attrDate('billing_period_start', 'period_start', 'bill_start', 'start_date', 'last_reset');
+              let pEnd = attrDate('billing_period_end', 'period_end', 'bill_end', 'end_date', 'next_reset');
+              if (!pStart) {
+                pStart = new Date(now.getFullYear(), now.getMonth(), BILL_START_DAY);
+                if (pStart > now) pStart.setMonth(pStart.getMonth() - 1);
+              }
+              if (!pEnd) { pEnd = new Date(pStart); pEnd.setMonth(pEnd.getMonth() + 1); }
+              // an end at midnight is the start of the next period, so show the day before
+              if (pEnd.getHours() === 0 && pEnd.getMinutes() === 0) pEnd = new Date(pEnd.getTime() - DAY_MS);
+              const dmy = (d) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }).toUpperCase();
+              const periodDays = Math.max(1, Math.round((pEnd - pStart) / DAY_MS) + 1);
+              const periodDay = Math.min(periodDays, Math.max(1, Math.floor((now - pStart) / DAY_MS) + 1));
+              const periodTxt = `${dmy(pStart)} – ${dmy(pEnd)}`;
 
               const w = states['weather.north_lakes_weather'];
               const temp = w && w.attributes.temperature !== undefined ? w.attributes.temperature + '°' : '—';
@@ -473,9 +497,11 @@ views:
               const billing = `
                 <g transform="translate(0 ${DY})">
                   ${glass(32, 576, 320, 214, C.grid, .28, DY)}
-                  ${lbl(54, 608, 'BILLING PERIOD')}
+                  ${lbl(54, 608, 'BILLING')}
+                  ${t(330, 608, 13, C.text, periodTxt, { end: 1, ls: 1.5, mono: 1, max: 190 })}
                   <g ${info('sensor.electricity_bill_to_date')}>
                     ${lbl(54, 642, 'BILL TO DATE')}
+                    ${t(330, 642, 12, C.muted, `DAY ${periodDay} / ${periodDays}`, { end: 1, ls: 1.5 })}
                     ${t(52, 688, 42, C.text, usd(billToDate), { mono: 1, wt: 700 })}
                     ${t(330, 686, 14, C.muted, billPct.toFixed(0) + '% OF EST.', { end: 1, ls: 1.5 })}
                     ${bar(54, 704, 276, billPct, C.ev, 8)}
