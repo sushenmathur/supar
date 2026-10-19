@@ -1,9 +1,10 @@
 # Electricity bill history: keeps the previous period's bill for comparison.
 #
-# The billing period runs from the 16th to the 15th. At 00:00 on the 16th the
+# The billing period matches AGL's meter-read period: the 17th to the 16th
+# (e.g. AGL bill "17 Aug 2026 to 16 Sep 2026"). At 00:00 on the 17th the
 # "Reset Monthly Billing Data" automation zeroes input_number.billing_import_total,
 # billing_solar_credit and the previous_daily_* helpers. One minute earlier
-# (23:59 on the 15th), this package copies the final bill-to-date into
+# (23:59 on the 16th), this package copies the final bill-to-date into
 # input_number.electricity_last_bill, so it is saved before anything resets.
 # The Energy dashboard compares the current estimated bill against it.
 #
@@ -28,14 +29,14 @@ automation:
     alias: Electricity - store last bill at period end
     description: >-
       Copies the final bill-to-date into input_number.electricity_last_bill
-      at 23:59 on the 15th, the last day of each billing period.
+      at 23:59 on the 16th, the last day of each AGL billing period (17th to 16th).
     mode: single
     triggers:
       - trigger: time
         at: "23:59:00"
     conditions:
       - condition: template
-        value_template: "{{ now().day == 15 }}"
+        value_template: "{{ now().day == 16 }}"
       - condition: template
         value_template: "{{ has_value('sensor.electricity_bill_to_date') }}"
     actions:

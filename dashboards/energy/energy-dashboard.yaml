@@ -359,7 +359,7 @@ views:
               const rateC = rate < 5 ? rate * 100 : rate;              // $/kWh -> c/kWh
               const night = st('sensor.dashboard_night_mode') === 'on';
               const SOLAR_MAX = 5000;                                   // inverter rating (W) for the solar ring
-              const BILL_START_DAY = 16;                                // billing period starts on the 16th each month
+              const BILL_START_DAY = 17;                                // AGL billing period: 17th to the 16th
 
               /* billing period: from sensor.electricity_billing_day / _days_remaining when available,
                  else dates on the bill sensors' attributes, else a monthly period starting BILL_START_DAY */
