@@ -401,7 +401,7 @@ views:
               };
 
               /* ---------- flows (photo coordinates, 1600 x 1000) ---------- */
-              // Card-to-card links are always drawn; the animated flow sits on top when power is moving.
+              // Card-to-card links are only drawn while power is moving along them; nothing shows when idle.
               const P_SOLAR_HOME = 'M 720 226 C 720 276, 754 296, 754 340';
               const P_HOME_TESLA = 'M 762 500 C 772 530, 800 552, 830 574';
               const P_HOME_KIA   = 'M 892 432 C 985 436, 1100 456, 1150 506';
@@ -414,12 +414,12 @@ views:
                   <circle cx="${x1}" cy="${y1}" r="4.5" fill="#04091A" stroke="${c}" stroke-width="2"/>
                   <circle cx="${pts[0]}" cy="${pts[1]}" r="4.5" fill="#04091A" stroke="${c}" stroke-width="2"/>`;
               };
-              let flows = link(P_SOLAR_HOME, C.solar) + link(P_HOME_TESLA, C.ev) + link(P_HOME_KIA, C.ev);
-              if (solar > 50) flows += flow(P_SOLAR_HOME, C.solar, solar - exp);
+              let flows = '';
+              if (solar > 50) flows += link(P_SOLAR_HOME, C.solar) + flow(P_SOLAR_HOME, C.solar, solar - exp);
               if (exp   > 50) flows += flow('M 630 300 C 560 292, 450 256, 354 248', C.solar, exp);
               if (imp   > 50) flows += flow('M 354 252 C 450 282, 580 384, 640 420', C.grid, imp);
-              if (tesla > 50) flows += flow(P_HOME_TESLA, C.ev, tesla);
-              if (kia   > 50) flows += flow(P_HOME_KIA, C.ev, kia);
+              if (tesla > 50) flows += link(P_HOME_TESLA, C.ev) + flow(P_HOME_TESLA, C.ev, tesla);
+              if (kia   > 50) flows += link(P_HOME_KIA, C.ev) + flow(P_HOME_KIA, C.ev, kia);
 
               /* ---------- conditions (top right) ---------- */
               const conditions = `
@@ -496,8 +496,8 @@ views:
                   ${t(680, 158, 32, C.solar, kw(solar), { mono: 1, wt: 700, max: 126 })}
                   ${t(682, 186, 13, selfUse >= 80 ? C.credit : selfUse >= 50 ? C.solar : C.cost, 'SELF USE ' + selfUse.toFixed(0) + '%', { ls: 1.5 })}
                 </g>
-                <path d="M690 226 L642 295" stroke="${C.solar}" stroke-dasharray="3 4" stroke-opacity=".8"/>
-                <circle cx="640" cy="298" r="5" fill="none" stroke="${C.solar}" stroke-width="2"/>`;
+                ${solar > 50 ? `<path d="M690 226 L642 295" stroke="${C.solar}" stroke-dasharray="3 4" stroke-opacity=".8"/>
+                <circle cx="640" cy="298" r="5" fill="none" stroke="${C.solar}" stroke-width="2"/>` : ''}`;
 
               const gridState = imp > 50 ? ['IMPORTING', C.cost, '▼ ' + kw(imp)]
                               : exp > 50 ? ['EXPORTING', C.credit, '▲ ' + kw(exp)]
