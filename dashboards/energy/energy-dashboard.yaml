@@ -126,8 +126,11 @@ views:
               const battC = (b) => b > 50 ? C.credit : b > 20 ? C.solar : C.cost;
 
               /* ---------- actions ---------- */
-              const info = (e) => `class="tap" onclick="this.dispatchEvent(new CustomEvent('hass-more-info',{bubbles:true,composed:true,detail:{entityId:'${e}'}}))"`;
-              const go = (p) => `class="tap" onclick="history.pushState(null,'','${p}');window.dispatchEvent(new CustomEvent('location-changed'))"`;
+              // Taps use pointerup, not onclick: on touchscreens button-card's own tap handler cancels the
+              // browser's synthetic click, so onclick never fires on the tablet. Navigation mirrors HA's
+              // navigate(): pushState, then location-changed with a { replace } detail.
+              const info = (e) => `class="tap" onpointerup="event.stopPropagation();this.dispatchEvent(new CustomEvent('hass-more-info',{bubbles:true,composed:true,detail:{entityId:'${e}'}}))"`;
+              const go = (p) => `class="tap" onpointerup="event.stopPropagation();history.pushState(null,'','${p}');window.dispatchEvent(new CustomEvent('location-changed',{detail:{replace:false}}))"`;
 
               /* ---------- drawing helpers ---------- */
               const BOXES = [];
