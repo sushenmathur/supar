@@ -7,6 +7,7 @@
 # Tap a panel for its sensor details; tap HOME to go back to the Hub. Taps are handled by
 # invisible button-cards (hotspot_*) laid over the panels, positioned in the same 16:10 space.
 # The hotspots set pointer-events: auto because the parent card (no tap action) disables input.
+# A visible HOME button (homebtn) in the bottom-right corner also navigates back to the Hub.
 kiosk_mode:
   user_settings:
     - users:
@@ -88,6 +89,9 @@ views:
             - overflow: hidden
             - position: relative
             - container-type: size
+            # No tap action on this card, so button-card would set pointer-events: none on it
+            # (and every child). Keep input on so the hotspots and HOME button receive taps.
+            - pointer-events: auto
           grid:
             - grid-template-areas: '"hud"'
             - grid-template-columns: 1fr
@@ -226,6 +230,12 @@ views:
               - top: calc((100cqh - min(100cqw, 160cqh) * 0.625) / 2 + min(100cqw, 160cqh) * 0.43375)
               - width: calc(min(100cqw, 160cqh) * 0.11750)
               - height: calc(min(100cqw, 160cqh) * 0.02000)
+            homebtn:
+              - position: absolute
+              - right: 20px
+              - bottom: 20px
+              - z-index: 3
+              - pointer-events: auto
         custom_fields:
           hotspot_weather:
             card:
@@ -339,6 +349,49 @@ views:
               entity: sensor.kia_grid_charging_cost_today
               tap_action:
                 action: more-info
+          homebtn:
+            # Visible navigation button pinned to the screen corner (not to the HUD drawing).
+            card:
+              type: custom:button-card
+              name: HOME
+              icon: mdi:home-variant
+              show_icon: true
+              show_name: true
+              show_state: false
+              show_label: false
+              tap_action:
+                action: navigate
+                navigation_path: /dashboard-hub/hubhome
+              hold_action:
+                action: none
+              styles:
+                card:
+                  - pointer-events: auto
+                  - height: 56px
+                  - width: max-content
+                  - padding: 0 22px 0 16px
+                  - border-radius: 28px
+                  - background: rgba(6, 14, 34, 0.62)
+                  - backdrop-filter: blur(12px)
+                  - -webkit-backdrop-filter: blur(12px)
+                  - border: 1px solid rgba(179, 136, 255, 0.65)
+                  - box-shadow: 0 0 18px rgba(179, 136, 255, 0.35), 0 8px 24px rgba(0, 0, 0, 0.45)
+                  - color: '#E6F1FF'
+                grid:
+                  - grid-template-areas: '"i n"'
+                  - grid-template-columns: auto auto
+                  - column-gap: 10px
+                  - align-items: center
+                icon:
+                  - width: 26px
+                  - color: '#B388FF'
+                  - filter: drop-shadow(0 0 4px #B388FF)
+                name:
+                  - font-family: Rajdhani, Roboto, sans-serif
+                  - font-size: 17px
+                  - font-weight: '700'
+                  - letter-spacing: 3px
+                  - color: '#E6F1FF'
           hud: |
               [[[
               /* ---------- fonts (loaded once into the main document) ---------- */
