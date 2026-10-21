@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Activity Badges</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f5f7;--card:#fafafa;--text:#16181a;--sub:#5b6266;--line:rgba(0,0,0,.08);--green:#30b552;--amber:#f2a516;--car:#0a84ff;--walk:#ff9f0a;--badge-ring:#fafafa;--phone:#ffffff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1214;--card:#161a1d;--text:#f1f3f4;--sub:#9aa3a8;--line:rgba(255,255,255,.08);--badge-ring:#161a1d;--phone:#161a1d}}
+:root[data-theme="dark"]{--bg:#0f1214;--card:#161a1d;--text:#f1f3f4;--sub:#9aa3a8;--line:rgba(255,255,255,.08);--badge-ring:#161a1d;--phone:#161a1d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Roboto,system-ui,sans-serif;padding:24px 16px 48px}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+.lead{color:var(--sub);font-size:14px;margin:0 0 20px;max-width:640px;line-height:1.5}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.bar button{font:inherit;font-size:13px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer}
+.bar button.on{background:var(--text);color:var(--bg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.phone{background:var(--phone);border:1px solid var(--line);border-radius:22px;padding:18px 16px 16px}
+.cap{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:12px}
+.hdr{display:grid;grid-template-columns:1fr auto auto;column-gap:10px;align-items:start}
+.date{font-size:12.5px;font-weight:500;color:var(--sub)}
+.name{font-size:26px;font-weight:900;margin-top:2px}
+.av{display:flex;flex-direction:column;align-items:center;width:44px}
+.ring{position:relative;width:34px;height:34px}
+.pic{width:34px;height:34px;border-radius:50%;border:2px solid var(--green);display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
+.pic.away{border-color:var(--amber)}
+.s .pic{background:linear-gradient(135deg,#8a6b52,#c49a76)}
+.p .pic{background:linear-gradient(135deg,#6b4f63,#b98aa6)}
+.badge{position:absolute;right:-7px;bottom:-5px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--badge-ring)}
+.badge svg{width:13px;height:13px;fill:#fff}
+.badge.car{background:var(--car)}
+.badge.walk{background:var(--walk)}
+.lbl{font-size:9.5px;opacity:.75;margin-top:3px;white-space:nowrap}
+.lbl.car{color:var(--car);opacity:1;font-weight:700}
+.lbl.walk{color:var(--walk);opacity:1;font-weight:700}
+.alert{margin-top:16px;border:1px solid #f2b705;border-radius:16px;padding:12px 14px;font-size:12px;color:var(--sub)}
+.alert b{display:block;color:#e8a600;font-size:10px;letter-spacing:.14em;margin-bottom:4px}
+.rules{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.rules h2{font-size:15px;margin:0 0 10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{text-align:left;padding:8px 6px;border-top:1px solid var(--line);vertical-align:middle}
+th{color:var(--sub);font-weight:500;border-top:none}
+code{font-size:12px;background:var(--line);padding:1px 5px;border-radius:5px}
+</style></head><body><div class="wrap">
+<h1>Activity badges on the people avatars</h1>
+<p class="lead">A small badge sits on the bottom-right of each avatar, based on the phone's activity sensor: a blue car for <b>Automotive</b> and an orange walker for <b>Walking</b>. For any other activity, no badge shows. The ring colour still shows whether the person is home or away.</p>
+<div class="bar" id="opt">
+  <button class="on" data-o="a">Option A · badge only</button>
+  <button data-o="b">Option B · badge + label says Driving / Walking</button>
+</div>
+<div class="grid" id="g"></div>
+<div class="rules"><h2>How it maps</h2>
+<table><tr><th>Activity sensor state</th><th>Badge</th><th>Label (Option B)</th></tr>
+<tr><td><code>Automotive</code></td><td>Blue car</td><td>Driving</td></tr>
+<tr><td><code>Walking</code></td><td>Orange walker</td><td>Walking</td></tr>
+<tr><td>Stationary, Running, Cycling, Unknown, unavailable</td><td>None</td><td>Location (Home / Away / zone)</td></tr>
+<tr><td colspan="3" style="color:var(--sub)">Sushen: <code>sensor.sushen_iphone_iphone_activity</code> · Paro: <code>sensor.paro_iphone_activity</code></td></tr></table></div>
+</div>
+<script>
+const car='<svg viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11a2 2 0 0 1 2 2v4h-2v2h-3v-2H8v2H5v-2H3v-4a2 2 0 0 1 2-2zm2.2 0h9.6l-1-3H8.2zM6.5 15a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>';
+const walk='<svg viewBox="0 0 24 24"><path d="M13.5 5.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM9.8 8.9 7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3A7.3 7.3 0 0 0 19 13v-2a5 5 0 0 1-4.3-2.4l-1-1.6a2 2 0 0 0-1.7-1c-.3 0-.5.1-.8.1L6 8.3V13h2V9.6z"/></svg>';
+const scen=[
+ {c:'Both home, not moving',s:['home','Stationary'],p:['home','Stationary']},
+ {c:'Sushen driving',s:['away','Automotive'],p:['home','Stationary']},
+ {c:'Paro out walking',s:['home','Stationary'],p:['away','Walking']},
+ {c:'Sushen driving, Paro walking',s:['away','Automotive'],p:['away','Walking']},
+ {c:'Just arrived home, still in car',s:['home','Automotive'],p:['home','Stationary']},
+ {c:'Paro at a zone (Work), walking',s:['home','Stationary'],p:['Work','Walking']}];
+let opt='a';
+const av=(cls,ini,[loc,act])=>{
+  const k=act==='Automotive'?'car':act==='Walking'?'walk':'';
+  const place=loc==='home'?'Home':loc==='away'?'Away':loc;
+  const label=opt==='b'&&k?(k==='car'?'Driving':'Walking'):place;
+  return `<div class="av ${cls}"><div class="ring"><div class="pic ${loc==='home'?'':'away'}">${ini}</div>${k?`<div class="badge ${k}">${k==='car'?car:walk}</div>`:''}</div><div class="lbl ${opt==='b'?k:''}">${label}</div></div>`;};
+function draw(){document.getElementById('g').innerHTML=scen.map(x=>`<div class="phone"><div class="cap">${x.c}</div><div class="hdr"><div><div class="date">Wed, 21 Oct · Good evening</div><div class="name">Sushen</div></div>${av('s','S',x.s)}${av('p','P',x.p)}</div><div class="alert"><b>WARNING</b>Patio Door</div></div>`).join('');}
+document.getElementById('opt').onclick=e=>{const b=e.target.closest('button');if(!b)return;opt=b.dataset.o;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));draw();};
+draw();
+</script></body></html>
