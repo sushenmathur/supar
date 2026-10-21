@@ -169,6 +169,17 @@ button_card_templates:
     show_state: true
     tap_action:
       action: more-info
+    variables:
+      activity: ''
+    custom_fields:
+      badge: |
+        [[[
+          const a = variables.activity && states[variables.activity] ? states[variables.activity].state : '';
+          const k = a === 'Automotive' ? ['mdi:car', '#0a84ff'] : a === 'Walking' ? ['mdi:walk', '#ff9f0a'] : null;
+          if (!k) return '';
+          return `<div style="width:20px;height:20px;border-radius:50%;background:${k[1]};border:2px solid var(--primary-background-color);box-sizing:border-box;display:grid;place-items:center">
+            <ha-icon icon="${k[0]}" style="--mdc-icon-size:12px;color:#fff;display:flex"></ha-icon></div>`;
+        ]]]
     styles:
       card:
         - background: none
@@ -176,6 +187,7 @@ button_card_templates:
         - border: none
         - padding: 0
         - overflow: visible
+        - position: relative
       grid:
         - grid-template-areas: '"i" "s"'
         - grid-template-rows: 36px min-content
@@ -194,6 +206,13 @@ button_card_templates:
         - font-size: 9.5px
         - opacity: 0.7
         - margin-top: 2px
+      custom_fields:
+        badge:
+          - position: absolute
+          - top: 20px
+          - left: calc(50% + 6px)
+          - z-index: 1
+          - line-height: 0
 
   # ---- Money stat (Solar tab) ---------------------------------------------
   b_stat:
@@ -764,11 +783,19 @@ views:
               type: custom:button-card
               template: b_avatar
               entity: person.sushenmathur
+              variables:
+                activity: sensor.sushen_iphone_iphone_activity
+              triggers_update:
+              - sensor.sushen_iphone_iphone_activity
           paro:
             card:
               type: custom:button-card
               template: b_avatar
               entity: person.paro
+              variables:
+                activity: sensor.paro_iphone_activity
+              triggers_update:
+              - sensor.paro_iphone_activity
         styles:
           card:
           - background: none
