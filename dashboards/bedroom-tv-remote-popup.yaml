@@ -436,8 +436,15 @@
         - media_player.bedroom_google_tv
       name: |
         [[[
+          if (['off', 'standby', 'unavailable'].includes(entity.state)) return 'Google TV';
           const a = entity.attributes;
-          return ['off', 'standby', 'unavailable'].includes(entity.state) ? 'Google TV' : (a.media_title || a.app_name || 'Google TV');
+          const apps = { 'com.stremio.one': 'Stremio', 'com.netflix.ninja': 'Netflix', 'com.google.android.youtube.tv': 'YouTube',
+            'com.amazon.amazonvideo.livingroom': 'Prime Video', 'com.disney.disneyplus': 'Disney+', 'au.com.stan.and': 'Stan',
+            'au.net.abc.iview': 'ABC iview', 'com.google.android.tvlauncher': 'Home', 'com.google.android.apps.tv.launcherx': 'Home' };
+          const id = a.app_id || a.app_name || '';
+          const app = apps[id] || (id.includes('.') ? id.split('.').filter(p => !['com', 'au', 'net', 'android', 'tv', 'app'].includes(p)).slice(-1)[0] || id : id);
+          const nice = app ? app.charAt(0).toUpperCase() + app.slice(1) : 'Google TV';
+          return a.media_title || nice;
         ]]]
       state_display: |
         [[[
@@ -463,8 +470,7 @@
                     entity_id: media_player.bedroom_google_tv
               - type: custom:button-card
                 template: b_qbtn
-                icon: |
-                  [[[ return states['media_player.bedroom_google_tv'].state === 'playing' ? 'mdi:pause' : 'mdi:play'; ]]]
+                icon: mdi:play-pause
                 tap_action:
                   action: perform-action
                   perform_action: media_player.media_play_pause
