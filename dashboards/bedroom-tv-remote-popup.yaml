@@ -78,6 +78,41 @@
             name:
               - font-size: 13px
               - font-weight: 600
+        - type: custom:button-card
+          icon: mdi:exit-to-app
+          name: Exit
+          show_name: true
+          show_state: false
+          tap_action:
+            action: perform-action
+            perform_action: remote.send_command
+            target:
+              entity_id: remote.rm_mini_3
+            data:
+              num_repeats: 1
+              delay_secs: 0.4
+              hold_secs: 0
+              device: bedroom_tv
+              command: exit
+          styles:
+            card:
+              - height: 54px
+              - padding: 0
+              - border-radius: 18px
+              - box-shadow: none
+              - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+              - background: rgba(var(--rgb-primary-text-color),0.07)
+            grid:
+              - grid-template-areas: '"i n"'
+              - grid-template-columns: auto auto
+              - justify-content: center
+              - column-gap: 8px
+            icon:
+              - width: 22px
+              - color: var(--primary-text-color)
+            name:
+              - font-size: 13px
+              - font-weight: 600
     - type: custom:button-card
       show_icon: false
       show_name: false
@@ -419,6 +454,102 @@
             grid:
               - grid-template-areas: '"i"'
               - grid-template-columns: 1fr
+              - justify-content: center
+              - column-gap: 8px
+            icon:
+              - width: 22px
+              - color: var(--primary-text-color)
+            name:
+              - font-size: 13px
+              - font-weight: 600
+    - type: horizontal-stack
+      cards:
+        - type: custom:button-card
+          icon: mdi:chevron-down-box-outline
+          name: CH −
+          show_name: true
+          show_state: false
+          tap_action:
+            action: perform-action
+            perform_action: remote.send_command
+            target:
+              entity_id: remote.rm_mini_3
+            data:
+              num_repeats: 1
+              delay_secs: 0.4
+              hold_secs: 0
+              device: bedroom_tv
+              command: channel_down
+          hold_action:
+            action: perform-action
+            perform_action: remote.send_command
+            repeat: 400
+            target:
+              entity_id: remote.rm_mini_3
+            data:
+              num_repeats: 1
+              delay_secs: 0.4
+              hold_secs: 0
+              device: bedroom_tv
+              command: channel_down
+          styles:
+            card:
+              - height: 54px
+              - padding: 0
+              - border-radius: 18px
+              - box-shadow: none
+              - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+              - background: rgba(var(--rgb-primary-text-color),0.07)
+            grid:
+              - grid-template-areas: '"i n"'
+              - grid-template-columns: auto auto
+              - justify-content: center
+              - column-gap: 8px
+            icon:
+              - width: 22px
+              - color: var(--primary-text-color)
+            name:
+              - font-size: 13px
+              - font-weight: 600
+        - type: custom:button-card
+          icon: mdi:chevron-up-box-outline
+          name: CH +
+          show_name: true
+          show_state: false
+          tap_action:
+            action: perform-action
+            perform_action: remote.send_command
+            target:
+              entity_id: remote.rm_mini_3
+            data:
+              num_repeats: 1
+              delay_secs: 0.4
+              hold_secs: 0
+              device: bedroom_tv
+              command: channel_up
+          hold_action:
+            action: perform-action
+            perform_action: remote.send_command
+            repeat: 400
+            target:
+              entity_id: remote.rm_mini_3
+            data:
+              num_repeats: 1
+              delay_secs: 0.4
+              hold_secs: 0
+              device: bedroom_tv
+              command: channel_up
+          styles:
+            card:
+              - height: 54px
+              - padding: 0
+              - border-radius: 18px
+              - box-shadow: none
+              - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+              - background: rgba(var(--rgb-primary-text-color),0.07)
+            grid:
+              - grid-template-areas: '"i n"'
+              - grid-template-columns: auto auto
               - justify-content: center
               - column-gap: 8px
             icon:
