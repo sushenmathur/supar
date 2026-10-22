@@ -1,0 +1,100 @@
+- type: custom:button-card
+  entity: switch.bedroom_tv
+  name: Bedroom TV Remote
+  icon: mdi:remote-tv
+  show_state: true
+  tap_action:
+    action: navigate
+    navigation_path: '#bedroom-tv-remote'
+  hold_action:
+    action: more-info
+  state_display: |
+    [[[ return 'Bedroom TV · ' + (entity.state === 'on' ? 'On' : entity.state === 'off' ? 'Off' : entity.state); ]]]
+  custom_fields:
+    quick:
+      card:
+        type: horizontal-stack
+        cards:
+          - type: custom:button-card
+            template: b_qbtn
+            icon: mdi:power
+            variables:
+              color: var(--red-color)
+            tap_action:
+              action: perform-action
+              perform_action: switch.toggle
+              target:
+                entity_id: switch.bedroom_tv
+          - type: custom:button-card
+            template: b_qbtn
+            icon: mdi:volume-mute
+            tap_action:
+              action: perform-action
+              perform_action: remote.send_command
+              target:
+                entity_id: remote.rm_mini_3
+              data:
+                num_repeats: 1
+                delay_secs: 0.4
+                hold_secs: 0
+                device: bedroom_tv
+                command: mute
+          - type: custom:button-card
+            template: b_qbtn
+            icon: mdi:volume-minus
+            tap_action:
+              action: perform-action
+              perform_action: remote.send_command
+              target:
+                entity_id: remote.rm_mini_3
+              data:
+                num_repeats: 1
+                delay_secs: 0.4
+                hold_secs: 0
+                device: bedroom_tv
+                command: vol_down
+          - type: custom:button-card
+            template: b_qbtn
+            icon: mdi:volume-plus
+            tap_action:
+              action: perform-action
+              perform_action: remote.send_command
+              target:
+                entity_id: remote.rm_mini_3
+              data:
+                num_repeats: 1
+                delay_secs: 0.4
+                hold_secs: 0
+                device: bedroom_tv
+                command: vol_up
+  styles:
+    card:
+      - padding: 10px 12px
+      - border-radius: 18px
+      - box-shadow: none
+      - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
+      - background: rgba(var(--rgb-primary-text-color),0.05)
+    grid:
+      - grid-template-areas: '"i n quick" "i s quick"'
+      - grid-template-columns: 40px 1fr auto
+      - column-gap: 10px
+    img_cell:
+      - width: 38px
+      - height: 38px
+      - border-radius: 12px
+      - background: rgba(90, 169, 255, 0.18)
+    icon:
+      - width: 22px
+      - color: '#5aa9ff'
+    name:
+      - justify-self: start
+      - font-size: 13px
+      - font-weight: 700
+    state:
+      - justify-self: start
+      - font-size: 11px
+      - opacity: 0.7
+      - white-space: nowrap
+      - overflow: hidden
+      - text-overflow: ellipsis
+      - max-width: 100%

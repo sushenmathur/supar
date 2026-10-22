@@ -228,6 +228,106 @@ sections:
             - overflow: hidden
             - text-overflow: ellipsis
             - max-width: 100%
+      - type: custom:button-card
+        entity: switch.bedroom_tv
+        name: Bedroom TV Remote
+        icon: mdi:remote-tv
+        show_state: true
+        tap_action:
+          action: navigate
+          navigation_path: '#bedroom-tv-remote'
+        hold_action:
+          action: more-info
+        state_display: |
+          [[[ return 'Bedroom TV · ' + (entity.state === 'on' ? 'On' : entity.state === 'off' ? 'Off' : entity.state); ]]]
+        custom_fields:
+          quick:
+            card:
+              type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: mdi:power
+                  variables:
+                    color: var(--red-color)
+                  tap_action:
+                    action: perform-action
+                    perform_action: switch.toggle
+                    target:
+                      entity_id: switch.bedroom_tv
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: mdi:volume-mute
+                  tap_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: mute
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: mdi:volume-minus
+                  tap_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: vol_down
+                - type: custom:button-card
+                  template: b_qbtn
+                  icon: mdi:volume-plus
+                  tap_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: vol_up
+        styles:
+          card:
+            - padding: 10px 12px
+            - border-radius: 18px
+            - box-shadow: none
+            - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
+            - background: rgba(var(--rgb-primary-text-color),0.05)
+          grid:
+            - grid-template-areas: '"i n quick" "i s quick"'
+            - grid-template-columns: 40px 1fr auto
+            - column-gap: 10px
+          img_cell:
+            - width: 38px
+            - height: 38px
+            - border-radius: 12px
+            - background: rgba(90, 169, 255, 0.18)
+          icon:
+            - width: 22px
+            - color: '#5aa9ff'
+          name:
+            - justify-self: start
+            - font-size: 13px
+            - font-weight: 700
+          state:
+            - justify-self: start
+            - font-size: 11px
+            - opacity: 0.7
+            - white-space: nowrap
+            - overflow: hidden
+            - text-overflow: ellipsis
+            - max-width: 100%
 
   # TV Remote pop-up (Bubble Card). Opened by the launcher above.
   - type: grid
@@ -262,6 +362,407 @@ sections:
                 name: Stremio
               - icon: mdi:youtube-tv
                 name: YouTube
+      - type: custom:bubble-card
+        card_type: pop-up
+        hash: '#bedroom-tv-remote'
+        name: Bedroom TV
+        icon: mdi:remote-tv
+        entity: switch.bedroom_tv
+        show_header: true
+        button_type: name
+        close_by_clicking_outside: true
+        bg_opacity: 88
+        bg_blur: 14
+        shadow_opacity: 0
+        margin_top_mobile: 60px
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:button-card
+                icon: mdi:power
+                name: Power
+                show_name: true
+                show_state: false
+                tap_action:
+                  action: perform-action
+                  perform_action: switch.toggle
+                  target:
+                    entity_id: switch.bedroom_tv
+                styles:
+                  card:
+                    - height: 54px
+                    - padding: 0
+                    - border-radius: 18px
+                    - box-shadow: none
+                    - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+                    - background: rgba(var(--rgb-primary-text-color),0.07)
+                  grid:
+                    - grid-template-areas: '"i n"'
+                    - grid-template-columns: auto auto
+                    - justify-content: center
+                    - column-gap: 8px
+                  icon:
+                    - width: 22px
+                    - color: var(--red-color)
+                  name:
+                    - font-size: 13px
+                    - font-weight: 600
+              - type: custom:button-card
+                icon: mdi:import
+                name: Input
+                show_name: true
+                show_state: false
+                tap_action:
+                  action: perform-action
+                  perform_action: remote.send_command
+                  target:
+                    entity_id: remote.rm_mini_3
+                  data:
+                    num_repeats: 1
+                    delay_secs: 0.4
+                    hold_secs: 0
+                    device: bedroom_tv
+                    command: input
+                styles:
+                  card:
+                    - height: 54px
+                    - padding: 0
+                    - border-radius: 18px
+                    - box-shadow: none
+                    - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+                    - background: rgba(var(--rgb-primary-text-color),0.07)
+                  grid:
+                    - grid-template-areas: '"i n"'
+                    - grid-template-columns: auto auto
+                    - justify-content: center
+                    - column-gap: 8px
+                  icon:
+                    - width: 22px
+                    - color: var(--primary-text-color)
+                  name:
+                    - font-size: 13px
+                    - font-weight: 600
+          - type: custom:button-card
+            show_icon: false
+            show_name: false
+            show_state: false
+            tap_action:
+              action: none
+            custom_fields:
+              up:
+                card:
+                  type: custom:button-card
+                  icon: mdi:chevron-up
+                  show_name: false
+                  show_state: false
+                  tap_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: up
+                  hold_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    repeat: 400
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: up
+                  styles:
+                    card:
+                      - height: 58px
+                      - padding: 0
+                      - border-radius: 18px
+                      - box-shadow: none
+                      - border: none
+                      - background: rgba(var(--rgb-primary-text-color),0.09)
+                    icon:
+                      - width: 30px
+                      - color: var(--primary-text-color)
+              left:
+                card:
+                  type: custom:button-card
+                  icon: mdi:chevron-left
+                  show_name: false
+                  show_state: false
+                  tap_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: left
+                  hold_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    repeat: 400
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: left
+                  styles:
+                    card:
+                      - height: 58px
+                      - padding: 0
+                      - border-radius: 18px
+                      - box-shadow: none
+                      - border: none
+                      - background: rgba(var(--rgb-primary-text-color),0.09)
+                    icon:
+                      - width: 30px
+                      - color: var(--primary-text-color)
+              right:
+                card:
+                  type: custom:button-card
+                  icon: mdi:chevron-right
+                  show_name: false
+                  show_state: false
+                  tap_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: right
+                  hold_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    repeat: 400
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: right
+                  styles:
+                    card:
+                      - height: 58px
+                      - padding: 0
+                      - border-radius: 18px
+                      - box-shadow: none
+                      - border: none
+                      - background: rgba(var(--rgb-primary-text-color),0.09)
+                    icon:
+                      - width: 30px
+                      - color: var(--primary-text-color)
+              down:
+                card:
+                  type: custom:button-card
+                  icon: mdi:chevron-down
+                  show_name: false
+                  show_state: false
+                  tap_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: down
+                  hold_action:
+                    action: perform-action
+                    perform_action: remote.send_command
+                    repeat: 400
+                    target:
+                      entity_id: remote.rm_mini_3
+                    data:
+                      num_repeats: 1
+                      delay_secs: 0.4
+                      hold_secs: 0
+                      device: bedroom_tv
+                      command: down
+                  styles:
+                    card:
+                      - height: 58px
+                      - padding: 0
+                      - border-radius: 18px
+                      - box-shadow: none
+                      - border: none
+                      - background: rgba(var(--rgb-primary-text-color),0.09)
+                    icon:
+                      - width: 30px
+                      - color: var(--primary-text-color)
+              mid: |
+                [[[ return `<ha-icon icon="mdi:remote" style="--mdc-icon-size:24px;color:var(--secondary-text-color);opacity:.6"></ha-icon>`; ]]]
+            styles:
+              card:
+                - background: rgba(var(--rgb-primary-text-color),0.04)
+                - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+                - box-shadow: none
+                - border-radius: 28px
+                - padding: 14px
+              grid:
+                - grid-template-areas: '". up ." "left mid right" ". down ."'
+                - grid-template-columns: 1fr 1fr 1fr
+                - grid-template-rows: 58px 58px 58px
+                - gap: 10px
+              custom_fields:
+                up:
+                  - width: 100%
+                left:
+                  - width: 100%
+                right:
+                  - width: 100%
+                down:
+                  - width: 100%
+                mid:
+                  - display: grid
+                  - place-items: center
+          - type: horizontal-stack
+            cards:
+              - type: custom:button-card
+                icon: mdi:volume-minus
+                show_name: false
+                show_state: false
+                tap_action:
+                  action: perform-action
+                  perform_action: remote.send_command
+                  target:
+                    entity_id: remote.rm_mini_3
+                  data:
+                    num_repeats: 1
+                    delay_secs: 0.4
+                    hold_secs: 0
+                    device: bedroom_tv
+                    command: vol_down
+                hold_action:
+                  action: perform-action
+                  perform_action: remote.send_command
+                  repeat: 400
+                  target:
+                    entity_id: remote.rm_mini_3
+                  data:
+                    num_repeats: 1
+                    delay_secs: 0.4
+                    hold_secs: 0
+                    device: bedroom_tv
+                    command: vol_down
+                styles:
+                  card:
+                    - height: 54px
+                    - padding: 0
+                    - border-radius: 18px
+                    - box-shadow: none
+                    - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+                    - background: rgba(var(--rgb-primary-text-color),0.07)
+                  grid:
+                    - grid-template-areas: '"i"'
+                    - grid-template-columns: 1fr
+                    - justify-content: center
+                    - column-gap: 8px
+                  icon:
+                    - width: 22px
+                    - color: var(--primary-text-color)
+                  name:
+                    - font-size: 13px
+                    - font-weight: 600
+              - type: custom:button-card
+                icon: mdi:volume-mute
+                show_name: false
+                show_state: false
+                tap_action:
+                  action: perform-action
+                  perform_action: remote.send_command
+                  target:
+                    entity_id: remote.rm_mini_3
+                  data:
+                    num_repeats: 1
+                    delay_secs: 0.4
+                    hold_secs: 0
+                    device: bedroom_tv
+                    command: mute
+                styles:
+                  card:
+                    - height: 54px
+                    - padding: 0
+                    - border-radius: 18px
+                    - box-shadow: none
+                    - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+                    - background: rgba(var(--rgb-primary-text-color),0.07)
+                  grid:
+                    - grid-template-areas: '"i"'
+                    - grid-template-columns: 1fr
+                    - justify-content: center
+                    - column-gap: 8px
+                  icon:
+                    - width: 22px
+                    - color: var(--primary-text-color)
+                  name:
+                    - font-size: 13px
+                    - font-weight: 600
+              - type: custom:button-card
+                icon: mdi:volume-plus
+                show_name: false
+                show_state: false
+                tap_action:
+                  action: perform-action
+                  perform_action: remote.send_command
+                  target:
+                    entity_id: remote.rm_mini_3
+                  data:
+                    num_repeats: 1
+                    delay_secs: 0.4
+                    hold_secs: 0
+                    device: bedroom_tv
+                    command: vol_up
+                hold_action:
+                  action: perform-action
+                  perform_action: remote.send_command
+                  repeat: 400
+                  target:
+                    entity_id: remote.rm_mini_3
+                  data:
+                    num_repeats: 1
+                    delay_secs: 0.4
+                    hold_secs: 0
+                    device: bedroom_tv
+                    command: vol_up
+                styles:
+                  card:
+                    - height: 54px
+                    - padding: 0
+                    - border-radius: 18px
+                    - box-shadow: none
+                    - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+                    - background: rgba(var(--rgb-primary-text-color),0.07)
+                  grid:
+                    - grid-template-areas: '"i"'
+                    - grid-template-columns: 1fr
+                    - justify-content: center
+                    - column-gap: 8px
+                  icon:
+                    - width: 22px
+                    - color: var(--primary-text-color)
+                  name:
+                    - font-size: 13px
+                    - font-weight: 600
 
   - type: grid
     cards:
