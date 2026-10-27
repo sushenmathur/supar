@@ -1,0 +1,25 @@
+From 6c8bfcd4488490a5829e3b22670e62e6f34a9a2f Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 27 Oct 2026 03:52:36 +0000
+Subject: [PATCH 3/3] Bump version to 0.5.46.2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_019RannaXh39jzCruFEkvtPf
+---
+ custom_components/stremio/manifest.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/custom_components/stremio/manifest.json b/custom_components/stremio/manifest.json
+index f05ae60..84f50d1 100644
+--- a/custom_components/stremio/manifest.json
++++ b/custom_components/stremio/manifest.json
+@@ -18,5 +18,5 @@
+   "requirements": [
+     "pyatv>=0.16.0"
+   ],
+-  "version": "0.5.46.1"
++  "version": "0.5.46.2"
+ }
+-- 
+2.43.0
+

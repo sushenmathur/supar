@@ -1,0 +1,25 @@
+# Settings > Automations & scenes > Scripts > Add script > Edit in YAML, paste
+# everything below (the script id is media_tv_open_stremio).
+# Used by the Stremio cards' "Open in Stremio" button (open_in_stremio_script).
+alias: Media TV - open Stremio
+icon: mdi:television-play
+mode: single
+sequence:
+  - if:
+      - condition: state
+        entity_id: media_player.tv
+        state:
+          - "off"
+          - unavailable
+    then:
+      - action: script.media_tv_power
+      - wait_template: "{{ not is_state('media_player.tv', ['off', 'unavailable']) }}"
+        timeout: "00:00:30"
+        continue_on_timeout: true
+      # webOS needs a moment after power-on before it accepts app launches
+      - delay: "00:00:05"
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.tv
+    data:
+      source: Stremio

@@ -1,0 +1,100 @@
+# Media view: add this as a new section, between the music section and the
+# navbar section (Bubble Card pop-ups, like the Devices view).
+type: grid
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#stremio-continue'
+    name: Continue Watching
+    icon: mdi:play-circle
+    show_header: true
+    button_type: name
+    close_by_clicking_outside: true
+    bg_opacity: 88
+    bg_blur: 14
+    shadow_opacity: 0
+    margin_top_mobile: 60px
+    cards:
+      - type: custom:stremio-continue-watching-card
+        title: Continue Watching
+        entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
+        apple_tv_entity: media_player.media_apple_tv
+        show_copy_button: false
+        open_in_stremio_script: script.media_tv_open_stremio
+        show_filters: true
+        show_title: true
+        show_progress_text: true
+        show_media_type_badge: false
+        show_similar_button: true
+        max_items: 20
+        columns: 3
+        card_height: 0
+        poster_aspect_ratio: 2/3
+        horizontal_scroll: false
+        tap_action: details
+        default_sort: recent
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#stremio-browse'
+    name: Browse Stremio
+    icon: mdi:magnify
+    show_header: true
+    button_type: name
+    close_by_clicking_outside: true
+    bg_opacity: 88
+    bg_blur: 14
+    shadow_opacity: 0
+    margin_top_mobile: 60px
+    cards:
+      - type: custom:stremio-browse-card
+        title: Browse Stremio
+        entity: media_player.stremio_mathur_sushen_gmail_com_stremio
+        apple_tv_entity: media_player.media_apple_tv
+        show_copy_button: false
+        open_in_stremio_script: script.media_tv_open_stremio
+        default_view: popular
+        default_type: movie
+        show_view_controls: true
+        show_type_controls: true
+        show_genre_filter: true
+        show_title: true
+        show_rating: true
+        show_media_type_badge: true
+        show_similar_button: true
+        columns: 3
+        max_items: 50
+        card_height: 0
+        poster_aspect_ratio: 2/3
+        horizontal_scroll: false
+        tap_action: details
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#stremio-library'
+    name: Stremio Library
+    icon: mdi:bookshelf
+    show_header: true
+    button_type: name
+    close_by_clicking_outside: true
+    bg_opacity: 88
+    bg_blur: 14
+    shadow_opacity: 0
+    margin_top_mobile: 60px
+    cards:
+      - type: custom:stremio-library-card
+        title: Stremio Library
+        entity: sensor.stremio_mathur_sushen_gmail_com_library_count
+        apple_tv_entity: media_player.media_apple_tv
+        show_copy_button: false
+        open_in_stremio_script: script.media_tv_open_stremio
+        show_search: true
+        show_filters: true
+        show_title: true
+        show_similar_button: true
+        show_media_type_badge: true
+        max_items: 50
+        columns: 3
+        card_height: 0
+        poster_aspect_ratio: 2/3
+        horizontal_scroll: false
+        tap_action: details
+        default_sort: recent

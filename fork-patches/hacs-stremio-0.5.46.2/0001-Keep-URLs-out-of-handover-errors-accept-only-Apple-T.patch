@@ -1,0 +1,726 @@
+From fc26f521d567b318c3a6649fb55e79a5f882d0a3 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 27 Oct 2026 03:52:36 +0000
+Subject: [PATCH 1/3] Keep URLs out of handover errors, accept only Apple TV
+ targets, wake before VLC
+
+- safe_error() strips any scheme:// link from handover error text and logs
+  (VLC, AirPlay, direct, discovery, fallback, stream lookup)
+- _resolve_apple_tv_entity() only accepts apple_tv platform entities; a
+  wrong-platform target falls back to the configured default or raises
+  not_apple_tv_entity naming the entity and its platform
+- VLC handover turns on a sleeping Apple TV, waits until it reports awake
+  (max 30 s) and then wake_delay seconds (default 15) before launching VLC
+- new optional wake_delay field on stremio.handover_to_apple_tv
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_019RannaXh39jzCruFEkvtPf
+---
+ .../stremio/apple_tv_handover.py              | 106 +++++++++++++--
+ custom_components/stremio/services.py         |  65 +++++++--
+ custom_components/stremio/services.yaml       |  13 ++
+ custom_components/stremio/strings.json        |   3 +
+ .../stremio/translations/en.json              |   3 +
+ tests/test_apple_tv_handover.py               | 110 +++++++++++++++
+ tests/test_services.py                        | 127 +++++++++++++++++-
+ 7 files changed, 401 insertions(+), 26 deletions(-)
+
+diff --git a/custom_components/stremio/apple_tv_handover.py b/custom_components/stremio/apple_tv_handover.py
+index 911bcd6..aba7e36 100644
+--- a/custom_components/stremio/apple_tv_handover.py
++++ b/custom_components/stremio/apple_tv_handover.py
+@@ -31,6 +31,31 @@ def redact_url(url: str | None) -> str:
+     return f"host={urlsplit(url).hostname or '?'} len={len(url)}"
+ 
+ 
++_URL_RE = re.compile(r"[A-Za-z][A-Za-z0-9+.\-]*://\S+")
++_URL_REDACTED = "<redacted-url>"
++
++
++def safe_error(err: BaseException | str) -> str:
++    """Describe an error without any URL it may contain (links carry tokens)."""
++    if isinstance(err, BaseException):
++        message = str(err)
++        name = type(err).__name__
++    else:
++        message, name = err, ""
++    message = _URL_RE.sub(_URL_REDACTED, message)
++    if name and name not in ("HandoverError", "HomeAssistantError"):
++        return f"{name}: {message}" if message else name
++    return message
++
++
++# Apple TV states that mean the box is asleep and must be woken before VLC can launch
++APPLE_TV_ASLEEP_STATES = ("off", "standby")
++# Seconds to wait for the Apple TV to report it is awake after turn_on
++WAKE_TIMEOUT = 30
++# Seconds to let tvOS settle after waking before launching VLC
++DEFAULT_WAKE_DELAY = 15
++
++
+ # Try to import pyatv, but handle if not installed or incompatible
+ try:
+     import pyatv
+@@ -254,8 +279,8 @@ class HandoverManager:
+                 return self._discovered_devices
+ 
+             except Exception as err:
+-                _LOGGER.error("Error discovering Apple TV devices: %s", err)
+-                raise HandoverError(f"Discovery failed: {err}") from err
++                _LOGGER.error("Error discovering Apple TV devices: %s", safe_error(err))
++                raise HandoverError(f"Discovery failed: {safe_error(err)}") from err
+ 
+     async def get_device_by_name(self, device_name: str) -> Any:
+         """Get an Apple TV device configuration by name.
+@@ -431,8 +456,10 @@ class HandoverManager:
+         except HandoverError:
+             raise
+         except Exception as err:
+-            _LOGGER.error("AirPlay handover failed: %s", err)
+-            raise AppleTVConnectionError(f"AirPlay handover failed: {err}") from err
++            _LOGGER.error("AirPlay handover failed: %s", safe_error(err))
++            raise AppleTVConnectionError(
++                f"AirPlay handover failed: {safe_error(err)}"
++            ) from err
+ 
+     def generate_vlc_deep_link(
+         self,
+@@ -462,14 +489,20 @@ class HandoverManager:
+         stream_url: str,
+         title: str | None = None,
+         subtitle_url: str | None = None,
++        wake_delay: float = DEFAULT_WAKE_DELAY,
+     ) -> bool:
+         """Send a stream to Apple TV's VLC app via a vlc-x-callback link.
+ 
++        If the Apple TV is asleep it is turned on first, and VLC is launched
++        once it reports awake plus wake_delay seconds (tvOS ignores app
++        launches while it is still waking).
++
+         Args:
+             device_entity_id: Entity ID of the target media player
+             stream_url: URL of the stream to play
+             title: Optional title for display
+             subtitle_url: Optional subtitle file URL
++            wake_delay: Seconds to wait after waking before launching VLC
+ 
+         Returns:
+             True if the command was sent (but playback may not start)
+@@ -500,6 +533,9 @@ class HandoverManager:
+                 "in Home Assistant's Entities page."
+             )
+ 
++        if state.state in APPLE_TV_ASLEEP_STATES:
++            await self._wake_apple_tv(device_entity_id, wake_delay)
++
+         try:
+             vlc_url = self.generate_vlc_deep_link(stream_url, title, subtitle_url)
+ 
+@@ -520,8 +556,45 @@ class HandoverManager:
+             return True
+ 
+         except Exception as err:
+-            _LOGGER.error("VLC handover failed: %s", err)
+-            raise HandoverError(f"VLC handover failed: {err}") from err
++            _LOGGER.error(
++                "VLC handover to '%s' failed: %s", device_entity_id, safe_error(err)
++            )
++            raise HandoverError(
++                f"VLC handover to '{device_entity_id}' failed: {safe_error(err)}"
++            ) from err
++
++    async def _wake_apple_tv(self, device_entity_id: str, wake_delay: float) -> None:
++        """Turn on a sleeping Apple TV and wait until it can launch apps."""
++        _LOGGER.info("Apple TV '%s' is asleep; turning it on", device_entity_id)
++        try:
++            await self.hass.services.async_call(
++                "media_player",
++                "turn_on",
++                {"entity_id": device_entity_id},
++                blocking=True,
++            )
++        except Exception as err:
++            raise HandoverError(
++                f"Could not turn on '{device_entity_id}': {safe_error(err)}"
++            ) from err
++
++        loop = asyncio.get_running_loop()
++        deadline = loop.time() + WAKE_TIMEOUT
++        while loop.time() < deadline:
++            state = self.hass.states.get(device_entity_id)
++            if state is not None and state.state not in APPLE_TV_ASLEEP_STATES:
++                break
++            await asyncio.sleep(1)
++        else:
++            _LOGGER.warning(
++                "Apple TV '%s' still reports asleep after %ss; trying VLC anyway",
++                device_entity_id,
++                WAKE_TIMEOUT,
++            )
++
++        if wake_delay > 0:
++            _LOGGER.debug("Waiting %ss for '%s' to settle", wake_delay, device_entity_id)
++            await asyncio.sleep(wake_delay)
+ 
+     async def handover_direct(
+         self,
+@@ -637,8 +710,8 @@ class HandoverManager:
+                     "The stream server may be slow or unreachable from Apple TV."
+                 ) from err
+ 
+-            _LOGGER.error("Direct handover failed: %s", err)
+-            raise HandoverError(f"Direct handover failed: {err}") from err
++            _LOGGER.error("Direct handover failed: %s", safe_error(err))
++            raise HandoverError(f"Direct handover failed: {safe_error(err)}") from err
+ 
+     async def handover(
+         self,
+@@ -647,6 +720,7 @@ class HandoverManager:
+         method: HandoverMethod | str = HandoverMethod.AUTO,
+         title: str | None = None,
+         subtitle_url: str | None = None,
++        wake_delay: float = DEFAULT_WAKE_DELAY,
+     ) -> dict[str, Any]:
+         """Perform handover to Apple TV using the specified method.
+ 
+@@ -658,6 +732,7 @@ class HandoverManager:
+             method: Handover method to use
+             title: Optional title for display
+             subtitle_url: Optional subtitle URL
++            wake_delay: Seconds to wait after waking a sleeping Apple TV (VLC only)
+ 
+         Returns:
+             Dictionary with handover result info
+@@ -712,7 +787,9 @@ class HandoverManager:
+                 entity_id = await self._find_media_player_entity(device_identifier)
+ 
+             if method == HandoverMethod.VLC:
+-                await self.handover_via_vlc(entity_id, stream_url, title, subtitle_url)
++                await self.handover_via_vlc(
++                    entity_id, stream_url, title, subtitle_url, wake_delay
++                )
+                 result["success"] = True
+                 result["method"] = "vlc"
+                 result["entity_id"] = entity_id
+@@ -749,26 +826,27 @@ class HandoverManager:
+                             result["success"] = True
+                             result["method"] = "airplay"
+                             result["fallback"] = True
+-                            result["original_error"] = str(direct_err)
++                            result["original_error"] = safe_error(direct_err)
+                             _LOGGER.info(
+                                 "AirPlay fallback successful after direct handover failed"
+                             )
+                             return result
+                         except Exception as airplay_err:
+                             _LOGGER.error(
+-                                "AirPlay fallback also failed: %s", airplay_err
++                                "AirPlay fallback also failed: %s",
++                                safe_error(airplay_err),
+                             )
+                             # Re-raise the original direct error with additional context
+                             raise HandoverError(
+-                                f"Direct handover failed ({direct_err}) and AirPlay "
+-                                f"fallback also failed ({airplay_err}). "
++                                f"Direct handover failed ({safe_error(direct_err)}) and "
++                                f"AirPlay fallback also failed ({safe_error(airplay_err)}). "
+                                 f"Please check your stream URL and Apple TV configuration."
+                             ) from direct_err
+                     # No fallback available or different error, re-raise
+                     raise
+ 
+         except Exception as err:
+-            result["error"] = str(err)
++            result["error"] = safe_error(err)
+             raise
+ 
+         return result
+diff --git a/custom_components/stremio/services.py b/custom_components/stremio/services.py
+index 6a2d187..4ef7c1f 100644
+--- a/custom_components/stremio/services.py
++++ b/custom_components/stremio/services.py
+@@ -13,8 +13,14 @@ from homeassistant.core import (
+ )
+ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+ from homeassistant.helpers import config_validation as cv
++from homeassistant.helpers import entity_registry as er
+ 
+-from .apple_tv_handover import HandoverError, HandoverManager
++from .apple_tv_handover import (
++    DEFAULT_WAKE_DELAY,
++    HandoverError,
++    HandoverManager,
++    safe_error,
++)
+ from .const import (
+     CONF_ADDON_STREAM_ORDER,
+     CONF_APPLE_TV_CREDENTIALS,
+@@ -57,6 +63,11 @@ ATTR_EPISODE = "episode"
+ ATTR_DEVICE_ID = "device_id"
+ ATTR_STREAM_URL = "stream_url"
+ ATTR_METHOD = "method"
++ATTR_WAKE_DELAY = "wake_delay"
++
++# Only Apple TV integration entities can launch VLC; others (e.g. Music Assistant
++# AirPlay speakers named after the Apple TV) fail with unrelated errors.
++APPLE_TV_PLATFORM = "apple_tv"
+ ATTR_GENRE = "genre"
+ ATTR_SKIP = "skip"
+ ATTR_CATALOG_TYPE = "catalog_type"
+@@ -109,6 +120,9 @@ HANDOVER_SCHEMA = vol.Schema(
+         vol.Optional(ATTR_MEDIA_ID): cv.string,
+         vol.Optional(ATTR_STREAM_URL): cv.string,
+         vol.Optional(ATTR_METHOD): vol.In(["auto", "airplay", "vlc", "direct"]),
++        vol.Optional(ATTR_WAKE_DELAY): vol.All(
++            vol.Coerce(float), vol.Range(min=0, max=60)  # type: ignore[arg-type]
++        ),
+     }
+ )
+ 
+@@ -203,16 +217,33 @@ def _resolve_apple_tv_entity(
+ ) -> str:
+     """Pick the Apple TV media_player for a handover.
+ 
+-    Uses the requested entity if it exists, otherwise the configured default.
++    Uses the requested entity if it exists and belongs to the Apple TV
++    integration, otherwise the configured default.
+ 
+     Raises:
+-        ServiceValidationError: If neither entity exists
++        ServiceValidationError: If neither entity is a usable Apple TV
+     """
++    registry = er.async_get(hass)
++
++    def _platform(entity_id: str) -> str | None:
++        entry = registry.async_get(entity_id)
++        return entry.platform if entry else None
+ 
+     def _usable(entity_id: str) -> bool:
+-        return entity_id.startswith("media_player.") and (
+-            hass.states.get(entity_id) is not None
+-        )
++        if not entity_id.startswith("media_player.") or (
++            hass.states.get(entity_id) is None
++        ):
++            return False
++        platform = _platform(entity_id)
++        if platform != APPLE_TV_PLATFORM:
++            _LOGGER.info(
++                "'%s' belongs to %s, not %s; it can't be a handover target",
++                entity_id,
++                platform or "no integration",
++                APPLE_TV_PLATFORM,
++            )
++            return False
++        return True
+ 
+     if requested and _usable(requested):
+         return requested
+@@ -225,6 +256,21 @@ def _resolve_apple_tv_entity(
+         )
+         return configured
+ 
++    for candidate in (requested, configured):
++        if candidate and hass.states.get(candidate) is not None:
++            platform = _platform(candidate) or "no integration"
++            raise ServiceValidationError(
++                f"{candidate} belongs to {platform}, not {APPLE_TV_PLATFORM}. "
++                "Pick an Apple TV integration entity on the card or in the Stremio "
++                "integration options.",
++                translation_domain=DOMAIN,
++                translation_key="not_apple_tv_entity",
++                translation_placeholders={
++                    "entity_id": candidate,
++                    "platform": platform,
++                },
++            )
++
+     raise ServiceValidationError(
+         "No Apple TV entity to send to. Set the Apple TV entity on the card, "
+         "or in the Stremio integration options.",
+@@ -552,7 +598,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
+                 if streams:
+                     stream_url = streams[0].get("url")
+             except StremioConnectionError as err:
+-                raise HomeAssistantError(f"Failed to get stream URL: {err}") from err
++                raise HomeAssistantError(
++                    f"Failed to get stream URL: {safe_error(err)}"
++                ) from err
+         else:
+             # Stream URL was provided directly, build minimal media info
+             media_info = {
+@@ -598,6 +646,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
+                 stream_url=stream_url,
+                 method=method,
+                 title=title,
++                wake_delay=call.data.get(ATTR_WAKE_DELAY, DEFAULT_WAKE_DELAY),
+             )
+ 
+             _LOGGER.info("Handover result: %s", result)
+@@ -606,7 +655,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
+             coordinator.set_current_media(media_info, stream_url)
+ 
+         except HandoverError as err:
+-            raise HomeAssistantError(f"Handover failed: {err}") from err
++            raise HomeAssistantError(f"Handover failed: {safe_error(err)}") from err
+ 
+         # Fire event
+         hass.bus.async_fire(
+diff --git a/custom_components/stremio/services.yaml b/custom_components/stremio/services.yaml
+index f1a8bc0..d0d8942 100644
+--- a/custom_components/stremio/services.yaml
++++ b/custom_components/stremio/services.yaml
+@@ -176,6 +176,19 @@ handover_to_apple_tv:
+             - "airplay"
+             - "direct"
+             - "vlc"
++    wake_delay:
++      name: Wake delay
++      description: >-
++        Seconds to wait after turning on a sleeping Apple TV before launching VLC.
++        tvOS ignores app launches while it is still waking.
++      required: false
++      default: 15
++      example: 20
++      selector:
++        number:
++          min: 0
++          max: 60
++          unit_of_measurement: s
+ 
+ browse_catalog:
+   name: Browse Catalog
+diff --git a/custom_components/stremio/strings.json b/custom_components/stremio/strings.json
+index 56d5084..7c724c8 100644
+--- a/custom_components/stremio/strings.json
++++ b/custom_components/stremio/strings.json
+@@ -100,6 +100,9 @@
+   "exceptions": {
+     "no_apple_tv_entity": {
+       "message": "No Apple TV entity to send to. Set the Apple TV entity on the card, or in the Stremio integration options."
++    },
++    "not_apple_tv_entity": {
++      "message": "{entity_id} belongs to {platform}, not apple_tv. Pick an Apple TV integration entity on the card or in the Stremio integration options."
+     }
+   }
+ }
+\ No newline at end of file
+diff --git a/custom_components/stremio/translations/en.json b/custom_components/stremio/translations/en.json
+index b638f8d..ab03226 100644
+--- a/custom_components/stremio/translations/en.json
++++ b/custom_components/stremio/translations/en.json
+@@ -177,6 +177,9 @@
+   "exceptions": {
+     "no_apple_tv_entity": {
+       "message": "No Apple TV entity to send to. Set the Apple TV entity on the card, or in the Stremio integration options."
++    },
++    "not_apple_tv_entity": {
++      "message": "{entity_id} belongs to {platform}, not apple_tv. Pick an Apple TV integration entity on the card or in the Stremio integration options."
+     }
+   }
+ }
+\ No newline at end of file
+diff --git a/tests/test_apple_tv_handover.py b/tests/test_apple_tv_handover.py
+index 3b4160c..3a4c414 100644
+--- a/tests/test_apple_tv_handover.py
++++ b/tests/test_apple_tv_handover.py
+@@ -9,9 +9,11 @@ from urllib.parse import parse_qs, urlsplit
+ import pytest
+ 
+ from custom_components.stremio.apple_tv_handover import (
++    HandoverError,
+     HandoverManager,
+     HandoverMethod,
+     redact_url,
++    safe_error,
+ )
+ 
+ VLC_PREFIX = "vlc-x-callback://x-callback-url/stream?url="
+@@ -106,3 +108,111 @@ class TestRecommendedMethod:
+                 _manager().get_recommended_method("https://x/a.m3u8")
+                 == HandoverMethod.AIRPLAY
+             )
++
++
++class TestSafeError:
++    """Error text must never carry a URL (deep links embed debrid tokens)."""
++
++    def test_strips_deep_link_and_stream_url(self):
++        err = RuntimeError(
++            "Could not resolve ['vlc-x-callback://x-callback-url/stream?url="
++            "https%3A%2F%2Fdebrid.example%2FTOKEN%2Fa.mkv'] or https://x.example/TOKEN"
++        )
++        text = safe_error(err)
++        assert "://" not in text
++        assert "TOKEN" not in text
++        assert text.startswith("RuntimeError: ")
++        assert "<redacted-url>" in text
++
++    def test_plain_message_kept(self):
++        assert safe_error(HandoverError("launch_app is not supported")) == (
++            "launch_app is not supported"
++        )
++
++
++def _vlc_hass(states):
++    """Hass mock whose entity state walks through `states` on each read."""
++    hass = MagicMock()
++    seq = iter(states)
++    last = {"value": states[-1]}
++
++    def _get(_entity_id):
++        try:
++            last["value"] = next(seq)
++        except StopIteration:
++            pass
++        return MagicMock(state=last["value"])
++
++    hass.states.get.side_effect = _get
++    hass.services.async_call = AsyncMock()
++    return hass
++
++
++class TestHandoverViaVlcErrors:
++    """VLC handover failures name the target but never the link."""
++
++    async def test_error_has_entity_but_no_url(self):
++        hass = _vlc_hass(["idle"])
++        hass.services.async_call.side_effect = RuntimeError(
++            "Could not resolve ['vlc-x-callback://x-callback-url/stream?url=SECRET']"
++        )
++        with pytest.raises(HandoverError) as err:
++            await HandoverManager(hass).handover_via_vlc(
++                "media_player.media_apple_tv", "https://debrid.example/SECRET/a.mkv"
++            )
++        assert "media_player.media_apple_tv" in str(err.value)
++        assert "://" not in str(err.value)
++        assert "SECRET" not in str(err.value)
++
++
++class TestHandoverViaVlcWake:
++    """A sleeping Apple TV is woken, and VLC waits for it to settle."""
++
++    async def test_awake_apple_tv_is_not_turned_on(self):
++        hass = _vlc_hass(["idle"])
++        with patch("asyncio.sleep", AsyncMock()) as sleep:
++            await HandoverManager(hass).handover_via_vlc(
++                "media_player.media_apple_tv", "https://files.example/a.mp4"
++            )
++        services = [c.args[1] for c in hass.services.async_call.call_args_list]
++        assert services == ["play_media"]
++        sleep.assert_not_called()
++
++    async def test_sleeping_apple_tv_is_woken_before_vlc(self):
++        # off on the initial check, off once while waking, then awake
++        hass = _vlc_hass(["off", "off", "idle"])
++        with patch("asyncio.sleep", AsyncMock()) as sleep:
++            await HandoverManager(hass).handover_via_vlc(
++                "media_player.media_apple_tv",
++                "https://files.example/a.mp4",
++                wake_delay=20,
++            )
++        services = [c.args[1] for c in hass.services.async_call.call_args_list]
++        assert services == ["turn_on", "play_media"]
++        # one poll second while still off, then the settle delay
++        assert [c.args[0] for c in sleep.call_args_list] == [1, 20]
++
++    async def test_wake_timeout_still_tries_vlc(self, caplog):
++        hass = _vlc_hass(["standby"])
++        caplog.set_level(logging.WARNING, logger=HANDOVER_LOGGER)
++        with patch("asyncio.sleep", AsyncMock()), patch(
++            "custom_components.stremio.apple_tv_handover.WAKE_TIMEOUT", 0
++        ):
++            await HandoverManager(hass).handover_via_vlc(
++                "media_player.media_apple_tv",
++                "https://files.example/a.mp4",
++                wake_delay=0,
++            )
++        services = [c.args[1] for c in hass.services.async_call.call_args_list]
++        assert services == ["turn_on", "play_media"]
++        assert "still reports asleep" in caplog.text
++
++    async def test_turn_on_failure_has_no_url(self):
++        hass = _vlc_hass(["off"])
++        hass.services.async_call.side_effect = RuntimeError("boom https://x.example/T")
++        with pytest.raises(HandoverError) as err:
++            await HandoverManager(hass).handover_via_vlc(
++                "media_player.media_apple_tv", "https://files.example/a.mp4"
++            )
++        assert "Could not turn on" in str(err.value)
++        assert "://" not in str(err.value)
+diff --git a/tests/test_services.py b/tests/test_services.py
+index e096ea0..c04fd29 100644
+--- a/tests/test_services.py
++++ b/tests/test_services.py
+@@ -81,6 +81,18 @@ def mock_service_hass(hass: HomeAssistant, mock_coordinator):
+     return hass
+ 
+ 
++
++def _add_media_player(hass, entity_id, platform="apple_tv", state="idle"):
++    """Register a media_player under an integration platform and give it a state."""
++    from homeassistant.helpers import entity_registry as er
++
++    object_id = entity_id.split(".", 1)[1]
++    er.async_get(hass).async_get_or_create(
++        "media_player", platform, object_id, suggested_object_id=object_id
++    )
++    hass.states.async_set(entity_id, state)
++
++
+ class TestSearchLibraryService:
+     """Tests for the search_library service."""
+ 
+@@ -358,7 +370,7 @@ class TestHandoverService:
+     async def test_handover_with_stream_url(self, mock_service_hass, mock_coordinator):
+         """Test handover with provided stream URL."""
+         mock_coordinator.data = {"current_watching": None}
+-        mock_service_hass.states.async_set("media_player.apple_tv", "idle")
++        _add_media_player(mock_service_hass, "media_player.apple_tv")
+ 
+         await async_setup_services(mock_service_hass)
+ 
+@@ -416,7 +428,7 @@ class TestHandoverTargetResolution:
+     ):
+         """An existing requested media_player is used as the target."""
+         mock_coordinator.data = {"current_watching": None}
+-        mock_service_hass.states.async_set("media_player.living_room", "idle")
++        _add_media_player(mock_service_hass, "media_player.living_room")
+         await async_setup_services(mock_service_hass)
+ 
+         manager = await self._call_handover(
+@@ -438,7 +450,7 @@ class TestHandoverTargetResolution:
+     ):
+         """A missing requested entity falls back to the configured default, with an info log."""
+         mock_coordinator.data = {"current_watching": None}
+-        mock_service_hass.states.async_set("media_player.bedroom", "idle")
++        _add_media_player(mock_service_hass, "media_player.bedroom")
+         self._add_configured_entity(mock_service_hass, "media_player.bedroom")
+         await async_setup_services(mock_service_hass)
+ 
+@@ -463,7 +475,7 @@ class TestHandoverTargetResolution:
+     ):
+         """An omitted device_id uses the configured default."""
+         mock_coordinator.data = {"current_watching": None}
+-        mock_service_hass.states.async_set("media_player.bedroom", "idle")
++        _add_media_player(mock_service_hass, "media_player.bedroom")
+         self._add_configured_entity(mock_service_hass, "media_player.bedroom")
+         await async_setup_services(mock_service_hass)
+ 
+@@ -494,6 +506,113 @@ class TestHandoverTargetResolution:
+ 
+         assert err.value.translation_key == "no_apple_tv_entity"
+ 
++    @pytest.mark.asyncio
++    async def test_non_apple_tv_entity_falls_back_to_configured(
++        self, mock_service_hass, mock_coordinator, caplog
++    ):
++        """A Music Assistant player is rejected and the configured Apple TV is used."""
++        mock_coordinator.data = {"current_watching": None}
++        _add_media_player(mock_service_hass, "media_player.bedroom", "music_assistant")
++        _add_media_player(mock_service_hass, "media_player.bedroom_apple_tv")
++        self._add_configured_entity(mock_service_hass, "media_player.bedroom_apple_tv")
++        await async_setup_services(mock_service_hass)
++
++        with caplog.at_level("INFO", logger="custom_components.stremio.services"):
++            manager = await self._call_handover(
++                mock_service_hass,
++                {
++                    "device_id": "media_player.bedroom",
++                    "stream_url": "https://example.com/a.mkv",
++                    "method": "vlc",
++                },
++            )
++
++        assert manager.handover.call_args.kwargs["device_identifier"] == (
++            "media_player.bedroom_apple_tv"
++        )
++        assert "belongs to music_assistant" in caplog.text
++
++    @pytest.mark.asyncio
++    async def test_non_apple_tv_entity_without_fallback_raises(
++        self, mock_service_hass, mock_coordinator
++    ):
++        """A non-Apple TV target with no valid default names the entity and platform."""
++        mock_coordinator.data = {"current_watching": None}
++        _add_media_player(mock_service_hass, "media_player.bedroom", "music_assistant")
++        await async_setup_services(mock_service_hass)
++
++        with pytest.raises(ServiceValidationError) as err:
++            await self._call_handover(
++                mock_service_hass,
++                {
++                    "device_id": "media_player.bedroom",
++                    "stream_url": "https://example.com/a.mkv",
++                    "method": "vlc",
++                },
++            )
++
++        assert err.value.translation_key == "not_apple_tv_entity"
++        assert err.value.translation_placeholders == {
++            "entity_id": "media_player.bedroom",
++            "platform": "music_assistant",
++        }
++
++    @pytest.mark.asyncio
++    async def test_wake_delay_passed_to_handover(
++        self, mock_service_hass, mock_coordinator
++    ):
++        """wake_delay from the service call reaches the handover manager."""
++        mock_coordinator.data = {"current_watching": None}
++        _add_media_player(mock_service_hass, "media_player.media_apple_tv")
++        await async_setup_services(mock_service_hass)
++
++        manager = await self._call_handover(
++            mock_service_hass,
++            {
++                "device_id": "media_player.media_apple_tv",
++                "stream_url": "https://example.com/a.mkv",
++                "method": "vlc",
++                "wake_delay": 25,
++            },
++        )
++
++        assert manager.handover.call_args.kwargs["wake_delay"] == 25
++
++    @pytest.mark.asyncio
++    async def test_handover_error_has_no_url(self, mock_service_hass, mock_coordinator):
++        """A handover failure surfaces without the stream or deep link URL."""
++        from custom_components.stremio.apple_tv_handover import HandoverError
++
++        mock_coordinator.data = {"current_watching": None}
++        _add_media_player(mock_service_hass, "media_player.media_apple_tv")
++        await async_setup_services(mock_service_hass)
++
++        with patch(
++            "custom_components.stremio.services.HandoverManager"
++        ) as mock_handover:
++            mock_manager = MagicMock()
++            mock_manager.handover = AsyncMock(
++                side_effect=HandoverError(
++                    "Could not resolve ['vlc-x-callback://x-callback-url/stream?url="
++                    "https%3A%2F%2Fexample.com%2Fsecret-token%2Fa.mkv'] to media"
++                )
++            )
++            mock_handover.return_value = mock_manager
++            with pytest.raises(HomeAssistantError) as err:
++                await mock_service_hass.services.async_call(
++                    DOMAIN,
++                    SERVICE_HANDOVER_TO_APPLE_TV,
++                    {
++                        "device_id": "media_player.media_apple_tv",
++                        "stream_url": "https://example.com/secret-token/a.mkv",
++                        "method": "vlc",
++                    },
++                    blocking=True,
++                )
++
++        assert "://" not in str(err.value)
++        assert "secret-token" not in str(err.value)
++
+ 
+ class TestServiceRegistration:
+     """Tests for service registration."""
+-- 
+2.43.0
+
