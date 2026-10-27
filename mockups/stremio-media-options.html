@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stremio Media Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f2;--phone:#f7f7f8;--card:rgba(0,0,0,.045);--card2:rgba(0,0,0,.07);--text:#15181a;--sub:#5d656a;--line:rgba(0,0,0,.08);--accent:#7b5bff;--accent2:#a48bff;--sheet:#ffffffee}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0e10;--phone:#121518;--card:rgba(255,255,255,.05);--card2:rgba(255,255,255,.08);--text:#f1f3f4;--sub:#9aa3a8;--line:rgba(255,255,255,.08);--sheet:#1a1e22f2}}
+:root[data-theme="dark"]{--bg:#0c0e10;--phone:#121518;--card:rgba(255,255,255,.05);--card2:rgba(255,255,255,.08);--text:#f1f3f4;--sub:#9aa3a8;--line:rgba(255,255,255,.08);--sheet:#1a1e22f2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Roboto,system-ui,sans-serif;padding:24px 16px 48px}
+.wrap{max-width:1240px;margin:0 auto}
+h1{font-size:22px;margin:0 0 6px}
+.lead{color:var(--sub);font-size:14px;line-height:1.5;margin:0 0 22px;max-width:760px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+.opt h2{font-size:16px;margin:0 0 4px}
+.opt p{font-size:13px;color:var(--sub);margin:0 0 12px;line-height:1.45;min-height:56px}
+.phone{position:relative;width:100%;max-width:380px;height:780px;margin:0 auto;background:var(--phone);border:1px solid var(--line);border-radius:30px;overflow:hidden;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:14px;padding:16px 18px 6px;font-size:18px;font-weight:500}
+.scroll{flex:1;overflow-y:auto;padding:8px 14px 110px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+/* music card (simplified) */
+.music{border-radius:22px;padding:12px;background:linear-gradient(135deg,rgba(150,190,200,.35),rgba(200,215,220,.25));border:1px solid var(--line)}
+.mrow{display:flex;gap:12px}
+.cover{width:84px;height:84px;border-radius:14px;background:linear-gradient(160deg,#b9d4dc,#5f8f9b 60%,#2c4a55);flex:none}
+.mt{font-size:16px;font-weight:500}.ms{font-size:12px;color:var(--sub);margin-top:4px}
+.mctl{display:flex;gap:22px;align-items:center;margin-top:10px;padding-left:6px}
+.play{width:36px;height:36px;border-radius:50%;background:#22272b;display:grid;place-items:center}
+.play:after{content:"";border-left:11px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+.tri{width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent}
+.wave{height:12px;margin:10px 0 8px;background:repeating-linear-gradient(90deg,var(--sub) 0 1px,transparent 1px 4px);opacity:.35;border-radius:2px}
+.mbar{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);background:var(--card);border-radius:12px;padding:8px 10px}
+/* section heading */
+.sh{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 10px}
+.sh b{font-size:15px;display:flex;align-items:center;gap:8px}
+.logo{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#8a6bff,#5a3fd6);display:grid;place-items:center}
+.logo:after{content:"";border-left:7px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-left:2px}
+.sh span{font-size:12px;color:var(--sub)}
+/* posters */
+.row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.row::-webkit-scrollbar{display:none}
+.poster{flex:none;width:96px}
+.pimg{position:relative;aspect-ratio:2/3;border-radius:12px;overflow:hidden;display:flex;align-items:flex-end;padding:7px;color:#fff;font-size:11px;font-weight:700;line-height:1.15;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.25)}
+.prog i{display:block;height:100%;background:var(--accent2)}
+.pt{font-size:11.5px;font-weight:500;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pm{font-size:10.5px;color:var(--sub)}
+.badge{position:absolute;top:6px;left:6px;font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.45)}
+/* buttons */
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bb{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer;text-align:left;color:var(--text);font:inherit}
+.bb .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none}
+.bb svg{width:20px;height:20px}
+.bb b{display:block;font-size:13.5px}.bb small{font-size:11px;color:var(--sub)}
+/* hero (option B) */
+.hero{position:relative;border-radius:22px;overflow:hidden;height:190px;color:#fff;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.05) 70%),linear-gradient(120deg,#3a2a6b,#1d4e6b 55%,#0f2a38)}
+.hero .k{font-size:10px;letter-spacing:.12em;font-weight:700;opacity:.8}
+.hero .t{font-size:20px;font-weight:900;margin-top:4px}
+.hero .s{font-size:12px;opacity:.8;margin-top:2px}
+.hbar{height:4px;border-radius:2px;background:rgba(255,255,255,.25);margin:10px 0}
+.hbar i{display:block;height:100%;width:62%;background:var(--accent2);border-radius:2px}
+.hrow{display:flex;gap:8px}
+.pill{border:none;border-radius:999px;padding:8px 14px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
+.pill.w{background:#fff;color:#111}
+.pill.g{background:rgba(255,255,255,.18);color:#fff;backdrop-filter:blur(8px)}
+.chips{display:flex;gap:8px;margin-top:12px}
+.chip{flex:1;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px;font:inherit;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer}
+.chip svg{width:17px;height:17px}
+/* option C */
+.launch{border-radius:22px;border:1px solid var(--line);background:var(--card);padding:12px}
+.lh{display:flex;align-items:center;gap:10px}
+.lh .logo{width:38px;height:38px;border-radius:12px}
+.lh .logo:after{border-left-width:11px;border-top-width:7px;border-bottom-width:7px}
+.lh b{font-size:14px}.lh small{display:block;font-size:11.5px;color:var(--sub);margin-top:2px}
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.tile{border:none;border-radius:16px;padding:12px 8px;background:var(--card2);font:inherit;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tile svg{width:22px;height:22px}
+.tile b{font-size:12.5px}.tile small{font-size:10.5px;color:var(--sub)}
+.mini{display:flex;gap:8px;align-items:center;margin-top:12px;padding:8px;border-radius:14px;background:var(--card2)}
+.mini .pimg{width:34px;padding:0;border-radius:7px;flex:none}
+.mini .mt2{flex:1;min-width:0}.mini b{font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini small{font-size:11px;color:var(--sub)}
+.mbtn{width:32px;height:32px;border-radius:50%;background:var(--accent);display:grid;place-items:center;flex:none}
+.mbtn:after{content:"";border-left:9px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:2px}
+/* nav */
+.nav{position:absolute;left:12px;right:12px;bottom:14px;height:62px;border-radius:26px;background:var(--sheet);border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.12);display:flex;justify-content:space-around;align-items:center;font-size:10.5px;color:var(--sub);z-index:3}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav i{width:18px;height:18px;border-radius:5px;background:currentColor;opacity:.45}
+.nav .on{color:#e8a020}.nav .on i{opacity:1}
+/* sheet */
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.35);display:none;z-index:5}
+.sheet.open{display:block}
+.panel{position:absolute;left:0;right:0;bottom:0;top:60px;background:var(--sheet);backdrop-filter:blur(14px);border-radius:28px 28px 0 0;padding:14px 14px 20px;overflow-y:auto}
+.ph{display:flex;align-items:center;gap:10px;background:var(--card2);border-radius:999px;padding:6px 6px 6px 8px}
+.ph b{flex:1;font-size:15px}
+.ph .x{width:36px;height:36px;border-radius:50%;background:var(--card2);border:none;font-size:18px;color:var(--text);cursor:pointer}
+.ctl{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap}
+.ctl span{font-size:11.5px;padding:6px 11px;border-radius:999px;background:var(--card2)}
+.ctl span.on{background:var(--accent);color:#fff}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pg .poster{width:auto}
+.search{border-radius:12px;background:var(--card2);padding:10px 12px;font-size:12.5px;color:var(--sub);margin-top:12px}
+.note{margin-top:28px;background:var(--phone);border:1px solid var(--line);border-radius:18px;padding:16px 18px;font-size:13px;line-height:1.55;color:var(--sub)}
+.note b{color:var(--text)}
+</style></head><body><div class="wrap">
+<h1>Stremio on the Media page: 3 options</h1>
+<p class="lead">Each option sits under your compact music card. <b>Browse</b> and <b>Library</b> open Bubble Card pop-ups with the full Stremio browse and library cards inside. Tap them in the mockups to preview the pop-ups. The posters are placeholders.</p>
+<div class="grid" id="grid"></div>
+<div class="note"><b>Cards used.</b> A uses <code>stremio-continue-watching-card</code> (horizontal scroll). B uses <code>stremio-player-card</code> (compact) when something is playing, and a resume banner built from the continue-watching list when it isn't. C is a small launcher (button-card) with counts from <code>sensor.…_continue_watching_count</code> and <code>sensor.…_library_count</code>. All three use the same two pop-ups: <code>#stremio-browse</code> (browse card, 3 columns) and <code>#stremio-library</code> (library card with search).</div>
+</div>
+<script>
+const P=[['Night Shift','S2 · E5',62,'#3b2a6b','#c0527a'],['Northern Line','Movie',35,'#1d4e6b','#5fb3c9'],['Paper Moon','S1 · E8',80,'#5a3d1f','#e0a85a'],['Iron Coast','S3 · E1',15,'#2a3a2a','#88b06a'],['Blue Hour','Movie',48,'#20264d','#7d8cff'],['Lantern','S1 · E2',22,'#4d2020','#ff8b6b']];
+const ic={browse:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 2a8 8 0 0 1 6.32 12.9l5.39 5.4-1.41 1.4-5.4-5.38A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>',lib:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 3h2v18H4zm4 0h2v18H8zm4.2.6 1.9-.6 5.6 17.4-1.9.6z"/></svg>',cont:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-2 6v8l6-4z"/></svg>'};
+const poster=(p,w)=>`<div class="poster"${w?` style="width:${w}px"`:''}><div class="pimg" style="background:linear-gradient(160deg,${p[4]},${p[3]} 70%)">${p[0]}<div class="prog"><i style="width:${p[2]}%"></i></div></div><div class="pt">${p[0]}</div><div class="pm">${p[1]} · ${p[2]}%</div></div>`;
+const music=`<div class="music"><div class="mrow"><div class="cover"></div><div><div class="mt">I Want It That Way</div><div class="ms">Backstreet Boys · Millennium</div><div class="mctl"><span class="tri" style="border-right:11px solid var(--text)"></span><span class="play"></span><span class="tri" style="border-left:11px solid var(--text)"></span></div></div></div><div class="wave"></div><div class="mbar"><span>▣ Living Room</span><span>⟲</span><span>⌂</span><span>|||</span><span>79%</span><span>⤢</span></div></div>`;
+const nav=`<div class="nav"><div><i></i>Home</div><div><i></i>Cameras</div><div class="on"><i></i>Media</div><div><i></i>Climate</div><div><i></i>Devices</div><div><i></i>More</div></div>`;
+const btn=(k,label,sub,col)=>`<button class="bb" data-pop="${k}"><span class="ic" style="background:${col}22;color:${col}">${ic[k==='browse'?'browse':'lib']}</span><span><b>${label}</b><small>${sub}</small></span></button>`;
+const A=`<div class="sh"><b><span class="logo"></span>Continue watching</b><span>6 titles</span></div><div class="row">${P.map(p=>poster(p)).join('')}</div><div class="btns">${btn('browse','Browse','Popular · Movies & TV','#7b5bff')}${btn('lib','Library','42 saved','#30a46c')}</div>`;
+const B=`<div class="sh"><b><span class="logo"></span>Stremio</b><span>Resume</span></div><div class="hero"><div class="k">CONTINUE WATCHING</div><div class="t">Night Shift</div><div class="s">Season 2 · Episode 5 · 18 min left</div><div class="hbar"><i></i></div><div class="hrow"><button class="pill w">▶ Resume on Media TV</button><button class="pill g">Details</button></div></div><div class="chips"><button class="chip" data-pop="browse">${ic.browse}Browse</button><button class="chip" data-pop="lib">${ic.lib}Library</button></div><div class="sh" style="margin-top:16px"><b style="font-size:13px">Up next</b><span>5 more</span></div><div class="row">${P.slice(1).map(p=>poster(p,84)).join('')}</div>`;
+const C=`<div class="launch" style="margin-top:14px"><div class="lh"><span class="logo"></span><div><b>Stremio</b><small>6 in progress · 42 in library</small></div></div><div class="mini"><div class="pimg" style="aspect-ratio:2/3;background:linear-gradient(160deg,${P[0][4]},${P[0][3]})"></div><div class="mt2"><b>Night Shift</b><small>S2 · E5 · 62% watched</small></div><span class="mbtn"></span></div><div class="tiles"><button class="tile" data-pop="cont">${ic.cont}<b>Continue</b><small>6 titles</small></button><button class="tile" data-pop="browse">${ic.browse}<b>Browse</b><small>Popular</small></button><button class="tile" data-pop="lib">${ic.lib}<b>Library</b><small>42 saved</small></button></div></div>`;
+const sheets={browse:`<div class="ph"><span class="logo"></span><b>Browse Stremio</b><button class="x">✕</button></div><div class="ctl"><span class="on">Popular</span><span>New</span><span>Featured</span><span class="on">Movies</span><span>Series</span><span>Genre ▾</span></div><div class="pg">${[...P,...P].map(p=>poster(p)).join('')}</div>`,
+lib:`<div class="ph"><span class="logo"></span><b>Stremio Library</b><button class="x">✕</button></div><div class="search">Search library…</div><div class="ctl"><span class="on">All</span><span>Movies</span><span>Series</span><span>Recent ▾</span></div><div class="pg">${[...P].reverse().concat(P).map(p=>poster(p)).join('')}</div>`,
+cont:`<div class="ph"><span class="logo"></span><b>Continue Watching</b><button class="x">✕</button></div><div class="ctl"><span class="on">All</span><span>Movies</span><span>Series</span><span>Recent ▾</span></div><div class="pg">${P.map(p=>poster(p)).join('')}</div>`};
+const opts=[['Option A · Shelf + two buttons','The continue-watching shelf scrolls sideways under the music card, with Browse and Library buttons below it. Shows what you were watching at a glance.',A],
+['Option B · Resume hero','A big banner for the last thing you watched, with a Resume button. Browse and Library sit as chips underneath, then a smaller Up Next row. Most cinematic, and the tallest.',B],
+['Option C · Compact launcher','The smallest option. One card with a mini resume row and three tiles: Continue, Browse and Library. Everything else lives in pop-ups.',C]];
+document.getElementById('grid').innerHTML=opts.map(([t,d,body],i)=>`<div class="opt"><h2>${t}</h2><p>${d}</p><div class="phone" id="ph${i}"><div class="top">←&nbsp; Media</div><div class="scroll">${music}${body}</div>${nav}<div class="sheet"><div class="panel"></div></div></div></div>`).join('');
+document.querySelectorAll('.phone').forEach(ph=>{const sh=ph.querySelector('.sheet'),pa=ph.querySelector('.panel');
+ ph.addEventListener('click',e=>{const b=e.target.closest('[data-pop]');if(b){pa.innerHTML=sheets[b.dataset.pop];sh.classList.add('open');return;}
+ if(e.target.closest('.x')||e.target===sh)sh.classList.remove('open');});});
+</script></body></html>
