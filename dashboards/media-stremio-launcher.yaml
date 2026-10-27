@@ -31,7 +31,10 @@ custom_fields:
       const it = items[0];
       if (!it) return `<div style="font-size:12px;color:var(--secondary-text-color);padding:6px 2px;text-align:left">Nothing in progress</div>`;
       const pct = Math.round(it.progress_percent || 0);
-      const meta = [it.type === 'series' ? 'Series' : 'Movie', pct ? pct + '% watched' : ''].filter(Boolean).join(' · ');
+      const secs = Math.floor((it.time_offset || 0) / 1000);
+      const at = secs >= 30 ? (secs >= 3600 ? `${Math.floor(secs / 3600)}:${String(Math.floor(secs % 3600 / 60)).padStart(2, '0')}` : `${Math.floor(secs / 60)}`) + ':' + String(secs % 60).padStart(2, '0') : '';
+      const ep = it.type === 'series' && it.season && it.episode ? `S${it.season} · E${it.episode}` : (it.type === 'series' ? 'Series' : 'Movie');
+      const meta = [ep, at ? 'stopped at ' + at : (pct ? pct + '% watched' : '')].filter(Boolean).join(' · ');
       const img = it.poster ? `<img src="${it.poster}" style="width:34px;height:51px;border-radius:7px;object-fit:cover;flex:none">`
         : `<div style="width:34px;height:51px;border-radius:7px;background:rgba(var(--rgb-primary-text-color),0.1);flex:none"></div>`;
       return `<div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:14px;background:rgba(var(--rgb-primary-text-color),0.06)">
