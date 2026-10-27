@@ -1,0 +1,531 @@
+badges: []
+dense_section_placement: true
+header: {}
+icon: mdi:account-music
+max_columns: 1
+path: media
+sections:
+  - cards:
+      - config_entry_id: ''
+        active_player_helper_entity: ''
+        rtl: true
+        language: en
+        show_ma_button: false
+        ma_interface_url: /music-assistant
+        ma_interface_target: _self
+        music_assistant_timeout_ms: 12000
+        homeii_engine_mode: required
+        homeii_engine_instance_id: ''
+        homeii_engine_profile_id: ''
+        homeii_engine_timeout_ms: 3500
+        theme_mode: auto
+        show_theme_toggle: true
+        hotel_mode: false
+        performance_profile: full
+        performance_mode: false
+        main_opacity: 0.66
+        popup_opacity: 0.92
+        layout_mode: mobile
+        settings_source: card
+        night_mode: 'off'
+        night_mode_auto_start: '22:00'
+        night_mode_auto_end: '06:00'
+        night_mode_days:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+        mobile_show_up_next: false
+        mobile_custom_color: '#f5a623'
+        mobile_dynamic_theme_mode: auto
+        mobile_background_motion_mode: subtle
+        mobile_custom_text_tone: light
+        mobile_font_scale: 1
+        mobile_icon_scale: 1
+        mobile_compact_mode: true
+        mobile_compact_widget_mode: auto
+        mobile_compact_edge_to_edge: true
+        mobile_edge_to_edge: false
+        mobile_layout_mode: auto
+        mobile_cover_flow: false
+        mobile_queue_flow: true
+        mobile_library_default_layout: list
+        mobile_footer_search_enabled: false
+        mobile_footer_mode: icon
+        action_menu_labels: true
+        player_design: immersive
+        mobile_studio_shortcut: true
+        volume_wheel: true
+        fan_theme: adaptive
+        show_source_badge: true
+        show_quality_badge: true
+        mobile_home_shortcut: false
+        mobile_home_shortcut_path: /
+        mobile_volume_mode: button
+        mobile_volume_step_buttons: false
+        mobile_volume_step_percent: 5
+        mobile_mic_mode: smart
+        voice_assistant_enabled: false
+        voice_assistant_mode: hybrid
+        voice_assistant_agent_id: conversation.claude_conversation
+        voice_assistant_speak_feedback: false
+        flow_assistant_response_timeout_ms: 18000
+        flow_assistant_listen_timeout_ms: 12000
+        flow_assistant_auto_close_ms: 4200
+        mobile_library_tabs:
+          - library_search
+          - library_liked
+          - library_playlists
+          - library_artists
+          - library_albums
+          - library_tracks
+          - library_radio
+          - library_podcasts
+        mobile_main_bar_items:
+          - actions
+          - players
+          - library
+          - settings
+          - home
+        mobile_main_bar_item_1: ''
+        mobile_main_bar_item_2: ''
+        mobile_main_bar_item_3: ''
+        mobile_main_bar_item_4: ''
+        mobile_main_bar_item_5: ''
+        mobile_main_bar_item_6: ''
+        mobile_main_bar_item_7: ''
+        show_empty_quick_shelf: true
+        mobile_quick_actions:
+          - timer
+          - like
+          - lyrics
+          - queue
+          - queue_flow
+          - radio
+          - history
+          - home
+        mobile_quick_action_1: timer
+        mobile_quick_action_2: like
+        mobile_quick_action_3: lyrics
+        mobile_quick_action_4: queue
+        mobile_quick_action_5: queue_flow
+        mobile_quick_action_6: radio
+        mobile_quick_action_7: history
+        mobile_quick_action_8: ''
+        mobile_quick_action_9: ''
+        mobile_quick_action_10: ''
+        mobile_swipe_mode: browse
+        mobile_radio_source_mode: combined
+        mobile_radio_browser_country: all
+        mobile_announcement_presets: []
+        mobile_announcement_volume: 20
+        announcement_tts_entity: ''
+        announcement_tts_language: en-US
+        ambient_light_enabled: false
+        ambient_light_entities: []
+        ambient_light_player_map: []
+        ambient_light_brightness: 35
+        ambient_light_transition: 3
+        ambient_light_cooldown: 8
+        screensaver_enabled: false
+        lrclib_lyrics_enabled: false
+        screensaver_auto_lyrics_when_playing: false
+        screensaver_control_buttons:
+          - previous
+          - next
+        screensaver_clock_mode: digital
+        screensaver_timeout_seconds: 90
+        screensaver_message: ''
+        screensaver_clock_size: 1
+        screensaver_clock_x: 82
+        screensaver_clock_y: 24
+        power_button_enabled: false
+        power_button_name: ''
+        power_button_icon: power
+        power_button_action: stop_player
+        power_button_entity: ''
+        aux_button_2_enabled: false
+        aux_button_2_name: ''
+        aux_button_2_icon: power
+        aux_button_2_action: toggle
+        aux_button_2_entity: ''
+        aux_button_3_enabled: false
+        aux_button_3_name: ''
+        aux_button_3_icon: power
+        aux_button_3_action: toggle
+        aux_button_3_entity: ''
+        aux_button_4_enabled: false
+        aux_button_4_name: ''
+        aux_button_4_icon: power
+        aux_button_4_action: toggle
+        aux_button_4_entity: ''
+        discovery_mode_enabled: true
+        pinned_player_entity: ''
+        pinned_player_entities: []
+        pinned_player_master: media_player.living_room_speaker_2
+        entity_sticky: false
+        pinned_players_exclusive: false
+        excluded_player_entities: []
+        player_sort_mode: default
+        player_order_entities: []
+        player_order_entity_1: ''
+        player_order_entity_2: ''
+        player_order_entity_3: ''
+        player_order_entity_4: ''
+        player_order_entity_5: ''
+        player_order_entity_6: ''
+        player_order_entity_7: ''
+        player_order_entity_8: ''
+        player_order_entity_9: ''
+        player_order_entity_10: ''
+        player_order_entity_11: ''
+        player_order_entity_12: ''
+        player_order_entity_13: ''
+        player_order_entity_14: ''
+        player_order_entity_15: ''
+        player_order_entity_16: ''
+        player_order_entity_17: ''
+        player_order_entity_18: ''
+        player_order_entity_19: ''
+        player_order_entity_20: ''
+        type: custom:homeii-music-flow
+        grid_options:
+          rows: auto
+          columns: full
+      - type: custom:button-card
+        entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
+        show_icon: false
+        show_name: false
+        show_state: false
+        tap_action:
+          action: navigate
+          navigation_path: '#stremio-continue'
+        triggers_update:
+          - sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
+          - sensor.stremio_mathur_sushen_gmail_com_library_count
+        grid_options:
+          columns: full
+        custom_fields:
+          head: |
+            [[[
+              const n = (e) => { const s = states[e]; return s && !isNaN(parseInt(s.state)) ? parseInt(s.state) : 0; };
+              const cw = n('sensor.stremio_mathur_sushen_gmail_com_continue_watching_count');
+              const lib = n('sensor.stremio_mathur_sushen_gmail_com_library_count');
+              return `<div style="display:flex;align-items:center;gap:10px">
+                <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#8a6bff,#5a3fd6);display:grid;place-items:center">
+                  <ha-icon icon="mdi:play" style="--mdc-icon-size:22px;color:#fff"></ha-icon></div>
+                <div style="text-align:left"><div style="font-size:14px;font-weight:700">Stremio</div>
+                  <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:1px">${cw} in progress · ${lib} in library</div></div></div>`;
+            ]]]
+          resume: |
+            [[[
+              const items = (entity && entity.attributes.items) || [];
+              const it = items[0];
+              if (!it) return `<div style="font-size:12px;color:var(--secondary-text-color);padding:6px 2px;text-align:left">Nothing in progress</div>`;
+              const pct = Math.round(it.progress_percent || 0);
+              const secs = Math.floor((it.time_offset || 0) / 1000);
+              const at = secs >= 30 ? (secs >= 3600 ? `${Math.floor(secs / 3600)}:${String(Math.floor(secs % 3600 / 60)).padStart(2, '0')}` : `${Math.floor(secs / 60)}`) + ':' + String(secs % 60).padStart(2, '0') : '';
+              const ep = it.type === 'series' && it.season && it.episode ? `S${it.season} · E${it.episode}` : (it.type === 'series' ? 'Series' : 'Movie');
+              const meta = [ep, at ? 'stopped at ' + at : (pct ? pct + '% watched' : '')].filter(Boolean).join(' · ');
+              const img = it.poster ? `<img src="${it.poster}" style="width:34px;height:51px;border-radius:7px;object-fit:cover;flex:none">`
+                : `<div style="width:34px;height:51px;border-radius:7px;background:rgba(var(--rgb-primary-text-color),0.1);flex:none"></div>`;
+              return `<div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:14px;background:rgba(var(--rgb-primary-text-color),0.06)">
+                ${img}
+                <div style="flex:1;min-width:0;text-align:left">
+                  <div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.title || ''}</div>
+                  <div style="font-size:11px;color:var(--secondary-text-color);margin-top:2px">${meta}</div>
+                  <div style="height:3px;border-radius:2px;background:rgba(var(--rgb-primary-text-color),0.12);margin-top:6px">
+                    <div style="height:3px;border-radius:2px;width:${pct}%;background:#a48bff"></div></div>
+                </div>
+                <div style="width:32px;height:32px;border-radius:50%;background:#7b5bff;display:grid;place-items:center;flex:none">
+                  <ha-icon icon="mdi:play" style="--mdc-icon-size:18px;color:#fff"></ha-icon></div></div>`;
+            ]]]
+          tiles:
+            card:
+              type: grid
+              columns: 3
+              square: false
+              cards:
+                - type: custom:button-card
+                  name: Continue
+                  icon: mdi:play-circle
+                  label: |
+                    [[[ const s = states['sensor.stremio_mathur_sushen_gmail_com_continue_watching_count']; return (s ? s.state : 0) + ' titles'; ]]]
+                  show_label: true
+                  tap_action:
+                    action: navigate
+                    navigation_path: '#stremio-continue'
+                  styles: &stremio_tile
+                    card:
+                      - padding: 12px 6px
+                      - border-radius: 16px
+                      - box-shadow: none
+                      - border: none
+                      - background: rgba(var(--rgb-primary-text-color),0.07)
+                    grid:
+                      - grid-template-areas: '"i" "n" "l"'
+                      - row-gap: 3px
+                    icon:
+                      - width: 22px
+                      - color: var(--primary-text-color)
+                    name:
+                      - font-size: 12.5px
+                      - font-weight: 700
+                    label:
+                      - font-size: 10.5px
+                      - color: var(--secondary-text-color)
+                - type: custom:button-card
+                  name: Browse
+                  icon: mdi:magnify
+                  label: Popular
+                  show_label: true
+                  tap_action:
+                    action: navigate
+                    navigation_path: '#stremio-browse'
+                  styles: *stremio_tile
+                - type: custom:button-card
+                  name: Library
+                  icon: mdi:bookshelf
+                  label: |
+                    [[[ const s = states['sensor.stremio_mathur_sushen_gmail_com_library_count']; return (s ? s.state : 0) + ' saved'; ]]]
+                  show_label: true
+                  tap_action:
+                    action: navigate
+                    navigation_path: '#stremio-library'
+                  styles: *stremio_tile
+        styles:
+          card:
+            - padding: 12px
+            - border-radius: 22px
+            - box-shadow: none
+            - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+            - background: rgba(var(--rgb-primary-text-color),0.045)
+          grid:
+            - grid-template-areas: '"head" "resume" "tiles"'
+            - grid-template-columns: 1fr
+            - row-gap: 12px
+          custom_fields:
+            head:
+              - justify-self: start
+            resume:
+              - justify-self: stretch
+            tiles:
+              - justify-self: stretch
+    type: grid
+  - cards:
+      - type: custom:bubble-card
+        card_type: pop-up
+        hash: '#stremio-continue'
+        name: Continue Watching
+        icon: mdi:play-circle
+        show_header: true
+        button_type: name
+        close_by_clicking_outside: true
+        bg_opacity: 88
+        bg_blur: 14
+        shadow_opacity: 0
+        margin_top_mobile: 60px
+        cards:
+          - type: custom:stremio-continue-watching-card
+            title: Continue Watching
+            entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
+            apple_tv_entity: media_player.media_apple_tv
+            show_copy_button: false
+            open_in_stremio_script: script.media_tv_open_stremio
+            show_filters: true
+            show_title: true
+            show_progress_text: true
+            show_media_type_badge: false
+            show_similar_button: true
+            max_items: 20
+            columns: 3
+            card_height: 0
+            poster_aspect_ratio: 2/3
+            horizontal_scroll: false
+            tap_action: details
+            default_sort: recent
+      - type: custom:bubble-card
+        card_type: pop-up
+        hash: '#stremio-browse'
+        name: Browse Stremio
+        icon: mdi:magnify
+        show_header: true
+        button_type: name
+        close_by_clicking_outside: true
+        bg_opacity: 88
+        bg_blur: 14
+        shadow_opacity: 0
+        margin_top_mobile: 60px
+        cards:
+          - type: custom:stremio-browse-card
+            title: Browse Stremio
+            entity: media_player.stremio_mathur_sushen_gmail_com_stremio
+            apple_tv_entity: media_player.media_apple_tv
+            show_copy_button: false
+            open_in_stremio_script: script.media_tv_open_stremio
+            default_view: popular
+            default_type: movie
+            show_view_controls: true
+            show_type_controls: true
+            show_genre_filter: true
+            show_title: true
+            show_rating: true
+            show_media_type_badge: true
+            show_similar_button: true
+            columns: 3
+            max_items: 50
+            card_height: 0
+            poster_aspect_ratio: 2/3
+            horizontal_scroll: false
+            tap_action: details
+      - type: custom:bubble-card
+        card_type: pop-up
+        hash: '#stremio-library'
+        name: Stremio Library
+        icon: mdi:bookshelf
+        show_header: true
+        button_type: name
+        close_by_clicking_outside: true
+        bg_opacity: 88
+        bg_blur: 14
+        shadow_opacity: 0
+        margin_top_mobile: 60px
+        cards:
+          - type: custom:stremio-library-card
+            title: Stremio Library
+            entity: sensor.stremio_mathur_sushen_gmail_com_library_count
+            apple_tv_entity: media_player.media_apple_tv
+            show_copy_button: false
+            open_in_stremio_script: script.media_tv_open_stremio
+            show_search: true
+            show_filters: true
+            show_title: true
+            show_similar_button: true
+            show_media_type_badge: true
+            max_items: 50
+            columns: 3
+            card_height: 0
+            poster_aspect_ratio: 2/3
+            horizontal_scroll: false
+            tap_action: details
+            default_sort: recent
+    type: grid
+  - cards:
+      - mobile:
+          mode: floating
+          show_labels: true
+          show_popup_label_backgrounds: false
+        routes:
+          - icon: mdi:home-assistant
+            icon_selected: ''
+            label: Home
+            url: /mobile-hub/mobile-hub
+          - hold_action:
+              action: navigate
+              navigation_path: /config/devices/dashboard
+            icon: mdi:webcam
+            label: Cameras
+            url: /mobile-hub/mobile-cameras
+          - icon: mdi:music
+            icon_color: Orange
+            label: Media
+            url: /mobile-hub/media
+          - icon: mdi:home-thermometer
+            icon_color: null
+            label: Climate
+            url: /mobile-hub/hvac-mobile
+          - icon: mdi:devices
+            icon_color: null
+            icon_selected: ''
+            label: Devices
+            url: /mobile-hub/devices-mobile
+          - icon: mdi:dots-horizontal
+            icon_color: null
+            label: More
+            popup:
+              - icon: mdi:cog
+                url: /config/dashboard
+              - icon: mdi:hammer
+                url: /developer-tools/yaml
+              - icon: mdi:power
+                tap_action:
+                  action: call-service
+                  confirmation:
+                    text: Are you sure you want to restart Home Assistant?
+                  service: homeassistant.restart
+                  service_data: {}
+            tap_action:
+              action: open-popup
+        styles: |+
+          .navbar-card.mobile.floating {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 28px !important;
+            box-shadow:
+              0 8px 32px rgba(0, 0, 0, 0.2),
+              inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+          }
+
+          .button.active {
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(8px);
+            border-radius: 25px !important;
+            width: 50px !important;
+            height: 56px !important;
+            min-width: 40px !important;
+            min-height: 56px !important;
+            margin: 0 auto !important;
+          }
+
+          .route {
+            overflow: visible !important;
+          }
+          .icon.active {
+            color: #ffffff;
+          }
+
+          .navbar-popup {
+            background: rgba(20, 20, 20, 0.3) !important;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px !important;
+          }
+
+          .popup-item .button {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(6px);
+
+          }
+
+          .navbar-card.mobile.floating {
+            bottom: 24px !important;
+            margin: 0 16px !important;
+            min-height: 64px !important;
+            padding: 8px 0 !important;
+            overflow: visible !important;
+          }
+
+          .navbar.mobile.floating {
+            bottom: 0 !important;
+          }
+
+          .icon {
+            --navbar-route-icon-size: 22px;
+          }
+
+          .button {
+            min-width: 52px !important;
+            min-height: 52px !important;
+          }
+
+        type: custom:navbar-card
+    type: grid
+subview: true
+title: Media
+type: sections
