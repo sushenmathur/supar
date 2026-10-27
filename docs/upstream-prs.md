@@ -103,3 +103,22 @@ playback to Stremio:
 
 Tests added for the client write, live position, tracker lifecycle and
 percentage fix.
+
+### How this differs from #23
+
+| | #23 | This PR |
+|---|---|---|
+| Progress while watching | One write at handover | Saves VLC's position from the Apple TV on pause, every 60 s and when VLC stops |
+| Handover from the cards | Stream dialog sends only `stream_url`, so the post-handover sync has no `media_id` and doesn't run | Dialog sends `media_id`, `media_type`, `season`, `episode` |
+| Titles not in the library | Skipped ("not found in library") | Stored `removed + temp`, shown in Continue Watching only |
+| Finishing a title | Manual `mark_watched` service | Marked watched automatically past 92 % |
+| Saved resume point | Overwritten at handover | Kept for 5 minutes so the viewer can skip ahead |
+| Resume hint | — | "Last stopped at mm:ss" in the stream dialog |
+| `progress_percent` | Uses `timeOffset`, not capped | Uses `timeOffset`, capped at 100 % |
+
+#23 adds things this PR doesn't: the `set_currently_watching`,
+`update_watch_progress` and `mark_watched` services, and watched/progress
+overlays on the browse, recommendations and library cards. The two fit
+together: this PR could call #23's client methods, or the tracker and dialog
+changes could be folded into #23. #23 is based on 0.5.42, so I kept this PR on
+current `master`; happy to rebase either way.
