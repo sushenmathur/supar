@@ -330,6 +330,9 @@ sections:
         margin_top_mobile: 60px
         cards:
           - type: custom:stremio-continue-watching-card
+            grid_options:
+              columns: full
+              rows: auto
             title: Continue Watching
             entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
             apple_tv_entity: media_player.media_apple_tv
@@ -361,6 +364,9 @@ sections:
         margin_top_mobile: 60px
         cards:
           - type: custom:stremio-browse-card
+            grid_options:
+              columns: full
+              rows: auto
             title: Browse Stremio
             entity: media_player.stremio_mathur_sushen_gmail_com_stremio
             apple_tv_entity: media_player.media_apple_tv
@@ -395,6 +401,9 @@ sections:
         margin_top_mobile: 60px
         cards:
           - type: custom:stremio-library-card
+            grid_options:
+              columns: full
+              rows: auto
             title: Stremio Library
             entity: sensor.stremio_mathur_sushen_gmail_com_library_count
             apple_tv_entity: media_player.media_apple_tv
@@ -429,7 +438,7 @@ sections:
             icon: mdi:webcam
             label: Cameras
             url: /mobile-hub/mobile-cameras
-          - icon: mdi:music
+          - icon: mdi:multimedia
             icon_color: Orange
             label: Media
             url: /mobile-hub/media

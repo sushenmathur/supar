@@ -1853,7 +1853,7 @@ sections:
       icon: mdi:webcam
       label: Cameras
       url: /mobile-hub/mobile-cameras
-    - icon: mdi:music
+    - icon: mdi:multimedia
       label: Media
       url: /mobile-hub/media
     - icon: mdi:home-thermometer

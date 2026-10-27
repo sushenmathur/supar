@@ -1022,7 +1022,7 @@ sections:
             icon_color: null
             label: Cameras
             url: /mobile-hub/mobile-cameras
-          - icon: mdi:music
+          - icon: mdi:multimedia
             icon_color: null
             label: Media
             url: /mobile-hub/media
