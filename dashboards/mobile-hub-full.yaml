@@ -959,7 +959,37 @@ views:
                 icon: |
                   [[[ const s = states['input_boolean.quiet_hour']; return s && s.state === 'on' ? 'mdi:bell-off' : 'mdi:bell-outline'; ]]]
                 tap_action:
-                  action: toggle
+                  action: javascript
+                  javascript: |
+                    [[[
+                      const id = 'input_boolean.quiet_hour';
+                      const s = states[id];
+                      if (s && s.state === 'on') {
+                        hass.callService('input_boolean', 'turn_off', { entity_id: id });
+                        return;
+                      }
+                      this.dispatchEvent(new CustomEvent('ll-custom', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                          browser_mod: {
+                            service: 'browser_mod.popup',
+                            data: {
+                              title: 'Turn on quiet hour?',
+                              icon: 'mdi:bell-off',
+                              content: 'All speaker announcements will be suppressed while quiet hour is on.',
+                              dismissable: true,
+                              left_button: 'Cancel',
+                              right_button: 'OK',
+                              right_button_action: {
+                                service: 'input_boolean.turn_on',
+                                data: { entity_id: id },
+                              },
+                            },
+                          },
+                        },
+                      }));
+                    ]]]
                 hold_action:
                   action: more-info
                 styles:
