@@ -317,6 +317,131 @@ button_card_templates:
           - justify-self: center
         ko:
           - justify-self: center
+  qh_tile:
+    show_icon: true
+    show_name: true
+    show_label: true
+    show_state: false
+    styles:
+      card:
+        - height: 150px
+        - border-radius: 24px
+        - padding: 18px
+        - background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34))
+        - border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70))
+        - box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90))
+      grid:
+        - grid-template-areas: '"i" "n" "l"'
+        - grid-template-rows: 1fr min-content min-content
+        - grid-template-columns: 1fr
+      icon:
+        - width: 34px
+        - justify-self: start
+        - align-self: start
+        - color: var(--primary-text-color)
+      name:
+        - justify-self: start
+        - font-size: 18px
+        - font-weight: 700
+        - color: var(--primary-text-color)
+      label:
+        - justify-self: start
+        - text-align: left
+        - font-size: 13px
+        - margin-top: 2px
+        - white-space: normal
+        - color: var(--secondary-text-color)
+  qh_announce:
+    template: qh_tile
+    icon: mdi:bullhorn
+    name: Announce
+    label: Speak a message on the speakers
+    styles:
+      card:
+        - background: linear-gradient(135deg, #7dd3fc, #818cf8)
+        - border-color: rgba(255, 255, 255, 0.5)
+      icon:
+        - color: '#0b1020'
+      name:
+        - color: '#0b1020'
+      label:
+        - color: rgba(11, 16, 32, 0.65)
+  qh_quiet_off:
+    template: qh_tile
+    icon: mdi:weather-night
+    name: Quiet hour
+    label: Off · tap to mute announcements
+    tap_action:
+      action: perform-action
+      perform_action: browser_mod.popup
+      data:
+        style: |
+          color-scheme: light dark;
+          --ha-dialog-surface-background: light-dark(rgba(236, 242, 255, 0.62), rgba(30, 38, 78, 0.66));
+          --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+          --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45), rgba(0, 0, 0, 0.6));
+          --primary-text-color: light-dark(#14203a, #ffffff);
+          --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255, 255, 255, 0.68));
+          --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255, 255, 0.18));
+        title: Turn on quiet hour?
+        icon: mdi:alert
+        dismissable: true
+        content: All automated speaker announcements will be suppressed while quiet hour is on.
+        left_button: Cancel
+        right_button: OK
+        right_button_action:
+          service: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.quiet_hour
+  qh_quiet_on:
+    template: qh_tile
+    icon: mdi:bell-off
+    name: Quiet hour
+    label: On · announcements muted. Tap to turn off
+    tap_action:
+      action: perform-action
+      perform_action: browser_mod.sequence
+      data:
+        sequence:
+          - service: input_boolean.turn_off
+            data:
+              entity_id: input_boolean.quiet_hour
+          - service: browser_mod.close_popup
+    styles:
+      card:
+        - background: linear-gradient(145deg, rgba(245, 158, 11, 0.40), rgba(217, 119, 6, 0.22))
+        - border-color: '#f59e0b'
+      icon:
+        - color: '#f59e0b'
+  qh_banner:
+    show_icon: true
+    show_state: false
+    icon: mdi:bell-off
+    name: Quiet hour is on. Automated announcements are suppressed.
+    tap_action:
+      action: none
+    styles:
+      card:
+        - height: 54px
+        - border-radius: 18px
+        - padding: 0 14px
+        - background: rgba(245, 158, 11, 0.20)
+        - border: 1px solid #f59e0b
+        - box-shadow: none
+      grid:
+        - grid-template-areas: '"i n"'
+        - grid-template-columns: 28px 1fr
+        - column-gap: 10px
+      icon:
+        - width: 22px
+        - color: '#f59e0b'
+      name:
+        - justify-self: start
+        - text-align: left
+        - font-size: 13px
+        - font-weight: 600
+        - white-space: normal
+        - color: var(--primary-text-color)
   ticker:
     extra_styles: >
       .mq {
@@ -972,6 +1097,9 @@ views:
               - condition: or
                 conditions:
                   - condition: state
+                    entity: input_boolean.quiet_hour
+                    state: 'on'
+                  - condition: state
                     entity: binary_sensor.garage_door_sensor_contact
                     state: 'on'
                   - condition: state
@@ -1041,6 +1169,7 @@ views:
                 - sun.sun
                 - sensor.time
                 - sensor.side_battery
+                - input_boolean.quiet_hour
               tap_action:
                 action: navigate
                 navigation_path: /dashboard-hub/security
@@ -1048,6 +1177,16 @@ views:
                 @keyframes alert-pulse {
                   0%, 100% { box-shadow: 0 0 24px rgba(244,63,94,.45), inset 0 1px 0 rgba(255,255,255,.5); }
                   50% { box-shadow: 0 0 56px rgba(244,63,94,.85), inset 0 1px 0 rgba(255,255,255,.5); }
+                }
+
+                @keyframes quiet-glow {
+                  0%, 100% { box-shadow: 0 0 14px rgba(245,158,11,.18), inset 0 1px 0 rgba(255,255,255,.5); }
+                  50% { box-shadow: 0 0 30px rgba(245,158,11,.38), inset 0 1px 0 rgba(255,255,255,.5); }
+                }
+
+                @keyframes quiet-breathe {
+                  0%, 100% { opacity: .55; transform: scale(1); }
+                  50% { opacity: 1; transform: scale(1.07); }
                 }
 
                 @media (prefers-reduced-motion: reduce) { * { animation: none
@@ -1091,6 +1230,9 @@ views:
                       if (!isNaN(bat) && bat < 20)
                         list.push({ p: 3, id: 'sensor.side_battery', msg: 'Side camera battery low', icon: 'mdi:battery-20' });
                     }
+                    // Quiet hour is informational: it sits below every real alert and is never snoozed.
+                    if (on('input_boolean.quiet_hour'))
+                      list.push({ p: 4, quiet: true, id: 'input_boolean.quiet_hour', msg: 'Quiet hour on', icon: 'mdi:bell-off' });
                     return list.sort((a, b) => a.p - b.p);
                   ]]]
               custom_fields:
@@ -1102,10 +1244,11 @@ views:
                     const since = new Date(states[top.id].last_changed).getTime();
                     const mins = Math.max(0, Math.round((Date.now() - since) / 60000));
                     const dur = mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${mins % 60} min`;
-                    const more = list.slice(1).map(a => a.msg.replace(/ open$/, '')).join(' · ');
-                    const sub = (more ? `${dur} · Also: ${more}` : `For ${dur}`);
+                    const more = list.slice(1).filter(a => !a.quiet).map(a => a.msg.replace(/ open$/, '')).join(' · ');
+                    const quiet = top.quiet === true;
+                    const sub = quiet ? `${dur} · Automated announcements suppressed${more ? ' · Also: ' + more : ''}` : (more ? `${dur} · Also: ${more}` : `For ${dur}`);
                     return `<div style="display:flex;align-items:center;gap:18px;text-align:left;color:#fff">
-                      <div style="width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.22);display:grid;place-items:center;flex:none">
+                      <div style="width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.22);display:grid;place-items:center;flex:none;${quiet ? 'animation:quiet-breathe 4s ease-in-out infinite' : ''}">
                         <ha-icon icon="${top.icon}" style="--mdc-icon-size:30px;display:block;width:30px;height:30px"></ha-icon></div>
                       <div style="min-width:0">
                         <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;white-space:nowrap">${top.msg}</div>
@@ -1226,6 +1369,34 @@ views:
                         - font-size: 14px
                         - box-shadow: none
                         - border: 1px solid rgba(255,255,255,.55)
+                quietoff:
+                  card:
+                    type: custom:button-card
+                    entity: input_boolean.quiet_hour
+                    name: End quiet hour
+                    show_icon: false
+                    show_state: false
+                    triggers_update:
+                      - input_boolean.quiet_hour
+                    tap_action:
+                      action: perform-action
+                      perform_action: input_boolean.turn_off
+                      target:
+                        entity_id: input_boolean.quiet_hour
+                    styles:
+                      card:
+                        - display: >-
+                            [[[ return states['input_boolean.quiet_hour']?.state
+                            === 'on' ? 'flex' : 'none'; ]]]
+                        - margin-left: 10px
+                        - background: rgba(255,255,255,.22)
+                        - color: '#fff'
+                        - border-radius: 18px
+                        - padding: 12px 20px
+                        - font-weight: 700
+                        - font-size: 14px
+                        - box-shadow: none
+                        - border: 1px solid rgba(255,255,255,.55)
                 snooze:
                   card:
                     type: custom:button-card
@@ -1274,17 +1445,21 @@ views:
                   - background: |
                       [[[
                         const p = variables.alerts[0]?.p || 3;
-                        return p === 1 ? 'var(--glass-alert-high, linear-gradient(135deg, rgba(244,63,94,0.92), rgba(190,18,60,0.88)))'
+                        return p === 4 ? 'var(--glass-alert-mid, linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.88)))'
+                          : p === 1 ? 'var(--glass-alert-high, linear-gradient(135deg, rgba(244,63,94,0.92), rgba(190,18,60,0.88)))'
                           : p === 2 ? 'var(--glass-alert-mid, linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.88)))'
                           : 'var(--glass-alert-low, linear-gradient(135deg, rgba(71,85,105,0.92), rgba(51,65,85,0.90)))';
                       ]]]
                   - border: 1px solid rgba(255,255,255,.45)
-                  - animation: >-
-                      [[[ return (variables.alerts[0]?.p || 3) === 1 ?
-                      'alert-pulse 2.4s ease-in-out infinite' : 'none'; ]]]
+                  - animation: |
+                      [[[
+                        const p = variables.alerts[0]?.p || 3;
+                        return p === 1 ? 'alert-pulse 2.4s ease-in-out infinite'
+                          : p === 4 ? 'quiet-glow 5s ease-in-out infinite' : 'none';
+                      ]]]
                 grid:
-                  - grid-template-areas: '"body close keepgarage keepside snooze"'
-                  - grid-template-columns: 1fr auto auto auto auto
+                  - grid-template-areas: '"body close keepgarage keepside snooze quietoff"'
+                  - grid-template-columns: 1fr auto auto auto auto auto
                   - column-gap: 0
                   - align-items: center
                 custom_fields:
@@ -1297,6 +1472,8 @@ views:
                   keepside:
                     - justify-self: end
                   snooze:
+                    - justify-self: end
+                  quietoff:
                     - justify-self: end
           - type: horizontal-stack
             grid_options:
@@ -1636,150 +1813,206 @@ views:
                       target:
                         entity_id: scene.good_night
                   - type: custom:button-card
-                    entity: script.say_tts_message
-                    icon: mdi:bullhorn
-                    name: Announce
+                    entity: input_boolean.quiet_hour
+                    icon: '[[[ return entity.state === "on" ? "mdi:bell-off" : "mdi:bullhorn"; ]]]'
+                    name: '[[[ return entity.state === "on" ? "Quiet" : "Announce"; ]]]'
                     template: glass_action
+                    triggers_update:
+                      - input_boolean.quiet_hour
+                    styles:
+                      card:
+                        - background: |
+                            [[[ return entity.state === 'on' ? 'linear-gradient(145deg, rgba(245,158,11,0.40), rgba(217,119,6,0.22))' : 'var(--glass-bg-soft)'; ]]]
+                        - border-color: |
+                            [[[ return entity.state === 'on' ? '#f59e0b' : 'var(--glass-border)'; ]]]
+                      icon:
+                        - color: |
+                            [[[ return entity.state === 'on' ? '#f59e0b' : 'var(--primary-text-color)'; ]]]
                     tap_action:
                       action: fire-dom-event
                       browser_mod:
-                        service: browser_mod.sequence
+                        service: browser_mod.popup
                         data:
-                          sequence:
-                            - service: input_text.set_value
-                              data:
-                                entity_id: input_text.announce_message
-                                value: ''
-                            - service: browser_mod.popup
-                              data:
-                                style: |
-                                  color-scheme: light dark;
-                                  --ha-dialog-surface-background: light-dark(rgba(236, 242, 255, 0.62), rgba(30, 38, 78, 0.66));
-                                  --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-                                  --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45), rgba(0, 0, 0, 0.6));
-                                  --primary-text-color: light-dark(#14203a, #ffffff);
-                                  --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255, 255, 255, 0.68));
-                                  --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255, 255, 0.18));
-                                title: Announce
-                                icon: mdi:bullhorn
-                                dismissable: true
-                                size: normal
-                                content:
-                                  type: vertical-stack
-                                  cards:
-                                    - type: heading
-                                      heading: Speakers
-                                      heading_style: subtitle
-                                      icon: mdi:speaker
-                                    - type: entities
-                                      show_header_toggle: false
-                                      entities:
-                                        - entity: input_select.announce_speaker
-                                          name: " "
-                                          icon: mdi:speaker-multiple
-                                      card_mod:
-                                        style: >-
-                                          ha-card { background:
-                                          var(--glass-chip-blue,
-                                          linear-gradient(145deg,
-                                          rgba(125,211,252,0.30),
-                                          rgba(167,139,250,0.24))); border: 1px
-                                          solid var(--glass-popup-border,
-                                          rgba(255,255,255,0.80)); box-shadow:
-                                          inset 0 1px 0 var(--glass-hi);
-                                          backdrop-filter: blur(18px)
-                                          saturate(180%); }
-                                    - type: heading
-                                      heading: Message
-                                      heading_style: subtitle
-                                      icon: mdi:message-text
-                                    - type: entities
-                                      show_header_toggle: false
-                                      entities:
-                                        - entity: input_text.announce_message
-                                          name: " "
-                                      card_mod:
-                                        style: >-
-                                          ha-card { background:
-                                          var(--glass-chip-blue,
-                                          linear-gradient(145deg,
-                                          rgba(125,211,252,0.30),
-                                          rgba(167,139,250,0.24))); border: 1px
-                                          solid var(--glass-popup-border,
-                                          rgba(255,255,255,0.80)); box-shadow:
-                                          inset 0 1px 0 var(--glass-hi);
-                                          backdrop-filter: blur(18px)
-                                          saturate(180%); }
-                                    - type: heading
-                                      heading: Volume
-                                      heading_style: subtitle
-                                      icon: mdi:volume-high
-                                    - type: entities
-                                      show_header_toggle: false
-                                      entities:
-                                        - entity: input_number.announce_volume
-                                          name: " "
-                                      card_mod:
-                                        style: >-
-                                          ha-card { background:
-                                          var(--glass-chip-blue,
-                                          linear-gradient(145deg,
-                                          rgba(125,211,252,0.30),
-                                          rgba(167,139,250,0.24))); border: 1px
-                                          solid var(--glass-popup-border,
-                                          rgba(255,255,255,0.80)); box-shadow:
-                                          inset 0 1px 0 var(--glass-hi);
-                                          backdrop-filter: blur(18px)
-                                          saturate(180%); }
-                                    - type: horizontal-stack
-                                      cards:
-                                        - type: custom:button-card
-                                          name: Cancel
-                                          tap_action:
-                                            action: perform-action
-                                            perform_action: browser_mod.close_popup
-                                          styles:
-                                            card:
-                                              - height: 54px
-                                              - border-radius: 20px
-                                              - background: >-
-                                                  var(--glass-chip-blue,
-                                                  linear-gradient(145deg,
-                                                  rgba(125,211,252,0.30),
-                                                  rgba(167,139,250,0.24)))
-                                              - border: >-
-                                                  1px solid var(--glass-popup-border,
-                                                  rgba(255,255,255,0.80))
-                                              - backdrop-filter: blur(18px)
-                                            name:
-                                              - font-weight: 700
-                                          show_icon: false
-                                        - type: custom:button-card
-                                          name: Announce
-                                          tap_action:
-                                            action: perform-action
-                                            perform_action: browser_mod.sequence
-                                            data:
-                                              sequence:
-                                                - service: script.announce_from_helpers
-                                                - service: browser_mod.close_popup
-                                          styles:
-                                            card:
-                                              - height: 54px
-                                              - border-radius: 20px
-                                              - background: >-
-                                                  var(--glass-accent,
-                                                  linear-gradient(135deg, #7dd3fc,
-                                                  #818cf8))
-                                              - border: >-
-                                                  1px solid var(--glass-popup-border,
-                                                  rgba(255,255,255,0.80))
-                                              - backdrop-filter: blur(18px)
-                                            name:
-                                              - font-weight: 700
-                                            icon:
-                                              - width: 20px
+                          style: |
+                            color-scheme: light dark;
+                            --ha-dialog-surface-background: light-dark(rgba(236, 242, 255, 0.62), rgba(30, 38, 78, 0.66));
+                            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45), rgba(0, 0, 0, 0.6));
+                            --primary-text-color: light-dark(#14203a, #ffffff);
+                            --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255, 255, 255, 0.68));
+                            --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255, 255, 0.18));
+                          title: Announce
+                          icon: mdi:bullhorn
+                          dismissable: true
+                          size: normal
+                          content:
+                            type: horizontal-stack
+                            cards:
+                              - type: custom:button-card
+                                template: qh_announce
+                                tap_action:
+                                  action: perform-action
+                                  perform_action: browser_mod.sequence
+                                  data:
+                                    sequence:
+                                      - service: input_text.set_value
+                                        data:
+                                          entity_id: input_text.announce_message
+                                          value: ''
+                                      - service: browser_mod.popup
+                                        data:
+                                          style: |
+                                            color-scheme: light dark;
+                                            --ha-dialog-surface-background: light-dark(rgba(236, 242, 255, 0.62), rgba(30, 38, 78, 0.66));
+                                            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+                                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45), rgba(0, 0, 0, 0.6));
+                                            --primary-text-color: light-dark(#14203a, #ffffff);
+                                            --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255, 255, 255, 0.68));
+                                            --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255, 255, 0.18));
+                                          title: Announce
                                           icon: mdi:bullhorn
+                                          dismissable: true
+                                          size: normal
+                                          content:
+                                            type: vertical-stack
+                                            cards:
+                                              - type: conditional
+                                                conditions:
+                                                  - condition: state
+                                                    entity: input_boolean.quiet_hour
+                                                    state: 'on'
+                                                card:
+                                                  type: custom:button-card
+                                                  template: qh_banner
+                                              - type: heading
+                                                heading: Speakers
+                                                heading_style: subtitle
+                                                icon: mdi:speaker
+                                              - type: entities
+                                                show_header_toggle: false
+                                                entities:
+                                                  - entity: input_select.announce_speaker
+                                                    name: " "
+                                                    icon: mdi:speaker-multiple
+                                                card_mod:
+                                                  style: >-
+                                                    ha-card { background:
+                                                    var(--glass-chip-blue,
+                                                    linear-gradient(145deg,
+                                                    rgba(125,211,252,0.30),
+                                                    rgba(167,139,250,0.24))); border: 1px
+                                                    solid var(--glass-popup-border,
+                                                    rgba(255,255,255,0.80)); box-shadow:
+                                                    inset 0 1px 0 var(--glass-hi);
+                                                    backdrop-filter: blur(18px)
+                                                    saturate(180%); }
+                                              - type: heading
+                                                heading: Message
+                                                heading_style: subtitle
+                                                icon: mdi:message-text
+                                              - type: entities
+                                                show_header_toggle: false
+                                                entities:
+                                                  - entity: input_text.announce_message
+                                                    name: " "
+                                                card_mod:
+                                                  style: >-
+                                                    ha-card { background:
+                                                    var(--glass-chip-blue,
+                                                    linear-gradient(145deg,
+                                                    rgba(125,211,252,0.30),
+                                                    rgba(167,139,250,0.24))); border: 1px
+                                                    solid var(--glass-popup-border,
+                                                    rgba(255,255,255,0.80)); box-shadow:
+                                                    inset 0 1px 0 var(--glass-hi);
+                                                    backdrop-filter: blur(18px)
+                                                    saturate(180%); }
+                                              - type: heading
+                                                heading: Volume
+                                                heading_style: subtitle
+                                                icon: mdi:volume-high
+                                              - type: entities
+                                                show_header_toggle: false
+                                                entities:
+                                                  - entity: input_number.announce_volume
+                                                    name: " "
+                                                card_mod:
+                                                  style: >-
+                                                    ha-card { background:
+                                                    var(--glass-chip-blue,
+                                                    linear-gradient(145deg,
+                                                    rgba(125,211,252,0.30),
+                                                    rgba(167,139,250,0.24))); border: 1px
+                                                    solid var(--glass-popup-border,
+                                                    rgba(255,255,255,0.80)); box-shadow:
+                                                    inset 0 1px 0 var(--glass-hi);
+                                                    backdrop-filter: blur(18px)
+                                                    saturate(180%); }
+                                              - type: horizontal-stack
+                                                cards:
+                                                  - type: custom:button-card
+                                                    name: Cancel
+                                                    tap_action:
+                                                      action: perform-action
+                                                      perform_action: browser_mod.close_popup
+                                                    styles:
+                                                      card:
+                                                        - height: 54px
+                                                        - border-radius: 20px
+                                                        - background: >-
+                                                            var(--glass-chip-blue,
+                                                            linear-gradient(145deg,
+                                                            rgba(125,211,252,0.30),
+                                                            rgba(167,139,250,0.24)))
+                                                        - border: >-
+                                                            1px solid var(--glass-popup-border,
+                                                            rgba(255,255,255,0.80))
+                                                        - backdrop-filter: blur(18px)
+                                                      name:
+                                                        - font-weight: 700
+                                                    show_icon: false
+                                                  - type: custom:button-card
+                                                    name: Announce
+                                                    tap_action:
+                                                      action: perform-action
+                                                      perform_action: browser_mod.sequence
+                                                      data:
+                                                        sequence:
+                                                          - service: script.announce_from_helpers
+                                                          - service: browser_mod.close_popup
+                                                    styles:
+                                                      card:
+                                                        - height: 54px
+                                                        - border-radius: 20px
+                                                        - background: >-
+                                                            var(--glass-accent,
+                                                            linear-gradient(135deg, #7dd3fc,
+                                                            #818cf8))
+                                                        - border: >-
+                                                            1px solid var(--glass-popup-border,
+                                                            rgba(255,255,255,0.80))
+                                                        - backdrop-filter: blur(18px)
+                                                      name:
+                                                        - font-weight: 700
+                                                      icon:
+                                                        - width: 20px
+                                                    icon: mdi:bullhorn
+                              - type: conditional
+                                conditions:
+                                  - condition: state
+                                    entity: input_boolean.quiet_hour
+                                    state: 'off'
+                                card:
+                                  type: custom:button-card
+                                  template: qh_quiet_off
+                              - type: conditional
+                                conditions:
+                                  - condition: state
+                                    entity: input_boolean.quiet_hour
+                                    state: 'on'
+                                card:
+                                  type: custom:button-card
+                                  template: qh_quiet_on
                   - type: custom:button-card
                     entity: script.lost_phone
                     icon: mdi:cellphone-arrow-down
