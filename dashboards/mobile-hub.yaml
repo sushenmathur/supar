@@ -709,6 +709,29 @@ button_card_templates:
         - background: '#ff9a56'
         icon:
         - color: '#1d1002'
+  b_sec:
+    show_name: true
+    show_state: false
+    hold_action:
+      action: more-info
+    styles:
+      card:
+      - padding: 7px 2px
+      - border-radius: 12px
+      - box-shadow: none
+      - border: none
+      - background: rgba(var(--rgb-primary-text-color),0.07)
+      grid:
+      - grid-template-areas: '"i" "n"'
+      - grid-template-rows: 20px min-content
+      - row-gap: 3px
+      icon:
+      - width: 18px
+      - color: var(--primary-text-color)
+      name:
+      - font-size: 9.5px
+      - font-weight: '600'
+      - color: var(--secondary-text-color)
   b_act:
     show_name: true
     show_state: false
@@ -1080,22 +1103,66 @@ views:
             custom_fields:
               body: |-
                 [[[
-                  const g = states['cover.garage_door_v2'], f = states['input_boolean.front_door'], a = states['alarm_control_panel.home_alarm'];
-                  const gOpen = g && g.state !== 'closed';
-                  const fOpen = f && f.state === 'on';
-                  const armed = a && !['disarmed', 'unavailable'].includes(a.state);
-                  const head = gOpen ? ['Garage open', 'var(--red-color)'] : fOpen ? ['Door unlocked', 'var(--red-color)'] : ['All locked', 'var(--primary-text-color)'];
-                  const tile = (i, t, bad, good) => `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:12px;
-                      background:${bad ? 'color-mix(in srgb, var(--red-color) 18%, transparent)' : good ? 'rgba(48, 209, 88, 0.9)' : 'rgba(var(--rgb-primary-text-color),0.07)'};
-                      font-size:9.5px;font-weight:600;color:${good ? '#04210d' : 'var(--secondary-text-color)'}">
-                      <ha-icon icon="${i}" style="--mdc-icon-size:18px;color:${bad ? 'var(--red-color)' : good ? '#04210d' : 'var(--primary-text-color)'}"></ha-icon>${t}</div>`;
-                  return `<div style="font-size:17px;font-weight:700;margin-top:6px;color:${head[1]}">${head[0]}</div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px">
-                      ${tile(gOpen ? 'mdi:garage-open-variant' : 'mdi:garage-variant', 'Garage', gOpen)}
-                      ${tile(fOpen ? 'mdi:lock-open-variant' : 'mdi:lock', 'Front', fOpen)}
-                      ${tile('mdi:shield-home', armed ? 'Armed' : 'Alarm', false, armed)}
-                    </div>`;
+                  const g = states['cover.garage_door_v2'], f = states['input_boolean.front_door'];
+                  const head = g && g.state !== 'closed' ? ['Garage open', 'var(--red-color)'] : f && f.state === 'on' ? ['Door unlocked', 'var(--red-color)'] : ['All locked', 'var(--primary-text-color)'];
+                  return `<div style="font-size:17px;font-weight:700;margin-top:6px;color:${head[1]}">${head[0]}</div>`;
                 ]]]
+              tiles:
+                card:
+                  type: horizontal-stack
+                  cards:
+                  - type: custom:button-card
+                    template: b_sec
+                    entity: cover.garage_door_v2
+                    name: Garage
+                    tap_action:
+                      action: toggle
+                    icon: |-
+                      [[[ const s = states['cover.garage_door_v2']; return s && s.state !== 'closed' ? 'mdi:garage-open-variant' : 'mdi:garage-variant'; ]]]
+                    styles:
+                      card:
+                      - background: |-
+                          [[[ const s = states['cover.garage_door_v2']; return s && s.state !== 'closed' ? 'color-mix(in srgb, var(--red-color) 18%, transparent)' : 'rgba(var(--rgb-primary-text-color),0.07)'; ]]]
+                      icon:
+                      - color: |-
+                          [[[ const s = states['cover.garage_door_v2']; return s && s.state !== 'closed' ? 'var(--red-color)' : 'var(--primary-text-color)'; ]]]
+                  - type: custom:button-card
+                    template: b_sec
+                    entity: input_boolean.front_door
+                    name: Front
+                    tap_action:
+                      action: toggle
+                    icon: |-
+                      [[[ const s = states['input_boolean.front_door']; return s && s.state === 'on' ? 'mdi:lock-open-variant' : 'mdi:lock'; ]]]
+                    styles:
+                      card:
+                      - background: |-
+                          [[[ const s = states['input_boolean.front_door']; return s && s.state === 'on' ? 'color-mix(in srgb, var(--red-color) 18%, transparent)' : 'rgba(var(--rgb-primary-text-color),0.07)'; ]]]
+                      icon:
+                      - color: |-
+                          [[[ const s = states['input_boolean.front_door']; return s && s.state === 'on' ? 'var(--red-color)' : 'var(--primary-text-color)'; ]]]
+                  - type: custom:button-card
+                    template: b_sec
+                    entity: alarm_control_panel.home_alarm
+                    icon: mdi:shield-home
+                    name: |-
+                      [[[ const a = states['alarm_control_panel.home_alarm']; return a && !['disarmed', 'unavailable'].includes(a.state) ? 'Armed' : 'Alarm'; ]]]
+                    tap_action:
+                      action: more-info
+                    styles:
+                      card:
+                      - background: |-
+                          [[[ const a = states['alarm_control_panel.home_alarm']; return a && !['disarmed', 'unavailable'].includes(a.state) ? 'rgba(48, 209, 88, 0.9)' : 'rgba(var(--rgb-primary-text-color),0.07)'; ]]]
+                      icon:
+                      - color: |-
+                          [[[ const a = states['alarm_control_panel.home_alarm']; return a && !['disarmed', 'unavailable'].includes(a.state) ? '#04210d' : 'var(--primary-text-color)'; ]]]
+                      name:
+                      - color: |-
+                          [[[ const a = states['alarm_control_panel.home_alarm']; return a && !['disarmed', 'unavailable'].includes(a.state) ? '#04210d' : 'var(--secondary-text-color)'; ]]]
+            styles:
+              grid:
+              - grid-template-areas: '"lbl" "body" "tiles"'
+              - grid-template-rows: min-content 1fr min-content
           - type: custom:button-card
             template: b_bento
             variables:
