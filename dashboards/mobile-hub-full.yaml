@@ -1075,11 +1075,25 @@ views:
                   .filter(a => states[a] && !['off', 'unavailable'].includes(states[a].state)).length;
                 return `<div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px">${w.temperature ?? '–'}°</div>
                   <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">${pretty}<br>feels ${feels}° · ${w.humidity ?? '–'}%</div>
-                  <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--secondary-text-color);margin-top:18px">
-                    <ha-icon icon="mdi:home-thermometer" style="--mdc-icon-size:15px"></ha-icon>Inside</div>
+                  <div style="margin-top:18px"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--secondary-text-color)">
+                    <ha-icon icon="mdi:home-thermometer" style="--mdc-icon-size:15px;width:15px;height:15px;color:#ff9a56"></ha-icon>Inside</span></div>
                   <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px;font-size:24px">${inside}°</div>
                   <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:4px;line-height:1.35">4 rooms · ${run ? run + ' AC on' : 'ACs off'}</div>`;
               ]]]
+            wx: |-
+              [[[
+                const c = states['weather.north_lakes_weather'] ? states['weather.north_lakes_weather'].state : '';
+                const map = { 'clear-night': 'night', cloudy: 'cloudy', exceptional: 'cloudy-alert', fog: 'fog', hail: 'hail',
+                  lightning: 'lightning', 'lightning-rainy': 'lightning-rainy', partlycloudy: 'partly-cloudy', pouring: 'pouring',
+                  rainy: 'rainy', snowy: 'snowy', 'snowy-rainy': 'snowy-rainy', sunny: 'sunny', windy: 'windy', 'windy-variant': 'windy-variant' };
+                return `<ha-icon icon="mdi:weather-${map[c] || 'partly-cloudy'}" style="--mdc-icon-size:44px;width:44px;height:44px;color:#ffc53d"></ha-icon>`;
+              ]]]
+          styles:
+            custom_fields:
+              wx:
+              - position: absolute
+              - top: 40px
+              - right: 16px
         - type: vertical-stack
           cards:
           - type: custom:button-card
