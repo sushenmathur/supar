@@ -1,0 +1,110 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Announce + Quiet hour</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+:root{--t:#14203a;--s:rgba(20,32,58,.62);--bg:linear-gradient(145deg,rgba(255,255,255,.62),rgba(255,255,255,.26));--soft:rgba(255,255,255,.42);--bd:rgba(255,255,255,.8);--hi:rgba(255,255,255,.95);--sh:0 14px 32px rgba(50,60,120,.2);--pop:rgba(236,242,255,.66);--scrim:rgba(15,20,50,.42);--sheetbg:rgba(247,249,255,.94);--field:rgba(255,255,255,.55);--amb:#b45309;--ambbg:rgba(245,158,11,.22);--ok:#15803d;
+ --wall:radial-gradient(900px 640px at 6% 8%,rgba(255,150,130,.8),transparent 62%),radial-gradient(820px 600px at 60% 12%,rgba(90,200,250,.75),transparent 62%),radial-gradient(760px 620px at 98% 70%,rgba(179,136,255,.75),transparent 62%),radial-gradient(700px 520px at 12% 98%,rgba(255,211,110,.7),transparent 62%),#eef3ff}
+body.dark{--t:#fff;--s:rgba(255,255,255,.68);--bg:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.04));--soft:rgba(255,255,255,.1);--bd:rgba(255,255,255,.24);--hi:rgba(255,255,255,.4);--sh:0 18px 40px rgba(0,0,0,.42);--pop:rgba(30,38,78,.7);--scrim:rgba(0,0,0,.6);--sheetbg:rgba(24,30,64,.97);--field:rgba(255,255,255,.12);--amb:#fbbf24;--ambbg:rgba(251,191,36,.2);--ok:#6ee7b7;
+ --wall:radial-gradient(900px 640px at 6% 8%,rgba(91,61,245,.55),transparent 62%),radial-gradient(820px 600px at 60% 12%,rgba(10,167,160,.45),transparent 62%),radial-gradient(760px 620px at 98% 70%,rgba(192,38,211,.45),transparent 62%),radial-gradient(700px 520px at 12% 98%,rgba(30,64,175,.5),transparent 62%),linear-gradient(160deg,#080d1e,#0f1730 55%,#0a1a26)}
+body{font-family:Poppins,Inter,system-ui,sans-serif;color:var(--t);background:var(--wall);min-height:100vh;overflow:hidden;position:relative}
+svg{width:1em;height:1em;fill:currentColor;vertical-align:-.14em}
+.bar{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:50;padding:6px;border-radius:99px;background:var(--bg);border:1px solid var(--bd);backdrop-filter:blur(20px)}
+.bar button{border:0;background:transparent;color:var(--t);font:600 13px/1 inherit;font-family:inherit;padding:9px 14px;border-radius:99px;cursor:pointer}
+.bar button.on{background:linear-gradient(135deg,#7dd3fc,#818cf8);color:#0b1020}
+.home{position:absolute;left:50%;top:92px;transform:translateX(-50%);display:flex;gap:12px}
+.qa{width:104px;height:96px;border-radius:24px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);display:grid;place-items:center;text-align:center;font-size:12px;font-weight:600;cursor:pointer;position:relative;transition:.25s}
+.qa .i{font-size:26px;display:block;margin-bottom:6px}
+.qa.quiet{border-color:var(--amb);background:var(--ambbg)}
+.qa.quiet .i{color:var(--amb)}
+.note{position:absolute;left:50%;top:210px;transform:translateX(-50%);font-size:13px;color:var(--s);text-align:center;width:600px}
+/* popup */
+.scrim{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.scrim.show{opacity:1;pointer-events:auto}
+.pop{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.97);width:540px;max-width:94vw;border-radius:32px;background:var(--pop);border:1px solid var(--bd);backdrop-filter:blur(30px) saturate(190%);box-shadow:var(--sh),inset 0 1px 0 var(--hi);padding:22px 24px 24px;opacity:0;pointer-events:none;transition:.28s cubic-bezier(.32,.72,0,1);z-index:70;overflow:hidden}
+.pop.optB{min-height:430px}.pop.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+.hd{display:flex;align-items:center;gap:14px;margin-bottom:18px}.hd b{font-size:20px}.hd .x{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:var(--soft);font-size:16px}
+.hd .sp{margin-left:auto;font-size:22px;color:var(--s)}
+.tile{border-radius:24px;border:1px solid var(--bd);background:var(--soft);box-shadow:inset 0 1px 0 var(--hi);cursor:pointer;transition:.2s;text-align:left}
+.tile:active{transform:scale(.97)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.big{height:170px;padding:20px;display:flex;flex-direction:column;justify-content:space-between}
+.big .ic{font-size:36px}.big b{font-size:19px;display:block}.big small{color:var(--s);font-size:13px;font-weight:500}
+.grad{background:linear-gradient(135deg,#7dd3fc,#818cf8);color:#0b1020;border-color:rgba(255,255,255,.5)}.grad small{color:rgba(11,16,32,.65)!important}
+.lit{background:var(--ambbg);border-color:var(--amb)}.lit .ic{color:var(--amb)}
+.btns{display:flex;gap:12px;margin-top:18px}.btn{flex:1;height:52px;border-radius:20px;display:grid;place-items:center;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--soft)}
+.btn.p{background:linear-gradient(135deg,#7dd3fc,#818cf8);color:#0b1020;border-color:transparent}
+.btn.w{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#2a1700;border-color:transparent}
+.warn{text-align:center;padding:6px 6px 0}.warn .wi{width:72px;height:72px;border-radius:24px;margin:0 auto 14px;display:grid;place-items:center;font-size:38px;background:var(--ambbg);color:var(--amb)}
+.warn h3{margin:0 0 8px;font-size:21px}.warn p{margin:0 auto;color:var(--s);font-size:15px;line-height:1.5;max-width:380px}
+.field{height:52px;border-radius:16px;background:var(--field);border:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;margin-bottom:12px;color:var(--s)}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--s);margin:4px 0 8px}
+.vol{height:8px;border-radius:4px;background:var(--field);margin:18px 0 6px;position:relative}.vol i{position:absolute;left:0;top:0;bottom:0;width:70%;border-radius:4px;background:linear-gradient(90deg,#7dd3fc,#818cf8)}
+.banner{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:18px;background:var(--ambbg);border:1px solid var(--amb);color:var(--t);font-size:14px;font-weight:600;margin-bottom:14px}.banner svg{color:var(--amb);font-size:22px}
+.banner a{margin-left:auto;color:var(--amb);font-weight:700;cursor:pointer}
+/* option B */
+.row{display:flex;align-items:center;gap:16px;padding:18px 20px;margin-bottom:12px}
+.row .ic{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;font-size:28px;background:var(--soft)}
+.row b{font-size:17px;display:block}.row small{color:var(--s);font-size:13px;font-weight:500}
+.row .chev{margin-left:auto;font-size:22px;color:var(--s)}
+.sw{margin-left:auto;width:62px;height:36px;border-radius:18px;background:var(--field);border:1px solid var(--bd);position:relative;transition:.25s;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:.25s cubic-bezier(.32,.72,0,1)}
+.sw.on{background:linear-gradient(135deg,#fbbf24,#f59e0b);border-color:transparent}.sw.on::after{left:29px}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--sheetbg);backdrop-filter:blur(30px) saturate(190%);border-top:1px solid var(--bd);border-radius:28px 28px 0 0;padding:22px 24px 24px;transform:translateY(105%);transition:.32s cubic-bezier(.32,.72,0,1);box-shadow:0 -12px 40px rgba(0,0,0,.25)}
+.sheet.show{transform:none}
+.dimmer{position:absolute;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.25s}.dimmer.show{opacity:1;pointer-events:auto}
+.toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);padding:12px 20px;border-radius:99px;background:var(--pop);border:1px solid var(--bd);backdrop-filter:blur(20px);font-weight:600;font-size:14px;opacity:0;transition:.3s;z-index:90}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+<body>
+<div class="bar"><button id="oA" class="on">Option A · Two big tiles</button><button id="oB">Option B · List + bottom sheet</button><button id="tm">Dark</button><button id="rs">Reset</button></div>
+<div class="home"><div class="qa"><div><span class="i" id="i1"></span>Good Night</div></div><div class="qa" id="ann"><div><span class="i" id="annI"></span><span id="annT">Announce</span></div></div><div class="qa"><div><span class="i" id="i3"></span>Lost Phone</div></div><div class="qa"><div><span class="i" id="i4"></span>WiFi</div></div><div class="qa"><div><span class="i" id="i5"></span>Robbie</div></div></div>
+<div class="note">Tap <b>Announce</b> on the home screen to open the popup. Everything here is clickable. When Quiet hour is on, the Announce button turns amber and says "Quiet".</div>
+<div class="scrim" id="scrim"></div><div class="pop" id="pop"></div><div class="toast" id="toast"></div>
+<script>
+const P={mega:'M12,8H4A2,2 0 0,0 2,10V14A2,2 0 0,0 4,16H5V20A1,1 0 0,0 6,21H8A1,1 0 0,0 9,20V16H12L17,20V4L12,8M21.5,12C21.5,13.71 20.5,15.18 19,15.89V8.11C20.5,8.82 21.5,10.29 21.5,12Z',
+bellOff:'M14,20A2,2 0 0,1 12,22A2,2 0 0,1 10,20H14M12,2A1,1 0 0,1 13,3V4.08C15.84,4.56 18,7.03 18,10V16L21,19H20.73L5.27,3.54L6.46,2.35L7.8,3.7C8.74,3.1 9.82,2.8 11,2.8V3A1,1 0 0,1 12,2M3,19L6,16V10C6,8.8 6.3,7.7 6.82,6.73L3,19Z',
+moon:'M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.48,12.34L20.06,14.5L18.25,13.25L16.44,14.5L17,12.34L15.25,11L17.44,10.94L18.25,8.94L19.06,10.94L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C7.79,7.9 8.75,10.87 10.95,13.06C13.14,15.26 16.1,16.22 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z',
+warn:'M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z',phone:'M17,19H7V5H17M17,1H7C5.89,1 5,1.89 5,3V21A2,2 0 0,0 7,23H17A2,2 0 0,0 19,21V3C19,1.89 18.1,1 17,1Z',wifi:'M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z',robot:'M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z',chev:'M8.59,16.59L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.59Z'};
+const ic=k=>`<svg viewBox="0 0 24 24"><path d="${P[k]}"/></svg>`;
+let S={opt:'A',quiet:false,view:'menu'};const $=id=>document.getElementById(id);
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
+function paintHome(){$('i1').innerHTML=ic('moon');$('i3').innerHTML=ic('phone');$('i4').innerHTML=ic('wifi');$('i5').innerHTML=ic('robot');
+ $('annI').innerHTML=ic(S.quiet?'bellOff':'mega');$('annT').textContent=S.quiet?'Quiet':'Announce';$('ann').classList.toggle('quiet',S.quiet)}
+const hd=(t,i)=>`<div class="hd"><div class="x" data-a="close">&#10005;</div><b>${t}</b><span class="sp">${ic(i||'mega')}</span></div>`;
+const qb=()=>S.quiet?`<div class="banner">${ic('bellOff')}Quiet hour is on. Speaker announcements are suppressed.<a data-a="quietOff">Turn off</a></div>`:'';
+const formView=()=>`${hd('Announce')}${qb()}<div class="lbl">Speaker</div><div class="field">Home speakers</div><div class="lbl">Message</div><div class="field">(empty value)</div><div class="lbl">Volume</div><div class="vol"><i></i></div><div class="btns"><div class="btn" data-a="back">Back</div><div class="btn p" data-a="send">Announce</div></div>`;
+function render(){const p=$('pop');let h='';p.classList.toggle('optB',S.opt==='B');
+ if(S.opt==='A'){
+  if(S.view==='menu')h=`${hd('Announce')}<div class="grid2"><div class="tile big grad" data-a="form"><span class="ic">${ic('mega')}</span><div><b>Announce</b><small>Speak a message on the speakers</small></div></div><div class="tile big ${S.quiet?'lit':''}" data-a="quiet"><span class="ic">${ic(S.quiet?'bellOff':'moon')}</span><div><b>Quiet hour</b><small>${S.quiet?'On · speakers muted. Tap to turn off':'Off · tap to mute announcements'}</small></div></div></div>`;
+  if(S.view==='confirm')h=`${hd('Quiet hour','bellOff')}<div class="warn"><div class="wi">${ic('warn')}</div><h3>Turn on quiet hour?</h3><p>All speaker announcements will be suppressed while quiet hour is on.</p></div><div class="btns"><div class="btn" data-a="cancel">Cancel</div><div class="btn w" data-a="ok">OK</div></div>`;
+  if(S.view==='form')h=formView();
+ }else{
+  const dim=S.view==='confirm'?'show':'';
+  h=`${hd('Announce')}${qb()}<div class="tile row grad" data-a="form"><div class="ic" style="background:rgba(255,255,255,.4)">${ic('mega')}</div><div><b>Announce</b><small>Speak a message on the speakers</small></div><span class="chev">${ic('chev')}</span></div>
+  <div class="tile row ${S.quiet?'lit':''}" data-a="swrow"><div class="ic" style="${S.quiet?'background:var(--ambbg);color:var(--amb)':''}">${ic(S.quiet?'bellOff':'moon')}</div><div><b>Quiet hour</b><small>${S.quiet?'On · announcements suppressed':'Off · speakers announce as normal'}</small></div><div class="sw ${S.quiet?'on':''}" id="sw"></div></div>
+  <div class="dimmer ${dim}"></div><div class="sheet ${dim}"><div class="warn"><div class="wi">${ic('warn')}</div><h3>Turn on quiet hour?</h3><p>All speaker announcements will be suppressed while quiet hour is on.</p></div><div class="btns"><div class="btn" data-a="cancel">Cancel</div><div class="btn w" data-a="ok">OK</div></div></div>`;
+  if(S.view==='form')h=formView();
+ }
+ p.innerHTML=h}
+function open(){S.view='menu';render();$('scrim').classList.add('show');$('pop').classList.add('show')}
+function close(){$('scrim').classList.remove('show');$('pop').classList.remove('show')}
+document.addEventListener('click',e=>{
+ const a=e.target.closest('[data-a]')?.dataset.a;
+ if(e.target.closest('#ann')){open();return}
+ if(e.target.id==='scrim'){close();return}
+ if(!a)return;
+ if(a==='close')close();
+ if(a==='form'){S.view='form';render()}
+ if(a==='back'){S.view='menu';render()}
+ if(a==='send'){close();toast(S.quiet?'Suppressed: quiet hour is on':'Announcement sent')}
+ if(a==='quiet'||a==='swrow'){if(S.quiet){S.quiet=false;paintHome();render();toast('Quiet hour off')}else{S.view='confirm';render()}}
+ if(a==='quietOff'){S.quiet=false;paintHome();render();toast('Quiet hour off')}
+ if(a==='cancel'){S.view='menu';render()}
+ if(a==='ok'){S.quiet=true;S.view='menu';paintHome();setTimeout(render,S.opt==='B'?120:0);if(S.opt==='A')render();toast('Quiet hour on')}
+});
+$('oA').onclick=()=>{S.opt='A';$('oA').classList.add('on');$('oB').classList.remove('on');if($('pop').classList.contains('show')){S.view='menu';render()}};
+$('oB').onclick=()=>{S.opt='B';$('oB').classList.add('on');$('oA').classList.remove('on');if($('pop').classList.contains('show')){S.view='menu';render()}};
+$('tm').onclick=()=>{document.body.classList.toggle('dark');$('tm').textContent=document.body.classList.contains('dark')?'Light':'Dark'};
+$('rs').onclick=()=>{S.quiet=false;S.view='menu';paintHome();close()};
+paintHome();
+const q=new URLSearchParams(location.search);if(q.get('dark'))$('tm').click();if(q.get('o')==='B')$('oB').click();
+</script>

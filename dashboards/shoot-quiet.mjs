@@ -1,0 +1,16 @@
+import { chromium } from '/tmp/claude-0/-home-user-supar/c3967fd4-802f-5f58-9549-01e6af9f615b/scratchpad/pw/node_modules/playwright-core/index.mjs';
+import path from 'path'; import fs from 'fs'; import url from 'url';
+const here=path.dirname(url.fileURLToPath(import.meta.url));
+const exe=fs.readdirSync('/opt/pw-browsers').filter(d=>d.startsWith('chromium-'))[0];
+const b=await chromium.launch({executablePath:`/opt/pw-browsers/${exe}/chrome-linux/chrome`,args:['--no-sandbox']});
+const p=await b.newPage({viewport:{width:1000,height:640},deviceScaleFactor:1.5});
+const f=`file://${here}/announce-quiet-options.html`;
+const shot=async n=>{await p.waitForTimeout(450);await p.screenshot({path:path.join(here,`previews/quiet-${n}.png`)})};
+p.on('pageerror',e=>console.log('pageerror',e.message));
+await p.goto(f);await p.click('#ann');await shot('A-menu');
+await p.click('[data-a=quiet]');await shot('A-confirm');
+await p.click('[data-a=ok]');await shot('A-on');
+await p.goto(f+'?o=B&dark=1');await p.click('#ann');await shot('B-menu');
+await p.click('[data-a=swrow]');await shot('B-confirm');
+await p.click('[data-a=ok]');await p.waitForTimeout(300);await shot('B-on');
+await b.close();
