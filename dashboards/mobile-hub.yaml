@@ -1029,7 +1029,7 @@ views:
                   label: Outside
                   icon: mdi:weather-partly-cloudy
                   tint: '#ffc53d'
-                  height: 248px
+                  height: 262px
                 tap_action:
                   action: navigate
                   navigation_path: /mobile-hub/hvac-mobile
@@ -1087,12 +1087,7 @@ views:
                     variables:
                       label: Security
                       icon: mdi:shield-home
-                      tint: |-
-                        [[[
-                          const g = states['cover.garage_door_v2'], f = states['input_boolean.front_door'];
-                          return (g && g.state !== 'closed') || (f && f.state === 'on') ? 'var(--red-color)' : 'var(--green-color)';
-                        ]]]
-                      height: 120px
+                      height: 134px
                     tap_action:
                       action: navigate
                       navigation_path: '#security'
@@ -1100,12 +1095,39 @@ views:
                       - cover.garage_door_v2
                       - input_boolean.front_door
                       - alarm_control_panel.home_alarm
+                      - binary_sensor.front_door_contact
+                      - binary_sensor.crimsafe_door_contact
+                      - binary_sensor.side_door_contact
+                      - binary_sensor.laundrydoorsensor_contact
+                      - binary_sensor.patio_door
                     custom_fields:
+                      lbl: |-
+                        [[[
+                          const doors = { 'binary_sensor.front_door_contact': 'Front', 'binary_sensor.crimsafe_door_contact': 'Crimsafe',
+                            'binary_sensor.side_door_contact': 'Side', 'binary_sensor.laundrydoorsensor_contact': 'Laundry', 'binary_sensor.patio_door': 'Patio' };
+                          const n = Object.keys(doors).filter(d => states[d] && states[d].state === 'on').length;
+                          const g = states['cover.garage_door_v2'], f = states['input_boolean.front_door'];
+                          const bad = n || (g && g.state !== 'closed') || (f && f.state === 'on');
+                          const pill = n
+                            ? `<span style="margin-left:auto;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:color-mix(in srgb, var(--red-color) 18%, transparent);color:var(--red-color)">${n} open</span>`
+                            : `<span style="margin-left:auto;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:color-mix(in srgb, var(--green-color) 16%, transparent);color:var(--green-color)">All closed</span>`;
+                          return `<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--secondary-text-color)">
+                            <ha-icon icon="mdi:shield-home" style="--mdc-icon-size:15px;color:${bad ? 'var(--red-color)' : 'var(--green-color)'}"></ha-icon>Security${pill}</div>`;
+                        ]]]
                       body: |-
                         [[[
+                          const doors = { 'binary_sensor.front_door_contact': 'Front', 'binary_sensor.crimsafe_door_contact': 'Crimsafe',
+                            'binary_sensor.side_door_contact': 'Side', 'binary_sensor.laundrydoorsensor_contact': 'Laundry', 'binary_sensor.patio_door': 'Patio' };
+                          const open = Object.keys(doors).filter(d => states[d] && states[d].state === 'on').map(d => doors[d]);
+                          const n = open.length;
                           const g = states['cover.garage_door_v2'], f = states['input_boolean.front_door'];
-                          const head = g && g.state !== 'closed' ? ['Garage open', 'var(--red-color)'] : f && f.state === 'on' ? ['Door unlocked', 'var(--red-color)'] : ['All locked', 'var(--primary-text-color)'];
-                          return `<div style="font-size:17px;font-weight:700;margin-top:6px;color:${head[1]}">${head[0]}</div>`;
+                          const gOpen = g && g.state !== 'closed';
+                          const fOpen = f && f.state === 'on';
+                          const red = 'var(--red-color)';
+                          const head = n ? [n === 1 ? '1 door open' : `${n} doors open`, red] : gOpen ? ['Garage open', red] : fOpen ? ['Door unlocked', red] : ['All closed', 'var(--primary-text-color)'];
+                          const sub = n ? open.join(' · ') + (gOpen ? ` · <span style="color:${red};font-weight:600">Garage open</span>` : '') : 'All doors closed';
+                          return `<div style="font-size:17px;font-weight:700;margin-top:6px;color:${head[1]}">${head[0]}</div>
+                            <div style="font-size:11px;color:var(--secondary-text-color);margin:2px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>`;
                         ]]]
                       tiles:
                         card:
@@ -1208,6 +1230,9 @@ views:
                       grid:
                         - grid-template-areas: '"lbl" "body" "tiles"'
                         - grid-template-rows: min-content 1fr min-content
+                      custom_fields:
+                        lbl:
+                          - justify-self: stretch
                   - type: custom:button-card
                     template: b_bento
                     variables:
