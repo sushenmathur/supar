@@ -950,6 +950,25 @@ views:
                   perform_action: script.turn_on
                   target:
                     entity_id: script.attention_paro
+              - type: custom:button-card
+                template: b_act
+                entity: input_boolean.quiet_hour
+                name: Quiet hour
+                icon: |
+                  [[[ return entity.state === 'on' ? 'mdi:bell-off' : 'mdi:bell-outline'; ]]]
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+                state:
+                - value: 'on'
+                  styles:
+                    img_cell:
+                    - background: color-mix(in srgb, var(--amber-color) 20%, transparent)
+                    icon:
+                    - color: var(--amber-color)
+                    name:
+                    - color: var(--amber-color)
         styles:
           grid:
           - grid-template-areas: '"lbl" "acts"'
