@@ -909,6 +909,8 @@ views:
           icon: mdi:lightning-bolt-circle
           tint: var(--secondary-text-color)
           height: auto
+        triggers_update:
+        - input_boolean.quiet_hour
         custom_fields:
           acts:
             card:
@@ -955,20 +957,21 @@ views:
                 entity: input_boolean.quiet_hour
                 name: Quiet hour
                 icon: |
-                  [[[ return entity.state === 'on' ? 'mdi:bell-off' : 'mdi:bell-outline'; ]]]
+                  [[[ const s = states['input_boolean.quiet_hour']; return s && s.state === 'on' ? 'mdi:bell-off' : 'mdi:bell-outline'; ]]]
                 tap_action:
                   action: toggle
                 hold_action:
                   action: more-info
-                state:
-                - value: 'on'
-                  styles:
-                    img_cell:
-                    - background: color-mix(in srgb, var(--amber-color) 20%, transparent)
-                    icon:
-                    - color: var(--amber-color)
-                    name:
-                    - color: var(--amber-color)
+                styles:
+                  img_cell:
+                  - background: |
+                      [[[ const s = states['input_boolean.quiet_hour']; return s && s.state === 'on' ? 'color-mix(in srgb, var(--amber-color) 20%, transparent)' : 'rgba(var(--rgb-primary-text-color),0.08)'; ]]]
+                  icon:
+                  - color: |
+                      [[[ const s = states['input_boolean.quiet_hour']; return s && s.state === 'on' ? 'var(--amber-color)' : 'var(--primary-text-color)'; ]]]
+                  name:
+                  - color: |
+                      [[[ const s = states['input_boolean.quiet_hour']; return s && s.state === 'on' ? 'var(--amber-color)' : 'var(--secondary-text-color)'; ]]]
         styles:
           grid:
           - grid-template-areas: '"lbl" "acts"'
