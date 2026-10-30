@@ -334,8 +334,17 @@ button_card_templates:
         - grid-template-areas: '"i" "n" "l"'
         - grid-template-rows: 1fr min-content min-content
         - grid-template-columns: 1fr
+      img_cell:
+        - justify-self: start
+        - align-self: start
+        - width: 38px
+        - height: 38px
+        - margin: 0
+        - border-radius: 0
+        - background: none
       icon:
-        - width: 34px
+        - width: 36px
+        - height: 36px
         - justify-self: start
         - align-self: start
         - color: var(--primary-text-color)
@@ -358,7 +367,7 @@ button_card_templates:
     label: Speak a message on the speakers
     styles:
       card:
-        - background: linear-gradient(135deg, #7dd3fc, #818cf8)
+        - background: 'linear-gradient(135deg, #7dd3fc, #818cf8)'
         - border-color: rgba(255, 255, 255, 0.5)
       icon:
         - color: '#0b1020'
@@ -368,7 +377,7 @@ button_card_templates:
         - color: rgba(11, 16, 32, 0.65)
   qh_quiet_off:
     template: qh_tile
-    icon: mdi:weather-night
+    icon: mdi:bell-sleep
     name: Quiet hour
     label: Off · tap to mute announcements
     tap_action:
@@ -383,16 +392,34 @@ button_card_templates:
           --primary-text-color: light-dark(#14203a, #ffffff);
           --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255, 255, 255, 0.68));
           --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255, 255, 0.18));
-        title: Turn on quiet hour?
-        icon: mdi:alert
+        title: Quiet hour
+        icon: mdi:bell-off
         dismissable: true
-        content: All automated speaker announcements will be suppressed while quiet hour is on.
-        left_button: Cancel
-        right_button: OK
-        right_button_action:
-          service: input_boolean.turn_on
-          target:
-            entity_id: input_boolean.quiet_hour
+        content:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: qh_warn
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  template: qh_btn
+                  name: Cancel
+                  tap_action:
+                    action: perform-action
+                    perform_action: browser_mod.close_popup
+                - type: custom:button-card
+                  template: qh_btn_ok
+                  name: OK
+                  tap_action:
+                    action: perform-action
+                    perform_action: browser_mod.sequence
+                    data:
+                      sequence:
+                        - service: input_boolean.turn_on
+                          data:
+                            entity_id: input_boolean.quiet_hour
+                        - service: browser_mod.close_popup
   qh_quiet_on:
     template: qh_tile
     icon: mdi:bell-off
@@ -442,6 +469,59 @@ button_card_templates:
         - font-weight: 600
         - white-space: normal
         - color: var(--primary-text-color)
+  qh_warn:
+    show_icon: false
+    show_name: false
+    show_state: false
+    tap_action:
+      action: none
+    custom_fields:
+      body: >
+        <div style="text-align:center;padding:6px 6px 0;white-space:normal"><div
+        style="width:72px;height:72px;border-radius:24px;margin:0 auto
+        14px;display:grid;place-items:center;background:rgba(245,158,11,.22)"><ha-icon
+        icon="mdi:alert"
+        style="--mdc-icon-size:38px;color:#f59e0b"></ha-icon></div><div
+        style="font-size:21px;font-weight:700;margin-bottom:8px">Turn on quiet
+        hour?</div><div
+        style="font-size:15px;line-height:1.5;color:var(--secondary-text-color);max-width:380px;margin:0
+        auto">All automated speaker announcements will be suppressed while quiet
+        hour is on.</div></div>
+    styles:
+      card:
+        - background: none
+        - border: none
+        - box-shadow: none
+        - backdrop-filter: none
+        - padding: 0
+      grid:
+        - grid-template-areas: '"body"'
+      custom_fields:
+        body:
+          - width: 100%
+  qh_btn:
+    show_icon: false
+    show_state: false
+    styles:
+      card:
+        - height: 52px
+        - border-radius: 20px
+        - padding: 0
+        - background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34))
+        - border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70))
+        - box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90))
+      name:
+        - font-size: 16px
+        - font-weight: 700
+        - color: var(--primary-text-color)
+  qh_btn_ok:
+    template: qh_btn
+    styles:
+      card:
+        - background: 'linear-gradient(135deg, #fbbf24, #f59e0b)'
+        - border-color: transparent
+      name:
+        - color: '#2a1700'
   ticker:
     extra_styles: >
       .mq {
