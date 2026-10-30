@@ -82,7 +82,7 @@ const card=st=>{const n=st.doors.length,g=st.garage,bad=n>0||g||st.unlocked;
   let sub=parts.join(' · ');
   if(g&&n)sub+=' · <em>Garage open</em>';
   if(!n)sub='All doors closed';
-  return `<div class="bento"><div class="lbl"><span class="ic" style="color:${bad?'var(--red)':'var(--green)'}">${I.shield}</span>Security<span class="pill${n?'':' ok'}">${n?n+' open':'Doors shut'}</span></div>
+  return `<div class="bento"><div class="lbl"><span class="ic" style="color:${bad?'var(--red)':'var(--green)'}">${I.shield}</span>Security<span class="pill${n?'':' ok'}">${n?n+' open':'All closed'}</span></div>
   <div class="big" style="color:${bad?'var(--red)':'var(--text)'}">${head}</div><div class="sub">${sub}</div>
   <div class="tiles"><div class="tile${g?' bad':''}">${g?I.garageOpen:I.garage}Garage</div><div class="tile${st.unlocked?' bad':''}">${I.lock}Front</div><div class="tile">${I.alarm}Alarm</div></div></div>`};
 const phone=st=>`<div class="hdr"><div><small>Fri, 30 Oct · Good evening</small><b>Sushen</b></div><div class="av"><i></i><i></i></div></div>
