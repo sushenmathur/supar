@@ -2,9 +2,9 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* Layout: three phone-width mockups of the Home view top, side by side, wrapping to one column on a phone */
+/* Layout: one full Home-view phone for context, then the Security card in every state on a wrapping grid */
 :root{--bg:#eef0f2;--phone:#fafafa;--card:#efefef;--btn:rgba(0,0,0,.07);--text:#16181a;--sub:#5d656a;--line:rgba(0,0,0,.08);
-  --red:#e5372c;--red-bg:rgba(229,55,44,.14);--green:#1f9d4c;--green-bg:rgba(31,157,76,.13);--amber:#d98a00;--orange:#ff9a56;--yellow:#e8a800;
+  --red:#e5372c;--red-bg:rgba(229,55,44,.14);--green:#1f9d4c;--green-bg:rgba(31,157,76,.13);--amber:#d98a00;--orange:#ff9a56;
   --font:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0e10;--phone:#111417;--card:#1b1f23;--btn:rgba(255,255,255,.08);--text:#f1f3f4;--sub:#9aa3a8;--line:rgba(255,255,255,.08);
   --red:#ff5a4f;--red-bg:rgba(255,90,79,.18);--green:#30d158;--green-bg:rgba(48,209,88,.16);color-scheme:dark}}
@@ -13,17 +13,14 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--font);padding-block:24px 48px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:1180px;margin:0 auto}
+.wrap{max-width:1100px;margin:0 auto}
 h1{font-size:22px;margin:0 0 6px;text-wrap:balance}
+h2{font-size:16px;margin:28px 0 4px}
 .lead{color:var(--sub);font-size:14px;line-height:1.5;margin:0 0 16px;max-width:720px}
-.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .bar button{font:inherit;font-size:13px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--phone);color:var(--text);cursor:pointer}
 .bar button.on{background:var(--text);color:var(--bg)}
 .bar button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:24px}
-.opt{min-width:0}
-.opt h2{font-size:16px;margin:0 0 4px}
-.opt p{font-size:13px;color:var(--sub);margin:0 0 12px;line-height:1.45}
 .phone{background:var(--phone);border:1px solid var(--line);border-radius:26px;padding:14px 12px;max-width:400px}
 .hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px;padding:0 4px}
 .hdr small{font-size:11.5px;font-weight:600;color:var(--sub)}
@@ -33,102 +30,70 @@ h1{font-size:22px;margin:0 0 6px;text-wrap:balance}
 .bento{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:13px}
 .lbl{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--sub)}
 .lbl svg{width:15px;height:15px;fill:currentColor}
+.lbl .ic{display:flex}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .stack{display:grid;gap:10px}
-.ghost{height:84px;border-radius:22px;background:var(--card);border:1px solid var(--line);padding:13px}
-.ghost.tall{height:100%}
+.ghost{border-radius:22px;background:var(--card);border:1px solid var(--line);padding:13px}
 .big{font-size:17px;font-weight:700;margin-top:6px}
 .sub{font-size:11px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub em{font-style:normal;color:var(--red);font-weight:600}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}
 .tile{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:12px;background:var(--btn);font-size:9.5px;font-weight:600;color:var(--sub)}
 .tile svg{width:18px;height:18px;fill:var(--text)}
 .tile.bad{background:var(--red-bg)}.tile.bad svg{fill:var(--red)}
 .pill{margin-left:auto;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--red-bg);color:var(--red)}
 .pill.ok{background:var(--green-bg);color:var(--green)}
-/* Option B strip */
-.strip{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:18px;margin-bottom:10px;background:var(--green-bg)}
-.strip.bad{background:var(--red-bg)}
-.strip .dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--green);flex:none}
-.strip.bad .dot{background:var(--red)}
-.strip .dot svg{width:18px;height:18px;fill:#fff}
-.strip b{display:block;font-size:13px;color:var(--green)}
-.strip.bad b{color:var(--red)}
-.strip small{display:block;font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.strip .txt{min-width:0}
-.strip .chev{margin-left:auto;fill:var(--sub);width:18px;height:18px;flex:none}
-/* Option C chips */
-.doors{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:10px}
-.door{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:12px;background:var(--btn);font-size:9px;font-weight:600;color:var(--sub);min-width:0}
-.door svg{width:17px;height:17px;fill:var(--green)}
-.door.bad{background:var(--red-bg);color:var(--red)}.door.bad svg{fill:var(--red)}
-.count{display:flex;align-items:baseline;gap:4px;margin-top:6px}
-.count b{font-size:26px;font-weight:700;line-height:1}
-.count span{font-size:12px;font-weight:600;color:var(--sub)}
+.states{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.state{min-width:0}
+.state h3{font-size:12.5px;margin:0 0 6px;color:var(--sub);font-weight:600}
+.state .bento{max-width:200px}
 .note{margin-top:26px;font-size:13px;color:var(--sub);line-height:1.55;background:var(--phone);border:1px solid var(--line);border-radius:16px;padding:14px 16px;max-width:900px}
-.note code{font-size:12px}
 </style>
 <div class="wrap">
-<h1>Door status on the Home view</h1>
-<p class="lead">Three ways to show how many doors are open. Each counts Front, Crimsafe, Side, Laundry and Patio door contacts plus the garage door. Use the buttons to see each option with different doors open.</p>
-<div class="bar" id="st">
-  <button class="on" data-s="0">All closed</button>
-  <button data-s="1">Patio open</button>
-  <button data-s="2">Patio + Laundry open</button>
-  <button data-s="3">Garage + Front + Side open</button>
-</div>
-<div class="grid" id="g"></div>
-<div class="note"><b>All options:</b> the status updates live from the door sensors, and tapping it opens the Cameras view, which already lists every door. <b>Garage</b> uses the garage door itself, so "opening" and "closing" count as open. If you would rather keep the garage out of the count (it already has its own tile on the Security card), say so and I will leave it out.</div>
+<h1>Door status in the Security card</h1>
+<p class="lead">Option A, with the garage left out of the door count. The count covers Front, Crimsafe, Side, Laundry and Patio. When the garage is open, the heading reads "Garage open" if no doors are open, and the Garage button turns red either way.</p>
+<div class="bar" id="st"></div>
+<div class="phone" id="ph"></div>
+<h2>Every state side by side</h2>
+<div class="states" id="all"></div>
+<div class="note"><b>How the heading picks its words:</b> doors open wins ("2 doors open"), then garage open ("Garage open"), otherwise "All closed". The line under it lists the open doors, and adds "Garage open" in red when the garage is open too. The pill next to "Security" only counts doors. Tapping the card still opens the security pop-up; the three buttons still work on their own.</div>
 </div>
 <script>
 const P='<svg viewBox="0 0 24 24"><path d="';const E='"/></svg>';
 const I={
 shield:P+'M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm0 6a3 3 0 1 1 0 6 3 3 0 0 1 0-6'+E,
-open:P+'M12 3c-1.1 0-2 .9-2 2v14H6V5H4v16h16v-2h-4V5c0-1.1-.9-2-2-2zm1 8a1 1 0 1 1 0 2 1 1 0 0 1 0-2'+E,
-closed:P+'M8 3c-1.1 0-2 .9-2 2v14H4v2h16v-2h-2V5c0-1.1-.9-2-2-2zm7 8a1 1 0 1 1 0 2 1 1 0 0 1 0-2'+E,
 garage:P+'M22 9v11h-2v-9H4v9H2V9l10-4zm-3 3H5v2h14zm0 3H5v2h14zm0 3H5v2h14z'+E,
+garageOpen:P+'M22 9v11h-2v-9H4v9H2V9l10-4zm-3 3H5v2h14z'+E,
 lock:P+'M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4m6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 10 0v2zm-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3'+E,
 alarm:P+'M12 3 2 12h3v8h14v-8h3zm0 4.7 2.5 2.3v3l-2.5 2-2.5-2v-3z'+E,
-check:P+'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z'+E,
-warn:P+'M13 14h-2V9h2m0 9h-2v-2h2M1 21h22L12 2z'+E,
-chev:P+'M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z'+E,
 cloud:P+'M12.74 5.47C15.1 6.5 16.35 9.03 15.92 11.46c1.44.36 2.73 1.47 3.1 2.95A3.5 3.5 0 0 1 15.5 19H6a4 4 0 0 1-.9-7.9 6 6 0 0 1 7.64-5.63'+E,
-bulb:P+'M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1'+E};
-const DOORS=[['front','Front'],['crimsafe','Crimsafe'],['side','Side'],['laundry','Laundry'],['patio','Patio'],['garage','Garage']];
-const SC=[[],['patio'],['patio','laundry'],['garage','front','side']];
-let s=0;
-const open=()=>SC[s];
-const names=()=>DOORS.filter(d=>open().includes(d[0])).map(d=>d[1]);
-const head=`<div class="hdr"><div><small>Fri, 30 Oct · Good evening</small><b>Sushen</b></div><div class="av"><i></i><i></i></div></div>`;
-const qa=`<div class="bento" style="height:58px"><div class="lbl">${I.bolt||''}Quick actions</div></div>`;
-const outside=`<div class="ghost tall"><div class="lbl" style="color:var(--sub)">${I.cloud}Outside</div><div class="big" style="font-size:28px">23.4°</div></div>`;
-const lights=`<div class="ghost"><div class="lbl">${I.bulb}Lights</div><div class="big">1 on</div></div>`;
-const tiles=()=>{const g=open().includes('garage'),f=open().includes('front');
-  return `<div class="tiles"><div class="tile${g?' bad':''}">${I.garage}Garage</div><div class="tile${f?' bad':''}">${I.lock}Front</div><div class="tile">${I.alarm}Alarm</div></div>`};
-const n=()=>open().length;
-const word=()=>n()===1?'1 door open':n()+' doors open';
-// Option A: Security card heading becomes the door count
-const A=()=>{const bad=n()>0;
-  return `<div class="phone">${head}${qa}<div class="cols">${outside}<div class="stack">
-  <div class="bento"><div class="lbl" style="color:var(--sub)"><span style="display:flex;color:${bad?'var(--red)':'var(--green)'}">${I.shield}</span>Security<span class="pill${bad?'':' ok'}">${bad?n()+' open':'All shut'}</span></div>
-  <div class="big" style="color:${bad?'var(--red)':'var(--text)'}">${bad?word():'All closed'}</div>
-  <div class="sub">${bad?names().join(' · '):'Every door closed'}</div>${tiles()}</div>${lights}</div></div></div>`};
-// Option B: full-width strip under the header
-const B=()=>{const bad=n()>0;
-  return `<div class="phone">${head}<div class="strip${bad?' bad':''}"><span class="dot">${bad?I.warn:I.check}</span>
-  <div class="txt"><b>${bad?word():'All doors closed'}</b><small>${bad?names().join(', '):'Front, Crimsafe, Side, Laundry, Patio, Garage'}</small></div>${I.chev.replace('<svg','<svg class="chev"')}</div>
-  ${qa}<div class="cols">${outside}<div class="stack"><div class="bento"><div class="lbl">${I.shield}Security</div><div class="big">All locked</div>${tiles()}</div>${lights}</div></div></div>`};
-// Option C: door chips card with count
-const C=()=>{const bad=n()>0;
-  return `<div class="phone">${head}${qa}
-  <div class="bento" style="margin-top:10px"><div class="lbl"><span style="display:flex;color:${bad?'var(--red)':'var(--green)'}">${bad?I.open:I.closed}</span>Doors</div>
-  <div class="count"><b style="color:${bad?'var(--red)':'var(--text)'}">${n()}</b><span>${bad?'open':'open · all closed'}</span></div>
-  <div class="doors">${DOORS.map(d=>{const o=open().includes(d[0]);return `<div class="door${o?' bad':''}">${d[0]==='garage'?I.garage:(o?I.open:I.closed)}${d[1]}</div>`}).join('')}</div></div>
-  <div class="cols">${outside}<div class="stack"><div class="bento"><div class="lbl">${I.shield}Security</div><div class="big">All locked</div>${tiles()}</div>${lights}</div></div></div>`};
-function draw(){document.getElementById('g').innerHTML=`
-<div class="opt"><h2>Option A · Inside the Security card</h2><p>No new card. The Security heading shows the door count and which doors are open, with a small count pill next to the label. The Garage, Front and Alarm buttons stay as they are.</p>${A()}</div>
-<div class="opt"><h2>Option B · Status strip under your name</h2><p>A full-width strip above Quick actions. Green with a tick when everything is shut, red with the open doors listed when not. The most visible option.</p>${B()}</div>
-<div class="opt"><h2>Option C · Doors card with every door</h2><p>A new card below Quick actions with the count and a chip for each door, lit red when open. Shows exactly which door at a glance, but adds a row to the page.</p>${C()}</div>`}
-document.getElementById('st').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;s=+b.dataset.s;
-  document.querySelectorAll('#st button').forEach(x=>x.classList.toggle('on',x===b));draw()});
+bulb:P+'M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1'+E,
+bolt:P+'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m-1 15 5-7h-3l1-5-5 7h3z'+E};
+const S=[
+  {t:'All closed',doors:[],garage:false},
+  {t:'Patio open',doors:['Patio'],garage:false},
+  {t:'Patio + Laundry open',doors:['Patio','Laundry'],garage:false},
+  {t:'Garage open only',doors:[],garage:true},
+  {t:'Garage + Patio open',doors:['Patio'],garage:true},
+  {t:'Front door unlocked',doors:[],garage:false,unlocked:true}];
+const card=st=>{const n=st.doors.length,g=st.garage,bad=n>0||g||st.unlocked;
+  const head=n?(n===1?'1 door open':n+' doors open'):g?'Garage open':st.unlocked?'Door unlocked':'All closed';
+  const parts=[...st.doors];
+  let sub=parts.join(' · ');
+  if(g&&n)sub+=' · <em>Garage open</em>';
+  if(!n)sub='All doors closed';
+  return `<div class="bento"><div class="lbl"><span class="ic" style="color:${bad?'var(--red)':'var(--green)'}">${I.shield}</span>Security<span class="pill${n?'':' ok'}">${n?n+' open':'Doors shut'}</span></div>
+  <div class="big" style="color:${bad?'var(--red)':'var(--text)'}">${head}</div><div class="sub">${sub}</div>
+  <div class="tiles"><div class="tile${g?' bad':''}">${g?I.garageOpen:I.garage}Garage</div><div class="tile${st.unlocked?' bad':''}">${I.lock}Front</div><div class="tile">${I.alarm}Alarm</div></div></div>`};
+const phone=st=>`<div class="hdr"><div><small>Fri, 30 Oct · Good evening</small><b>Sushen</b></div><div class="av"><i></i><i></i></div></div>
+  <div class="bento" style="height:58px"><div class="lbl">${I.bolt}Quick actions</div></div>
+  <div class="cols"><div class="ghost"><div class="lbl">${I.cloud}Outside</div><div class="big" style="font-size:28px">23.4°</div></div>
+  <div class="stack">${card(st)}<div class="ghost"><div class="lbl">${I.bulb}Lights</div><div class="big">1 on</div></div></div></div>`;
+let cur=4;
+function draw(){
+  document.getElementById('st').innerHTML=S.map((x,i)=>`<button data-i="${i}" class="${i===cur?'on':''}">${x.t}</button>`).join('');
+  document.getElementById('ph').innerHTML=phone(S[cur]);
+  document.getElementById('all').innerHTML=S.map(x=>`<div class="state"><h3>${x.t}</h3>${card(x)}</div>`).join('')}
+document.getElementById('st').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur=+b.dataset.i;draw()});
 draw();
 </script>
