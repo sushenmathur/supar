@@ -3364,7 +3364,7 @@ views:
             performance_mode: false
             main_opacity: 0.66
             popup_opacity: 0.92
-            layout_mode: auto
+            layout_mode: mobile
             settings_source: card
             night_mode: 'off'
             night_mode_auto_start: '22:00'
@@ -3384,7 +3384,7 @@ views:
             mobile_custom_text_tone: light
             mobile_font_scale: 1
             mobile_icon_scale: 1
-            mobile_compact_mode: false
+            mobile_compact_mode: true
             mobile_compact_widget_mode: auto
             mobile_compact_edge_to_edge: true
             mobile_edge_to_edge: false
@@ -3409,7 +3409,7 @@ views:
             mobile_mic_mode: smart
             voice_assistant_enabled: false
             voice_assistant_mode: hybrid
-            voice_assistant_agent_id: ''
+            voice_assistant_agent_id: conversation.claude_conversation
             voice_assistant_speak_feedback: false
             flow_assistant_response_timeout_ms: 18000
             flow_assistant_listen_timeout_ms: 12000
@@ -3428,6 +3428,15 @@ views:
               - players
               - library
               - settings
+              - home
+            mobile_main_bar_item_1: ''
+            mobile_main_bar_item_2: ''
+            mobile_main_bar_item_3: ''
+            mobile_main_bar_item_4: ''
+            mobile_main_bar_item_5: ''
+            mobile_main_bar_item_6: ''
+            mobile_main_bar_item_7: ''
+            show_empty_quick_shelf: true
             mobile_quick_actions:
               - timer
               - like
@@ -3436,6 +3445,7 @@ views:
               - queue_flow
               - radio
               - history
+              - home
             mobile_quick_action_1: timer
             mobile_quick_action_2: like
             mobile_quick_action_3: lyrics
@@ -3452,7 +3462,7 @@ views:
             mobile_announcement_presets: []
             mobile_announcement_volume: 20
             announcement_tts_entity: ''
-            announcement_tts_language: auto
+            announcement_tts_language: en-US
             ambient_light_enabled: false
             ambient_light_entities: []
             ambient_light_player_map: []
@@ -3494,7 +3504,7 @@ views:
             discovery_mode_enabled: true
             pinned_player_entity: ''
             pinned_player_entities: []
-            pinned_player_master: ''
+            pinned_player_master: media_player.living_room_speaker_2
             entity_sticky: false
             pinned_players_exclusive: false
             excluded_player_entities: []
@@ -3521,6 +3531,9 @@ views:
             player_order_entity_19: ''
             player_order_entity_20: ''
             type: custom:homeii-music-flow
+            grid_options:
+              rows: auto
+              columns: full
           - type: custom:button-card
             entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
             show_icon: false
@@ -3641,8 +3654,7 @@ views:
                 tiles:
                   - justify-self: stretch
         type: grid
-      - type: grid
-        cards:
+      - cards:
           - type: custom:bubble-card
             card_type: pop-up
             hash: '#stremio-continue'
@@ -3657,6 +3669,9 @@ views:
             margin_top_mobile: 60px
             cards:
               - type: custom:stremio-continue-watching-card
+                grid_options:
+                  columns: full
+                  rows: auto
                 title: Continue Watching
                 entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
                 apple_tv_entity: media_player.media_apple_tv
@@ -3688,6 +3703,9 @@ views:
             margin_top_mobile: 60px
             cards:
               - type: custom:stremio-browse-card
+                grid_options:
+                  columns: full
+                  rows: auto
                 title: Browse Stremio
                 entity: media_player.stremio_mathur_sushen_gmail_com_stremio
                 apple_tv_entity: media_player.media_apple_tv
@@ -3722,6 +3740,9 @@ views:
             margin_top_mobile: 60px
             cards:
               - type: custom:stremio-library-card
+                grid_options:
+                  columns: full
+                  rows: auto
                 title: Stremio Library
                 entity: sensor.stremio_mathur_sushen_gmail_com_library_count
                 apple_tv_entity: media_player.media_apple_tv
@@ -3739,6 +3760,7 @@ views:
                 horizontal_scroll: false
                 tap_action: details
                 default_sort: recent
+        type: grid
       - cards:
           - mobile:
               mode: floating
