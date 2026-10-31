@@ -3521,7 +3521,224 @@ views:
             player_order_entity_19: ''
             player_order_entity_20: ''
             type: custom:homeii-music-flow
+          - type: custom:button-card
+            entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
+            show_icon: false
+            show_name: false
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: '#stremio-continue'
+            triggers_update:
+              - sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
+              - sensor.stremio_mathur_sushen_gmail_com_library_count
+            grid_options:
+              columns: full
+            custom_fields:
+              head: |
+                [[[
+                  const n = (e) => { const s = states[e]; return s && !isNaN(parseInt(s.state)) ? parseInt(s.state) : 0; };
+                  const cw = n('sensor.stremio_mathur_sushen_gmail_com_continue_watching_count');
+                  const lib = n('sensor.stremio_mathur_sushen_gmail_com_library_count');
+                  return `<div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#8a6bff,#5a3fd6);display:grid;place-items:center">
+                      <ha-icon icon="mdi:play" style="--mdc-icon-size:22px;color:#fff"></ha-icon></div>
+                    <div style="text-align:left"><div style="font-size:14px;font-weight:700">Stremio</div>
+                      <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:1px">${cw} in progress · ${lib} in library</div></div></div>`;
+                ]]]
+              resume: |
+                [[[
+                  const items = (entity && entity.attributes.items) || [];
+                  const it = items[0];
+                  if (!it) return `<div style="font-size:12px;color:var(--secondary-text-color);padding:6px 2px;text-align:left">Nothing in progress</div>`;
+                  const pct = Math.round(it.progress_percent || 0);
+                  const secs = Math.floor((it.time_offset || 0) / 1000);
+                  const at = secs >= 30 ? (secs >= 3600 ? `${Math.floor(secs / 3600)}:${String(Math.floor(secs % 3600 / 60)).padStart(2, '0')}` : `${Math.floor(secs / 60)}`) + ':' + String(secs % 60).padStart(2, '0') : '';
+                  const ep = it.type === 'series' && it.season && it.episode ? `S${it.season} · E${it.episode}` : (it.type === 'series' ? 'Series' : 'Movie');
+                  const meta = [ep, at ? 'stopped at ' + at : (pct ? pct + '% watched' : '')].filter(Boolean).join(' · ');
+                  const img = it.poster ? `<img src="${it.poster}" style="width:34px;height:51px;border-radius:7px;object-fit:cover;flex:none">`
+                    : `<div style="width:34px;height:51px;border-radius:7px;background:rgba(var(--rgb-primary-text-color),0.1);flex:none"></div>`;
+                  return `<div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:14px;background:rgba(var(--rgb-primary-text-color),0.06)">
+                    ${img}
+                    <div style="flex:1;min-width:0;text-align:left">
+                      <div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.title || ''}</div>
+                      <div style="font-size:11px;color:var(--secondary-text-color);margin-top:2px">${meta}</div>
+                      <div style="height:3px;border-radius:2px;background:rgba(var(--rgb-primary-text-color),0.12);margin-top:6px">
+                        <div style="height:3px;border-radius:2px;width:${pct}%;background:#a48bff"></div></div>
+                    </div>
+                    <div style="width:32px;height:32px;border-radius:50%;background:#7b5bff;display:grid;place-items:center;flex:none">
+                      <ha-icon icon="mdi:play" style="--mdc-icon-size:18px;color:#fff"></ha-icon></div></div>`;
+                ]]]
+              tiles:
+                card:
+                  type: grid
+                  columns: 3
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      name: Continue
+                      icon: mdi:play-circle
+                      label: |
+                        [[[ const s = states['sensor.stremio_mathur_sushen_gmail_com_continue_watching_count']; return (s ? s.state : 0) + ' titles'; ]]]
+                      show_label: true
+                      tap_action:
+                        action: navigate
+                        navigation_path: '#stremio-continue'
+                      styles: &stremio_tile
+                        card:
+                          - padding: 12px 6px
+                          - border-radius: 16px
+                          - box-shadow: none
+                          - border: none
+                          - background: rgba(var(--rgb-primary-text-color),0.07)
+                        grid:
+                          - grid-template-areas: '"i" "n" "l"'
+                          - row-gap: 3px
+                        icon:
+                          - width: 22px
+                          - color: var(--primary-text-color)
+                        name:
+                          - font-size: 12.5px
+                          - font-weight: 700
+                        label:
+                          - font-size: 10.5px
+                          - color: var(--secondary-text-color)
+                    - type: custom:button-card
+                      name: Browse
+                      icon: mdi:magnify
+                      label: Popular
+                      show_label: true
+                      tap_action:
+                        action: navigate
+                        navigation_path: '#stremio-browse'
+                      styles: *stremio_tile
+                    - type: custom:button-card
+                      name: Library
+                      icon: mdi:bookshelf
+                      label: |
+                        [[[ const s = states['sensor.stremio_mathur_sushen_gmail_com_library_count']; return (s ? s.state : 0) + ' saved'; ]]]
+                      show_label: true
+                      tap_action:
+                        action: navigate
+                        navigation_path: '#stremio-library'
+                      styles: *stremio_tile
+            styles:
+              card:
+                - padding: 12px
+                - border-radius: 22px
+                - box-shadow: none
+                - border: 1px solid rgba(var(--rgb-primary-text-color),0.08)
+                - background: rgba(var(--rgb-primary-text-color),0.045)
+              grid:
+                - grid-template-areas: '"head" "resume" "tiles"'
+                - grid-template-columns: 1fr
+                - row-gap: 12px
+              custom_fields:
+                head:
+                  - justify-self: start
+                resume:
+                  - justify-self: stretch
+                tiles:
+                  - justify-self: stretch
         type: grid
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#stremio-continue'
+            name: Continue Watching
+            icon: mdi:play-circle
+            show_header: true
+            button_type: name
+            close_by_clicking_outside: true
+            bg_opacity: 88
+            bg_blur: 14
+            shadow_opacity: 0
+            margin_top_mobile: 60px
+            cards:
+              - type: custom:stremio-continue-watching-card
+                title: Continue Watching
+                entity: sensor.stremio_mathur_sushen_gmail_com_continue_watching_count
+                apple_tv_entity: media_player.media_apple_tv
+                show_copy_button: false
+                open_in_stremio_script: script.media_tv_open_stremio
+                show_filters: true
+                show_title: true
+                show_progress_text: true
+                show_media_type_badge: false
+                show_similar_button: true
+                max_items: 20
+                columns: 3
+                card_height: 0
+                poster_aspect_ratio: 2/3
+                horizontal_scroll: false
+                tap_action: details
+                default_sort: recent
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#stremio-browse'
+            name: Browse Stremio
+            icon: mdi:magnify
+            show_header: true
+            button_type: name
+            close_by_clicking_outside: true
+            bg_opacity: 88
+            bg_blur: 14
+            shadow_opacity: 0
+            margin_top_mobile: 60px
+            cards:
+              - type: custom:stremio-browse-card
+                title: Browse Stremio
+                entity: media_player.stremio_mathur_sushen_gmail_com_stremio
+                apple_tv_entity: media_player.media_apple_tv
+                show_copy_button: false
+                open_in_stremio_script: script.media_tv_open_stremio
+                default_view: popular
+                default_type: movie
+                show_view_controls: true
+                show_type_controls: true
+                show_genre_filter: true
+                show_title: true
+                show_rating: true
+                show_media_type_badge: true
+                show_similar_button: true
+                columns: 3
+                max_items: 50
+                card_height: 0
+                poster_aspect_ratio: 2/3
+                horizontal_scroll: false
+                tap_action: details
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#stremio-library'
+            name: Stremio Library
+            icon: mdi:bookshelf
+            show_header: true
+            button_type: name
+            close_by_clicking_outside: true
+            bg_opacity: 88
+            bg_blur: 14
+            shadow_opacity: 0
+            margin_top_mobile: 60px
+            cards:
+              - type: custom:stremio-library-card
+                title: Stremio Library
+                entity: sensor.stremio_mathur_sushen_gmail_com_library_count
+                apple_tv_entity: media_player.media_apple_tv
+                show_copy_button: false
+                open_in_stremio_script: script.media_tv_open_stremio
+                show_search: true
+                show_filters: true
+                show_title: true
+                show_similar_button: true
+                show_media_type_badge: true
+                max_items: 50
+                columns: 3
+                card_height: 0
+                poster_aspect_ratio: 2/3
+                horizontal_scroll: false
+                tap_action: details
+                default_sort: recent
       - cards:
           - mobile:
               mode: floating
