@@ -1782,6 +1782,13 @@ views:
                     entity: light.laundry_light
                     name: Laundry Spotlight
                     icon: mdi:spotlight-beam
+                  - type: custom:button-card
+                    template: b_sq
+                    entity: switch.festive_lights
+                    name: Festive Lights
+                    icon: phu:light-string
+                    tap_action:
+                      action: toggle
           - type: custom:bubble-card
             card_type: pop-up
             hash: '#security'
