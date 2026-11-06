@@ -1276,7 +1276,7 @@ views:
               - sensor.sh50rs_a21c2106894_mppt_total_power
               - sensor.sh50rs_a21c2106894_purchased_power
               - sensor.sh50rs_a21c2106894_total_export_active_power
-              - sensor.bluey_charger_power
+              - sensor.sonic_charger_power
               - sensor.kia_charger_power
               - sensor.daily_import_cost
               - sensor.daily_solar_credit
@@ -1294,7 +1294,7 @@ views:
                   const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
                   const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
                   const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
-                  const cars = w('sensor.bluey_charger_power') + w('sensor.kia_charger_power');
+                  const cars = w('sensor.sonic_charger_power') + w('sensor.kia_charger_power');
                   const load = Math.max(0, solar + imp - exp);
                   const fromSolar = Math.max(0, solar - exp);
                   const sPct = load > 0 ? Math.round(Math.min(1, fromSolar / load) * 100) : 0;
@@ -1317,7 +1317,7 @@ views:
             cards:
               - type: custom:button-card
                 template: b_bento
-                entity: sensor.bluey_battery_level
+                entity: sensor.sonic_battery
                 variables:
                   label: Bluey
                   icon: phu:tesla-icon
@@ -1329,17 +1329,17 @@ views:
                 hold_action:
                   action: more-info
                 triggers_update:
-                  - sensor.bluey_battery_range
-                  - switch.bluey_charge
-                  - sensor.bluey_shift_state
-                  - device_tracker.bluey_location
+                  - sensor.sonic_range_rated
+                  - binary_sensor.sonic_charging
+                  - sensor.sonic_shift_state
+                  - device_tracker.tesla
                 custom_fields:
                   body: |-
                     [[[
-                      const r = Math.round(parseFloat(states['sensor.bluey_battery_range'] ? states['sensor.bluey_battery_range'].state : 0) || 0);
-                      const chg = states['switch.bluey_charge'] && states['switch.bluey_charge'].state === 'on';
-                      const shift = ((states['sensor.bluey_shift_state'] || {}).state || '').toLowerCase();
-                      const zones = states['device_tracker.bluey_location'] ? states['device_tracker.bluey_location'].attributes.in_zones : null;
+                      const r = Math.round(parseFloat(states['sensor.sonic_range_rated'] ? states['sensor.sonic_range_rated'].state : 0) || 0);
+                      const chg = states['binary_sensor.sonic_charging'] && states['binary_sensor.sonic_charging'].state === 'on';
+                      const shift = ((states['sensor.sonic_shift_state'] || {}).state || '').toLowerCase();
+                      const zones = states['device_tracker.tesla'] ? states['device_tracker.tesla'].attributes.in_zones : null;
                       const z = Array.isArray(zones) && zones.length ? zones[0] : null;
                       const loc = shift === 'd' ? 'Driving' : z === 'zone.home' ? 'Home' : (z && z.indexOf('_work') !== -1) ? 'Work' : 'Away';
                       return `<div style="font-size:22px;font-weight:700;line-height:1;margin-top:34px">${loc}</div>
@@ -1347,7 +1347,7 @@ views:
                     ]]]
                   ring: |-
                     [[[
-                      const p = Math.max(0, Math.min(100, Math.round(parseFloat(states['sensor.bluey_battery_level'] ? states['sensor.bluey_battery_level'].state : 0) || 0)));
+                      const p = Math.max(0, Math.min(100, Math.round(parseFloat(states['sensor.sonic_battery'] ? states['sensor.sonic_battery'].state : 0) || 0)));
                       return `<svg viewBox="0 0 64 64" width="60" height="60">
                         <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(127,127,127,0.18)" stroke-width="7"/>
                         <circle cx="32" cy="32" r="26" fill="none" stroke="#30d158" stroke-width="7" stroke-linecap="round"
@@ -1952,7 +1952,7 @@ views:
                   - sensor.sh50rs_a21c2106894_mppt_total_power
                   - sensor.sh50rs_a21c2106894_purchased_power
                   - sensor.sh50rs_a21c2106894_total_export_active_power
-                  - sensor.bluey_charger_power
+                  - sensor.sonic_charger_power
                   - sensor.kia_charger_power
                 extra_styles: >
                   .fs-wire{position:relative;height:4px;border-radius:2px;background:rgba(var(--rgb-primary-text-color),0.1);margin:0
@@ -1984,7 +1984,7 @@ views:
                       const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
                       const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
                       const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
-                      const tesla = w('sensor.bluey_charger_power');
+                      const tesla = w('sensor.sonic_charger_power');
                       const kia = w('sensor.kia_charger_power');
 
                       const fmt = v => v >= 1000 ? (v / 1000).toFixed(1) + ' kW' : Math.round(v) + ' W';
@@ -2071,25 +2071,25 @@ views:
             margin_top_mobile: 60px
             cards:
               - type: custom:button-card
-                entity: sensor.bluey_battery_level
+                entity: sensor.sonic_battery
                 show_icon: false
                 show_name: false
                 show_state: false
                 triggers_update:
-                  - sensor.bluey_battery_level
-                  - sensor.bluey_battery_range
-                  - sensor.bluey_shift_state
-                  - binary_sensor.bluey_charge_cable
-                  - switch.bluey_charge
-                  - sensor.bluey_inside_temperature
-                  - sensor.bluey_time_to_full_charge
+                  - sensor.sonic_battery
+                  - sensor.sonic_range_rated
+                  - sensor.sonic_shift_state
+                  - binary_sensor.sonic_plug
+                  - binary_sensor.sonic_charging
+                  - sensor.sonic_temperature_inside
+                  - sensor.sonic_charging_time_remaining
                   - input_boolean.bluey_show_range
                   - lock.bluey_lock
                   - climate.bluey_climate
                   - cover.bluey_trunk
                   - cover.bluey_frunk
                   - cover.bluey_charge_port_door
-                  - device_tracker.bluey_location
+                  - device_tracker.tesla
                   - number.bluey_charge_limit
                   - number.bluey_charge_current
                 extra_styles: |
@@ -2102,12 +2102,12 @@ views:
                   header: |
                     [[[
                       const showRange = states['input_boolean.bluey_show_range'].state === 'on';
-                      const battery = Math.round(states['sensor.bluey_battery_level'].state);
-                      const range = Math.round(states['sensor.bluey_battery_range'].state);
-                      const charging = states['switch.bluey_charge'].state === 'on';
+                      const battery = Math.round(states['sensor.sonic_battery'].state);
+                      const range = Math.round(states['sensor.sonic_range_rated'].state);
+                      const charging = states['binary_sensor.sonic_charging'].state === 'on';
                       const battColor = battery < 20 ? '#ff453a' : '#30d158';
                       const battIcon = charging ? 'mdi:battery-charging' : 'mdi:battery';
-                      let shift = (states['sensor.bluey_shift_state'].state || '').toUpperCase();
+                      let shift = (states['sensor.sonic_shift_state'].state || '').toUpperCase();
                       const shiftMap = { P: 'Parked', D: 'Driving', R: 'Reverse', N: 'Neutral', UNKNOWN: 'Parked' };
                       shift = shiftMap[shift] || 'Parked';
                       return `
@@ -2123,8 +2123,8 @@ views:
                     ]]]
                   car: |
                     [[[
-                      const cableConnected = states['binary_sensor.bluey_charge_cable'].state === 'on';
-                      const charging = states['switch.bluey_charge'].state === 'on';
+                      const cableConnected = states['binary_sensor.sonic_plug'].state === 'on';
+                      const charging = states['binary_sensor.sonic_charging'].state === 'on';
                       const carImage = cableConnected ? '/local/tesla_charging.png' : '/local/bluey_icon.png';
                       const chargePulse = charging ? `
                         <div style="position:absolute;bottom:2%;left:50%;transform:translateX(-50%);width:70%;height:12px;pointer-events:none;">
@@ -2217,7 +2217,7 @@ views:
                                   '#30d158' : '#ffffff'; ]]]
                   charge_panel: |
                     [[[
-                      const cableConnected = states['binary_sensor.bluey_charge_cable'].state === 'on';
+                      const cableConnected = states['binary_sensor.sonic_plug'].state === 'on';
                       if (!cableConnected) return '';
 
                       const chargeLimitEntity = states['number.bluey_charge_limit'];
@@ -2232,7 +2232,7 @@ views:
                       const ampsMax = ampsEntity && ampsEntity.attributes.max != null ? ampsEntity.attributes.max : 32;
                       const ampsStep = ampsEntity && ampsEntity.attributes.step != null ? ampsEntity.attributes.step : 1;
 
-                      const charging = states['switch.bluey_charge'].state === 'on';
+                      const charging = states['binary_sensor.sonic_charging'].state === 'on';
                       const chargeStatusText = charging ? 'Charging' : 'Charging Stopped';
                       const chargeStatusColor = charging ? '#30d158' : '#8f8f8f';
 
@@ -2277,11 +2277,11 @@ views:
                     ]]]
                   info: |
                     [[[
-                      const charging = states['switch.bluey_charge'].state === 'on';
-                      const climateTemp = states['sensor.bluey_inside_temperature'].state;
-                      const range = Math.round(states['sensor.bluey_battery_range'].state);
+                      const charging = states['binary_sensor.sonic_charging'].state === 'on';
+                      const climateTemp = states['sensor.sonic_temperature_inside'].state;
+                      const range = Math.round(states['sensor.sonic_range_rated'].state);
 
-                      const etaRaw = states['sensor.bluey_time_to_full_charge'];
+                      const etaRaw = states['sensor.sonic_charging_time_remaining'];
                       let eta = null;
                       if (charging && etaRaw && etaRaw.state !== 'unavailable' && etaRaw.state !== 'unknown' && parseFloat(etaRaw.state) > 0) {
                         const hrs = parseFloat(etaRaw.state);
@@ -2290,7 +2290,7 @@ views:
                         eta = h > 0 ? `${h}hr ${m}min` : `${m}min`;
                       }
 
-                      const tracker = states['device_tracker.bluey_location'];
+                      const tracker = states['device_tracker.tesla'];
                       const lat = tracker ? tracker.attributes.latitude : null;
                       const lon = tracker ? tracker.attributes.longitude : null;
                       const inZonesRaw = tracker ? tracker.attributes.in_zones : null;
@@ -2385,7 +2385,7 @@ views:
                     charge_panel:
                       - display: >
                           [[[ return
-                          states['binary_sensor.bluey_charge_cable'].state ===
+                          states['binary_sensor.sonic_plug'].state ===
                           'on' ? 'block' : 'none'; ]]]
           - type: custom:bubble-card
             card_type: pop-up
@@ -2436,7 +2436,7 @@ views:
                 square: false
                 cards:
                   - type: custom:button-card
-                    entity: sensor.bluey_battery_level
+                    entity: sensor.sonic_battery
                     entity_picture: /local/bluey_icon.png
                     name: Bluey
                     show_entity_picture: true
@@ -2444,17 +2444,17 @@ views:
                     show_label: true
                     show_name: true
                     triggers_update:
-                      - sensor.bluey_battery_level
-                      - sensor.bluey_battery_range
-                      - sensor.bluey_shift_state
-                      - device_tracker.bluey_location
+                      - sensor.sonic_battery
+                      - sensor.sonic_range_rated
+                      - sensor.sonic_shift_state
+                      - device_tracker.tesla
                     label: |
                       [[[
-                        const battery = states['sensor.bluey_battery_level'].state;
-                        const range = Math.round(states['sensor.bluey_battery_range'].state);
-                        const shift = (states['sensor.bluey_shift_state'].state || '').toLowerCase();
+                        const battery = states['sensor.sonic_battery'].state;
+                        const range = Math.round(states['sensor.sonic_range_rated'].state);
+                        const shift = (states['sensor.sonic_shift_state'].state || '').toLowerCase();
                         let location = 'Away';
-                        const zones = states['device_tracker.bluey_location'].attributes.in_zones;
+                        const zones = states['device_tracker.tesla'].attributes.in_zones;
                         const zoneId = Array.isArray(zones) && zones.length > 0 ? zones[0] : null;
                         if (shift === 'd') { location = 'Driving'; }
                         else if (zoneId === 'zone.home') { location = 'Home'; }
