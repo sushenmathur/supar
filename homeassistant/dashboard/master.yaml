@@ -1590,6 +1590,7 @@ views:
                   - weather.north_lakes_weather
                   - sun.sun
                   - input_boolean.weather_animations
+                  - input_boolean.festive_mode
                 show_icon: false
                 show_name: false
                 show_state: false
@@ -1687,7 +1688,8 @@ views:
                         rainy: 'rainy', pouring: 'pour', hail: 'pour', lightning: 'storm', 'lightning-rainy': 'storm',
                         snowy: 'snowy', 'snowy-rainy': 'snowy', fog: 'fog' };
                       const key = animOff ? '' : (kmap[cond] || '');
-                      if (!key) return '';
+                      const festive = states['input_boolean.festive_mode']?.state === 'on';
+                      if (!key && !festive) return '';
                       const r = (i, s) => { const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return x - Math.floor(x); };
                       const n = (c, f) => Array.from({ length: c }, (_, i) => f(i)).join('');
                       const clouds = (c, dark) => n(c, i => `<i class="ws-cl ${dark ? 'ws-d' : ''}" style="top:${-6 + r(i, 1) * 50}px;width:${110 + r(i, 2) * 90}px;animation-duration:${(dark ? 26 : 34) + r(i, 3) * 22}s;animation-delay:-${r(i, 4) * 40}s"></i>`);
@@ -1707,7 +1709,16 @@ views:
                         fog: '<i class="ws-band" style="top:14px;animation-duration:11s"></i><i class="ws-band" style="top:48px;animation-duration:15s;animation-delay:-5s"></i><i class="ws-band" style="top:80px;animation-duration:13s;animation-delay:-8s"></i>'
                       }[key];
                       const cls = { pour: 'rainy', nightcloud: 'night' }[key] || key;
-                      return `<div class="ws-sc ws-${cls}">${inner}</div>`;
+                      const weather = key ? `<div class="ws-sc ws-${cls}">${inner}</div>` : '';
+                      if (!festive) return weather;
+                      const diya = i => {
+                        const sc = (0.85 + r(i, 21) * 0.3).toFixed(2);
+                        const dl = `animation-delay:-${(r(i, 22) * 3).toFixed(2)}s`;
+                        return `<span class="fm-d" style="transform:scale(${sc})"><svg viewBox="0 0 44 40" width="46" height="42"><ellipse class="fm-glow" cx="22" cy="14" rx="20" ry="16" fill="url(#fmg)" style="${dl}"/><path class="fm-fl" d="M22 3 C28 9 29 15 22 21 C15 15 16 9 22 3Z" fill="url(#fmf)" style="${dl}"/><path class="fm-fl" d="M22 11 C24.8 14 24.8 16.5 22 19 C19.2 16.5 19.2 14 22 11Z" fill="#fff6c8" style="${dl}"/><path d="M3 22 Q5 36 22 36 Q39 36 41 22 Q22 27 3 22Z" fill="url(#fmb)" stroke="#ffd37a" stroke-width="1"/><ellipse cx="22" cy="22" rx="19" ry="3.4" fill="#7a3b12" stroke="#ffd37a" stroke-width="1"/></svg></span>`;
+                      };
+                      const sparks = n(10, i => `<i class="fm-sp" style="left:${(4 + r(i, 23) * 92).toFixed(1)}%;animation-duration:${(3 + r(i, 24) * 3).toFixed(1)}s;animation-delay:-${(r(i, 25) * 6).toFixed(1)}s"></i>`);
+                      const defs = '<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="fmf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff8a00"/><stop offset="1" stop-color="#ffe27a"/></linearGradient><linearGradient id="fmb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0a040"/><stop offset="1" stop-color="#a84a14"/></linearGradient><radialGradient id="fmg"><stop offset="0" stop-color="#ffc060" stop-opacity="0.65"/><stop offset="1" stop-color="#ffc060" stop-opacity="0"/></radialGradient></defs></svg>';
+                      return weather + `<div class="fm-sc">${defs}${sparks}<div class="fm-row">${n(11, diya)}</div></div>`;
                     ]]]
                   body: |
                     [[[
@@ -1858,8 +1869,43 @@ views:
                   opacity: 0.75; } 89% { opacity: 0.1; } 91% { opacity: 0.6; }
                   95% { opacity: 0; } }
 
-                  @media (prefers-reduced-motion: reduce) { .ws-sc * {
-                  animation: none !important; } }
+                  .fm-sc { position: absolute; inset: 0; overflow: hidden;
+                  border-radius: 28px; pointer-events: none; background:
+                  linear-gradient(to top, rgba(255,150,40,0.30), transparent
+                  58%); }
+
+                  .fm-row { position: absolute; left: 14px; right: 14px;
+                  bottom: 1px; display: flex; justify-content: space-between;
+                  align-items: flex-end; }
+
+                  .fm-d { display: block; line-height: 0; transform-origin: 50%
+                  100%; }
+
+                  .fm-fl { transform-box: fill-box; transform-origin: 50% 100%;
+                  animation: fm-flick 1.4s ease-in-out infinite; }
+
+                  .fm-glow { animation: fm-pulse 2.2s ease-in-out infinite; }
+
+                  .fm-sp { position: absolute; bottom: 14px; width: 3px;
+                  height: 3px; border-radius: 50%; background: #ffd77a;
+                  box-shadow: 0 0 6px 1px rgba(255,200,90,0.9); opacity: 0;
+                  animation: fm-rise linear infinite; }
+
+                  @keyframes fm-flick { 0%, 100% { transform: scale(1, 1)
+                  skewX(0deg); } 25% { transform: scale(0.92, 1.1)
+                  skewX(-4deg); } 50% { transform: scale(1.06, 0.93)
+                  skewX(3deg); } 75% { transform: scale(0.96, 1.06)
+                  skewX(-2deg); } }
+
+                  @keyframes fm-pulse { 0%, 100% { opacity: 0.55; } 50% {
+                  opacity: 1; } }
+
+                  @keyframes fm-rise { 0% { transform: translateY(0); opacity:
+                  0; } 15% { opacity: 1; } 100% { transform: translateY(-70px);
+                  opacity: 0; } }
+
+                  @media (prefers-reduced-motion: reduce) { .ws-sc *, .fm-sc *
+                  { animation: none !important; } }
                 styles:
                   card:
                     - height: 112px
