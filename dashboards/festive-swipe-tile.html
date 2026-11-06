@@ -1,0 +1,37 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Swipeable Good Night / Festive tile</title>
+<style>
+body{margin:0;padding:20px;background:#1e1b2e;color:#fff;font-family:Roboto,system-ui,sans-serif}
+h1{font-size:18px;margin:0 0 4px}p{font-size:13px;opacity:.75;margin:0 0 14px;max-width:760px}
+.f{position:relative;width:1080px;height:150px;overflow:hidden;border-radius:14px;background:url(previews/home-view-current.webp) -200px -70px no-repeat}
+.patch{position:absolute;left:700px;top:0;width:380px;height:120px;background:linear-gradient(90deg,#d7ecfb,#dcdcfb)}
+.row{position:absolute;left:705px;top:10px;display:flex;gap:9px}
+.t{width:66px;height:96px;border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.75),rgba(205,235,250,.55));border:1px solid rgba(255,255,255,.85);box-shadow:0 4px 14px rgba(80,100,160,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#1a2a3a;font-size:12px;font-weight:600;text-align:center;line-height:1.1;box-sizing:border-box}
+.t svg{width:24px;height:24px;fill:#1a2a3a}
+.pager{position:relative;width:66px;height:96px;border-radius:22px;overflow:hidden}
+.track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}.track::-webkit-scrollbar{display:none}
+.track .t{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:center;scroll-snap-stop:always;position:relative;cursor:pointer;user-select:none}
+.fest.on{background:linear-gradient(160deg,rgba(255,214,120,.95),rgba(255,160,60,.85));border-color:rgba(255,235,190,.95);box-shadow:0 0 18px rgba(255,170,60,.6)}
+.fest.on svg{fill:#7a3b00}
+.dots{position:absolute;left:0;right:0;bottom:7px;display:flex;justify-content:center;gap:4px;pointer-events:none}.dots i{width:5px;height:5px;border-radius:50%;background:rgba(26,42,58,.28);transition:.2s}.dots i.a{background:rgba(26,42,58,.8);width:11px;border-radius:3px}
+.t.lbl{padding-bottom:12px}
+.cap{font-size:12.5px;margin:6px 0 20px;opacity:.8}
+.states{display:flex;gap:10px;margin:12px 0}.states button{border:0;border-radius:99px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer;background:rgba(255,255,255,.18);color:#fff}
+</style></head><body>
+<h1>Swipeable tile: Good Night ⇄ Festive</h1>
+<p>The first quick-action tile becomes a two-page swipe tile (drag/swipe left or right on it below). Page 1 is Good Night exactly as today. Page 2 is Festive, which toggles the festive lights/diyas. Festive page only exists until 13 Nov; after that the tile is plain Good Night again, with no dots.</p>
+<div class="states"><button data-p="0">Show Good Night</button><button data-p="1">Show Festive</button></div>
+<div class="f"><div class="patch"></div><div class="row" id="row"></div></div>
+<div class="cap">Interactive: swipe the first tile, or tap Festive to switch it on/off (turns amber and glows when on).</div>
+<script>
+const ic=(d)=>`<svg viewBox="0 0 24 24"><path d="${d}"/></svg>`;
+const others=[['Announce','M3 10v4h3l5 4V6L6 10H3Zm13-2v8a4 4 0 0 0 0-8Z'],['Lost Phone','M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm0 3v13h8V5Z'],['WiFi','M12 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-5-3 1.5 1.5a5 5 0 0 1 7 0L17 15a7 7 0 0 0-10 0Zm-3-3 1.5 1.5a9 9 0 0 1 13 0L20 12a11 11 0 0 0-16 0Z'],['Robbie','M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-3 7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z']];
+const row=document.getElementById('row');
+row.innerHTML=`<div class="pager"><div class="track" id="tr">
+<div class="t lbl">${ic('M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z')}Good Night</div>
+<div class="t lbl fest on" id="fest">${ic('M12 2c3 4 3.5 7 0 11-3.5-4-3-7 0-11ZM4 15q1 6 8 6t8-6q-8 3-16 0Z')}Festive</div></div>
+<div class="dots"><i class="a"></i><i></i></div></div>`+others.map(o=>`<div class="t">${ic(o[1])}${o[0]}</div>`).join('');
+const tr=document.getElementById('tr'),dots=row.querySelectorAll('.dots i');
+tr.addEventListener('scroll',()=>{const p=Math.round(tr.scrollLeft/tr.clientWidth);dots.forEach((d,i)=>d.classList.toggle('a',i==p))});
+document.getElementById('fest').onclick=e=>e.currentTarget.classList.toggle('on');
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>tr.scrollTo({left:b.dataset.p*tr.clientWidth,behavior:'smooth'}));
+</script></body></html>
