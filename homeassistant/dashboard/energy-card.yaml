@@ -12,7 +12,7 @@ triggers_update:
   - sensor.sh50rs_a21c2106894_mppt_total_power
   - sensor.sh50rs_a21c2106894_purchased_power
   - sensor.sh50rs_a21c2106894_total_export_active_power
-  - sensor.bluey_charger_power
+  - sensor.sonic_charger_power
   - sensor.kia_charger_power
   - sensor.daily_import_cost
   - sensor.daily_solar_credit
@@ -32,7 +32,7 @@ custom_fields:
       const solar = w('sensor.sh50rs_a21c2106894_mppt_total_power');
       const imp = w('sensor.sh50rs_a21c2106894_purchased_power');
       const exp = w('sensor.sh50rs_a21c2106894_total_export_active_power');
-      const cars = w('sensor.bluey_charger_power') + w('sensor.kia_charger_power');
+      const cars = w('sensor.sonic_charger_power') + w('sensor.kia_charger_power');
       const load = Math.max(0, solar + imp - exp);
       const fromSolar = Math.max(0, solar - exp);
       const sPct = load > 0 ? Math.round(Math.min(1, fromSolar / load) * 100) : 0;

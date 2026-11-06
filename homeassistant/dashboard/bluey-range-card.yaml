@@ -1,5 +1,5 @@
 type: custom:button-card
-entity: sensor.bluey_battery_range
+entity: sensor.sonic_range_rated
 name: Range
 icon: mdi:gauge
 template: glass_chip

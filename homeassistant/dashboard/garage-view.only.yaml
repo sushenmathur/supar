@@ -45,20 +45,20 @@ sections:
   - type: grid
     cards:
       - type: custom:button-card
-        entity: sensor.bluey_battery_level
+        entity: sensor.sonic_battery
         template: glass_vehicle
         variables:
           title: Bluey
           image: /api/image/serve/cdd510be49f2493bc87fd540c01cea69/512x512
-          battery: sensor.bluey_battery_level
-          tracker: device_tracker.bluey_location
+          battery: sensor.sonic_battery
+          tracker: device_tracker.tesla
           onroad: input_boolean.tesla_onroad
-          charging: '[[[ return states["sensor.bluey_charging"]?.state === "Charging"; ]]]'
+          charging: '[[[ return states["binary_sensor.sonic_charging"]?.state === "on"; ]]]'
         grid_options:
           columns: 12
           rows: 8
       - type: custom:button-card
-        entity: sensor.bluey_battery_range
+        entity: sensor.sonic_range_rated
         name: |
           [[[
             const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
@@ -141,7 +141,7 @@ sections:
           columns: 4
           rows: 1
       - type: custom:button-card
-        entity: switch.bluey_charge
+        entity: binary_sensor.sonic_charging
         name: |
           [[[
             const tick = (t, n) => t.length <= n ? t : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;

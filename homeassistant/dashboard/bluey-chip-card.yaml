@@ -1,12 +1,12 @@
 type: custom:button-card
-entity: device_tracker.bluey_location
+entity: device_tracker.tesla
 name: Bluey
 template: glass_chip
 show_icon: false
 triggers_update:
-- device_tracker.bluey_location
-- sensor.bluey_battery_level
-- sensor.bluey_charging
+- device_tracker.tesla
+- sensor.sonic_battery
+- binary_sensor.sonic_charging
 extra_styles: |
   @keyframes bluey-ring-pulse {
     0%, 100% { filter: drop-shadow(0 0 0 rgba(16,185,129,0)); }
@@ -16,19 +16,19 @@ extra_styles: |
 label: |
   [[[
     const place = entity.state === 'home' ? 'Home' : entity.state === 'not_home' ? 'Away' : entity.state;
-    const pct = parseFloat(states['sensor.bluey_battery_level']?.state);
-    const charging = states['sensor.bluey_charging']?.state === 'Charging';
+    const pct = parseFloat(states['sensor.sonic_battery']?.state);
+    const charging = states['binary_sensor.sonic_charging']?.state === 'on';
     if (isNaN(pct)) return place;
     return `${place} · ${Math.round(pct)}%${charging ? ' · charging' : ''}`;
   ]]]
 custom_fields:
   ring: |
     [[[
-      const pct = parseFloat(states['sensor.bluey_battery_level']?.state);
+      const pct = parseFloat(states['sensor.sonic_battery']?.state);
       const has = !isNaN(pct);
       const p = has ? Math.max(0, Math.min(100, pct)) : 0;
       const col = !has ? 'var(--divider-color)' : p < 20 ? '#ef4444' : p < 50 ? '#f59e0b' : '#10b981';
-      const charging = states['sensor.bluey_charging']?.state === 'Charging';
+      const charging = states['binary_sensor.sonic_charging']?.state === 'on';
       return `<div style="position:relative;width:34px;height:34px;${charging ? 'animation:bluey-ring-pulse 1.6s ease-in-out infinite' : ''}">
         <div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(${col} ${p * 3.6}deg, rgba(var(--rgb-primary-text-color),0.15) 0);-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px))"></div>
         <ha-icon icon="phu:tesla-icon" style="position:absolute;left:50%;top:50%;margin:-8px 0 0 -8px;width:16px;height:16px;--mdc-icon-size:16px;color:var(--primary-text-color);display:block"></ha-icon>
@@ -72,21 +72,21 @@ tap_action:
         type: vertical-stack
         cards:
         - type: custom:button-card
-          entity: sensor.bluey_battery_level
+          entity: sensor.sonic_battery
           template: glass_vehicle
           variables:
             title: Bluey
             image: /api/image/serve/cdd510be49f2493bc87fd540c01cea69/512x512
-            battery: sensor.bluey_battery_level
-            tracker: device_tracker.bluey_location
+            battery: sensor.sonic_battery
+            tracker: device_tracker.tesla
             onroad: input_boolean.tesla_onroad
-            charging: '[[[ return states["sensor.bluey_charging"]?.state === "Charging"; ]]]'
+            charging: '[[[ return states["binary_sensor.sonic_charging"]?.state === "on"; ]]]'
           card_mod:
             style: 'ha-card { height: 330px; }'
         - type: horizontal-stack
           cards:
           - type: custom:button-card
-            entity: sensor.bluey_battery_range
+            entity: sensor.sonic_range_rated
             icon: mdi:gauge
             template:
             - glass_chip
@@ -145,7 +145,7 @@ tap_action:
               confirmation:
                 text: Open or close the boot?
           - type: custom:button-card
-            entity: switch.bluey_charge
+            entity: binary_sensor.sonic_charging
             icon: mdi:ev-station
             template:
             - glass_chip
