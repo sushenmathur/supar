@@ -1688,7 +1688,7 @@ views:
                         rainy: 'rainy', pouring: 'pour', hail: 'pour', lightning: 'storm', 'lightning-rainy': 'storm',
                         snowy: 'snowy', 'snowy-rainy': 'snowy', fog: 'fog' };
                       const key = animOff ? '' : (kmap[cond] || '');
-                      const festive = states['input_boolean.festive_mode']?.state === 'on';
+                      const festive = states['input_boolean.festive_mode']?.state === 'on' && night;
                       if (!key && !festive) return '';
                       const r = (i, s) => { const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return x - Math.floor(x); };
                       const n = (c, f) => Array.from({ length: c }, (_, i) => f(i)).join('');
@@ -1714,11 +1714,16 @@ views:
                       const diya = i => {
                         const sc = (0.85 + r(i, 21) * 0.3).toFixed(2);
                         const dl = `animation-delay:-${(r(i, 22) * 3).toFixed(2)}s`;
-                        return `<span class="fm-d" style="transform:scale(${sc})"><svg viewBox="0 0 44 40" width="46" height="42"><ellipse class="fm-glow" cx="22" cy="14" rx="20" ry="16" fill="url(#fmg)" style="${dl}"/><path class="fm-fl" d="M22 3 C28 9 29 15 22 21 C15 15 16 9 22 3Z" fill="url(#fmf)" style="${dl}"/><path class="fm-fl" d="M22 11 C24.8 14 24.8 16.5 22 19 C19.2 16.5 19.2 14 22 11Z" fill="#fff6c8" style="${dl}"/><path d="M3 22 Q5 36 22 36 Q39 36 41 22 Q22 27 3 22Z" fill="url(#fmb)" stroke="#ffd37a" stroke-width="1"/><ellipse cx="22" cy="22" rx="19" ry="3.4" fill="#7a3b12" stroke="#ffd37a" stroke-width="1"/></svg></span>`;
+                        return `<span class="fm-d" style="transform:scale(${sc})"><svg viewBox="0 0 44 40" width="34" height="31"><ellipse class="fm-glow" cx="22" cy="14" rx="20" ry="16" fill="url(#fmg)" style="${dl}"/><path class="fm-fl" d="M22 3 C28 9 29 15 22 21 C15 15 16 9 22 3Z" fill="url(#fmf)" style="${dl}"/><path class="fm-fl" d="M22 11 C24.8 14 24.8 16.5 22 19 C19.2 16.5 19.2 14 22 11Z" fill="#fff6c8" style="${dl}"/><path d="M3 22 Q5 36 22 36 Q39 36 41 22 Q22 27 3 22Z" fill="url(#fmb)" stroke="#ffd37a" stroke-width="1"/><ellipse cx="22" cy="22" rx="19" ry="3.4" fill="#7a3b12" stroke="#ffd37a" stroke-width="1"/></svg></span>`;
                       };
-                      const sparks = n(10, i => `<i class="fm-sp" style="left:${(4 + r(i, 23) * 92).toFixed(1)}%;animation-duration:${(3 + r(i, 24) * 3).toFixed(1)}s;animation-delay:-${(r(i, 25) * 6).toFixed(1)}s"></i>`);
+                      const sparks = n(6, i => `<i class="fm-sp" style="left:${(4 + r(i, 23) * 92).toFixed(1)}%;animation-duration:${(3 + r(i, 24) * 3).toFixed(1)}s;animation-delay:-${(r(i, 25) * 6).toFixed(1)}s"></i>`);
                       const defs = '<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="fmf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff8a00"/><stop offset="1" stop-color="#ffe27a"/></linearGradient><linearGradient id="fmb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0a040"/><stop offset="1" stop-color="#a84a14"/></linearGradient><radialGradient id="fmg"><stop offset="0" stop-color="#ffc060" stop-opacity="0.65"/><stop offset="1" stop-color="#ffc060" stop-opacity="0"/></radialGradient></defs></svg>';
-                      return weather + `<div class="fm-sc">${defs}${sparks}<div class="fm-row">${n(11, diya)}</div></div>`;
+                      const cols = ['#ff9d1a', '#ffd23f', '#ff5d8f', '#ffb347'];
+                      const bulbs = n(16, i => { const t = ((i % 8) + 0.5) / 8; const x = (i < 8 ? 0 : 350) + 350 * t; const y = 2 + 40 * t * (1 - t);
+                        return `<circle class="fm-bulb" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${cols[i % 4]}" style="animation-delay:-${(r(i, 30) * 2).toFixed(2)}s;filter:drop-shadow(0 0 4px ${cols[i % 4]})"/>`; });
+                      const wire = `<svg class="fm-wire" viewBox="0 0 700 30" preserveAspectRatio="none"><path d="M0 2 Q175 22 350 2 Q525 22 700 2" fill="none" stroke="rgba(255,215,140,0.55)" stroke-width="1.2"/>${bulbs}</svg>`;
+                      const lantern = (side, c, d) => `<div class="fm-lant" style="${side}:4px;animation-delay:-${d}s"><svg width="24" height="42" viewBox="0 0 26 46"><line x1="13" y1="0" x2="13" y2="8" stroke="#ffd37a"/><path d="M6 10 L20 10 L24 24 L13 40 L2 24Z" fill="${c}" fill-opacity="0.9" stroke="#ffd37a"/><path d="M13 10 L13 40 M6 10 L2 24 M20 10 L24 24" stroke="#ffd37a" stroke-opacity="0.6" fill="none"/><circle cx="13" cy="22" r="14" fill="url(#fmg)"/><path d="M13 40 L13 46" stroke="#ffd37a"/></svg></div>`;
+                      return weather + `<div class="fm-sc">${defs}${wire}${lantern('left', '#ff7a1a', 0)}${lantern('right', '#e8385f', 1.5)}${sparks}<div class="fm-row">${n(7, diya)}</div></div>`;
                     ]]]
                   body: |
                     [[[
@@ -1874,9 +1879,23 @@ views:
                   linear-gradient(to top, rgba(255,150,40,0.30), transparent
                   58%); }
 
-                  .fm-row { position: absolute; left: 14px; right: 14px;
-                  bottom: 1px; display: flex; justify-content: space-between;
+                  .fm-row { position: absolute; left: 120px; right: 120px;
+                  bottom: 1px; display: flex; justify-content: space-around;
                   align-items: flex-end; }
+
+                  .fm-wire { position: absolute; left: 0; top: 0; width: 100%;
+                  height: 30px; }
+
+                  .fm-bulb { animation: fm-bl 1.8s ease-in-out infinite; }
+
+                  .fm-lant { position: absolute; top: 0; transform-origin: 50%
+                  0; animation: fm-sw 4s ease-in-out infinite; }
+
+                  @keyframes fm-bl { 0%, 100% { opacity: 0.35; } 50% { opacity:
+                  1; } }
+
+                  @keyframes fm-sw { 0%, 100% { transform: rotate(-4deg); } 50%
+                  { transform: rotate(4deg); } }
 
                   .fm-d { display: block; line-height: 0; transform-origin: 50%
                   100%; }
@@ -1908,9 +1927,12 @@ views:
                   { animation: none !important; } }
                 styles:
                   card:
-                    - height: 112px
+                    - height: >-
+                        [[[ return (states['input_boolean.festive_mode']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '150px' : '112px'; ]]]
                     - border-radius: 28px
-                    - padding: 0 24px
+                    - padding: >-
+                        [[[ return (states['input_boolean.festive_mode']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '16px 24px 26px' : '0 24px'; ]]]
+                    - box-sizing: border-box
                     - position: relative
                     - overflow: hidden
                   grid:
