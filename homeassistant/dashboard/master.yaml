@@ -1930,8 +1930,7 @@ views:
                     - height: >-
                         [[[ return (states['switch.festive_lights']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '150px' : '112px'; ]]]
                     - border-radius: 28px
-                    - padding: >-
-                        [[[ return (states['switch.festive_lights']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '16px 24px 26px' : '0 24px'; ]]]
+                    - padding: 0 24px
                     - box-sizing: border-box
                     - position: relative
                     - overflow: hidden
@@ -1952,6 +1951,9 @@ views:
                       - z-index: 2
                       - width: 100%
                       - justify-self: stretch
+                      - padding: >-
+                          [[[ return (states['switch.festive_lights']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '16px 0 26px' : '0'; ]]]
+                      - box-sizing: border-box
               - type: grid
                 columns: 1
                 square: false
