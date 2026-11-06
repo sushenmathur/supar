@@ -1590,7 +1590,7 @@ views:
                   - weather.north_lakes_weather
                   - sun.sun
                   - input_boolean.weather_animations
-                  - input_boolean.festive_mode
+                  - switch.festive_lights
                 show_icon: false
                 show_name: false
                 show_state: false
@@ -1688,7 +1688,7 @@ views:
                         rainy: 'rainy', pouring: 'pour', hail: 'pour', lightning: 'storm', 'lightning-rainy': 'storm',
                         snowy: 'snowy', 'snowy-rainy': 'snowy', fog: 'fog' };
                       const key = animOff ? '' : (kmap[cond] || '');
-                      const festive = states['input_boolean.festive_mode']?.state === 'on' && night;
+                      const festive = states['switch.festive_lights']?.state === 'on' && night;
                       if (!key && !festive) return '';
                       const r = (i, s) => { const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return x - Math.floor(x); };
                       const n = (c, f) => Array.from({ length: c }, (_, i) => f(i)).join('');
@@ -1928,10 +1928,10 @@ views:
                 styles:
                   card:
                     - height: >-
-                        [[[ return (states['input_boolean.festive_mode']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '150px' : '112px'; ]]]
+                        [[[ return (states['switch.festive_lights']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '150px' : '112px'; ]]]
                     - border-radius: 28px
                     - padding: >-
-                        [[[ return (states['input_boolean.festive_mode']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '16px 24px 26px' : '0 24px'; ]]]
+                        [[[ return (states['switch.festive_lights']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '16px 24px 26px' : '0 24px'; ]]]
                     - box-sizing: border-box
                     - position: relative
                     - overflow: hidden
