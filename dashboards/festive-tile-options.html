@@ -1,0 +1,25 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><title>Festive tile – temporary placement</title>
+<style>
+body{margin:0;padding:20px;background:#1e1b2e;color:#fff;font-family:Roboto,system-ui,sans-serif}
+h1{font-size:18px;margin:0 0 4px}p{font-size:13px;opacity:.75;margin:0 0 16px}
+.f{position:relative;width:1080px;height:190px;overflow:hidden;border-radius:14px;margin-bottom:6px;background:url(previews/home-view-current.webp) -200px -70px no-repeat}
+h2{font-size:14px;margin:18px 0 2px}small{display:block;opacity:.7;font-size:12.5px;margin-bottom:8px}
+.patch{position:absolute;left:700px;top:0;width:380px;height:112px;background:linear-gradient(90deg,#d7ecfb,#dcdcfb)}
+.row{position:absolute;left:705px;top:10px;display:flex;gap:7px}
+.t{width:54px;height:96px;border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.75),rgba(205,235,250,.55));border:1px solid rgba(255,255,255,.85);box-shadow:0 4px 14px rgba(80,100,160,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#1a2a3a;font-size:11px;font-weight:600;text-align:center;line-height:1.1}
+.t svg{width:22px;height:22px;fill:#1a2a3a}
+.t.fest{background:linear-gradient(160deg,rgba(255,214,120,.95),rgba(255,160,60,.85));border-color:rgba(255,235,190,.95);box-shadow:0 0 18px rgba(255,170,60,.6)}
+.t.fest svg{fill:#5a2a00}.t.fest{animation:g 2.4s ease-in-out infinite}@keyframes g{50%{box-shadow:0 0 26px rgba(255,170,60,.9)}}
+.pill{position:absolute;left:400px;top:130px;display:flex;align-items:center;gap:7px;padding:5px 12px 5px 8px;border-radius:99px;background:rgba(255,190,80,.28);border:1px solid rgba(255,215,140,.7);color:#fff;font-size:12px;font-weight:600;backdrop-filter:blur(8px);box-shadow:0 0 14px rgba(255,170,60,.45)}
+.pill svg{width:18px;height:18px}.sw{width:30px;height:16px;border-radius:99px;background:#f59e0b;position:relative}.sw:after{content:"";position:absolute;right:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff}
+</style></head><body>
+<h1>Festive switch on the Home view – temporary (until 13 Nov)</h1><p>Both options appear only while the date is 6–13 Nov, then disappear on their own, so the base design returns untouched.</p>
+<h2>Option A – sixth quick-action tile</h2><small>"Festive" tile at the end of the quick-action row (Good Night, Announce, Lost Phone, WiFi, Robbie). Tiles narrow slightly while it is shown.</small>
+<div class="f"><div class="patch"></div><div class="row" id="ra"></div></div>
+<h2>Option B – pill inside the greeting card</h2><small>Small diya pill with a switch in the empty bottom-right corner of the greeting card. Nothing moves; the quick-action row stays at five tiles.</small>
+<div class="f"><div class="pill"><svg viewBox="0 0 44 40"><path d="M22 3C28 9 29 15 22 21 15 15 16 9 22 3Z" fill="#ffd23f"/><path d="M3 22Q5 36 22 36 39 36 41 22 22 27 3 22Z" fill="#f0a040" stroke="#ffd37a"/></svg>Festive<span class="sw"></span></div></div>
+<script>
+const I={a:'M12 3a7 7 0 0 0-4 12.7V18h8v-2.3A7 7 0 0 0 12 3Zm-3 17h6v1H9z',b:'M12 2a2 2 0 0 0-2 2v8l-2.5 2.5 1 1L12 13l3.5 2.5 1-1L14 12V4a2 2 0 0 0-2-2Z'};
+const tiles=[['Good Night','M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z'],['Announce','M3 10v4h3l5 4V6L6 10H3Zm13-2v8a4 4 0 0 0 0-8Z'],['Lost Phone','M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm0 3v13h8V5Z'],['WiFi','M12 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-5-3 1.5 1.5a5 5 0 0 1 7 0L17 15a7 7 0 0 0-10 0Zm-3-3 1.500 1.500a9 9 0 0 1 13 0L20 12a11 11 0 0 0-16 0Z'],['Robbie','M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-3 7a1.500 1.500 0 1 1 0 3 1.500 1.500 0 0 1 0-3Zm6 0a1.500 1.500 0 1 1 0 3 1.500 1.500 0 0 1 0-3Z'],['Festive','M12 2c3 4 3.500 7 0 11-3.500-4-3-7 0-11ZM4 15q1 6 8 6t8-6q-8 3-16 0Z',1]];
+document.getElementById('ra').innerHTML=tiles.map(t=>`<div class="t ${t[2]?'fest':''}"><svg viewBox="0 0 24 24"><path d="${t[1]}"/></svg>${t[0]}</div>`).join('');
+</script></body></html>
