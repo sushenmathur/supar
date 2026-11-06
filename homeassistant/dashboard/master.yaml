@@ -1984,18 +1984,63 @@ views:
                 columns: 5
                 square: false
                 cards:
-                  - type: custom:button-card
-                    entity: scene.good_night
-                    icon: mdi:weather-night
-                    name: Good Night
-                    template: glass_action
-                    tap_action:
-                      action: perform-action
-                      confirmation:
-                        text: Run the Good Night scene?
-                      perform_action: scene.turn_on
-                      target:
-                        entity_id: scene.good_night
+                  - type: horizontal-stack
+                    card_mod:
+                      style: |
+                        ha-card { background: none !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; overflow: hidden; height: 100%; }
+                        #root { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; height: 100%; }
+                        #root::-webkit-scrollbar { display: none; }
+                    cards:
+                      - type: custom:button-card
+                        entity: scene.good_night
+                        icon: mdi:weather-night
+                        name: Good Night
+                        template: glass_action
+                        card_mod:
+                          style: ':host { flex: 0 0 100% !important; scroll-snap-align: center; scroll-snap-stop: always; }'
+                        tap_action:
+                          action: perform-action
+                          confirmation:
+                            text: Run the Good Night scene?
+                          perform_action: scene.turn_on
+                          target:
+                            entity_id: scene.good_night
+                      - type: custom:button-card
+                        entity: switch.festive_lights
+                        icon: mdi:string-lights
+                        name: Festive
+                        template: glass_action
+                        visibility:
+                          - condition: state
+                            entity: sensor.date
+                            state:
+                              - '2026-11-06'
+                              - '2026-11-07'
+                              - '2026-11-08'
+                              - '2026-11-09'
+                              - '2026-11-10'
+                              - '2026-11-11'
+                              - '2026-11-12'
+                              - '2026-11-13'
+                        triggers_update:
+                          - switch.festive_lights
+                        card_mod:
+                          style: ':host { flex: 0 0 100% !important; scroll-snap-align: center; scroll-snap-stop: always; }'
+                        styles:
+                          card:
+                            - background: >
+                                [[[ return entity.state === 'on' ?
+                                'linear-gradient(145deg, rgba(255,200,90,0.55),
+                                rgba(245,130,40,0.30))' : 'var(--glass-bg-soft)'; ]]]
+                            - border-color: >
+                                [[[ return entity.state === 'on' ? '#f59e0b' :
+                                'var(--glass-border)'; ]]]
+                          icon:
+                            - color: >
+                                [[[ return entity.state === 'on' ? '#f59e0b' :
+                                'var(--primary-text-color)'; ]]]
+                        tap_action:
+                          action: toggle
                   - type: custom:button-card
                     entity: input_boolean.quiet_hour
                     icon: >-
