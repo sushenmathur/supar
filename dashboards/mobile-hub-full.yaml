@@ -944,10 +944,63 @@ views:
                       name: Announce
                       icon: mdi:account-voice
                       tap_action:
-                        action: perform-action
-                        perform_action: script.turn_on
-                        target:
-                          entity_id: script.say_tts_message
+                        action: fire-dom-event
+                        browser_mod:
+                          service: browser_mod.sequence
+                          data:
+                            sequence:
+                              - service: input_text.set_value
+                                data:
+                                  entity_id: input_text.announce_message
+                                  value: ""
+                              - service: browser_mod.popup
+                                data:
+                                  title: Announce
+                                  icon: mdi:bullhorn
+                                  size: normal
+                                  dismissable: true
+                                  content:
+                                    type: vertical-stack
+                                    cards:
+                                      - type: entities
+                                        entities:
+                                          - entity: input_select.announce_speaker
+                                            name: Speaker
+                                            icon: mdi:speaker-multiple
+                                          - entity: input_text.announce_message
+                                            name: Message
+                                            icon: mdi:message-text
+                                          - entity: input_number.announce_volume
+                                            name: Volume
+                                            icon: mdi:volume-high
+                                      - type: horizontal-stack
+                                        cards:
+                                          - type: custom:button-card
+                                            name: Cancel
+                                            show_icon: false
+                                            tap_action:
+                                              action: perform-action
+                                              perform_action: browser_mod.close_popup
+                                            styles:
+                                              card:
+                                                - height: 48px
+                                                - border-radius: 14px
+                                          - type: custom:button-card
+                                            name: Announce
+                                            icon: mdi:bullhorn
+                                            tap_action:
+                                              action: perform-action
+                                              perform_action: browser_mod.sequence
+                                              data:
+                                                sequence:
+                                                  - service: script.announce_from_helpers
+                                                  - service: browser_mod.close_popup
+                                            styles:
+                                              card:
+                                                - height: 48px
+                                                - border-radius: 14px
+                                                - background: var(--primary-color)
+                                                - color: var(--text-primary-color)
                     - type: custom:button-card
                       template: b_act
                       name: Call Paro
