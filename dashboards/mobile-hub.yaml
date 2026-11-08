@@ -979,8 +979,9 @@ views:
                                             name: Cancel
                                             show_icon: false
                                             tap_action:
-                                              action: perform-action
-                                              perform_action: browser_mod.close_popup
+                                              action: fire-dom-event
+                                              browser_mod:
+                                                service: browser_mod.close_popup
                                             styles:
                                               card:
                                                 - height: 48px
@@ -989,12 +990,13 @@ views:
                                             name: Announce
                                             icon: mdi:bullhorn
                                             tap_action:
-                                              action: perform-action
-                                              perform_action: browser_mod.sequence
-                                              data:
-                                                sequence:
-                                                  - service: script.announce_from_helpers
-                                                  - service: browser_mod.close_popup
+                                              action: fire-dom-event
+                                              browser_mod:
+                                                service: browser_mod.sequence
+                                                data:
+                                                  sequence:
+                                                    - service: script.announce_from_helpers
+                                                    - service: browser_mod.close_popup
                                             styles:
                                               card:
                                                 - height: 48px
