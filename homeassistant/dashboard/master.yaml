@@ -141,7 +141,7 @@ button_card_templates:
               const r = res && res.response;
               if (r && r.ok === true) {
                 say('Alert sent to ' + s.phone, 'good');
-                setTimeout(() => { try { h.callService('browser_mod', 'close_popup', { browser_id: bid }); } catch (e) {} }, 1500);
+                setTimeout(() => { try { if (window.browser_mod && window.browser_mod.service) window.browser_mod.service('close_popup', {}); else h.callService('browser_mod', 'close_popup', { browser_id: bid }); } catch (e) { try { h.callService('browser_mod', 'close_popup', { browser_id: bid }); } catch (e2) {} } }, 1500);
               } else if (r && r.ok === false) {
                 deny('Access Denied - Wrong passcode');
               } else {
@@ -381,69 +381,73 @@ button_card_templates:
     name: Quiet hour
     label: Off · tap to mute announcements
     tap_action:
-      action: perform-action
-      perform_action: browser_mod.popup
-      data:
-        style: >
-          color-scheme: light dark;
+      action: fire-dom-event
+      browser_mod:
+        service: browser_mod.popup
+        data:
+          style: >
+            color-scheme: light dark;
 
-          --ha-dialog-surface-background: light-dark(rgba(236, 242, 255, 0.62),
-          rgba(30, 38, 78, 0.66));
+            --ha-dialog-surface-background: light-dark(rgba(236, 242, 255, 0.62),
+            rgba(30, 38, 78, 0.66));
 
-          --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
+            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
 
-          --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45), rgba(0,
-          0, 0, 0.6));
+            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45), rgba(0,
+            0, 0, 0.6));
 
-          --primary-text-color: light-dark(#14203a, #ffffff);
+            --primary-text-color: light-dark(#14203a, #ffffff);
 
-          --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255,
-          255, 255, 0.68));
+            --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255,
+            255, 255, 0.68));
 
-          --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255,
-          255, 0.18));
-        title: Quiet hour
-        icon: mdi:bell-off
-        dismissable: true
-        content:
-          type: vertical-stack
-          cards:
-            - type: custom:button-card
-              template: qh_warn
-            - type: horizontal-stack
-              cards:
-                - type: custom:button-card
-                  template: qh_btn
-                  name: Cancel
-                  tap_action:
-                    action: perform-action
-                    perform_action: browser_mod.close_popup
-                - type: custom:button-card
-                  template: qh_btn_ok
-                  name: OK
-                  tap_action:
-                    action: perform-action
-                    perform_action: browser_mod.sequence
-                    data:
-                      sequence:
-                        - service: input_boolean.turn_on
-                          data:
-                            entity_id: input_boolean.quiet_hour
-                        - service: browser_mod.close_popup
+            --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255,
+            255, 0.18));
+          title: Quiet hour
+          icon: mdi:bell-off
+          dismissable: true
+          content:
+            type: vertical-stack
+            cards:
+              - type: custom:button-card
+                template: qh_warn
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    template: qh_btn
+                    name: Cancel
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.close_popup
+                  - type: custom:button-card
+                    template: qh_btn_ok
+                    name: OK
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.sequence
+                        data:
+                          sequence:
+                            - service: input_boolean.turn_on
+                              data:
+                                entity_id: input_boolean.quiet_hour
+                            - service: browser_mod.close_popup
   qh_quiet_on:
     template: qh_tile
     icon: mdi:bell-off
     name: Quiet hour
     label: On · announcements muted. Tap to turn off
     tap_action:
-      action: perform-action
-      perform_action: browser_mod.sequence
-      data:
-        sequence:
-          - service: input_boolean.turn_off
-            data:
-              entity_id: input_boolean.quiet_hour
-          - service: browser_mod.close_popup
+      action: fire-dom-event
+      browser_mod:
+        service: browser_mod.sequence
+        data:
+          sequence:
+            - service: input_boolean.turn_off
+              data:
+                entity_id: input_boolean.quiet_hour
+            - service: browser_mod.close_popup
     styles:
       card:
         - background: >-
@@ -1905,16 +1909,15 @@ views:
 
                   .fm-glow { animation: fm-pulse 2.2s ease-in-out infinite; }
 
-                  .fm-sp { position: absolute; bottom: 14px; width: 3px;
-                  height: 3px; border-radius: 50%; background: #ffd77a;
-                  box-shadow: 0 0 6px 1px rgba(255,200,90,0.9); opacity: 0;
-                  animation: fm-rise linear infinite; }
+                  .fm-sp { position: absolute; bottom: 14px; width: 3px; height:
+                  3px; border-radius: 50%; background: #ffd77a; box-shadow: 0 0
+                  6px 1px rgba(255,200,90,0.9); opacity: 0; animation: fm-rise
+                  linear infinite; }
 
                   @keyframes fm-flick { 0%, 100% { transform: scale(1, 1)
-                  skewX(0deg); } 25% { transform: scale(0.92, 1.1)
-                  skewX(-4deg); } 50% { transform: scale(1.06, 0.93)
-                  skewX(3deg); } 75% { transform: scale(0.96, 1.06)
-                  skewX(-2deg); } }
+                  skewX(0deg); } 25% { transform: scale(0.92, 1.1) skewX(-4deg);
+                  } 50% { transform: scale(1.06, 0.93) skewX(3deg); } 75% {
+                  transform: scale(0.96, 1.06) skewX(-2deg); } }
 
                   @keyframes fm-pulse { 0%, 100% { opacity: 0.55; } 50% {
                   opacity: 1; } }
@@ -1923,12 +1926,14 @@ views:
                   0; } 15% { opacity: 1; } 100% { transform: translateY(-70px);
                   opacity: 0; } }
 
-                  @media (prefers-reduced-motion: reduce) { .ws-sc *, .fm-sc *
-                  { animation: none !important; } }
+                  @media (prefers-reduced-motion: reduce) { .ws-sc *, .fm-sc * {
+                  animation: none !important; } }
                 styles:
                   card:
                     - height: >-
-                        [[[ return (states['switch.festive_lights']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '150px' : '112px'; ]]]
+                        [[[ return (states['switch.festive_lights']?.state ===
+                        'on' && states['sun.sun']?.state === 'below_horizon') ?
+                        '150px' : '112px'; ]]]
                     - border-radius: 28px
                     - padding: 0 24px
                     - box-sizing: border-box
@@ -1952,7 +1957,9 @@ views:
                       - width: 100%
                       - justify-self: stretch
                       - padding: >-
-                          [[[ return (states['switch.festive_lights']?.state === 'on' && states['sun.sun']?.state === 'below_horizon') ? '16px 0 26px' : '0'; ]]]
+                          [[[ return (states['switch.festive_lights']?.state ===
+                          'on' && states['sun.sun']?.state === 'below_horizon')
+                          ? '16px 0 26px' : '0'; ]]]
                       - box-sizing: border-box
               - type: grid
                 columns: 1
@@ -1986,9 +1993,16 @@ views:
                 cards:
                   - type: horizontal-stack
                     card_mod:
-                      style: |
-                        ha-card { background: none !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; overflow: hidden; height: 100%; }
-                        #root { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; height: 100%; }
+                      style: >
+                        ha-card { background: none !important; border: none
+                        !important; box-shadow: none !important;
+                        backdrop-filter: none !important; overflow: hidden;
+                        height: 100%; }
+
+                        #root { display: flex; overflow-x: auto;
+                        scroll-snap-type: x mandatory; scrollbar-width: none;
+                        overscroll-behavior-x: contain; height: 100%; }
+
                         #root::-webkit-scrollbar { display: none; }
                     cards:
                       - type: custom:button-card
@@ -1997,7 +2011,10 @@ views:
                         name: Good Night
                         template: glass_action
                         card_mod:
-                          style: ':host { flex: 0 0 100% !important; scroll-snap-align: center; scroll-snap-stop: always; }'
+                          style: >-
+                            :host { flex: 0 0 100% !important;
+                            scroll-snap-align: center; scroll-snap-stop: always;
+                            }
                         tap_action:
                           action: perform-action
                           confirmation:
@@ -2025,13 +2042,17 @@ views:
                         triggers_update:
                           - switch.festive_lights
                         card_mod:
-                          style: ':host { flex: 0 0 100% !important; scroll-snap-align: center; scroll-snap-stop: always; }'
+                          style: >-
+                            :host { flex: 0 0 100% !important;
+                            scroll-snap-align: center; scroll-snap-stop: always;
+                            }
                         styles:
                           card:
                             - background: >
                                 [[[ return entity.state === 'on' ?
                                 'linear-gradient(145deg, rgba(255,200,90,0.55),
-                                rgba(245,130,40,0.30))' : 'var(--glass-bg-soft)'; ]]]
+                                rgba(245,130,40,0.30))' :
+                                'var(--glass-bg-soft)'; ]]]
                             - border-color: >
                                 [[[ return entity.state === 'on' ? '#f59e0b' :
                                 'var(--glass-border)'; ]]]
@@ -2099,167 +2120,170 @@ views:
                               - type: custom:button-card
                                 template: qh_announce
                                 tap_action:
-                                  action: perform-action
-                                  perform_action: browser_mod.sequence
-                                  data:
-                                    sequence:
-                                      - service: input_text.set_value
-                                        data:
-                                          entity_id: input_text.announce_message
-                                          value: ''
-                                      - service: browser_mod.popup
-                                        data:
-                                          style: >
-                                            color-scheme: light dark;
+                                  action: fire-dom-event
+                                  browser_mod:
+                                    service: browser_mod.sequence
+                                    data:
+                                      sequence:
+                                        - service: input_text.set_value
+                                          data:
+                                            entity_id: input_text.announce_message
+                                            value: ''
+                                        - service: browser_mod.popup
+                                          data:
+                                            style: >
+                                              color-scheme: light dark;
 
-                                            --ha-dialog-surface-background:
-                                            light-dark(rgba(236, 242, 255, 0.62),
-                                            rgba(30, 38, 78, 0.66));
+                                              --ha-dialog-surface-background:
+                                              light-dark(rgba(236, 242, 255, 0.62),
+                                              rgba(30, 38, 78, 0.66));
 
-                                            --ha-dialog-surface-backdrop-filter:
-                                            blur(30px) saturate(190%);
+                                              --ha-dialog-surface-backdrop-filter:
+                                              blur(30px) saturate(190%);
 
-                                            --mdc-dialog-scrim-color:
-                                            light-dark(rgba(15, 20, 50, 0.45),
-                                            rgba(0, 0, 0, 0.6));
+                                              --mdc-dialog-scrim-color:
+                                              light-dark(rgba(15, 20, 50, 0.45),
+                                              rgba(0, 0, 0, 0.6));
 
-                                            --primary-text-color:
-                                            light-dark(#14203a, #ffffff);
+                                              --primary-text-color:
+                                              light-dark(#14203a, #ffffff);
 
-                                            --secondary-text-color:
-                                            light-dark(rgba(20, 32, 58, 0.62),
-                                            rgba(255, 255, 255, 0.68));
+                                              --secondary-text-color:
+                                              light-dark(rgba(20, 32, 58, 0.62),
+                                              rgba(255, 255, 255, 0.68));
 
-                                            --divider-color: light-dark(rgba(20, 32,
-                                            58, 0.12), rgba(255, 255, 255, 0.18));
-                                          title: Announce
-                                          icon: mdi:bullhorn
-                                          dismissable: true
-                                          size: normal
-                                          content:
-                                            type: vertical-stack
-                                            cards:
-                                              - type: conditional
-                                                conditions:
-                                                  - condition: state
-                                                    entity: input_boolean.quiet_hour
-                                                    state: 'on'
-                                                card:
-                                                  type: custom:button-card
-                                                  template: qh_banner
-                                              - type: heading
-                                                heading: Speakers
-                                                heading_style: subtitle
-                                                icon: mdi:speaker
-                                              - type: entities
-                                                show_header_toggle: false
-                                                entities:
-                                                  - entity: input_select.announce_speaker
-                                                    name: " "
-                                                    icon: mdi:speaker-multiple
-                                                card_mod:
-                                                  style: >-
-                                                    ha-card { background:
-                                                    var(--glass-chip-blue,
-                                                    linear-gradient(145deg,
-                                                    rgba(125,211,252,0.30),
-                                                    rgba(167,139,250,0.24))); border: 1px
-                                                    solid var(--glass-popup-border,
-                                                    rgba(255,255,255,0.80)); box-shadow:
-                                                    inset 0 1px 0 var(--glass-hi);
-                                                    backdrop-filter: blur(18px)
-                                                    saturate(180%); }
-                                              - type: heading
-                                                heading: Message
-                                                heading_style: subtitle
-                                                icon: mdi:message-text
-                                              - type: entities
-                                                show_header_toggle: false
-                                                entities:
-                                                  - entity: input_text.announce_message
-                                                    name: " "
-                                                card_mod:
-                                                  style: >-
-                                                    ha-card { background:
-                                                    var(--glass-chip-blue,
-                                                    linear-gradient(145deg,
-                                                    rgba(125,211,252,0.30),
-                                                    rgba(167,139,250,0.24))); border: 1px
-                                                    solid var(--glass-popup-border,
-                                                    rgba(255,255,255,0.80)); box-shadow:
-                                                    inset 0 1px 0 var(--glass-hi);
-                                                    backdrop-filter: blur(18px)
-                                                    saturate(180%); }
-                                              - type: heading
-                                                heading: Volume
-                                                heading_style: subtitle
-                                                icon: mdi:volume-high
-                                              - type: entities
-                                                show_header_toggle: false
-                                                entities:
-                                                  - entity: input_number.announce_volume
-                                                    name: " "
-                                                card_mod:
-                                                  style: >-
-                                                    ha-card { background:
-                                                    var(--glass-chip-blue,
-                                                    linear-gradient(145deg,
-                                                    rgba(125,211,252,0.30),
-                                                    rgba(167,139,250,0.24))); border: 1px
-                                                    solid var(--glass-popup-border,
-                                                    rgba(255,255,255,0.80)); box-shadow:
-                                                    inset 0 1px 0 var(--glass-hi);
-                                                    backdrop-filter: blur(18px)
-                                                    saturate(180%); }
-                                              - type: horizontal-stack
-                                                cards:
-                                                  - type: custom:button-card
-                                                    name: Cancel
-                                                    tap_action:
-                                                      action: perform-action
-                                                      perform_action: browser_mod.close_popup
-                                                    styles:
-                                                      card:
-                                                        - height: 54px
-                                                        - border-radius: 20px
-                                                        - background: >-
-                                                            var(--glass-chip-blue,
-                                                            linear-gradient(145deg,
-                                                            rgba(125,211,252,0.30),
-                                                            rgba(167,139,250,0.24)))
-                                                        - border: >-
-                                                            1px solid var(--glass-popup-border,
-                                                            rgba(255,255,255,0.80))
-                                                        - backdrop-filter: blur(18px)
-                                                      name:
-                                                        - font-weight: 700
-                                                    show_icon: false
-                                                  - type: custom:button-card
-                                                    name: Announce
-                                                    tap_action:
-                                                      action: perform-action
-                                                      perform_action: browser_mod.sequence
-                                                      data:
-                                                        sequence:
-                                                          - service: script.announce_from_helpers
-                                                          - service: browser_mod.close_popup
-                                                    styles:
-                                                      card:
-                                                        - height: 54px
-                                                        - border-radius: 20px
-                                                        - background: >-
-                                                            var(--glass-accent,
-                                                            linear-gradient(135deg, #7dd3fc,
-                                                            #818cf8))
-                                                        - border: >-
-                                                            1px solid var(--glass-popup-border,
-                                                            rgba(255,255,255,0.80))
-                                                        - backdrop-filter: blur(18px)
-                                                      name:
-                                                        - font-weight: 700
-                                                      icon:
-                                                        - width: 20px
-                                                    icon: mdi:bullhorn
+                                              --divider-color: light-dark(rgba(20, 32,
+                                              58, 0.12), rgba(255, 255, 255, 0.18));
+                                            title: Announce
+                                            icon: mdi:bullhorn
+                                            dismissable: true
+                                            size: normal
+                                            content:
+                                              type: vertical-stack
+                                              cards:
+                                                - type: conditional
+                                                  conditions:
+                                                    - condition: state
+                                                      entity: input_boolean.quiet_hour
+                                                      state: 'on'
+                                                  card:
+                                                    type: custom:button-card
+                                                    template: qh_banner
+                                                - type: heading
+                                                  heading: Speakers
+                                                  heading_style: subtitle
+                                                  icon: mdi:speaker
+                                                - type: entities
+                                                  show_header_toggle: false
+                                                  entities:
+                                                    - entity: input_select.announce_speaker
+                                                      name: " "
+                                                      icon: mdi:speaker-multiple
+                                                  card_mod:
+                                                    style: >-
+                                                      ha-card { background:
+                                                      var(--glass-chip-blue,
+                                                      linear-gradient(145deg,
+                                                      rgba(125,211,252,0.30),
+                                                      rgba(167,139,250,0.24))); border: 1px
+                                                      solid var(--glass-popup-border,
+                                                      rgba(255,255,255,0.80)); box-shadow:
+                                                      inset 0 1px 0 var(--glass-hi);
+                                                      backdrop-filter: blur(18px)
+                                                      saturate(180%); }
+                                                - type: heading
+                                                  heading: Message
+                                                  heading_style: subtitle
+                                                  icon: mdi:message-text
+                                                - type: entities
+                                                  show_header_toggle: false
+                                                  entities:
+                                                    - entity: input_text.announce_message
+                                                      name: " "
+                                                  card_mod:
+                                                    style: >-
+                                                      ha-card { background:
+                                                      var(--glass-chip-blue,
+                                                      linear-gradient(145deg,
+                                                      rgba(125,211,252,0.30),
+                                                      rgba(167,139,250,0.24))); border: 1px
+                                                      solid var(--glass-popup-border,
+                                                      rgba(255,255,255,0.80)); box-shadow:
+                                                      inset 0 1px 0 var(--glass-hi);
+                                                      backdrop-filter: blur(18px)
+                                                      saturate(180%); }
+                                                - type: heading
+                                                  heading: Volume
+                                                  heading_style: subtitle
+                                                  icon: mdi:volume-high
+                                                - type: entities
+                                                  show_header_toggle: false
+                                                  entities:
+                                                    - entity: input_number.announce_volume
+                                                      name: " "
+                                                  card_mod:
+                                                    style: >-
+                                                      ha-card { background:
+                                                      var(--glass-chip-blue,
+                                                      linear-gradient(145deg,
+                                                      rgba(125,211,252,0.30),
+                                                      rgba(167,139,250,0.24))); border: 1px
+                                                      solid var(--glass-popup-border,
+                                                      rgba(255,255,255,0.80)); box-shadow:
+                                                      inset 0 1px 0 var(--glass-hi);
+                                                      backdrop-filter: blur(18px)
+                                                      saturate(180%); }
+                                                - type: horizontal-stack
+                                                  cards:
+                                                    - type: custom:button-card
+                                                      name: Cancel
+                                                      tap_action:
+                                                        action: fire-dom-event
+                                                        browser_mod:
+                                                          service: browser_mod.close_popup
+                                                      styles:
+                                                        card:
+                                                          - height: 54px
+                                                          - border-radius: 20px
+                                                          - background: >-
+                                                              var(--glass-chip-blue,
+                                                              linear-gradient(145deg,
+                                                              rgba(125,211,252,0.30),
+                                                              rgba(167,139,250,0.24)))
+                                                          - border: >-
+                                                              1px solid var(--glass-popup-border,
+                                                              rgba(255,255,255,0.80))
+                                                          - backdrop-filter: blur(18px)
+                                                        name:
+                                                          - font-weight: 700
+                                                      show_icon: false
+                                                    - type: custom:button-card
+                                                      name: Announce
+                                                      tap_action:
+                                                        action: fire-dom-event
+                                                        browser_mod:
+                                                          service: browser_mod.sequence
+                                                          data:
+                                                            sequence:
+                                                              - service: script.announce_from_helpers
+                                                              - service: browser_mod.close_popup
+                                                      styles:
+                                                        card:
+                                                          - height: 54px
+                                                          - border-radius: 20px
+                                                          - background: >-
+                                                              var(--glass-accent,
+                                                              linear-gradient(135deg, #7dd3fc,
+                                                              #818cf8))
+                                                          - border: >-
+                                                              1px solid var(--glass-popup-border,
+                                                              rgba(255,255,255,0.80))
+                                                          - backdrop-filter: blur(18px)
+                                                        name:
+                                                          - font-weight: 700
+                                                        icon:
+                                                          - width: 20px
+                                                      icon: mdi:bullhorn
                               - type: conditional
                                 conditions:
                                   - condition: state
@@ -2315,34 +2339,35 @@ views:
                     name: WiFi
                     template: glass_action
                     tap_action:
-                      action: perform-action
-                      perform_action: browser_mod.popup
-                      data:
-                        style: >
-                          color-scheme: light dark;
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          style: >
+                            color-scheme: light dark;
 
-                          --ha-dialog-surface-background: light-dark(rgba(236,
-                          242, 255, 0.62), rgba(30, 38, 78, 0.66));
+                            --ha-dialog-surface-background: light-dark(rgba(236,
+                            242, 255, 0.62), rgba(30, 38, 78, 0.66));
 
-                          --ha-dialog-surface-backdrop-filter: blur(30px)
-                          saturate(190%);
+                            --ha-dialog-surface-backdrop-filter: blur(30px)
+                            saturate(190%);
 
-                          --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
-                          0.45), rgba(0, 0, 0, 0.6));
+                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
+                            0.45), rgba(0, 0, 0, 0.6));
 
-                          --primary-text-color: light-dark(#14203a, #ffffff);
+                            --primary-text-color: light-dark(#14203a, #ffffff);
 
-                          --secondary-text-color: light-dark(rgba(20, 32, 58,
-                          0.62), rgba(255, 255, 255, 0.68));
+                            --secondary-text-color: light-dark(rgba(20, 32, 58,
+                            0.62), rgba(255, 255, 255, 0.68));
 
-                          --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                          rgba(255, 255, 255, 0.18));
-                        title: Scan for WiFi
-                        content:
-                          type: picture
-                          image:
-                            media_content_id: media-source://image_upload/50750ef2d78e15cc901576e1c9fa2bae
-                            media_content_type: image/png
+                            --divider-color: light-dark(rgba(20, 32, 58, 0.12),
+                            rgba(255, 255, 255, 0.18));
+                          title: Scan for WiFi
+                          content:
+                            type: picture
+                            image:
+                              media_content_id: media-source://image_upload/50750ef2d78e15cc901576e1c9fa2bae
+                              media_content_type: image/png
                   - type: custom:button-card
                     entity: vacuum.robbie
                     icon: mdi:robot-vacuum
@@ -2411,229 +2436,230 @@ views:
                                 : s === 'error' ? 'robbie-pulse 1.0s ease-in-out infinite' : 'none';
                             ]]]
                     tap_action:
-                      action: perform-action
-                      perform_action: browser_mod.popup
-                      data:
-                        style: >
-                          color-scheme: light dark;
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          style: >
+                            color-scheme: light dark;
 
-                          --ha-dialog-surface-background: light-dark(rgba(236,
-                          242, 255, 0.62), rgba(30, 38, 78, 0.66));
+                            --ha-dialog-surface-background: light-dark(rgba(236,
+                            242, 255, 0.62), rgba(30, 38, 78, 0.66));
 
-                          --ha-dialog-surface-backdrop-filter: blur(30px)
-                          saturate(190%);
+                            --ha-dialog-surface-backdrop-filter: blur(30px)
+                            saturate(190%);
 
-                          --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
-                          0.45), rgba(0, 0, 0, 0.6));
+                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
+                            0.45), rgba(0, 0, 0, 0.6));
 
-                          --primary-text-color: light-dark(#14203a, #ffffff);
+                            --primary-text-color: light-dark(#14203a, #ffffff);
 
-                          --secondary-text-color: light-dark(rgba(20, 32, 58,
-                          0.62), rgba(255, 255, 255, 0.68));
+                            --secondary-text-color: light-dark(rgba(20, 32, 58,
+                            0.62), rgba(255, 255, 255, 0.68));
 
-                          --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                          rgba(255, 255, 255, 0.18));
-                        title: Robbie
-                        content:
-                          type: vertical-stack
-                          cards:
-                            - type: custom:mushroom-vacuum-card
-                              entity: vacuum.robbie
-                              commands:
-                                - start_pause
-                                - return_home
-                                - stop
-                              icon_animation: true
-                              card_mod:
-                                style:
-                                  mushroom-shape-icon$: >
-                                    {% if not is_state('vacuum.robbie',
-                                    'docked') %}
+                            --divider-color: light-dark(rgba(20, 32, 58, 0.12),
+                            rgba(255, 255, 255, 0.18));
+                          title: Robbie
+                          content:
+                            type: vertical-stack
+                            cards:
+                              - type: custom:mushroom-vacuum-card
+                                entity: vacuum.robbie
+                                commands:
+                                  - start_pause
+                                  - return_home
+                                  - stop
+                                icon_animation: true
+                                card_mod:
+                                  style:
+                                    mushroom-shape-icon$: >
+                                      {% if not is_state('vacuum.robbie',
+                                      'docked') %}
 
-                                    .shape { animation: robbie-pulse 2s
-                                    ease-in-out infinite; }
+                                      .shape { animation: robbie-pulse 2s
+                                      ease-in-out infinite; }
 
-                                    {% endif %}
+                                      {% endif %}
 
-                                    @keyframes robbie-pulse { 0%, 100% {
-                                    box-shadow: 0 0 0 0 color-mix(in srgb,
-                                    var(--glass-robbie, #2dd4bf) 0%,
-                                    transparent); } 50% { box-shadow: 0 0 18px
-                                    4px color-mix(in srgb, var(--glass-robbie,
-                                    #2dd4bf) 55%, transparent); } }
-                                  .: >
-                                    {% if not is_state('vacuum.robbie',
-                                    'docked') %}
+                                      @keyframes robbie-pulse { 0%, 100% {
+                                      box-shadow: 0 0 0 0 color-mix(in srgb,
+                                      var(--glass-robbie, #2dd4bf) 0%,
+                                      transparent); } 50% { box-shadow: 0 0 18px
+                                      4px color-mix(in srgb, var(--glass-robbie,
+                                      #2dd4bf) 55%, transparent); } }
+                                    .: >
+                                      {% if not is_state('vacuum.robbie',
+                                      'docked') %}
 
-                                    mushroom-shape-icon ha-state-icon,
-                                    mushroom-shape-icon ha-icon { animation:
-                                    robbie-spin 3s linear infinite;
-                                    transform-origin: center; }
+                                      mushroom-shape-icon ha-state-icon,
+                                      mushroom-shape-icon ha-icon { animation:
+                                      robbie-spin 3s linear infinite;
+                                      transform-origin: center; }
 
-                                    {% endif %}
+                                      {% endif %}
 
-                                    @keyframes robbie-spin { to { transform:
-                                    rotate(360deg); } }
-                            - type: grid
-                              columns: 2
-                              square: false
-                              cards:
-                                - type: tile
-                                  card_mod:
-                                    style: |
-                                      ha-card {
-                                        background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
-                                        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
-                                        box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
-                                        backdrop-filter: blur(12px) saturate(180%);
-                                        -webkit-backdrop-filter: blur(12px) saturate(180%);
-                                        --control-button-background-color: #ffffff;
-                                        --control-button-background-opacity: 0.26;
-                                        --control-button-icon-color: var(--primary-text-color);
-                                        --control-button-border-radius: 16px;
-                                        --control-slider-background: #ffffff;
-                                        --control-slider-background-opacity: 0.30;
-                                        --control-slider-color: #5b8cff;
-                                        --control-slider-border-radius: 16px;
-                                      }
-                                  entity: button.robbie_kitchen_clean
-                                  name: Kitchen
-                                  icon: mdi:countertop
-                                  tap_action:
-                                    action: perform-action
-                                    perform_action: button.press
-                                    target:
-                                      entity_id: button.robbie_kitchen_clean
-                                - type: tile
-                                  card_mod:
-                                    style: |
-                                      ha-card {
-                                        background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
-                                        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
-                                        box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
-                                        backdrop-filter: blur(12px) saturate(180%);
-                                        -webkit-backdrop-filter: blur(12px) saturate(180%);
-                                        --control-button-background-color: #ffffff;
-                                        --control-button-background-opacity: 0.26;
-                                        --control-button-icon-color: var(--primary-text-color);
-                                        --control-button-border-radius: 16px;
-                                        --control-slider-background: #ffffff;
-                                        --control-slider-background-opacity: 0.30;
-                                        --control-slider-color: #5b8cff;
-                                        --control-slider-border-radius: 16px;
-                                      }
-                                  entity: button.robbie_media_clean
-                                  name: Media Room
-                                  icon: mdi:television-shimmer
-                                  tap_action:
-                                    action: perform-action
-                                    perform_action: button.press
-                                    target:
-                                      entity_id: button.robbie_media_clean
-                                - type: tile
-                                  card_mod:
-                                    style: |
-                                      ha-card {
-                                        background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
-                                        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
-                                        box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
-                                        backdrop-filter: blur(12px) saturate(180%);
-                                        -webkit-backdrop-filter: blur(12px) saturate(180%);
-                                        --control-button-background-color: #ffffff;
-                                        --control-button-background-opacity: 0.26;
-                                        --control-button-icon-color: var(--primary-text-color);
-                                        --control-button-border-radius: 16px;
-                                        --control-slider-background: #ffffff;
-                                        --control-slider-background-opacity: 0.30;
-                                        --control-slider-color: #5b8cff;
-                                        --control-slider-border-radius: 16px;
-                                      }
-                                  entity: button.robbie_media_kitchen2
-                                  name: Media & Kitchen
-                                  icon: mdi:silverware-clean
-                                  tap_action:
-                                    action: perform-action
-                                    perform_action: button.press
-                                    target:
-                                      entity_id: button.robbie_media_kitchen2
-                                - type: tile
-                                  card_mod:
-                                    style: |
-                                      ha-card {
-                                        background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
-                                        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
-                                        box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
-                                        backdrop-filter: blur(12px) saturate(180%);
-                                        -webkit-backdrop-filter: blur(12px) saturate(180%);
-                                        --control-button-background-color: #ffffff;
-                                        --control-button-background-opacity: 0.26;
-                                        --control-button-icon-color: var(--primary-text-color);
-                                        --control-button-border-radius: 16px;
-                                        --control-slider-background: #ffffff;
-                                        --control-slider-background-opacity: 0.30;
-                                        --control-slider-color: #5b8cff;
-                                        --control-slider-border-radius: 16px;
-                                      }
-                                  entity: button.robbie_coffee_station_clean
-                                  name: Coffee Station
-                                  icon: mdi:coffee-maker
-                                  tap_action:
-                                    action: perform-action
-                                    perform_action: button.press
-                                    target:
-                                      entity_id: button.robbie_coffee_station_clean
-                                - type: tile
-                                  card_mod:
-                                    style: |
-                                      ha-card {
-                                        background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
-                                        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
-                                        box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
-                                        backdrop-filter: blur(12px) saturate(180%);
-                                        -webkit-backdrop-filter: blur(12px) saturate(180%);
-                                        --control-button-background-color: #ffffff;
-                                        --control-button-background-opacity: 0.26;
-                                        --control-button-icon-color: var(--primary-text-color);
-                                        --control-button-border-radius: 16px;
-                                        --control-slider-background: #ffffff;
-                                        --control-slider-background-opacity: 0.30;
-                                        --control-slider-color: #5b8cff;
-                                        --control-slider-border-radius: 16px;
-                                      }
-                                  entity: button.robbie_tiled_area_clean
-                                  name: Mop Tiled Area
-                                  icon: mdi:vacuum-outline
-                                  tap_action:
-                                    action: perform-action
-                                    perform_action: button.press
-                                    target:
-                                      entity_id: button.robbie_tiled_area_clean
-                                - type: tile
-                                  card_mod:
-                                    style: |
-                                      ha-card {
-                                        background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
-                                        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
-                                        box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
-                                        backdrop-filter: blur(12px) saturate(180%);
-                                        -webkit-backdrop-filter: blur(12px) saturate(180%);
-                                        --control-button-background-color: #ffffff;
-                                        --control-button-background-opacity: 0.26;
-                                        --control-button-icon-color: var(--primary-text-color);
-                                        --control-button-border-radius: 16px;
-                                        --control-slider-background: #ffffff;
-                                        --control-slider-background-opacity: 0.30;
-                                        --control-slider-color: #5b8cff;
-                                        --control-slider-border-radius: 16px;
-                                      }
-                                  entity: button.robbie_hallways
-                                  name: Hallways
-                                  icon: mdi:door-open
-                                  tap_action:
-                                    action: perform-action
-                                    perform_action: button.press
-                                    target:
-                                      entity_id: button.robbie_hallways
+                                      @keyframes robbie-spin { to { transform:
+                                      rotate(360deg); } }
+                              - type: grid
+                                columns: 2
+                                square: false
+                                cards:
+                                  - type: tile
+                                    card_mod:
+                                      style: |
+                                        ha-card {
+                                          background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
+                                          border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
+                                          box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
+                                          backdrop-filter: blur(12px) saturate(180%);
+                                          -webkit-backdrop-filter: blur(12px) saturate(180%);
+                                          --control-button-background-color: #ffffff;
+                                          --control-button-background-opacity: 0.26;
+                                          --control-button-icon-color: var(--primary-text-color);
+                                          --control-button-border-radius: 16px;
+                                          --control-slider-background: #ffffff;
+                                          --control-slider-background-opacity: 0.30;
+                                          --control-slider-color: #5b8cff;
+                                          --control-slider-border-radius: 16px;
+                                        }
+                                    entity: button.robbie_kitchen_clean
+                                    name: Kitchen
+                                    icon: mdi:countertop
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: button.press
+                                      target:
+                                        entity_id: button.robbie_kitchen_clean
+                                  - type: tile
+                                    card_mod:
+                                      style: |
+                                        ha-card {
+                                          background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
+                                          border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
+                                          box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
+                                          backdrop-filter: blur(12px) saturate(180%);
+                                          -webkit-backdrop-filter: blur(12px) saturate(180%);
+                                          --control-button-background-color: #ffffff;
+                                          --control-button-background-opacity: 0.26;
+                                          --control-button-icon-color: var(--primary-text-color);
+                                          --control-button-border-radius: 16px;
+                                          --control-slider-background: #ffffff;
+                                          --control-slider-background-opacity: 0.30;
+                                          --control-slider-color: #5b8cff;
+                                          --control-slider-border-radius: 16px;
+                                        }
+                                    entity: button.robbie_media_clean
+                                    name: Media Room
+                                    icon: mdi:television-shimmer
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: button.press
+                                      target:
+                                        entity_id: button.robbie_media_clean
+                                  - type: tile
+                                    card_mod:
+                                      style: |
+                                        ha-card {
+                                          background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
+                                          border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
+                                          box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
+                                          backdrop-filter: blur(12px) saturate(180%);
+                                          -webkit-backdrop-filter: blur(12px) saturate(180%);
+                                          --control-button-background-color: #ffffff;
+                                          --control-button-background-opacity: 0.26;
+                                          --control-button-icon-color: var(--primary-text-color);
+                                          --control-button-border-radius: 16px;
+                                          --control-slider-background: #ffffff;
+                                          --control-slider-background-opacity: 0.30;
+                                          --control-slider-color: #5b8cff;
+                                          --control-slider-border-radius: 16px;
+                                        }
+                                    entity: button.robbie_media_kitchen2
+                                    name: Media & Kitchen
+                                    icon: mdi:silverware-clean
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: button.press
+                                      target:
+                                        entity_id: button.robbie_media_kitchen2
+                                  - type: tile
+                                    card_mod:
+                                      style: |
+                                        ha-card {
+                                          background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
+                                          border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
+                                          box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
+                                          backdrop-filter: blur(12px) saturate(180%);
+                                          -webkit-backdrop-filter: blur(12px) saturate(180%);
+                                          --control-button-background-color: #ffffff;
+                                          --control-button-background-opacity: 0.26;
+                                          --control-button-icon-color: var(--primary-text-color);
+                                          --control-button-border-radius: 16px;
+                                          --control-slider-background: #ffffff;
+                                          --control-slider-background-opacity: 0.30;
+                                          --control-slider-color: #5b8cff;
+                                          --control-slider-border-radius: 16px;
+                                        }
+                                    entity: button.robbie_coffee_station_clean
+                                    name: Coffee Station
+                                    icon: mdi:coffee-maker
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: button.press
+                                      target:
+                                        entity_id: button.robbie_coffee_station_clean
+                                  - type: tile
+                                    card_mod:
+                                      style: |
+                                        ha-card {
+                                          background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
+                                          border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
+                                          box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
+                                          backdrop-filter: blur(12px) saturate(180%);
+                                          -webkit-backdrop-filter: blur(12px) saturate(180%);
+                                          --control-button-background-color: #ffffff;
+                                          --control-button-background-opacity: 0.26;
+                                          --control-button-icon-color: var(--primary-text-color);
+                                          --control-button-border-radius: 16px;
+                                          --control-slider-background: #ffffff;
+                                          --control-slider-background-opacity: 0.30;
+                                          --control-slider-color: #5b8cff;
+                                          --control-slider-border-radius: 16px;
+                                        }
+                                    entity: button.robbie_tiled_area_clean
+                                    name: Mop Tiled Area
+                                    icon: mdi:vacuum-outline
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: button.press
+                                      target:
+                                        entity_id: button.robbie_tiled_area_clean
+                                  - type: tile
+                                    card_mod:
+                                      style: |
+                                        ha-card {
+                                          background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34));
+                                          border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70));
+                                          box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90));
+                                          backdrop-filter: blur(12px) saturate(180%);
+                                          -webkit-backdrop-filter: blur(12px) saturate(180%);
+                                          --control-button-background-color: #ffffff;
+                                          --control-button-background-opacity: 0.26;
+                                          --control-button-icon-color: var(--primary-text-color);
+                                          --control-button-border-radius: 16px;
+                                          --control-slider-background: #ffffff;
+                                          --control-slider-background-opacity: 0.30;
+                                          --control-slider-color: #5b8cff;
+                                          --control-slider-border-radius: 16px;
+                                        }
+                                    entity: button.robbie_hallways
+                                    name: Hallways
+                                    icon: mdi:door-open
+                                    tap_action:
+                                      action: perform-action
+                                      perform_action: button.press
+                                      target:
+                                        entity_id: button.robbie_hallways
                 card_mod:
                   style: ':host { flex: 1.3 1 0 !important; }'
           - type: grid
@@ -3199,19 +3225,27 @@ views:
               rows: 2
       - type: grid
         cards:
-          - type: custom:calendar-card-pro
+          - config_version: 5
             entities:
               - calendar.supar_family
-            compact_days_to_show: 1
-            compact_events_complete_days: true
-            compact_events_to_show: 2
             filter_duplicates: true
+            today_weekday_color: Blue
             show_location: false
+            type: custom:calendar-card-pro
             tap_action:
               action: expand
-            today_weekday_color: Blue
+            hold_action:
+              action: perform-action
+              perform_action: select.select_option
+              target:
+                entity_id: select.kitchen_tab_calendar_view
+              data:
+                option: Week
+            list:
+              compact_days_to_show: 1
+              compact_events_to_show: 2
+              compact_events_complete_days: true
             weather:
-              position: event
               date:
                 color: var(--primary-text-color)
                 font_size: 12px
@@ -3225,6 +3259,7 @@ views:
                 icon_size: 14px
                 show_conditions: true
                 show_temp: true
+              entity: weather.north_lakes_weather
           - type: custom:button-card
             entity: device_tracker.kia_gps_location
             name: Sorento
@@ -3496,7 +3531,9 @@ views:
                           tracker: device_tracker.tesla
                           onroad: input_boolean.tesla_onroad
                           charging: >-
-                            [[[ return states["binary_sensor.sonic_charging"]?.state === "on"; ]]]
+                            [[[ return
+                            states["binary_sensor.sonic_charging"]?.state ===
+                            "on"; ]]]
                         card_mod:
                           style: 'ha-card { height: 330px; }'
                       - type: horizontal-stack
@@ -3630,14 +3667,15 @@ views:
                         icon: mdi:shield-home
                         template: glass_action
                         tap_action:
-                          action: perform-action
-                          perform_action: browser_mod.sequence
-                          data:
-                            sequence:
-                              - service: browser_mod.close_popup
-                              - service: browser_mod.navigate
-                                data:
-                                  path: /dashboard-hub/security
+                          action: fire-dom-event
+                          browser_mod:
+                            service: browser_mod.sequence
+                            data:
+                              sequence:
+                                - service: browser_mod.close_popup
+                                - service: browser_mod.navigate
+                                  data:
+                                    path: /dashboard-hub/security
                         styles:
                           card:
                             - height: 56px
@@ -4685,7 +4723,8 @@ views:
               tracker: device_tracker.tesla
               onroad: input_boolean.tesla_onroad
               charging: >-
-                [[[ return states["binary_sensor.sonic_charging"]?.state === "on"; ]]]
+                [[[ return states["binary_sensor.sonic_charging"]?.state ===
+                "on"; ]]]
             grid_options:
               columns: 12
               rows: 8
