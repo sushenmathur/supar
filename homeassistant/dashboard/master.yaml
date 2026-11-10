@@ -1,9 +1,3 @@
-kiosk_mode:
-  user_settings:
-    - users:
-        - suparhome
-      hide_header: true
-      hide_sidebar: true
 button_card_templates:
   lp_display:
     show_icon: false
@@ -386,23 +380,7 @@ button_card_templates:
         service: browser_mod.popup
         data:
           style: >
-            color-scheme: light dark;
-
-            --ha-dialog-surface-background: light-dark(rgba(236, 242, 255, 0.62),
-            rgba(30, 38, 78, 0.66));
-
-            --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%);
-
-            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45), rgba(0,
-            0, 0, 0.6));
-
-            --primary-text-color: light-dark(#14203a, #ffffff);
-
-            --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62), rgba(255,
-            255, 255, 0.68));
-
-            --divider-color: light-dark(rgba(20, 32, 58, 0.12), rgba(255, 255,
-            255, 0.18));
+            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
           title: Quiet hour
           icon: mdi:bell-off
           dismissable: true
@@ -1382,24 +1360,7 @@ views:
                         service: browser_mod.popup
                         data:
                           style: >
-                            color-scheme: light dark;
-
-                            --ha-dialog-surface-background: light-dark(rgba(236,
-                            242, 255, 0.62), rgba(30, 38, 78, 0.66));
-
-                            --ha-dialog-surface-backdrop-filter: blur(30px)
-                            saturate(190%);
-
-                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20,
-                            50, 0.45), rgba(0, 0, 0, 0.6));
-
-                            --primary-text-color: light-dark(#14203a, #ffffff);
-
-                            --secondary-text-color: light-dark(rgba(20, 32, 58,
-                            0.62), rgba(255, 255, 255, 0.68));
-
-                            --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                            rgba(255, 255, 255, 0.18));
+                            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                           title: Close the garage door?
                           content: >-
                             The door will start closing straight away. Make sure
@@ -1604,24 +1565,7 @@ views:
                     service: browser_mod.popup
                     data:
                       style: >
-                        color-scheme: light dark;
-
-                        --ha-dialog-surface-background: light-dark(rgba(236,
-                        242, 255, 0.62), rgba(30, 38, 78, 0.66));
-
-                        --ha-dialog-surface-backdrop-filter: blur(30px)
-                        saturate(190%);
-
-                        --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
-                        0.45), rgba(0, 0, 0, 0.6));
-
-                        --primary-text-color: light-dark(#14203a, #ffffff);
-
-                        --secondary-text-color: light-dark(rgba(20, 32, 58,
-                        0.62), rgba(255, 255, 255, 0.68));
-
-                        --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                        rgba(255, 255, 255, 0.18));
+                        --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                       title: Brisbane
                       icon: mdi:weather-partly-cloudy
                       dismissable: true
@@ -2092,24 +2036,7 @@ views:
                         service: browser_mod.popup
                         data:
                           style: >
-                            color-scheme: light dark;
-
-                            --ha-dialog-surface-background: light-dark(rgba(236,
-                            242, 255, 0.62), rgba(30, 38, 78, 0.66));
-
-                            --ha-dialog-surface-backdrop-filter: blur(30px)
-                            saturate(190%);
-
-                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20,
-                            50, 0.45), rgba(0, 0, 0, 0.6));
-
-                            --primary-text-color: light-dark(#14203a, #ffffff);
-
-                            --secondary-text-color: light-dark(rgba(20, 32, 58,
-                            0.62), rgba(255, 255, 255, 0.68));
-
-                            --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                            rgba(255, 255, 255, 0.18));
+                            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                           title: Announce
                           icon: mdi:bullhorn
                           dismissable: true
@@ -2132,28 +2059,7 @@ views:
                                         - service: browser_mod.popup
                                           data:
                                             style: >
-                                              color-scheme: light dark;
-
-                                              --ha-dialog-surface-background:
-                                              light-dark(rgba(236, 242, 255, 0.62),
-                                              rgba(30, 38, 78, 0.66));
-
-                                              --ha-dialog-surface-backdrop-filter:
-                                              blur(30px) saturate(190%);
-
-                                              --mdc-dialog-scrim-color:
-                                              light-dark(rgba(15, 20, 50, 0.45),
-                                              rgba(0, 0, 0, 0.6));
-
-                                              --primary-text-color:
-                                              light-dark(#14203a, #ffffff);
-
-                                              --secondary-text-color:
-                                              light-dark(rgba(20, 32, 58, 0.62),
-                                              rgba(255, 255, 255, 0.68));
-
-                                              --divider-color: light-dark(rgba(20, 32,
-                                              58, 0.12), rgba(255, 255, 255, 0.18));
+                                              --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                                             title: Announce
                                             icon: mdi:bullhorn
                                             dismissable: true
@@ -2311,24 +2217,7 @@ views:
                         service: browser_mod.popup
                         data:
                           style: >
-                            color-scheme: light dark;
-
-                            --ha-dialog-surface-background: light-dark(rgba(236,
-                            242, 255, 0.62), rgba(30, 38, 78, 0.66));
-
-                            --ha-dialog-surface-backdrop-filter: blur(30px)
-                            saturate(190%);
-
-                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20,
-                            50, 0.45), rgba(0, 0, 0, 0.6));
-
-                            --primary-text-color: light-dark(#14203a, #ffffff);
-
-                            --secondary-text-color: light-dark(rgba(20, 32, 58,
-                            0.62), rgba(255, 255, 255, 0.68));
-
-                            --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                            rgba(255, 255, 255, 0.18));
+                            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                           title: Lost Phone
                           dismissable: true
                           content:
@@ -2344,24 +2233,7 @@ views:
                         service: browser_mod.popup
                         data:
                           style: >
-                            color-scheme: light dark;
-
-                            --ha-dialog-surface-background: light-dark(rgba(236,
-                            242, 255, 0.62), rgba(30, 38, 78, 0.66));
-
-                            --ha-dialog-surface-backdrop-filter: blur(30px)
-                            saturate(190%);
-
-                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
-                            0.45), rgba(0, 0, 0, 0.6));
-
-                            --primary-text-color: light-dark(#14203a, #ffffff);
-
-                            --secondary-text-color: light-dark(rgba(20, 32, 58,
-                            0.62), rgba(255, 255, 255, 0.68));
-
-                            --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                            rgba(255, 255, 255, 0.18));
+                            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                           title: Scan for WiFi
                           content:
                             type: picture
@@ -2441,24 +2313,7 @@ views:
                         service: browser_mod.popup
                         data:
                           style: >
-                            color-scheme: light dark;
-
-                            --ha-dialog-surface-background: light-dark(rgba(236,
-                            242, 255, 0.62), rgba(30, 38, 78, 0.66));
-
-                            --ha-dialog-surface-backdrop-filter: blur(30px)
-                            saturate(190%);
-
-                            --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
-                            0.45), rgba(0, 0, 0, 0.6));
-
-                            --primary-text-color: light-dark(#14203a, #ffffff);
-
-                            --secondary-text-color: light-dark(rgba(20, 32, 58,
-                            0.62), rgba(255, 255, 255, 0.68));
-
-                            --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                            rgba(255, 255, 255, 0.18));
+                            --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                           title: Robbie
                           content:
                             type: vertical-stack
@@ -2867,24 +2722,7 @@ views:
                     service: browser_mod.popup
                     data:
                       style: >
-                        color-scheme: light dark;
-
-                        --ha-dialog-surface-background: light-dark(rgba(236,
-                        242, 255, 0.62), rgba(30, 38, 78, 0.66));
-
-                        --ha-dialog-surface-backdrop-filter: blur(30px)
-                        saturate(190%);
-
-                        --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50,
-                        0.45), rgba(0, 0, 0, 0.6));
-
-                        --primary-text-color: light-dark(#14203a, #ffffff);
-
-                        --secondary-text-color: light-dark(rgba(20, 32, 58,
-                        0.62), rgba(255, 255, 255, 0.68));
-
-                        --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                        rgba(255, 255, 255, 0.18));
+                        --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                       title: Media
                       dismissable: true
                       size: normal
@@ -3316,24 +3154,7 @@ views:
                 service: browser_mod.popup
                 data:
                   style: >
-                    color-scheme: light dark;
-
-                    --ha-dialog-surface-background: light-dark(rgba(236, 242,
-                    255, 0.62), rgba(30, 38, 78, 0.66));
-
-                    --ha-dialog-surface-backdrop-filter: blur(30px)
-                    saturate(190%);
-
-                    --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45),
-                    rgba(0, 0, 0, 0.6));
-
-                    --primary-text-color: light-dark(#14203a, #ffffff);
-
-                    --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62),
-                    rgba(255, 255, 255, 0.68));
-
-                    --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                    rgba(255, 255, 255, 0.18));
+                    --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                   title: Sorento
                   icon: mdi:car-electric
                   dismissable: true
@@ -3491,24 +3312,7 @@ views:
                 service: browser_mod.popup
                 data:
                   style: >
-                    color-scheme: light dark;
-
-                    --ha-dialog-surface-background: light-dark(rgba(236, 242,
-                    255, 0.62), rgba(30, 38, 78, 0.66));
-
-                    --ha-dialog-surface-backdrop-filter: blur(30px)
-                    saturate(190%);
-
-                    --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45),
-                    rgba(0, 0, 0, 0.6));
-
-                    --primary-text-color: light-dark(#14203a, #ffffff);
-
-                    --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62),
-                    rgba(255, 255, 255, 0.68));
-
-                    --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                    rgba(255, 255, 255, 0.18));
+                    --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                   title: Bluey
                   icon: mdi:car-electric
                   dismissable: true
@@ -3629,24 +3433,7 @@ views:
                 service: browser_mod.popup
                 data:
                   style: >
-                    color-scheme: light dark;
-
-                    --ha-dialog-surface-background: light-dark(rgba(236, 242,
-                    255, 0.62), rgba(30, 38, 78, 0.66));
-
-                    --ha-dialog-surface-backdrop-filter: blur(30px)
-                    saturate(190%);
-
-                    --mdc-dialog-scrim-color: light-dark(rgba(15, 20, 50, 0.45),
-                    rgba(0, 0, 0, 0.6));
-
-                    --primary-text-color: light-dark(#14203a, #ffffff);
-
-                    --secondary-text-color: light-dark(rgba(20, 32, 58, 0.62),
-                    rgba(255, 255, 255, 0.68));
-
-                    --divider-color: light-dark(rgba(20, 32, 58, 0.12),
-                    rgba(255, 255, 255, 0.18));
+                    --ha-dialog-surface-background: var(--glass-popup-fill, rgba(236, 242, 255, 0.62)); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: var(--glass-popup-scrim, rgba(15, 20, 50, 0.45));
                   title: Front Door
                   icon: mdi:door
                   dismissable: true
