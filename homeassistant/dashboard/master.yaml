@@ -1017,11 +1017,11 @@ navbar-templates:
           count: |
             [[[ return Object.values(states).filter(e =>
                   e.entity_id.startsWith('light.') &&
-                  !e.entity_id.startsWith('light.browser') && e.state === 'on').length; ]]]
+                  !e.entity_id.startsWith('light.browser') && e.entity_id !== 'light.kitchen_tab_screen' && e.state === 'on').length; ]]]
           show: |
             [[[ return Object.values(states).some(e =>
                   e.entity_id.startsWith('light.') &&
-                  !e.entity_id.startsWith('light.browser') && e.state === 'on'); ]]]
+                  !e.entity_id.startsWith('light.browser') && e.entity_id !== 'light.kitchen_tab_screen' && e.state === 'on'); ]]]
         icon: mdi:lightbulb-outline
         icon_selected: mdi:lightbulb-on
         label: Lights
