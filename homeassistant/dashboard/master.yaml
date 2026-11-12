@@ -2343,6 +2343,8 @@ views:
                                       4px color-mix(in srgb, var(--glass-robbie,
                                       #2dd4bf) 55%, transparent); } }
                                     .: >
+                                      ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); }
+
                                       {% if not is_state('vacuum.robbie',
                                       'docked') %}
 
@@ -3181,7 +3183,7 @@ views:
                             parseFloat(states["sensor.kia_charger_power"]?.state)
                             > 10; ]]]
                         card_mod:
-                          style: 'ha-card { height: 330px; }'
+                          style: 'ha-card { height: 330px; background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); }'
                       - type: horizontal-stack
                         cards:
                           - type: custom:button-card
@@ -3248,8 +3250,8 @@ views:
                               - glass_popup_chip
                             variables:
                               title: Location
-                              name_max: 7
-                              label_max: 7
+                              name_max: 9
+                              label_max: 9
                               on_text: At home
                               off_text: Away
                             card_mod:
@@ -3339,7 +3341,7 @@ views:
                             states["binary_sensor.sonic_charging"]?.state ===
                             "on"; ]]]
                         card_mod:
-                          style: 'ha-card { height: 330px; }'
+                          style: 'ha-card { height: 330px; background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); }'
                       - type: horizontal-stack
                         cards:
                           - type: custom:button-card
