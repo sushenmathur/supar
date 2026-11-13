@@ -662,6 +662,96 @@ button_card_templates:
         - line-height: 1.2
         - white-space: normal
         - color: var(--primary-text-color)
+  dyn_light:
+    template: glass_toggle
+    triggers_update:
+      - light.kitchen_pendants
+      - light.dining_light
+      - light.sonoff_1000dbd8b7
+      - switch.sonoff_100090d020
+      - light.corridor_light
+      - light.hallway_light
+      - light.kitchenled
+      - light.kitchen_downlights
+      - light.tall_lamp
+      - light.aarlo_samar_cam
+      - switch.sonoff_1000e5018c
+      - switch.sonoff_1000e54df1
+      - light.garage_light
+      - light.driveway_light
+      - switch.sonoff_1000905c71
+      - switch.sonoff_100053e676
+      - switch.patio_lights
+      - light.backyard_light
+      - light.laundry_light
+      - switch.festive_lights
+    variables:
+      slot: 0
+      meta:
+        light.kitchen_pendants: ["Kitchen Pendants", mdi:ceiling-light-multiple]
+        light.dining_light: ["Dining", mdi:ceiling-light]
+        light.sonoff_1000dbd8b7: ["Media Room", mdi:light-recessed]
+        switch.sonoff_100090d020: ["Lamp", mdi:lamp]
+        light.corridor_light: ["Corridor", mdi:light-recessed]
+        light.hallway_light: ["Hallway", mdi:light-recessed]
+        light.kitchenled: ["Kitchen Bench", mdi:led-strip-variant]
+        light.kitchen_downlights: ["Kitchen Downlights", mdi:light-recessed]
+        light.tall_lamp: ["Tall Lamp", mdi:floor-lamp]
+        light.aarlo_samar_cam: ["Samar Night Light", mdi:light-recessed]
+        switch.sonoff_1000e5018c: [null, mdi:light-recessed]
+        switch.sonoff_1000e54df1: [null, mdi:light-recessed]
+        light.garage_light: ["Garage Downlight", mdi:light-recessed]
+        light.driveway_light: ["Driveway Floodlight", mdi:spotlight-beam]
+        switch.sonoff_1000905c71: ["Door Downlight", mdi:light-recessed]
+        switch.sonoff_100053e676: ["Outdoor Lights", mdi:bulkhead-light]
+        switch.patio_lights: ["Patio Lights", mdi:string-lights]
+        light.backyard_light: ["Backyard Spotlight", mdi:spotlight-beam]
+        light.laundry_light: ["Laundry Spotlight", mdi:spotlight-beam]
+        switch.festive_lights: ["Festive Light", phu:light-string]
+      sel: |
+        [[[
+          const FAV = ['light.kitchen_pendants', 'light.dining_light', 'light.sonoff_1000dbd8b7', 'switch.sonoff_100090d020', 'light.corridor_light', 'light.hallway_light'];
+          const POOL = ['light.kitchen_pendants', 'light.dining_light', 'light.sonoff_1000dbd8b7', 'switch.sonoff_100090d020', 'light.corridor_light', 'light.hallway_light', 'light.kitchenled', 'light.kitchen_downlights', 'light.tall_lamp', 'light.aarlo_samar_cam', 'switch.sonoff_1000e5018c', 'switch.sonoff_1000e54df1', 'light.garage_light', 'light.driveway_light', 'switch.sonoff_1000905c71', 'switch.sonoff_100053e676', 'switch.patio_lights', 'light.backyard_light', 'light.laundry_light', 'switch.festive_lights'];
+          const on = id => states[id]?.state === 'on';
+          const t = id => new Date(states[id]?.last_changed || 0).getTime();
+          const extras = POOL.filter(id => !FAV.includes(id) && on(id)).sort((a, b) => t(a) - t(b));
+          const order = FAV.filter(f => !on(f)).sort((a, b) => t(a) - t(b));
+          const shown = extras.slice(Math.max(0, extras.length - order.length));
+          const map = FAV.slice();
+          shown.forEach((e, i) => { map[FAV.indexOf(order[i])] = e; });
+          return map[variables.slot];
+        ]]]
+    name: |
+      [[[
+        const m = variables.meta[variables.sel];
+        return (m && m[0]) || states[variables.sel]?.attributes?.friendly_name || variables.sel;
+      ]]]
+    icon: |
+      [[[
+        const m = variables.meta[variables.sel];
+        return m ? m[1] : 'mdi:lightbulb';
+      ]]]
+    tap_action:
+      action: javascript
+      javascript: |
+        [[[
+          this._hass.callService('homeassistant', 'toggle', { entity_id: variables.sel });
+        ]]]
+    hold_action:
+      action: javascript
+      javascript: |
+        [[[
+          this.dispatchEvent(new CustomEvent('hass-more-info', { bubbles: true, composed: true, detail: { entityId: variables.sel } }));
+        ]]]
+    styles:
+      card:
+        - background: |
+            [[[ return states[variables.sel]?.state === 'on' ? 'var(--glass-on-bg)' : 'var(--glass-bg-soft)'; ]]]
+        - box-shadow: |
+            [[[ return (states[variables.sel]?.state === 'on' ? 'var(--glass-on-glow), ' : '') + 'inset 0 1px 0 var(--glass-hi)'; ]]]
+      icon:
+        - color: |
+            [[[ return states[variables.sel]?.state === 'on' ? 'var(--primary-text-color)' : 'var(--secondary-text-color)'; ]]]
   glass_chip:
     template:
       - ticker
@@ -3017,49 +3107,49 @@ views:
                 action: toggle
           - type: custom:button-card
             entity: light.kitchen_pendants
-            name: Kitchen Pendants
-            icon: mdi:ceiling-light-multiple
-            template: glass_toggle
+            template: dyn_light
+            variables:
+              slot: 0
             grid_options:
               columns: 4
               rows: 2
           - type: custom:button-card
             entity: light.dining_light
-            name: Dining
-            icon: mdi:ceiling-light
-            template: glass_toggle
+            template: dyn_light
+            variables:
+              slot: 1
             grid_options:
               columns: 4
               rows: 2
           - type: custom:button-card
             entity: light.sonoff_1000dbd8b7
-            name: Media Room
-            icon: mdi:light-recessed
-            template: glass_toggle
+            template: dyn_light
+            variables:
+              slot: 2
             grid_options:
               columns: 4
               rows: 2
           - type: custom:button-card
             entity: switch.sonoff_100090d020
-            name: Lamp
-            icon: mdi:lamp
-            template: glass_toggle
+            template: dyn_light
+            variables:
+              slot: 3
             grid_options:
               columns: 4
               rows: 2
           - type: custom:button-card
             entity: light.corridor_light
-            name: Corridor
-            icon: mdi:light-recessed
-            template: glass_toggle
+            template: dyn_light
+            variables:
+              slot: 4
             grid_options:
               columns: 4
               rows: 2
           - type: custom:button-card
             entity: light.hallway_light
-            name: Hallway
-            icon: mdi:light-recessed
-            template: glass_toggle
+            template: dyn_light
+            variables:
+              slot: 5
             grid_options:
               columns: 4
               rows: 2
