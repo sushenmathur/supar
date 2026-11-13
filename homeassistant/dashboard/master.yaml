@@ -4183,26 +4183,137 @@ views:
     theme: Glass
     cards: []
   - badges:
-      - color: >
-          {% set temps = ['sensor.living_room_inside_temperature',
-                          'sensor.aarlo_temperature_samar_cam',
-                          'sensor.shanayaroomtemp_temperature',
-                          'sensor.bedroom_temperature_temperature']
-                         | map('states') | select('is_number') | map('float') | list %}
-          {% set avg = (temps | sum / temps | length) if temps else none %}
-
-          {{ 'grey' if avg is none else 'blue' if avg < 22 else 'amber' if avg <
-          27 else 'red' }}
-        content: >
-          {% set temps = ['sensor.living_room_inside_temperature',
-                          'sensor.aarlo_temperature_samar_cam',
-                          'sensor.shanayaroomtemp_temperature',
-                          'sensor.bedroom_temperature_temperature']
-                         | map('states') | select('is_number') | map('float') | list %}
-          {{ 'Average ' ~ (temps | sum / temps | length) | round(1) ~ '°' if
-          temps else 'No data' }}
-        icon: mdi:home-thermometer
-        type: custom:mushroom-template-badge
+    - color: "{% set temps = ['sensor.living_room_inside_temperature',\n                'sensor.aarlo_temperature_samar_cam',\n                'sensor.shanayaroomtemp_temperature',\n                'sensor.bedroom_temperature_temperature']\n               | map('states') | select('is_number') | map('float') | list %}\n{% set avg = (temps | sum / temps | length) if temps else none %}\n{{ 'grey' if avg is none else 'blue' if avg < 22 else 'amber' if avg < 27 else 'red' }}\n"
+      content: "{% set temps = ['sensor.living_room_inside_temperature',\n                'sensor.aarlo_temperature_samar_cam',\n                'sensor.shanayaroomtemp_temperature',\n                'sensor.bedroom_temperature_temperature']\n               | map('states') | select('is_number') | map('float') | list %}\n{{ 'Average ' ~ (temps | sum / temps | length) | round(1) ~ '°' if temps else 'No data' }}\n"
+      icon: mdi:home-thermometer
+      type: custom:mushroom-template-badge
+      card_mod:
+        style: ":host {\n  --ha-card-background: var(--glass-bg);\n  --ha-card-backdrop-filter: blur(22px) saturate(200%) brightness(1.04);\n  --ha-card-border-width: 1px;\n  --ha-card-border-color: var(--glass-border);\n  --ha-card-box-shadow: var(--glass-shadow);\n  --ha-badge-border-radius: 28px;\n}"
+    - card_mod:
+        style: ":host {\n  --ha-card-background: var(--glass-bg);\n  --ha-card-backdrop-filter: blur(22px) saturate(200%) brightness(1.04);\n  --ha-card-border-width: 1px;\n  --ha-card-border-color: var(--glass-border);\n  --ha-card-box-shadow: var(--glass-shadow);\n  --ha-badge-border-radius: 28px;\n}"
+      color: "{% set ts = ['timer.ac_off_living', 'timer.ac_off_bedroom',\n             'timer.ac_off_samar', 'timer.ac_off_shanaya'] %}\n{{ 'blue' if ts | select('is_state', 'active') | list | count > 0 else 'grey' }}"
+      content: '{% set rooms = {"Living AC":"timer.ac_off_living","Bedroom AC":"timer.ac_off_bedroom","Samar Room AC":"timer.ac_off_samar","Shanaya Room AC":"timer.ac_off_shanaya"} %} {% set ns = namespace(room=none, left=0) %} {% for room, t in rooms.items() %}{% set fin = state_attr(t, "finishes_at") %}{% if is_state(t, "active") and fin %}{% set left = [as_timestamp(fin) - as_timestamp(now()), 0] | max | int %}{% if ns.room is none or left < ns.left %}{% set ns.room = room %}{% set ns.left = left %}{% endif %}{% endif %}{% endfor %} {% set mins = ((ns.left + 59) // 60) | int %} {% set _ = states("sensor.time") %} {{ (ns.room ~ " · " ~ (mins // 60) ~ "h " ~ (mins % 60) ~ "m") if ns.room and mins >= 60 else (ns.room ~ " · " ~ mins ~ "m") if ns.room else "AC Timer" }}'
+      icon: mdi:timer-sand
+      tap_action:
+        action: fire-dom-event
+        browser_mod:
+          data:
+            content:
+              cards:
+              - entities:
+                - entity: input_select.ac_timer_target
+                  name: Room
+                - entity: input_select.ac_timer_preset
+                  name: Duration
+                type: entities
+                card_mod:
+                  style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+              - card:
+                  entity: timer.ac_off_living
+                  name: Set custom duration
+                  tap_action:
+                    action: more-info
+                  type: tile
+                  card_mod:
+                    style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                conditions:
+                - condition: state
+                  entity: input_select.ac_timer_target
+                  state: Living AC
+                - condition: state
+                  entity: input_select.ac_timer_preset
+                  state: Custom
+                type: conditional
+              - card:
+                  entity: timer.ac_off_bedroom
+                  name: Set custom duration
+                  tap_action:
+                    action: more-info
+                  type: tile
+                  card_mod:
+                    style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                conditions:
+                - condition: state
+                  entity: input_select.ac_timer_target
+                  state: Bedroom AC
+                - condition: state
+                  entity: input_select.ac_timer_preset
+                  state: Custom
+                type: conditional
+              - card:
+                  entity: timer.ac_off_samar
+                  name: Set custom duration
+                  tap_action:
+                    action: more-info
+                  type: tile
+                  card_mod:
+                    style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                conditions:
+                - condition: state
+                  entity: input_select.ac_timer_target
+                  state: Samar Room AC
+                - condition: state
+                  entity: input_select.ac_timer_preset
+                  state: Custom
+                type: conditional
+              - card:
+                  entity: timer.ac_off_shanaya
+                  name: Set custom duration
+                  tap_action:
+                    action: more-info
+                  type: tile
+                  card_mod:
+                    style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                conditions:
+                - condition: state
+                  entity: input_select.ac_timer_target
+                  state: Shanaya Room AC
+                - condition: state
+                  entity: input_select.ac_timer_preset
+                  state: Custom
+                type: conditional
+              - entities:
+                - entities:
+                  - entity: script.ac_off_timer_start
+                    icon: mdi:timer-play
+                    name: Start
+                    tap_action:
+                      action: perform-action
+                      perform_action: script.turn_on
+                      target:
+                        entity_id: script.ac_off_timer_start
+                  - entity: script.ac_off_timer_cancel
+                    icon: mdi:timer-off
+                    name: Cancel
+                    tap_action:
+                      action: perform-action
+                      perform_action: script.turn_on
+                      target:
+                        entity_id: script.ac_off_timer_cancel
+                  type: buttons
+                type: entities
+                card_mod:
+                  style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+              - entities:
+                - entity: timer.ac_off_living
+                  name: Living AC
+                - entity: timer.ac_off_bedroom
+                  name: Bedroom AC
+                - entity: timer.ac_off_samar
+                  name: Samar Room AC
+                - entity: timer.ac_off_shanaya
+                  name: Shanaya Room AC
+                title: Running timers
+                type: entities
+                card_mod:
+                  style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+              type: vertical-stack
+            title: AC Off Timer
+            style: '--ha-dialog-surface-background: oklch(from var(--primary-text-color) calc(1.1 - 0.85 * l) 0.045 265 / 0.62); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: rgba(10, 15, 40, 0.5);'
+            dismissable: true
+          service: browser_mod.popup
+      type: custom:mushroom-template-badge
+    cards: []
     header:
       badges_position: bottom
       card:
@@ -4214,72 +4325,71 @@ views:
     max_columns: 4
     path: homeclimate
     sections:
+    - cards:
       - cards:
-          - cards:
-              - cards:
-                  - detail: 1
-                    entity: sensor.living_room_inside_temperature
-                    graph: line
-                    hours_to_show: 12
-                    name: Living Room
-                    type: sensor
-                  - entity: climate.living_room
-                    features:
-                      - type: climate-hvac-modes
-                    name: Aircon
-                    type: thermostat
-                type: vertical-stack
-              - cards:
-                  - detail: 1
-                    entity: sensor.bedroom_temperature_temperature
-                    graph: line
-                    hours_to_show: 12
-                    name: Bedroom
-                    type: sensor
-                  - entity: climate.bed_ac
-                    features:
-                      - type: climate-hvac-modes
-                    name: Aircon
-                    type: thermostat
-                type: vertical-stack
-              - cards:
-                  - detail: 1
-                    entity: sensor.aarlo_temperature_samar_cam
-                    graph: line
-                    hours_to_show: 12
-                    name: Samar Room
-                    type: sensor
-                  - entity: climate.samar_room
-                    features:
-                      - type: climate-hvac-modes
-                    name: Aircon
-                    type: thermostat
-                type: vertical-stack
-              - cards:
-                  - detail: 1
-                    entity: sensor.shanayaroomtemp_temperature
-                    graph: line
-                    hours_to_show: 12
-                    name: Shanaya Room
-                    type: sensor
-                  - entity: climate.shanaya_room
-                    features:
-                      - type: climate-hvac-modes
-                    name: Aircon
-                    type: thermostat
-                type: vertical-stack
-            grid_options:
-              columns: full
-            type: horizontal-stack
-          - template: main
-            type: custom:navbar-card
-        column_span: 4
-        type: grid
+        - cards:
+          - detail: 1
+            entity: sensor.living_room_inside_temperature
+            graph: line
+            hours_to_show: 12
+            name: Living Room
+            type: sensor
+          - entity: climate.living_room
+            features:
+            - type: climate-hvac-modes
+            name: Aircon
+            type: thermostat
+          type: vertical-stack
+        - cards:
+          - detail: 1
+            entity: sensor.bedroom_roomtemp_temperature
+            graph: line
+            hours_to_show: 12
+            name: Bedroom
+            type: sensor
+          - entity: climate.bed_ac
+            features:
+            - type: climate-hvac-modes
+            name: Aircon
+            type: thermostat
+          type: vertical-stack
+        - cards:
+          - detail: 1
+            entity: sensor.aarlo_temperature_samar_cam
+            graph: line
+            hours_to_show: 12
+            name: Samar Room
+            type: sensor
+          - entity: climate.samar_room
+            features:
+            - type: climate-hvac-modes
+            name: Aircon
+            type: thermostat
+          type: vertical-stack
+        - cards:
+          - detail: 1
+            entity: sensor.shanayaroomtemp_temperature
+            graph: line
+            hours_to_show: 12
+            name: Shanaya Room
+            type: sensor
+          - entity: climate.shanaya_room
+            features:
+            - type: climate-hvac-modes
+            name: Aircon
+            type: thermostat
+          type: vertical-stack
+        grid_options:
+          columns: full
+        type: horizontal-stack
+      - template: main
+        type: custom:navbar-card
+      column_span: 4
+      type: grid
     subview: true
+    theme: Glass
     title: Climate
     type: sections
-    theme: Glass
-    cards: []
   - badges:
       - entity: binary_sensor.corridormotionsensor_occupancy
         icon: mdi:motion-sensor
