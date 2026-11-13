@@ -5292,19 +5292,76 @@ views:
                               entity_id: script.ac_off_timer_cancel
                         type: buttons
                       type: entities
-                    - card_mod:
-                        style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
-                      entities:
-                      - entity: timer.ac_off_living
-                        name: Living AC
-                      - entity: timer.ac_off_bedroom
-                        name: Bedroom AC
-                      - entity: timer.ac_off_samar
-                        name: Samar Room AC
-                      - entity: timer.ac_off_shanaya
-                        name: Shanaya Room AC
-                      title: Running timers
-                      type: entities
+                    - type: conditional
+                      conditions:
+                      - condition: or
+                        conditions:
+                        - condition: state
+                          entity: timer.ac_off_living
+                          state:
+                          - active
+                          - paused
+                        - condition: state
+                          entity: timer.ac_off_bedroom
+                          state:
+                          - active
+                          - paused
+                        - condition: state
+                          entity: timer.ac_off_samar
+                          state:
+                          - active
+                          - paused
+                        - condition: state
+                          entity: timer.ac_off_shanaya
+                          state:
+                          - active
+                          - paused
+                      card:
+                        type: entities
+                        title: Running timers
+                        card_mod:
+                          style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                        entities:
+                          - type: conditional
+                            conditions:
+                            - condition: state
+                              entity: timer.ac_off_living
+                              state:
+                              - active
+                              - paused
+                            row:
+                              entity: timer.ac_off_living
+                              name: Living AC
+                          - type: conditional
+                            conditions:
+                            - condition: state
+                              entity: timer.ac_off_bedroom
+                              state:
+                              - active
+                              - paused
+                            row:
+                              entity: timer.ac_off_bedroom
+                              name: Bedroom AC
+                          - type: conditional
+                            conditions:
+                            - condition: state
+                              entity: timer.ac_off_samar
+                              state:
+                              - active
+                              - paused
+                            row:
+                              entity: timer.ac_off_samar
+                              name: Samar Room AC
+                          - type: conditional
+                            conditions:
+                            - condition: state
+                              entity: timer.ac_off_shanaya
+                              state:
+                              - active
+                              - paused
+                            row:
+                              entity: timer.ac_off_shanaya
+                              name: Shanaya Room AC
                     type: vertical-stack
                   dismissable: true
                   style: '--ha-dialog-surface-background: oklch(from var(--primary-text-color) calc(1.1 - 0.85 * l) 0.045 265 / 0.62); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: rgba(10, 15, 40, 0.5);'
