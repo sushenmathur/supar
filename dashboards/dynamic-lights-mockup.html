@@ -1,0 +1,77 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dynamic lights – interactive mock-up</title>
+<style>
+:root{--tx:#14203a;--tx2:rgba(20,32,58,.62);--bg:radial-gradient(900px 600px at 6% 8%,rgba(255,150,130,.7),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(90,200,250,.7),transparent 62%),radial-gradient(760px 600px at 98% 70%,rgba(179,136,255,.7),transparent 62%),linear-gradient(160deg,#eef3ff,#e6ecfa);--soft:rgba(255,255,255,.55);--bd:rgba(255,255,255,.8);--hi:rgba(255,255,255,.95);--panel:rgba(255,255,255,.45)}
+body.dark{--tx:#fff;--tx2:rgba(255,255,255,.62);--bg:radial-gradient(900px 600px at 6% 8%,rgba(91,61,245,.55),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(10,167,160,.45),transparent 62%),linear-gradient(160deg,#080d1e,#0f1730 55%,#0a1a26);--soft:rgba(255,255,255,.09);--bd:rgba(255,255,255,.26);--hi:rgba(255,255,255,.4);--panel:rgba(255,255,255,.07)}
+*{box-sizing:border-box}body{margin:0;padding:22px;font-family:Roboto,system-ui,sans-serif;color:var(--tx);background:var(--bg) fixed;min-height:100vh}
+h1{font-size:18px;margin:0 0 4px}p.s{margin:0 0 16px;font-size:13px;color:var(--tx2);max-width:860px}
+.top{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:16px;font-size:13px}
+.top label{display:flex;gap:6px;align-items:center}.top select,.top button{font:inherit;border-radius:99px;border:1px solid var(--bd);background:var(--soft);color:var(--tx);padding:5px 12px;cursor:pointer}
+.wrap{display:grid;grid-template-columns:minmax(380px,520px) 1fr;gap:22px;align-items:start}
+.glass{background:var(--panel);border:1px solid var(--bd);border-radius:26px;backdrop-filter:blur(18px) saturate(180%);box-shadow:inset 0 1px 0 var(--hi),0 10px 28px rgba(40,50,110,.15);padding:16px}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx2);margin:0 0 10px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.t{position:relative;height:118px;border-radius:22px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;user-select:none;transition:background .3s,box-shadow .3s}
+.t.on{background:linear-gradient(145deg,rgba(255,222,140,.95),rgba(255,170,70,.75));box-shadow:0 0 30px rgba(255,170,60,.45),inset 0 1px 0 var(--hi);color:#2a1700}
+.t svg{width:28px;height:28px;fill:currentColor;opacity:.8}.t b{font-size:14px;line-height:1.15}
+.t .tag{position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(91,140,255,.22);color:var(--tx)}
+.t.on .tag{background:rgba(255,255,255,.55);color:#2a1700}
+.t.swap{animation:sw .55s ease}@keyframes sw{0%{transform:rotateX(90deg);opacity:0}100%{transform:none;opacity:1}}
+.log{margin-top:12px;font-size:12.5px;color:var(--tx2);min-height:34px}.more{margin-top:10px;font-size:12.5px;color:var(--tx2)}
+.pool .grp{margin-bottom:12px}.pool .grp div{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;gap:7px;align-items:center;padding:7px 12px;border-radius:99px;font-size:13px;background:var(--soft);border:1px solid var(--bd);cursor:pointer;user-select:none}
+.chip.on{background:linear-gradient(145deg,rgba(255,222,140,.95),rgba(255,170,70,.75));color:#2a1700;font-weight:600}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--tx2);opacity:.5}.chip.on i{background:#7a3b00;opacity:1}.chip.fav{border-style:dashed}
+.legend{font-size:12px;color:var(--tx2);margin-top:6px}.legend b{color:var(--tx)}
+</style></head><body>
+<h1>Dynamic lights on the Home view – interactive mock-up</h1>
+<p class="s">Six tiles, always. Your six favourites stay put. When any other light on the Lights view turns on, it takes the place of a favourite that is <b>off</b>. When it goes off, the favourite comes back. Click lights on the right (or the tiles on the left) to try it.</p>
+<div class="top">
+<label>Which favourite gets replaced first
+<select id="mode"><option value="fixed">Fixed order (Dining first, as in your example)</option><option value="lru">The one switched on longest ago</option></select></label>
+<label>If more lights are on than free slots
+<select id="over"><option value="pill">Show "+N more on" note</option><option value="hide">Say nothing</option></select></label>
+<button id="dark">Dark mode</button><button id="reset">Reset</button></div>
+<div class="wrap">
+<div class="glass"><h2>Home view · lights (always 6)</h2><div class="grid" id="grid"></div><div class="more" id="more"></div><div class="log" id="log">All six favourites showing.</div>
+<div class="legend"><b>Dashed chips</b> on the right = your favourites. Blue "swapped in" tag marks a light that replaced a favourite.</div></div>
+<div class="glass pool"><h2>All lights on the Lights view (tap to toggle)</h2><div id="pool"></div></div></div>
+<script>
+const L={dining:'Dining',pend:'Kitchen Pendants',media:'Media Room',lamp:'Lamp',corr:'Corridor',hall:'Hallway',bench:'Kitchen Bench',kd:'Kitchen Downlights',tall:'Tall Lamp',samar:'Samar Night Light',hl:'Hallway Light',bd:'Bedroom Downlights',gd:'Garage Downlight',drv:'Driveway Floodlight',door:'Door Downlight',out:'Outdoor Lights',patio:'Patio Lights',back:'Backyard Spotlight',laun:'Laundry Spotlight',fest:'Festive Light'};
+const groups=[['Living & Kitchen',['dining','pend','bench','media','lamp','kd']],['Hallways & Bedrooms',['corr','tall','samar','hl','bd']],['Garage & Outdoor',['gd','drv','door','out','patio','back','laun','fest']]];
+const FAV=['pend','dining','media','lamp','corr','hall'];            // grid order
+const EVICT=['dining','hall','corr','pend','media','lamp'];        // fixed replace order
+const ICON='M12 2a7 7 0 0 0-4 12.7V18h8v-2.3A7 7 0 0 0 12 3Zm-3 17h6v1H9z';
+let on={},since={},prevMap={};
+const $=id=>document.getElementById(id);
+function slots(){
+ const mode=$('mode').value;
+ const extras=Object.keys(on).filter(k=>on[k]&&!FAV.includes(k)).sort((a,b)=>since[a]-since[b]); // oldest first
+ const free=FAV.filter(f=>!on[f]);                                    // favourites that are off
+ let order=mode==='fixed'?EVICT.filter(f=>free.includes(f)):free.slice().sort((a,b)=>(since[a]||0)-(since[b]||0));
+ const cap=order.length, shown=extras.slice(Math.max(0,extras.length-cap)), overflow=extras.length-shown.length;
+ const map={};FAV.forEach(f=>map[f]=f);shown.forEach((e,i)=>map[order[i]]=e);
+ return {map,overflow,shown};
+}
+function render(msg){
+ const {map,overflow}=slots();
+ $('grid').innerHTML=FAV.map(f=>{const id=map[f],sw=id!==f;const ch=prevMap[f]!==undefined&&prevMap[f]!==id;
+  return `<div class="t ${on[id]?'on':''} ${ch?'swap':''}" data-id="${id}"><svg viewBox="0 0 24 24"><path d="${ICON}"/></svg><b>${L[id]}</b>${sw?'<span class="tag">swapped in</span>':''}</div>`}).join('');
+ prevMap=map;
+ $('more').textContent=(overflow&&$('over').value==='pill')?`+${overflow} more light${overflow>1?'s':''} on (not shown – no free slot)`:'';
+ $('pool').innerHTML=groups.map(([n,ids])=>`<div class="grp"><h2 style="margin-top:4px">${n}</h2><div>${ids.map(i=>`<span class="chip ${on[i]?'on':''} ${FAV.includes(i)?'fav':''}" data-id="${i}"><i></i>${L[i]}</span>`).join('')}</div></div>`).join('');
+ document.querySelectorAll('[data-id]').forEach(e=>e.onclick=()=>toggle(e.dataset.id));
+ if(msg)$('log').textContent=msg;
+}
+function toggle(id){
+ const before=slots().map;const was=on[id];on[id]=!was;since[id]=Date.now();
+ const {map}=slots();let msg='';
+ if(on[id]&&!FAV.includes(id)){const slot=Object.keys(map).find(k=>map[k]===id);msg=slot?`${L[id]} turned on → replaced ${L[slot]} (it was off).`:`${L[id]} turned on → no free slot, all six tiles are lights that are on.`}
+ else if(!on[id]&&!FAV.includes(id)){msg=`${L[id]} turned off → its slot goes back to the favourite.`}
+ else {msg=`${L[id]} ${on[id]?'on':'off'}.`}
+ render(msg);
+}
+$('mode').onchange=()=>render('Replace order changed.');$('over').onchange=()=>render();
+$('reset').onclick=()=>{on={};since={};prevMap={};render('All six favourites showing.')};
+$('dark').onclick=()=>{document.body.classList.toggle('dark');$('dark').textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode'};
+render();
+</script></body></html>
