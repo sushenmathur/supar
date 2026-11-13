@@ -1080,7 +1080,7 @@ views:
                       const pretty = cond === 'partlycloudy' ? 'Partly cloudy' : cond === 'clear-night' ? 'Clear night'
                         : cond.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
                       const feels = states['sensor.home_apparent_temperature'] ? states['sensor.home_apparent_temperature'].state : '–';
-                      const rooms = ['sensor.living_room_inside_temperature', 'sensor.bedroom_temperature_temperature',
+                      const rooms = ['sensor.living_room_inside_temperature', 'sensor.bedroom_roomtemp_temperature',
                                      'sensor.aarlo_temperature_samar_cam', 'sensor.shanayaroomtemp_temperature']
                         .map(s => parseFloat(states[s] ? states[s].state : NaN)).filter(n => !isNaN(n));
                       const inside = rooms.length ? (rooms.reduce((a, b) => a + b, 0) / rooms.length).toFixed(1) : '–';
@@ -1116,7 +1116,7 @@ views:
                   - weather.forecast_home_2
                   - sensor.home_apparent_temperature
                   - sensor.living_room_inside_temperature
-                  - sensor.bedroom_temperature_temperature
+                  - sensor.bedroom_roomtemp_temperature
                   - sensor.aarlo_temperature_samar_cam
                   - sensor.shanayaroomtemp_temperature
                   - climate.bed_ac
@@ -5115,7 +5115,7 @@ views:
           - climate.samar_room
           - climate.shanaya_room
           - sensor.living_room_inside_temperature
-          - sensor.bedroom_temperature_temperature
+          - sensor.bedroom_roomtemp_temperature
           - sensor.aarlo_temperature_samar_cam
           - sensor.shanayaroomtemp_temperature
         type: custom:button-card
@@ -5124,7 +5124,7 @@ views:
             [[[
               const acs = ['climate.bed_ac', 'climate.living_room', 'climate.samar_room', 'climate.shanaya_room'];
               const running = acs.filter(a => states[a] && !['off', 'unavailable'].includes(states[a].state)).length;
-              const temps = ['sensor.living_room_inside_temperature', 'sensor.bedroom_temperature_temperature',
+              const temps = ['sensor.living_room_inside_temperature', 'sensor.bedroom_roomtemp_temperature',
                              'sensor.aarlo_temperature_samar_cam', 'sensor.shanayaroomtemp_temperature']
                 .map(s => parseFloat(states[s] ? states[s].state : NaN)).filter(n => !isNaN(n));
               const avg = temps.length ? (temps.reduce((a, b) => a + b, 0) / temps.length).toFixed(1) : '–';
@@ -5180,267 +5180,166 @@ views:
             columns: 2
             square: false
             type: grid
-          - entity: timer.ac_off_living
-            hold_action:
-              action: none
-            icon: mdi:timer-sand
-            name: AC Off Timer
-            show_name: true
-            show_state: true
-            state_display: '[[[ return variables.status; ]]]'
-            styles:
-              card:
-                - padding: 12px 14px
-                - border-radius: 18px
-                - box-shadow: none
-                - border: 1px solid rgba(var(--rgb-primary-text-color),0.1)
-                - background: >-
-                    [[[ return variables.on ? 'color-mix(in srgb, #4c8dff 14%,
-                    transparent)' : 'rgba(var(--rgb-primary-text-color),0.05)';
-                    ]]]
-              grid:
-                - grid-template-areas: '"i n" "i s"'
-                - grid-template-columns: 36px 1fr
-                - grid-template-rows: min-content min-content
-                - column-gap: 10px
-                - align-items: center
-              icon:
-                - width: 20px
-                - color: >-
-                    [[[ return variables.on ? '#4c8dff' :
-                    'var(--secondary-text-color)'; ]]]
-              img_cell:
-                - width: 32px
-                - height: 32px
-                - border-radius: 50%
-                - justify-self: center
-                - background: >-
-                    [[[ return variables.on ? 'color-mix(in srgb, #4c8dff 20%,
-                    transparent)' : 'rgba(var(--rgb-primary-text-color),0.08)';
-                    ]]]
-              name:
-                - justify-self: start
-                - font-size: 13px
-                - font-weight: 700
-                - white-space: nowrap
-              state:
-                - justify-self: start
-                - font-size: 11px
-                - opacity: 0.7
-                - white-space: nowrap
+          - type: custom:button-card
+            template: b_bento
+            entity: timer.ac_off_living
+            variables:
+              label: AC off timer
+              icon: mdi:timer-sand
+              height: auto
+              tint: |-
+                [[[
+                  return ['timer.ac_off_living', 'timer.ac_off_bedroom', 'timer.ac_off_samar', 'timer.ac_off_shanaya'].some(id => states[id] && states[id].state === 'active')
+                    ? '#4c8dff' : 'var(--secondary-text-color)';
+                ]]]
             tap_action:
               action: fire-dom-event
               browser_mod:
                 data:
                   content:
                     cards:
-                      - card_mod:
-                          style: >-
-                            ha-card { background: var(--glass-bg-soft, rgba(255,
-                            255, 255, 0.34)) !important; border: 1px solid
-                            var(--glass-border, rgba(255, 255, 255, 0.70));
-                            box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255,
-                            255, 255, 0.90)); backdrop-filter: blur(12px)
-                            saturate(180%); -webkit-backdrop-filter: blur(12px)
-                            saturate(180%); --mdc-text-field-fill-color:
-                            rgba(var(--rgb-primary-text-color, 255,255,255),
-                            0.08); }
-                        entities:
-                          - entity: input_select.ac_timer_target
-                            name: Room
-                          - entity: input_select.ac_timer_preset
-                            name: Duration
-                        type: entities
-                      - card:
-                          card_mod:
-                            style: >-
-                              ha-card { background: var(--glass-bg-soft,
-                              rgba(255, 255, 255, 0.34)) !important; border: 1px
-                              solid var(--glass-border, rgba(255, 255, 255,
-                              0.70)); box-shadow: inset 0 1px 0 var(--glass-hi,
-                              rgba(255, 255, 255, 0.90)); backdrop-filter:
-                              blur(12px) saturate(180%);
-                              -webkit-backdrop-filter: blur(12px)
-                              saturate(180%); --mdc-text-field-fill-color:
-                              rgba(var(--rgb-primary-text-color, 255,255,255),
-                              0.08); }
-                          entity: timer.ac_off_living
-                          name: Set custom duration
+                    - card_mod:
+                        style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                      entities:
+                      - entity: input_select.ac_timer_target
+                        name: Room
+                      - entity: input_select.ac_timer_preset
+                        name: Duration
+                      type: entities
+                    - card:
+                        card_mod:
+                          style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                        entity: timer.ac_off_living
+                        name: Set custom duration
+                        tap_action:
+                          action: more-info
+                        type: tile
+                      conditions:
+                      - condition: state
+                        entity: input_select.ac_timer_target
+                        state: Living AC
+                      - condition: state
+                        entity: input_select.ac_timer_preset
+                        state: Custom
+                      type: conditional
+                    - card:
+                        card_mod:
+                          style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                        entity: timer.ac_off_bedroom
+                        name: Set custom duration
+                        tap_action:
+                          action: more-info
+                        type: tile
+                      conditions:
+                      - condition: state
+                        entity: input_select.ac_timer_target
+                        state: Bedroom AC
+                      - condition: state
+                        entity: input_select.ac_timer_preset
+                        state: Custom
+                      type: conditional
+                    - card:
+                        card_mod:
+                          style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                        entity: timer.ac_off_samar
+                        name: Set custom duration
+                        tap_action:
+                          action: more-info
+                        type: tile
+                      conditions:
+                      - condition: state
+                        entity: input_select.ac_timer_target
+                        state: Samar Room AC
+                      - condition: state
+                        entity: input_select.ac_timer_preset
+                        state: Custom
+                      type: conditional
+                    - card:
+                        card_mod:
+                          style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                        entity: timer.ac_off_shanaya
+                        name: Set custom duration
+                        tap_action:
+                          action: more-info
+                        type: tile
+                      conditions:
+                      - condition: state
+                        entity: input_select.ac_timer_target
+                        state: Shanaya Room AC
+                      - condition: state
+                        entity: input_select.ac_timer_preset
+                        state: Custom
+                      type: conditional
+                    - card_mod:
+                        style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                      entities:
+                      - entities:
+                        - entity: script.ac_off_timer_start
+                          icon: mdi:timer-play
+                          name: Start
                           tap_action:
-                            action: more-info
-                          type: tile
-                        conditions:
-                          - condition: state
-                            entity: input_select.ac_timer_target
-                            state: Living AC
-                          - condition: state
-                            entity: input_select.ac_timer_preset
-                            state: Custom
-                        type: conditional
-                      - card:
-                          card_mod:
-                            style: >-
-                              ha-card { background: var(--glass-bg-soft,
-                              rgba(255, 255, 255, 0.34)) !important; border: 1px
-                              solid var(--glass-border, rgba(255, 255, 255,
-                              0.70)); box-shadow: inset 0 1px 0 var(--glass-hi,
-                              rgba(255, 255, 255, 0.90)); backdrop-filter:
-                              blur(12px) saturate(180%);
-                              -webkit-backdrop-filter: blur(12px)
-                              saturate(180%); --mdc-text-field-fill-color:
-                              rgba(var(--rgb-primary-text-color, 255,255,255),
-                              0.08); }
-                          entity: timer.ac_off_bedroom
-                          name: Set custom duration
+                            action: perform-action
+                            perform_action: script.turn_on
+                            target:
+                              entity_id: script.ac_off_timer_start
+                        - entity: script.ac_off_timer_cancel
+                          icon: mdi:timer-off
+                          name: Cancel
                           tap_action:
-                            action: more-info
-                          type: tile
-                        conditions:
-                          - condition: state
-                            entity: input_select.ac_timer_target
-                            state: Bedroom AC
-                          - condition: state
-                            entity: input_select.ac_timer_preset
-                            state: Custom
-                        type: conditional
-                      - card:
-                          card_mod:
-                            style: >-
-                              ha-card { background: var(--glass-bg-soft,
-                              rgba(255, 255, 255, 0.34)) !important; border: 1px
-                              solid var(--glass-border, rgba(255, 255, 255,
-                              0.70)); box-shadow: inset 0 1px 0 var(--glass-hi,
-                              rgba(255, 255, 255, 0.90)); backdrop-filter:
-                              blur(12px) saturate(180%);
-                              -webkit-backdrop-filter: blur(12px)
-                              saturate(180%); --mdc-text-field-fill-color:
-                              rgba(var(--rgb-primary-text-color, 255,255,255),
-                              0.08); }
-                          entity: timer.ac_off_samar
-                          name: Set custom duration
-                          tap_action:
-                            action: more-info
-                          type: tile
-                        conditions:
-                          - condition: state
-                            entity: input_select.ac_timer_target
-                            state: Samar Room AC
-                          - condition: state
-                            entity: input_select.ac_timer_preset
-                            state: Custom
-                        type: conditional
-                      - card:
-                          card_mod:
-                            style: >-
-                              ha-card { background: var(--glass-bg-soft,
-                              rgba(255, 255, 255, 0.34)) !important; border: 1px
-                              solid var(--glass-border, rgba(255, 255, 255,
-                              0.70)); box-shadow: inset 0 1px 0 var(--glass-hi,
-                              rgba(255, 255, 255, 0.90)); backdrop-filter:
-                              blur(12px) saturate(180%);
-                              -webkit-backdrop-filter: blur(12px)
-                              saturate(180%); --mdc-text-field-fill-color:
-                              rgba(var(--rgb-primary-text-color, 255,255,255),
-                              0.08); }
-                          entity: timer.ac_off_shanaya
-                          name: Set custom duration
-                          tap_action:
-                            action: more-info
-                          type: tile
-                        conditions:
-                          - condition: state
-                            entity: input_select.ac_timer_target
-                            state: Shanaya Room AC
-                          - condition: state
-                            entity: input_select.ac_timer_preset
-                            state: Custom
-                        type: conditional
-                      - card_mod:
-                          style: >-
-                            ha-card { background: var(--glass-bg-soft, rgba(255,
-                            255, 255, 0.34)) !important; border: 1px solid
-                            var(--glass-border, rgba(255, 255, 255, 0.70));
-                            box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255,
-                            255, 255, 0.90)); backdrop-filter: blur(12px)
-                            saturate(180%); -webkit-backdrop-filter: blur(12px)
-                            saturate(180%); --mdc-text-field-fill-color:
-                            rgba(var(--rgb-primary-text-color, 255,255,255),
-                            0.08); }
-                        entities:
-                          - entities:
-                              - entity: script.ac_off_timer_start
-                                icon: mdi:timer-play
-                                name: Start
-                                tap_action:
-                                  action: perform-action
-                                  perform_action: script.turn_on
-                                  target:
-                                    entity_id: script.ac_off_timer_start
-                              - entity: script.ac_off_timer_cancel
-                                icon: mdi:timer-off
-                                name: Cancel
-                                tap_action:
-                                  action: perform-action
-                                  perform_action: script.turn_on
-                                  target:
-                                    entity_id: script.ac_off_timer_cancel
-                            type: buttons
-                        type: entities
-                      - card_mod:
-                          style: >-
-                            ha-card { background: var(--glass-bg-soft, rgba(255,
-                            255, 255, 0.34)) !important; border: 1px solid
-                            var(--glass-border, rgba(255, 255, 255, 0.70));
-                            box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255,
-                            255, 255, 0.90)); backdrop-filter: blur(12px)
-                            saturate(180%); -webkit-backdrop-filter: blur(12px)
-                            saturate(180%); --mdc-text-field-fill-color:
-                            rgba(var(--rgb-primary-text-color, 255,255,255),
-                            0.08); }
-                        entities:
-                          - entity: timer.ac_off_living
-                            name: Living AC
-                          - entity: timer.ac_off_bedroom
-                            name: Bedroom AC
-                          - entity: timer.ac_off_samar
-                            name: Samar Room AC
-                          - entity: timer.ac_off_shanaya
-                            name: Shanaya Room AC
-                        title: Running timers
-                        type: entities
+                            action: perform-action
+                            perform_action: script.turn_on
+                            target:
+                              entity_id: script.ac_off_timer_cancel
+                        type: buttons
+                      type: entities
+                    - card_mod:
+                        style: 'ha-card { background: var(--glass-bg-soft, rgba(255, 255, 255, 0.34)) !important; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.70)); box-shadow: inset 0 1px 0 var(--glass-hi, rgba(255, 255, 255, 0.90)); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); --mdc-text-field-fill-color: rgba(var(--rgb-primary-text-color, 255,255,255), 0.08); }'
+                      entities:
+                      - entity: timer.ac_off_living
+                        name: Living AC
+                      - entity: timer.ac_off_bedroom
+                        name: Bedroom AC
+                      - entity: timer.ac_off_samar
+                        name: Samar Room AC
+                      - entity: timer.ac_off_shanaya
+                        name: Shanaya Room AC
+                      title: Running timers
+                      type: entities
                     type: vertical-stack
                   dismissable: true
-                  style: >-
-                    --ha-dialog-surface-background: oklch(from
-                    var(--primary-text-color) calc(1.1 - 0.85 * l) 0.045 265 /
-                    0.62); --ha-dialog-surface-backdrop-filter: blur(30px)
-                    saturate(190%); --mdc-dialog-scrim-color: rgba(10, 15, 40,
-                    0.5);
+                  style: '--ha-dialog-surface-background: oklch(from var(--primary-text-color) calc(1.1 - 0.85 * l) 0.045 265 / 0.62); --ha-dialog-surface-backdrop-filter: blur(30px) saturate(190%); --mdc-dialog-scrim-color: rgba(10, 15, 40, 0.5);'
                   title: AC Off Timer
                 service: browser_mod.popup
+            hold_action:
+              action: none
             triggers_update:
-              - timer.ac_off_living
-              - timer.ac_off_bedroom
-              - timer.ac_off_samar
-              - timer.ac_off_shanaya
-              - sensor.time
-            type: custom:button-card
-            variables:
-              'on': >-
-                [[[ return
-                ['timer.ac_off_living','timer.ac_off_bedroom','timer.ac_off_samar','timer.ac_off_shanaya'].some(id=>states[id]&&states[id].state==='active');
+            - timer.ac_off_living
+            - timer.ac_off_bedroom
+            - timer.ac_off_samar
+            - timer.ac_off_shanaya
+            - sensor.time
+            custom_fields:
+              body: |-
+                [[[
+                  const ts = [['Living', 'timer.ac_off_living'], ['Bedroom', 'timer.ac_off_bedroom'],
+                              ['Samar', 'timer.ac_off_samar'], ['Shanaya', 'timer.ac_off_shanaya']];
+                  const running = [];
+                  for (const [room, id] of ts) {
+                    const s = states[id];
+                    if (!s || s.state !== 'active' || !s.attributes.finishes_at) continue;
+                    running.push({ room, left: Math.max(0, new Date(s.attributes.finishes_at).getTime() - Date.now()) });
+                  }
+                  running.sort((a, b) => a.left - b.left);
+                  const fmt = ms => { const m = Math.max(1, Math.ceil(ms / 60000)); return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`; };
+                  if (!running.length) return `<div style="font-size:17px;font-weight:700;margin-top:6px">No timer running</div>
+                    <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:2px">Tap to turn an AC off later</div>`;
+                  const top = running[0];
+                  const more = running.length > 1 ? ` · +${running.length - 1} more` : '';
+                  return `<div style="display:flex;align-items:baseline;gap:6px;margin-top:6px">
+                      <span style="font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1;color:#4c8dff">${fmt(top.left)}</span>
+                      <span style="font-size:12px;font-weight:600;color:var(--secondary-text-color)">left</span></div>
+                    <div style="font-size:11.5px;color:var(--secondary-text-color);margin-top:3px">${top.room} AC turns off${more}</div>`;
                 ]]]
-              status: >-
-                [[[ const
-                ts=[['Living','timer.ac_off_living'],['Bedroom','timer.ac_off_bedroom'],['Samar','timer.ac_off_samar'],['Shanaya','timer.ac_off_shanaya']];let
-                best=null;for (const [room,id] of ts){const
-                s=states[id];if(!s||s.state!=='active')continue;const
-                fin=s.attributes.finishes_at;if(!fin)continue;const
-                left=Math.max(0,new
-                Date(fin).getTime()-Date.now());if(!best||left<best.left)best={room,left};}if(!best)return
-                'No timer running';const
-                m=Math.max(1,Math.ceil(best.left/60000));return best.room+' AC ·
-                '+(m>=60?Math.floor(m/60)+'h '+(m%60)+'m':m+'m'); ]]]
         type: grid
       - cards:
           - mobile:
