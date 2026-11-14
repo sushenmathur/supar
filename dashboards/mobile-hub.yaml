@@ -1275,8 +1275,9 @@ views:
                   - custom_fields:
                       body: |-
                         [[[
+                          const skip = ['light.kitchen_tab_screen', 'light.supar_kitchen_tab_screen'];
                           const n = Object.values(states).filter(e => e.entity_id.startsWith('light.')
-                            && !e.entity_id.startsWith('light.browser') && e.state === 'on').length;
+                            && !e.entity_id.startsWith('light.browser') && !skip.includes(e.entity_id) && e.state === 'on').length;
                           return `<div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-.5px;margin-top:8px">${n}<span style="font-size:13px;font-weight:600;color:var(--secondary-text-color);margin-left:3px">on</span></div>`;
                         ]]]
                       toggles:
@@ -1713,6 +1714,11 @@ views:
                   - entity: light.sonoff_1000dbd8b7
                     icon: mdi:light-recessed
                     name: Media Downlights
+                    template: b_sq_light
+                    type: custom:button-card
+                  - entity: light.media_tv_led
+                    icon: mdi:led-strip-variant
+                    name: Media TV LED
                     template: b_sq_light
                     type: custom:button-card
                   - entity: switch.sonoff_100090d020
