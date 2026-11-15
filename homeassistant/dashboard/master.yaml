@@ -4566,8 +4566,21 @@ views:
 
             styles:
               grid:
-                - grid-template-areas: >-
-                    "head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"
+                - grid-template-areas: |
+                    [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"'; ]]]
+              custom_fields:
+                s1:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s2:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s3:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s4:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
       - type: grid
         cards:
           - type: custom:button-card
@@ -4723,8 +4736,21 @@ views:
 
             styles:
               grid:
-                - grid-template-areas: >-
-                    "head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"
+                - grid-template-areas: |
+                    [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"'; ]]]
+              custom_fields:
+                s1:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s2:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s3:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s4:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
       - type: grid
         cards:
           - type: custom:button-card
@@ -4920,8 +4946,21 @@ views:
 
             styles:
               grid:
-                - grid-template-areas: >-
-                    "head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 c8 c8"
+                - grid-template-areas: |
+                    [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 c8 c8"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 c8 c8"'; ]]]
+              custom_fields:
+                s1:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s2:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s3:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                s4:
+                  - display: |
+                      [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
           - template: main
             type: custom:navbar-card
     subview: true
