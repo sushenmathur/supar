@@ -849,6 +849,8 @@ button_card_templates:
       card:
         - border-radius: 30px
         - padding: 18px
+        - min-height: 560px
+        - align-content: start
         - background: |
             [[[
               const E = variables.ents || [];
@@ -4322,15 +4324,15 @@ views:
                     - light.kitchenled
                     - light.sonoff_1000dbd8b7
                     - light.kitchen_downlights
-                - name: Hallways & Bedrooms
+                - name: Hallways, Bedrooms & Garage
                   ents:
                     - light.corridor_light
                     - light.aarlo_samar_cam
                     - light.hallway_light
                     - switch.sonoff_1000e54df1
-                - name: Garage & Outdoor
-                  ents:
                     - light.garage_light
+                - name: Outdoor
+                  ents:
                     - light.driveway_light
                     - switch.sonoff_1000905c71
                     - switch.sonoff_100053e676
@@ -4709,14 +4711,16 @@ views:
               - light.aarlo_samar_cam
               - light.hallway_light
               - switch.sonoff_1000e54df1
+              - light.garage_light
             variables:
-              title: Hallways & Bedrooms
+              title: Hallways, Bedrooms & Garage
               icon: mdi:bed
               ents:
                 - light.corridor_light
                 - light.aarlo_samar_cam
                 - light.hallway_light
                 - switch.sonoff_1000e54df1
+                - light.garage_light
             custom_fields:
                 sw:
                   card:
@@ -4728,6 +4732,7 @@ views:
                         - light.aarlo_samar_cam
                         - light.hallway_light
                         - switch.sonoff_1000e54df1
+                        - light.garage_light
                 c1:
                   card:
                     type: tile
@@ -4842,12 +4847,23 @@ views:
                     entity: switch.sonoff_1000e54df1
                     template: lr_chip
                     icon: mdi:light-recessed
+                c5:
+                  card:
+                    type: custom:button-card
+                    entity: light.garage_light
+                    template: lr_chip
+                    icon: mdi:light-recessed
+                    variables:
+                      label: Garage Downlight
+                gl: '<div style="text-align:left;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--secondary-text-color);padding:6px 4px 0">Garage</div>'
 
             styles:
               grid:
                 - grid-template-areas: >-
-                    "head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4"
+                    "head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "gl gl gl gl" "c5 c5 . ."
               custom_fields:
+                gl:
+                  - justify-self: stretch
                 c1:
                   - justify-self: stretch
                   - align-self: stretch
@@ -4860,12 +4876,14 @@ views:
                 c4:
                   - justify-self: stretch
                   - align-self: stretch
+                c5:
+                  - justify-self: stretch
+                  - align-self: stretch
       - type: grid
         cards:
           - type: custom:button-card
             template: lr_room
             triggers_update:
-              - light.garage_light
               - light.driveway_light
               - switch.sonoff_1000905c71
               - switch.sonoff_100053e676
@@ -4874,10 +4892,9 @@ views:
               - light.laundry_light
               - switch.festive_lights
             variables:
-              title: Garage & Outdoor
+              title: Outdoor
               icon: mdi:gate
               ents:
-                - light.garage_light
                 - light.driveway_light
                 - switch.sonoff_1000905c71
                 - switch.sonoff_100053e676
@@ -4892,7 +4909,6 @@ views:
                     template: lr_sw
                     variables:
                       ents:
-                        - light.garage_light
                         - light.driveway_light
                         - switch.sonoff_1000905c71
                         - switch.sonoff_100053e676
@@ -4903,20 +4919,12 @@ views:
                 c1:
                   card:
                     type: custom:button-card
-                    entity: light.garage_light
-                    template: lr_chip
-                    icon: mdi:light-recessed
-                    variables:
-                      label: Garage Downlight
-                c2:
-                  card:
-                    type: custom:button-card
                     entity: light.driveway_light
                     template: lr_chip
                     icon: mdi:spotlight-beam
                     variables:
                       label: Driveway Floodlight
-                c3:
+                c2:
                   card:
                     type: custom:button-card
                     entity: switch.sonoff_1000905c71
@@ -4924,7 +4932,7 @@ views:
                     icon: mdi:light-recessed
                     variables:
                       label: Door Downlight
-                c4:
+                c3:
                   card:
                     type: custom:button-card
                     entity: switch.sonoff_100053e676
@@ -4932,7 +4940,7 @@ views:
                     icon: mdi:bulkhead-light
                     variables:
                       label: Outdoor Lights
-                c5:
+                c4:
                   card:
                     type: custom:button-card
                     entity: switch.patio_lights
@@ -4940,7 +4948,7 @@ views:
                     icon: mdi:string-lights
                     variables:
                       label: Patio Lights
-                c6:
+                c5:
                   card:
                     type: custom:button-card
                     entity: light.backyard_light
@@ -4948,7 +4956,7 @@ views:
                     icon: mdi:spotlight-beam
                     variables:
                       label: Backyard Spotlight
-                c7:
+                c6:
                   card:
                     type: custom:button-card
                     entity: light.laundry_light
@@ -4956,7 +4964,7 @@ views:
                     icon: mdi:spotlight-beam
                     variables:
                       label: Laundry Spotlight
-                c8:
+                c7:
                   card:
                     type: custom:button-card
                     entity: switch.festive_lights
@@ -4968,7 +4976,7 @@ views:
             styles:
               grid:
                 - grid-template-areas: >-
-                    "head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 c8 c8"
+                    "head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 . ."
               custom_fields:
                 c1:
                   - justify-self: stretch
@@ -4989,9 +4997,6 @@ views:
                   - justify-self: stretch
                   - align-self: stretch
                 c7:
-                  - justify-self: stretch
-                  - align-self: stretch
-                c8:
                   - justify-self: stretch
                   - align-self: stretch
           - template: main
