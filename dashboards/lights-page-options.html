@@ -1,0 +1,76 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lights page redesign – options</title>
+<style>
+:root{--tx:#14203a;--tx2:rgba(20,32,58,.62);--bg:radial-gradient(900px 600px at 6% 8%,rgba(255,150,130,.7),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(90,200,250,.7),transparent 62%),radial-gradient(760px 600px at 98% 70%,rgba(179,136,255,.7),transparent 62%),radial-gradient(700px 520px at 12% 98%,rgba(255,211,110,.6),transparent 62%),linear-gradient(160deg,#eef3ff,#e6ecfa);--soft:rgba(255,255,255,.55);--glass:linear-gradient(145deg,rgba(255,255,255,.55),rgba(255,255,255,.22));--bd:rgba(255,255,255,.8);--hi:rgba(255,255,255,.95);--field:rgba(255,255,255,.55);--on:linear-gradient(145deg,rgba(255,222,140,.95),rgba(255,170,70,.75));--glow:0 0 30px rgba(255,170,60,.45)}
+body.dark{--tx:#fff;--tx2:rgba(255,255,255,.62);--bg:radial-gradient(900px 600px at 6% 8%,rgba(91,61,245,.55),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(10,167,160,.45),transparent 62%),radial-gradient(760px 600px at 98% 70%,rgba(192,38,211,.45),transparent 62%),linear-gradient(160deg,#080d1e,#0f1730 55%,#0a1a26);--soft:rgba(255,255,255,.09);--glass:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.04));--bd:rgba(255,255,255,.26);--hi:rgba(255,255,255,.4);--field:rgba(255,255,255,.1);--on:linear-gradient(145deg,rgba(255,214,102,.6),rgba(255,150,60,.4))}
+*{box-sizing:border-box}body{margin:0;padding:18px 22px 40px;font-family:Roboto,system-ui,sans-serif;color:var(--tx);background:var(--bg) fixed;min-height:100vh}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;font-size:13px;flex-wrap:wrap}.bar button{font:inherit;border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:99px;padding:6px 14px;cursor:pointer}.bar button.a{background:var(--on);color:#2a1700;font-weight:700}
+.view{display:none;max-width:1120px;margin:0 auto}.view.show{display:block}
+.g{background:var(--glass);border:1px solid var(--bd);border-radius:28px;backdrop-filter:blur(20px) saturate(190%);box-shadow:inset 0 1px 0 var(--hi),0 12px 30px rgba(50,60,120,.18)}
+h1{font-size:26px;text-align:center;margin:8px 0 14px}
+.hero{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;padding:18px 24px;margin-bottom:16px}
+.big{font-size:64px;font-weight:800;line-height:1;letter-spacing:-.03em}.big small{font-size:18px;font-weight:600;color:var(--tx2);letter-spacing:0}
+.sub{font-size:13px;color:var(--tx2);margin-top:4px}
+.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ar{background:var(--field);border-radius:18px;padding:10px 14px;cursor:pointer;border:1px solid var(--bd)}.ar.act{outline:2px solid #f59e0b}
+.ar b{display:block;font-size:13px}.ar span{font-size:12px;color:var(--tx2)}
+.meter{height:6px;border-radius:4px;background:rgba(127,127,127,.2);margin-top:6px;overflow:hidden}.meter i{display:block;height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:4px;transition:width .3s}
+.acts{display:flex;flex-direction:column;gap:8px}.btn{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:16px;padding:10px 16px;font:600 13px Roboto,system-ui;cursor:pointer;display:flex;gap:8px;align-items:center;white-space:nowrap}
+.btn.hot{background:var(--on);color:#2a1700}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.area{padding:14px}.ah{display:flex;align-items:center;gap:10px;margin-bottom:10px}.ah .ic{width:38px;height:38px;border-radius:14px;background:var(--field);display:grid;place-items:center}
+.ah b{font-size:15px}.ah div span{display:block;font-size:12px;color:var(--tx2)}
+.sw{margin-left:auto;width:46px;height:26px;border-radius:99px;background:rgba(127,127,127,.3);position:relative;cursor:pointer;transition:.2s}.sw:after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}.sw.on{background:#f59e0b}.sw.on:after{left:23px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.t{position:relative;background:var(--soft);border:1px solid var(--bd);border-radius:20px;padding:10px 12px;cursor:pointer;user-select:none;overflow:hidden;box-shadow:inset 0 1px 0 var(--hi);transition:background .25s}
+.t.on{background:var(--on);box-shadow:var(--glow),inset 0 1px 0 var(--hi);color:#2a1700}
+.t .r{display:flex;gap:8px;align-items:center}.t .r svg{width:22px;height:22px;fill:currentColor;opacity:.75;flex:none}.t b{font-size:13px;line-height:1.15}.t span{display:block;font-size:11.5px;opacity:.7}
+.br{height:6px;border-radius:4px;background:rgba(80,40,0,.18);margin-top:8px;position:relative}.br i{display:block;height:100%;border-radius:4px;background:#7a3b00;opacity:.75}
+.fl{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}.chip{padding:7px 14px;border-radius:99px;background:var(--soft);border:1px solid var(--bd);font-size:13px;cursor:pointer}.chip.a{background:var(--on);color:#2a1700;font-weight:700}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.t2{min-height:122px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;border-radius:24px}
+.t2 svg{width:30px;height:30px}.t2 .tg{font-size:10.5px;opacity:.65;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.note{font-size:12.5px;color:var(--tx2);text-align:center;margin-top:14px}
+</style></head><body>
+<div class="bar"><b>Lights page redesign</b><button class="a" data-v="A">Option A · Area cards</button><button data-v="B">Option B · Filter + tile wall</button><span style="flex:1"></span><button id="dk">Dark mode</button><button id="rs">Reset</button></div>
+
+<div class="view show" id="A"><h1>Lighting</h1><div class="g hero" id="heroA"></div><div class="cols" id="colsA"></div><div class="note">Tap a tile to toggle · tap an area switch to turn the whole area on or off · bar = brightness (tap to set)</div></div>
+<div class="view" id="B"><h1>Lighting</h1><div class="g hero" id="heroB"></div><div class="fl" id="flB"></div><div class="grid5" id="gridB"></div><div class="note">Lights that are on float to the top. Filter by area or show only what is on.</div></div>
+
+<script>
+const IC='M12 2a7 7 0 0 0-4 12.7V18h8v-2.3A7 7 0 0 0 12 3Zm-3 17h6v1H9z';
+const AREAS=[{k:'liv',n:'Living & Kitchen',ic:'M3 12V9a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v3a2 2 0 0 1 2 2v4h-2v2h-2v-2H6v2H4v-2H2v-4a2 2 0 0 1 2-2Z'},{k:'hall',n:'Hallways & Bedrooms',ic:'M2 7v10h2v-3h16v3h2v-6a4 4 0 0 0-4-4H10v4H4V7Z'},{k:'out',n:'Garage & Outdoor',ic:'M4 21V9l8-6 8 6v12h-4v-8H8v8Z'}];
+let D=[['liv','Dining',0,0],['liv','Pendants',100,1],['liv','Kitchen Bench',52,1],['liv','Media Downlights',100,1],['liv','Lamp',0,0],['liv','Kitchen Downlights',1,2],
+['hall','Corridor',0,0],['hall','Tall Lamp',88,1],['hall','Samar Night Light',59,1],['hall','Hallway Light',0,0],['hall','Bedroom Downlights',0,0],
+['out','Garage Downlight',0,0],['out','Driveway Floodlight',0,0],['out','Door Downlight',0,0],['out','Outdoor Lights',1,2],['out','Patio Lights',0,0],['out','Backyard Spotlight',0,0],['out','Laundry Spotlight',0,0],['out','Festive Light',0,0]];
+// [area,name,brightness%(0=off),dimmable(1) | 2 = on, not dimmable]
+const INIT=JSON.stringify(D);let flt='all',onlyOn=false,dark=false;
+const L=D.map((d,i)=>({id:i,a:d[0],n:d[1],on:d[2]>0,b:d[2]>1?d[2]:null,dim:d[3]===1}));
+const orig=JSON.parse(JSON.stringify(L));
+const cnt=a=>L.filter(l=>(!a||l.a===a)&&l.on).length, tot=a=>L.filter(l=>!a||l.a===a).length;
+const ico=p=>`<svg viewBox="0 0 24 24" width="22" height="22"><path d="${p}"/></svg>`;
+function tile(l,big){const st=l.on?(l.dim&&l.b?l.b+'%':'On'):'Off';
+ return `<div class="t ${big?'t2':''} ${l.on?'on':''}" data-id="${l.id}">${big?`<div><div class="tg">${AREAS.find(a=>a.k===l.a).n.split(' ')[0]}</div><svg viewBox="0 0 24 24"><path d="${IC}"/></svg></div><div><b>${l.n}</b><span>${st}</span>${l.dim&&l.on?`<div class="br" data-br="${l.id}"><i style="width:${l.b}%"></i></div>`:''}</div>`:
+ `<div class="r"><svg viewBox="0 0 24 24"><path d="${IC}"/></svg><div><b>${l.n}</b><span>${st}</span></div></div>${l.dim&&l.on?`<div class="br" data-br="${l.id}"><i style="width:${l.b}%"></i></div>`:''}`}</div>`}
+function hero(){return `<div><div class="big">${cnt()}<small> of ${tot()} on</small></div><div class="sub">${cnt()?'Lights currently on across the house':'All lights are off'}</div></div>
+<div class="areas">${AREAS.map(a=>`<div class="ar ${flt===a.k?'act':''}" data-f="${a.k}"><b>${a.n}</b><span>${cnt(a.k)} of ${tot(a.k)} on</span><div class="meter"><i style="width:${cnt(a.k)/tot(a.k)*100}%"></i></div></div>`).join('')}</div>
+<div class="acts"><div class="btn hot" data-act="alloff">⏻ All off</div><div class="btn" data-act="night">🌙 Good Night</div></div>`}
+function render(){
+ const h=hero();document.getElementById('heroA').innerHTML=h;document.getElementById('heroB').innerHTML=h;
+ document.getElementById('colsA').innerHTML=AREAS.map(a=>`<div class="g area"><div class="ah"><div class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="${a.ic}"/></svg></div><div><b>${a.n}</b><span>${cnt(a.k)} of ${tot(a.k)} on</span></div><div class="sw ${cnt(a.k)?'on':''}" data-area="${a.k}"></div></div><div class="tiles">${L.filter(l=>l.a===a.k).sort((x,y)=>y.on-x.on).map(l=>tile(l)).join('')}</div></div>`).join('');
+ document.getElementById('flB').innerHTML=['all',...AREAS.map(a=>a.k)].map(k=>`<div class="chip ${flt===k&&k!=='all'||(flt==='all'&&k==='all')?'a':''}" data-f="${k}">${k==='all'?'All areas':AREAS.find(a=>a.k===k).n}</div>`).join('')+`<div class="chip ${onlyOn?'a':''}" data-on="1">On only</div>`;
+ document.getElementById('gridB').innerHTML=L.filter(l=>(flt==='all'||l.a===flt)&&(!onlyOn||l.on)).sort((x,y)=>y.on-x.on).map(l=>tile(l,true)).join('');
+ bind();
+}
+function bind(){
+ document.querySelectorAll('[data-id]').forEach(e=>e.onclick=ev=>{if(ev.target.closest('[data-br]'))return;const l=L[e.dataset.id];l.on=!l.on;if(l.on&&l.dim&&!l.b)l.b=80;render()});
+ document.querySelectorAll('[data-br]').forEach(e=>e.onclick=ev=>{const r=e.getBoundingClientRect();L[e.dataset.br].b=Math.max(5,Math.round((ev.clientX-r.left)/r.width*100));render()});
+ document.querySelectorAll('[data-area]').forEach(e=>e.onclick=()=>{const a=e.dataset.area,any=cnt(a)>0;L.filter(l=>l.a===a).forEach(l=>{l.on=!any;if(l.on&&l.dim&&!l.b)l.b=80});render()});
+ document.querySelectorAll('[data-f]').forEach(e=>e.onclick=()=>{flt=(flt===e.dataset.f)?'all':e.dataset.f;render()});
+ document.querySelectorAll('[data-on]').forEach(e=>e.onclick=()=>{onlyOn=!onlyOn;render()});
+ document.querySelectorAll('[data-act]').forEach(e=>e.onclick=()=>{L.forEach(l=>l.on=false);render()});
+}
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.view').forEach(v=>v.classList.remove('show'));document.getElementById(b.dataset.v).classList.add('show');document.querySelectorAll('[data-v]').forEach(x=>x.classList.toggle('a',x===b))});
+document.getElementById('dk').onclick=e=>{document.body.classList.toggle('dark');e.target.textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode'};
+document.getElementById('rs').onclick=()=>{orig.forEach((o,i)=>Object.assign(L[i],o));flt='all';onlyOn=false;render()};
+render();
+</script></body></html>
