@@ -928,7 +928,7 @@ button_card_templates:
         - border-radius: 30px
         - padding: 14px 24px
       grid:
-        - grid-template-areas: '"count pills gn off"'
+        - grid-template-areas: '"count pills gn aoff"'
         - grid-template-columns: auto 1fr auto auto
         - column-gap: 20px
         - align-items: center
@@ -941,7 +941,7 @@ button_card_templates:
           - overflow: hidden
         gn:
           - justify-self: end
-        off:
+        aoff:
           - justify-self: end
   glass_chip:
     template:
@@ -4374,7 +4374,7 @@ views:
                     perform_action: scene.turn_on
                     target:
                       entity_id: scene.good_night
-              off:
+              aoff:
                 card:
                   type: custom:button-card
                   name: All off
