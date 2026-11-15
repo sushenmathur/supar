@@ -750,55 +750,6 @@ button_card_templates:
       icon:
         - color: |
             [[[ return states[variables.sel]?.state === 'on' ? 'var(--primary-text-color)' : 'var(--secondary-text-color)'; ]]]
-  lr_chip:
-    template:
-      - ticker
-    show_icon: true
-    show_name: true
-    show_state: false
-    show_label: false
-    name: |
-      [[[
-        const on = entity.state === 'on';
-        const t = String(variables.label || entity.attributes.friendly_name || entity.entity_id);
-        const b = entity.attributes.brightness;
-        const pct = on && b !== undefined && b !== null ? `<span style="margin-left:10px;font-size:13px;font-weight:600;opacity:0.75;flex:none">${Math.round(b / 2.55)}%</span>` : '';
-        const nm = t.length <= 15 ? `<span style="flex:1;min-width:0">${t}</span>` : `<span class="mq"><span class="run"><span>${t}</span><span>${t}</span></span></span>`;
-        return `<div style="display:flex;align-items:center;width:100%;min-width:0">${nm}${pct}</div>`;
-      ]]]
-    tap_action:
-      action: toggle
-    hold_action:
-      action: more-info
-    styles:
-      card:
-        - height: 54px
-        - border-radius: 27px
-        - padding: 0 18px
-        - background: |
-            [[[ return entity.state === 'on' ? 'linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75))' : 'var(--glass-bg-soft)'; ]]]
-        - border: 1px solid var(--glass-border)
-        - box-shadow: |
-            [[[ return (entity.state === 'on' ? '0 0 18px rgba(255,170,60,0.45), ' : '') + 'inset 0 1px 0 var(--glass-hi)'; ]]]
-        - color: |
-            [[[ return entity.state === 'on' ? '#2a1700' : 'var(--primary-text-color)'; ]]]
-      grid:
-        - grid-template-areas: '"i n"'
-        - grid-template-columns: 28px 1fr
-        - column-gap: 12px
-        - align-items: center
-      icon:
-        - width: 24px
-        - color: |
-            [[[ return entity.state === 'on' ? '#2a1700' : 'var(--primary-text-color)'; ]]]
-      name:
-        - justify-self: stretch
-        - font-size: 15.5px
-        - font-weight: 600
-        - text-align: left
-        - min-width: 0
-        - overflow: hidden
-        - color: inherit
   lr_sw:
     show_icon: false
     show_name: false
@@ -4444,7 +4395,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4494,7 +4445,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4544,7 +4495,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4594,7 +4545,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4644,7 +4595,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4672,12 +4623,51 @@ views:
                           }
                 c6:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: light.kitchen_downlights
-                    template: lr_chip
+                    name: Kitchen Downlights
                     icon: mdi:light-recessed
-                    variables:
-                      label: Kitchen Downlights
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
 
             styles:
               grid:
@@ -4757,7 +4747,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4807,7 +4797,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4835,26 +4825,144 @@ views:
                           }
                 c3:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: light.hallway_light
-                    template: lr_chip
+                    name: Hallway Light
                     icon: mdi:light-recessed
-                    variables:
-                      label: Hallway Light
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c4:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: switch.sonoff_1000e54df1
-                    template: lr_chip
                     icon: mdi:light-recessed
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c5:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: light.garage_light
-                    template: lr_chip
+                    name: Garage Downlight
                     icon: mdi:light-recessed
-                    variables:
-                      label: Garage Downlight
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 gl: '<div style="text-align:left;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--secondary-text-color);padding:6px 4px 0">Garage</div>'
 
             styles:
@@ -4918,60 +5026,333 @@ views:
                         - switch.festive_lights
                 c1:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: light.driveway_light
-                    template: lr_chip
+                    name: Driveway Floodlight
                     icon: mdi:spotlight-beam
-                    variables:
-                      label: Driveway Floodlight
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c2:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: switch.sonoff_1000905c71
-                    template: lr_chip
+                    name: Door Downlight
                     icon: mdi:light-recessed
-                    variables:
-                      label: Door Downlight
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c3:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: switch.sonoff_100053e676
-                    template: lr_chip
+                    name: Outdoor Lights
                     icon: mdi:bulkhead-light
-                    variables:
-                      label: Outdoor Lights
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c4:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: switch.patio_lights
-                    template: lr_chip
+                    name: Patio Lights
                     icon: mdi:string-lights
-                    variables:
-                      label: Patio Lights
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c5:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: light.backyard_light
-                    template: lr_chip
+                    name: Backyard Spotlight
                     icon: mdi:spotlight-beam
-                    variables:
-                      label: Backyard Spotlight
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c6:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: light.laundry_light
-                    template: lr_chip
+                    name: Laundry Spotlight
                     icon: mdi:spotlight-beam
-                    variables:
-                      label: Laundry Spotlight
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
                 c7:
                   card:
-                    type: custom:button-card
+                    type: tile
                     entity: switch.festive_lights
-                    template: lr_chip
+                    name: Festive Light
                     icon: phu:light-string
-                    variables:
-                      label: Festive Light
+                    vertical: false
+                    tap_action:
+                      action: toggle
+                    icon_tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: |
+                          ha-card {
+                            {% if is_state(config.entity, 'on') %}
+                            background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
+                            box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
+                            --primary-text-color: #2a1700;
+                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --tile-color: #7a3b00 !important;
+                            --control-slider-color: #7a3b00;
+                            --control-slider-background: #7a3b00;
+                            --control-slider-background-opacity: 0.2;
+                            {% else %}
+                            background: var(--glass-bg-soft) !important;
+                            box-shadow: inset 0 1px 0 var(--glass-hi);
+                            --tile-color: var(--primary-text-color) !important;
+                            --state-inactive-color: var(--primary-text-color);
+                            --state-light-inactive-color: var(--primary-text-color);
+                            {% endif %}
+                            border: 1px solid var(--glass-border);
+                            border-radius: 27px;
+                            backdrop-filter: none;
+                          }
+                          {% if not is_state(config.entity, 'on') %}
+                          hui-card-features { display: none !important; }
+                          {% endif %}
+                        ha-tile-info$: |
+                          .primary, .secondary {
+                            white-space: normal !important;
+                            overflow: visible !important;
+                            text-overflow: clip !important;
+                            line-height: 1.2;
+                          }
 
             styles:
               grid:
