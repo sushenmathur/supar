@@ -842,7 +842,7 @@ button_card_templates:
           const lv = d.length ? Math.round(d.reduce((a, b) => a + b, 0) / d.length) : null;
           return `<div style="display:flex;align-items:center;gap:14px;text-align:left">
             <div style="width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:var(--glass-field)"><ha-icon icon="${variables.icon}" style="--mdc-icon-size:26px"></ha-icon></div>
-            <div><div style="font-size:18px;font-weight:700">${variables.title}</div>
+            <div style="min-width:0"><div style="font-size:18px;font-weight:700;line-height:1.2;white-space:normal">${variables.title}</div>
             <div style="font-size:13px;color:var(--secondary-text-color)">${on.length ? on.length + ' of ' + E.length + ' on' + (lv !== null ? ' · ' + lv + '%' : '') : 'All off'}</div></div></div>`;
         ]]]
     styles:
@@ -850,7 +850,6 @@ button_card_templates:
         - border-radius: 30px
         - padding: 18px
         - min-height: 560px
-        - align-content: start
         - background: |
             [[[
               const E = variables.ents || [];
@@ -859,6 +858,7 @@ button_card_templates:
               return `radial-gradient(120% 90% at 50% 0%, rgba(255,190,90,${w}), transparent 65%), var(--glass-bg)`;
             ]]]
       grid:
+        - align-content: start
         - grid-template-columns: repeat(4, 1fr)
         - column-gap: 10px
         - row-gap: 12px
@@ -4347,7 +4347,7 @@ views:
                   entity: scene.good_night
                   icon: mdi:weather-night
                   name: Good Night
-                  template: glass_action
+                  template: lr_btn
                   tap_action:
                     action: perform-action
                     confirmation:
@@ -4360,7 +4360,7 @@ views:
                   type: custom:button-card
                   name: All off
                   icon: mdi:power
-                  template: glass_action
+                  template: lr_btn
                   tap_action:
                     action: perform-action
                     confirmation:
@@ -4444,7 +4444,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --secondary-text-color: rgba(42,23,0,0.65);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4494,7 +4494,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --secondary-text-color: rgba(42,23,0,0.65);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4544,7 +4544,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --secondary-text-color: rgba(42,23,0,0.65);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4594,7 +4594,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --secondary-text-color: rgba(42,23,0,0.65);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4644,7 +4644,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --secondary-text-color: rgba(42,23,0,0.65);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4757,7 +4757,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --secondary-text-color: rgba(42,23,0,0.65);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4807,7 +4807,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.82);
+                            --secondary-text-color: rgba(42,23,0,0.65);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
