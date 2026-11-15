@@ -4444,7 +4444,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4494,7 +4494,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4544,7 +4544,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4594,7 +4594,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4644,7 +4644,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4757,7 +4757,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
@@ -4807,7 +4807,7 @@ views:
                             background: linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75)) !important;
                             box-shadow: 0 0 18px rgba(255,170,60,0.45), inset 0 1px 0 var(--glass-hi);
                             --primary-text-color: #2a1700;
-                            --secondary-text-color: rgba(42,23,0,0.65);
+                            --secondary-text-color: rgba(42,23,0,0.82);
                             --tile-color: #7a3b00 !important;
                             --control-slider-color: #7a3b00;
                             --control-slider-background: #7a3b00;
