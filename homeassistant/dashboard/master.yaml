@@ -753,17 +753,14 @@ button_card_templates:
   lr_chip:
     show_icon: false
     show_state: false
-    show_label: true
+    show_label: false
     name: |
       [[[
         const on = entity.state === 'on';
         const dot = `<span style="display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:10px;vertical-align:middle;background:${on ? '#7a3b00' : 'var(--secondary-text-color)'};opacity:${on ? 1 : 0.45}"></span>`;
-        return dot + (variables.label || entity.attributes.friendly_name || entity.entity_id);
-      ]]]
-    label: |
-      [[[
         const b = entity.attributes.brightness;
-        return entity.state === 'on' && b !== undefined && b !== null ? Math.round(b / 2.55) + '%' : '';
+        const pct = on && b !== undefined && b !== null ? `<span style="float:right;margin-left:12px;font-size:13px;font-weight:600;opacity:0.75">${Math.round(b / 2.55)}%</span>` : '';
+        return dot + (variables.label || entity.attributes.friendly_name || entity.entity_id) + pct;
       ]]]
     tap_action:
       action: toggle
@@ -782,8 +779,8 @@ button_card_templates:
         - color: |
             [[[ return entity.state === 'on' ? '#2a1700' : 'var(--primary-text-color)'; ]]]
       grid:
-        - grid-template-areas: '"n l"'
-        - grid-template-columns: 1fr auto
+        - grid-template-areas: '"n"'
+        - grid-template-columns: 1fr
         - align-items: center
       name:
         - justify-self: start
@@ -792,10 +789,7 @@ button_card_templates:
         - white-space: nowrap
         - overflow: hidden
         - text-overflow: ellipsis
-        - color: inherit
-      label:
-        - font-size: 13px
-        - opacity: 0.75
+        - width: 100%
         - color: inherit
   lr_step:
     show_icon: false
@@ -814,13 +808,15 @@ button_card_templates:
     styles:
       card:
         - height: 44px
-        - border-radius: 22px
+        - width: 100%
+        - border-radius: |
+            [[[ return variables.pct === 25 ? '22px 6px 6px 22px' : variables.pct === 100 ? '6px 22px 22px 6px' : '6px'; ]]]
         - padding: 0
         - background: |
             [[[
               const d = (variables.ents || []).map(id => states[id]).filter(s => s && s.state === 'on' && s.attributes.brightness !== undefined && s.attributes.brightness !== null).map(s => s.attributes.brightness / 2.55);
               const avg = d.length ? d.reduce((a, b) => a + b, 0) / d.length : -999;
-              return Math.abs(avg - variables.pct) <= 12 ? 'linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75))' : 'var(--glass-bg-soft)';
+              return avg >= variables.pct - 12 ? 'linear-gradient(145deg, rgba(255,222,140,0.95), rgba(255,170,70,0.75))' : 'var(--glass-bg-soft)';
             ]]]
         - border: 1px solid var(--glass-border)
         - box-shadow: inset 0 1px 0 var(--glass-hi)
@@ -828,7 +824,7 @@ button_card_templates:
             [[[
               const d = (variables.ents || []).map(id => states[id]).filter(s => s && s.state === 'on' && s.attributes.brightness !== undefined && s.attributes.brightness !== null).map(s => s.attributes.brightness / 2.55);
               const avg = d.length ? d.reduce((a, b) => a + b, 0) / d.length : -999;
-              return Math.abs(avg - variables.pct) <= 12 ? '#2a1700' : 'var(--primary-text-color)';
+              return avg >= variables.pct - 12 ? '#2a1700' : 'var(--primary-text-color)';
             ]]]
       name:
         - font-size: 14px
@@ -901,6 +897,31 @@ button_card_templates:
           - justify-self: stretch
         sw:
           - justify-self: end
+  lr_btn:
+    show_icon: true
+    show_name: true
+    show_state: false
+    styles:
+      card:
+        - height: 52px
+        - border-radius: 26px
+        - padding: 0 22px
+        - background: var(--glass-bg-soft)
+        - border: 1px solid var(--glass-border)
+        - box-shadow: inset 0 1px 0 var(--glass-hi)
+      grid:
+        - grid-template-areas: '"i n"'
+        - grid-template-columns: auto 1fr
+        - column-gap: 10px
+        - align-items: center
+      icon:
+        - width: 22px
+        - color: var(--primary-text-color)
+      name:
+        - font-size: 15px
+        - font-weight: 700
+        - white-space: nowrap
+        - color: var(--primary-text-color)
   lr_summary:
     show_icon: false
     show_name: false
@@ -4358,7 +4379,7 @@ views:
                   entity: scene.good_night
                   icon: mdi:weather-night
                   name: Good Night
-                  template: glass_action
+                  template: lr_btn
                   tap_action:
                     action: perform-action
                     confirmation:
@@ -4371,7 +4392,7 @@ views:
                   type: custom:button-card
                   name: All off
                   icon: mdi:power
-                  template: glass_action
+                  template: lr_btn
                   tap_action:
                     action: perform-action
                     confirmation:
@@ -4560,17 +4581,33 @@ views:
                     [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"'; ]]]
               custom_fields:
                 s1:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s2:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s3:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s4:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                c1:
+                  - justify-self: stretch
+                c2:
+                  - justify-self: stretch
+                c3:
+                  - justify-self: stretch
+                c4:
+                  - justify-self: stretch
+                c5:
+                  - justify-self: stretch
+                c6:
+                  - justify-self: stretch
       - type: grid
         cards:
           - type: custom:button-card
@@ -4696,17 +4733,29 @@ views:
                     [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4"'; ]]]
               custom_fields:
                 s1:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s2:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s3:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s4:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                c1:
+                  - justify-self: stretch
+                c2:
+                  - justify-self: stretch
+                c3:
+                  - justify-self: stretch
+                c4:
+                  - justify-self: stretch
       - type: grid
         cards:
           - type: custom:button-card
@@ -4906,17 +4955,37 @@ views:
                     [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 c8 c8"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 c8 c8"'; ]]]
               custom_fields:
                 s1:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s2:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s3:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
                 s4:
+                  - justify-self: stretch
                   - display: |
                       [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? 'flex' : 'none'; ]]]
+                c1:
+                  - justify-self: stretch
+                c2:
+                  - justify-self: stretch
+                c3:
+                  - justify-self: stretch
+                c4:
+                  - justify-self: stretch
+                c5:
+                  - justify-self: stretch
+                c6:
+                  - justify-self: stretch
+                c7:
+                  - justify-self: stretch
+                c8:
+                  - justify-self: stretch
           - template: main
             type: custom:navbar-card
     subview: true
