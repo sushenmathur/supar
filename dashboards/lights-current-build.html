@@ -1,0 +1,52 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lights page – what the build looks like</title>
+<style>
+:root{--tx:#14203a;--tx2:rgba(20,32,58,.62);--bg:radial-gradient(900px 600px at 6% 8%,rgba(255,150,130,.7),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(90,200,250,.7),transparent 62%),radial-gradient(760px 600px at 98% 70%,rgba(179,136,255,.7),transparent 62%),radial-gradient(700px 520px at 12% 98%,rgba(255,211,110,.6),transparent 62%),linear-gradient(160deg,#eef3ff,#e6ecfa);--soft:rgba(255,255,255,.5);--glass:linear-gradient(145deg,rgba(255,255,255,.55),rgba(255,255,255,.22));--bd:rgba(255,255,255,.8);--hi:rgba(255,255,255,.95);--field:rgba(255,255,255,.55);--track:rgba(20,32,58,.12)}
+body.dark{--tx:#fff;--tx2:rgba(255,255,255,.62);--bg:radial-gradient(900px 600px at 6% 8%,rgba(91,61,245,.55),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(10,167,160,.45),transparent 62%),radial-gradient(760px 600px at 98% 70%,rgba(192,38,211,.45),transparent 62%),linear-gradient(160deg,#080d1e,#0f1730 55%,#0a1a26);--soft:rgba(255,255,255,.09);--glass:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.04));--bd:rgba(255,255,255,.26);--hi:rgba(255,255,255,.4);--field:rgba(255,255,255,.1);--track:rgba(255,255,255,.16)}
+*{box-sizing:border-box}body{margin:0;padding:14px 22px 30px;font-family:Roboto,system-ui,sans-serif;color:var(--tx);background:var(--bg) fixed;min-height:100vh}
+.bar{max-width:1180px;margin:0 auto 6px;display:flex;gap:10px;font-size:12.5px;align-items:center}.bar button{font:inherit;border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:99px;padding:5px 12px;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto}h1{text-align:center;font-size:26px;margin:4px 0 12px}
+.g{background:var(--glass);border:1px solid var(--bd);border-radius:30px;backdrop-filter:blur(20px) saturate(190%);box-shadow:inset 0 1px 0 var(--hi),0 12px 30px rgba(50,60,120,.18)}
+.sum{display:flex;align-items:center;gap:18px;padding:14px 24px;margin-bottom:14px}
+.sum .n{font-size:46px;font-weight:800;letter-spacing:-.03em;line-height:1;white-space:nowrap}.sum .n small{font-size:15px;font-weight:600;color:var(--tx2);letter-spacing:0}
+.pills{display:flex;gap:8px;flex:1;flex-wrap:wrap}.pill{padding:10px 16px;border-radius:99px;background:var(--field);border:1px solid var(--bd);font-size:14.5px;font-weight:600;display:flex;gap:8px;align-items:center;white-space:nowrap}.pill i{width:10px;height:10px;border-radius:50%;background:var(--tx2);opacity:.45}.pill.l i{background:#f59e0b;opacity:1;box-shadow:0 0 8px #f59e0b}
+.btn{width:170px;white-space:nowrap;height:52px;border-radius:26px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);display:flex;gap:10px;align-items:center;padding:0 18px;font-weight:700;font-size:15px;cursor:pointer;color:var(--tx)}.btn svg{width:22px;height:22px;fill:currentColor}
+.rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.room{padding:18px;position:relative;overflow:hidden;min-height:560px}.room .warm{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,rgba(255,190,90,.55),transparent 65%);opacity:var(--w,0);pointer-events:none}.room>*{position:relative}
+.rh{display:flex;align-items:center;gap:12px;margin-bottom:12px}.ic{width:48px;height:48px;border-radius:16px;background:var(--field);display:grid;place-items:center}.rh b{font-size:18px;display:block}.rh span{font-size:12.5px;color:var(--tx2)}
+.sw{margin-left:auto;width:52px;height:30px;border-radius:15px;background:rgba(127,127,127,.35);position:relative;cursor:pointer}.sw:after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}.sw.on{background:#f59e0b}.sw.on:after{left:25px}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+.sepl{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);padding:6px 4px 0;text-align:left}
+.tile{border-radius:27px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);padding:12px 14px;cursor:pointer;user-select:none;transition:.25s}
+.tile .top{display:flex;gap:10px;align-items:center}.tile .ib{width:36px;height:36px;border-radius:50%;background:rgba(127,127,127,.18);display:grid;place-items:center;flex:none}.tile svg{width:20px;height:20px;fill:var(--tx)}
+.tile b{font-size:14px;line-height:1.2;display:block}.tile small{font-size:12.5px;color:var(--tx2)}
+.tile .sl{height:34px;border-radius:12px;margin-top:10px;background:rgba(80,40,0,.2);position:relative;overflow:hidden}.tile .sl i{position:absolute;left:0;top:0;bottom:0;background:#7a3b00;opacity:.75;border-radius:12px}.tile .sl u{position:absolute;top:6px;bottom:6px;width:4px;border-radius:2px;background:#fff;margin-left:-8px}
+.tile.on,.pl.on{background:linear-gradient(145deg,rgba(255,222,140,.95),rgba(255,170,70,.75));box-shadow:0 0 18px rgba(255,170,60,.45),inset 0 1px 0 var(--hi);color:#2a1700}.tile.on svg,.pl.on svg{fill:#2a1700}.tile.on small{color:rgba(42,23,0,.65)}.tile.on .ib{background:rgba(122,59,0,.18)}
+.pl{height:54px;border-radius:27px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);display:flex;align-items:center;gap:12px;padding:0 18px;font-size:15.5px;font-weight:600;cursor:pointer;user-select:none;overflow:hidden;white-space:nowrap}.pl svg{width:24px;height:24px;fill:var(--tx);flex:none}.pl span{flex:1;min-width:0;overflow:hidden}.run{display:inline-block;white-space:nowrap;animation:tk 9s linear infinite}@keyframes tk{0%,12%{transform:translateX(0)}60%,100%{transform:translateX(-52%)}}.pl em{font-style:normal;font-size:13px;opacity:.75}
+.note{text-align:center;font-size:12px;color:var(--tx2);margin-top:12px}
+</style></head><body>
+<div class="bar"><b style="margin-right:auto">Approximation of the Lights view as built (tap tiles to toggle)</b><button id="dk">Dark mode</button><button id="rs">Reset</button></div>
+<div class="wrap"><h1>Lighting</h1><div class="g sum" id="sum"></div><div class="rooms" id="rooms"></div>
+<div class="note">Drawn in HTML to show layout, colours and behaviour. Your tablet will differ slightly (native Home Assistant slider and fonts).</div></div>
+<script>
+const IC={rec:'M3 12a9 9 0 0 1 18 0v1H3Zm4 3h10v2H7z',spot:'M4 4l6 2-2 5-6-2zm7 3 9 3-3 9-9-3z',bulk:'M7 3h10v3H7zM6 8h12v10a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z',str:'M2 6c4 6 8 6 10 0 2 6 6 6 10 0M6 12v3a2 2 0 1 0 4 0v-3M14 12v3a2 2 0 1 0 4 0v-3',lamp:'M9 3h6l3 9H6zM11 12h2v7h3v2H8v-2h3z',bulb:'M12 2a7 7 0 0 0-4 12.7V18h8v-2.3A7 7 0 0 0 12 2Zm-3 19h6v1H9z'};
+const R=[{n:'Living & Kitchen',ic:'mdi',L:[['Dining',100,'rec',0],['Tall Lamp',88,'lamp',1],['Pendants',100,'bulb',1],['Kitchen Bench',52,'bulb',1],['Media Downlights',100,'rec',1],['Kitchen Downlights',0,'rec',2]]},
+{n:'Hallways, Bedrooms & Garage',L:[['Corridor',0,'rec',0],['Samar Night Light',40,'rec',1],['Hallway Light',0,'rec',2],['Bedroom Downlights',0,'rec',2],'GARAGE',['Garage Downlight',0,'rec',2]]},
+{n:'Outdoor',L:[['Driveway Floodlight',0,'spot',2],['Door Downlight',0,'rec',2],['Outdoor Lights',1,'bulk',2],['Patio Lights',0,'str',2],['Backyard Spotlight',0,'spot',2],['Laundry Spotlight',0,'spot',2],['Festive Light',0,'str',2]]}];
+// [name, level(0=off,1=on,>1 pct), icon, mode 0=tile(slider),1=tile,2=pill]; dimmable tiles: mode 0/1 -> tile with slider
+let S;const init=()=>{S=R.map(r=>r.L.map(l=>typeof l==='string'?l:{n:l[0],on:l[1]>0,b:l[1]>1?l[1]:80,ic:l[2],dim:l[3]<2}))};init();
+// first room: set Dining off like the photo
+S[0][0].on=false;
+const $=id=>document.getElementById(id);
+const items=r=>S[r].filter(x=>typeof x!=='string');
+function render(){
+ const all=S.flat().filter(x=>typeof x!=='string');
+ $('sum').innerHTML=`<div class="n">${all.filter(x=>x.on).length}<small> of ${all.length} lights on</small></div><div class="pills">${R.map((r,i)=>{const n=items(i).filter(x=>x.on).length;return `<div class="pill ${n?'l':''}"><i></i>${r.n} ${n}/${items(i).length}</div>`}).join('')}</div><div class="btn"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg>Good Night</div><div class="btn"><svg viewBox="0 0 24 24"><path d="M11 2h2v10h-2zM6.3 5.3l1.4 1.4a7 7 0 1 0 8.6 0l1.4-1.4A9 9 0 1 1 6.3 5.3Z"/></svg>All off</div>`;
+ $('rooms').innerHTML=R.map((r,ri)=>{const it=items(ri),n=it.filter(x=>x.on).length,d=it.filter(x=>x.on&&x.dim);const lv=d.length?Math.round(d.reduce((s,x)=>s+x.b,0)/d.length):null;
+  return `<div class="g room" style="--w:${n?Math.min(.75,.25+n/it.length*.6):0}"><div class="warm"></div><div class="rh"><div class="ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="${IC.bulb}"/></svg></div><div><b>${r.n}</b><span>${n?`${n} of ${it.length} on${lv!==null?' · '+lv+'%':''}`:'All off'}</span></div><div class="sw ${n?'on':''}" data-room="${ri}"></div></div>
+  <div class="cg">${S[ri].map((x,xi)=>typeof x==='string'?`<div class="sepl">${x}</div>`:(x.dim?`<div class="tile ${x.on?'on':''}" data-r="${ri}" data-i="${xi}"><div class="top"><div class="ib"><svg viewBox="0 0 24 24"><path d="${IC[x.ic]}"/></svg></div><div><b>${x.n}</b><small>${x.on?x.b+'%':'Off'}</small></div></div>${x.on?`<div class="sl"><i style="width:${x.b}%"></i><u style="left:${x.b}%"></u></div>`:''}</div>`:`<div class="pl ${x.on?'on':''}" data-r="${ri}" data-i="${xi}"><svg viewBox="0 0 24 24"><path d="${IC[x.ic]}"/></svg><span>${x.n.length>15?`<span class="run">${x.n} &nbsp;&nbsp;&nbsp; ${x.n}</span>`:x.n}</span></div>`)).join('')}</div></div>`}).join('');
+ document.querySelectorAll('[data-r]').forEach(e=>e.onclick=()=>{const x=S[e.dataset.r][e.dataset.i];x.on=!x.on;render()});
+ document.querySelectorAll('[data-room]').forEach(e=>e.onclick=()=>{const it=items(e.dataset.room),a=it.some(x=>x.on);it.forEach(x=>x.on=!a);render()});
+}
+$('dk').onclick=e=>{document.body.classList.toggle('dark');e.target.textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode'};
+$('rs').onclick=()=>{init();S[0][0].on=false;render()};render();
+</script></body></html>

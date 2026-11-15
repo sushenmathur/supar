@@ -876,7 +876,7 @@ button_card_templates:
     styles:
       card:
         - height: 52px
-        - width: 150px
+        - width: 170px
         - border-radius: 26px
         - padding: 0 18px
         - background: var(--glass-bg-soft)
