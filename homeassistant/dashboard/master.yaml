@@ -675,7 +675,6 @@ button_card_templates:
       - light.kitchen_downlights
       - light.tall_lamp
       - light.aarlo_samar_cam
-      - switch.sonoff_1000e5018c
       - switch.sonoff_1000e54df1
       - light.garage_light
       - light.driveway_light
@@ -698,7 +697,6 @@ button_card_templates:
         light.kitchen_downlights: ["Kitchen Downlights", mdi:light-recessed]
         light.tall_lamp: ["Tall Lamp", mdi:floor-lamp]
         light.aarlo_samar_cam: ["Samar Night Light", mdi:light-recessed]
-        switch.sonoff_1000e5018c: [null, mdi:light-recessed]
         switch.sonoff_1000e54df1: [null, mdi:light-recessed]
         light.garage_light: ["Garage Downlight", mdi:light-recessed]
         light.driveway_light: ["Driveway Floodlight", mdi:spotlight-beam]
@@ -711,7 +709,7 @@ button_card_templates:
       sel: |
         [[[
           const FAV = ['light.kitchen_pendants', 'light.dining_light', 'light.sonoff_1000dbd8b7', 'switch.sonoff_100090d020', 'light.corridor_light', 'light.hallway_light'];
-          const POOL = ['light.kitchen_pendants', 'light.dining_light', 'light.sonoff_1000dbd8b7', 'switch.sonoff_100090d020', 'light.corridor_light', 'light.hallway_light', 'light.kitchenled', 'light.kitchen_downlights', 'light.tall_lamp', 'light.aarlo_samar_cam', 'switch.sonoff_1000e5018c', 'switch.sonoff_1000e54df1', 'light.garage_light', 'light.driveway_light', 'switch.sonoff_1000905c71', 'switch.sonoff_100053e676', 'switch.patio_lights', 'light.backyard_light', 'light.laundry_light', 'switch.festive_lights'];
+          const POOL = ['light.kitchen_pendants', 'light.dining_light', 'light.sonoff_1000dbd8b7', 'switch.sonoff_100090d020', 'light.corridor_light', 'light.hallway_light', 'light.kitchenled', 'light.kitchen_downlights', 'light.tall_lamp', 'light.aarlo_samar_cam', 'switch.sonoff_1000e54df1', 'light.garage_light', 'light.driveway_light', 'switch.sonoff_1000905c71', 'switch.sonoff_100053e676', 'switch.patio_lights', 'light.backyard_light', 'light.laundry_light', 'switch.festive_lights'];
           const on = id => states[id]?.state === 'on';
           const t = id => new Date(states[id]?.last_changed || 0).getTime();
           const extras = POOL.filter(id => !FAV.includes(id) && on(id)).sort((a, b) => t(a) - t(b));
@@ -4291,16 +4289,14 @@ views:
               columns: full
             triggers_update:
               - light.dining_light
+              - light.tall_lamp
               - light.kitchen_pendants
               - light.kitchenled
               - light.sonoff_1000dbd8b7
-              - switch.sonoff_100090d020
               - light.kitchen_downlights
               - light.corridor_light
-              - light.tall_lamp
               - light.aarlo_samar_cam
               - light.hallway_light
-              - switch.sonoff_1000e5018c
               - switch.sonoff_1000e54df1
               - light.garage_light
               - light.driveway_light
@@ -4313,16 +4309,14 @@ views:
             variables:
               all:
                 - light.dining_light
+                - light.tall_lamp
                 - light.kitchen_pendants
                 - light.kitchenled
                 - light.sonoff_1000dbd8b7
-                - switch.sonoff_100090d020
                 - light.kitchen_downlights
                 - light.corridor_light
-                - light.tall_lamp
                 - light.aarlo_samar_cam
                 - light.hallway_light
-                - switch.sonoff_1000e5018c
                 - switch.sonoff_1000e54df1
                 - light.garage_light
                 - light.driveway_light
@@ -4336,18 +4330,16 @@ views:
                 - name: Living
                   ents:
                     - light.dining_light
+                    - light.tall_lamp
                     - light.kitchen_pendants
                     - light.kitchenled
                     - light.sonoff_1000dbd8b7
-                    - switch.sonoff_100090d020
                     - light.kitchen_downlights
                 - name: Hallways
                   ents:
                     - light.corridor_light
-                    - light.tall_lamp
                     - light.aarlo_samar_cam
                     - light.hallway_light
-                    - switch.sonoff_1000e5018c
                     - switch.sonoff_1000e54df1
                 - name: Garage
                   ents:
@@ -4388,16 +4380,14 @@ views:
                     target:
                       entity_id:
                         - light.dining_light
+                        - light.tall_lamp
                         - light.kitchen_pendants
                         - light.kitchenled
                         - light.sonoff_1000dbd8b7
-                        - switch.sonoff_100090d020
                         - light.kitchen_downlights
                         - light.corridor_light
-                        - light.tall_lamp
                         - light.aarlo_samar_cam
                         - light.hallway_light
-                        - switch.sonoff_1000e5018c
                         - switch.sonoff_1000e54df1
                         - light.garage_light
                         - light.driveway_light
@@ -4413,20 +4403,20 @@ views:
             template: lr_room
             triggers_update:
               - light.dining_light
+              - light.tall_lamp
               - light.kitchen_pendants
               - light.kitchenled
               - light.sonoff_1000dbd8b7
-              - switch.sonoff_100090d020
               - light.kitchen_downlights
             variables:
               title: Living & Kitchen
               icon: mdi:sofa
               ents:
                 - light.dining_light
+                - light.tall_lamp
                 - light.kitchen_pendants
                 - light.kitchenled
                 - light.sonoff_1000dbd8b7
-                - switch.sonoff_100090d020
                 - light.kitchen_downlights
             custom_fields:
                 sw:
@@ -4436,10 +4426,10 @@ views:
                     variables:
                       ents:
                         - light.dining_light
+                        - light.tall_lamp
                         - light.kitchen_pendants
                         - light.kitchenled
                         - light.sonoff_1000dbd8b7
-                        - switch.sonoff_100090d020
                         - light.kitchen_downlights
                 s1:
                   card:
@@ -4449,17 +4439,17 @@ views:
                       pct: 25
                       ents:
                         - light.dining_light
+                        - light.tall_lamp
                         - light.kitchen_pendants
                         - light.kitchenled
                         - light.sonoff_1000dbd8b7
-                        - switch.sonoff_100090d020
                         - light.kitchen_downlights
                     triggers_update:
                       - light.dining_light
+                      - light.tall_lamp
                       - light.kitchen_pendants
                       - light.kitchenled
                       - light.sonoff_1000dbd8b7
-                      - switch.sonoff_100090d020
                       - light.kitchen_downlights
                 s2:
                   card:
@@ -4469,17 +4459,17 @@ views:
                       pct: 50
                       ents:
                         - light.dining_light
+                        - light.tall_lamp
                         - light.kitchen_pendants
                         - light.kitchenled
                         - light.sonoff_1000dbd8b7
-                        - switch.sonoff_100090d020
                         - light.kitchen_downlights
                     triggers_update:
                       - light.dining_light
+                      - light.tall_lamp
                       - light.kitchen_pendants
                       - light.kitchenled
                       - light.sonoff_1000dbd8b7
-                      - switch.sonoff_100090d020
                       - light.kitchen_downlights
                 s3:
                   card:
@@ -4489,17 +4479,17 @@ views:
                       pct: 75
                       ents:
                         - light.dining_light
+                        - light.tall_lamp
                         - light.kitchen_pendants
                         - light.kitchenled
                         - light.sonoff_1000dbd8b7
-                        - switch.sonoff_100090d020
                         - light.kitchen_downlights
                     triggers_update:
                       - light.dining_light
+                      - light.tall_lamp
                       - light.kitchen_pendants
                       - light.kitchenled
                       - light.sonoff_1000dbd8b7
-                      - switch.sonoff_100090d020
                       - light.kitchen_downlights
                 s4:
                   card:
@@ -4509,17 +4499,17 @@ views:
                       pct: 100
                       ents:
                         - light.dining_light
+                        - light.tall_lamp
                         - light.kitchen_pendants
                         - light.kitchenled
                         - light.sonoff_1000dbd8b7
-                        - switch.sonoff_100090d020
                         - light.kitchen_downlights
                     triggers_update:
                       - light.dining_light
+                      - light.tall_lamp
                       - light.kitchen_pendants
                       - light.kitchenled
                       - light.sonoff_1000dbd8b7
-                      - switch.sonoff_100090d020
                       - light.kitchen_downlights
                 c1:
                   card:
@@ -4531,31 +4521,31 @@ views:
                 c2:
                   card:
                     type: custom:button-card
+                    entity: light.tall_lamp
+                    template: lr_chip
+                    variables:
+                      label: Tall Lamp
+                c3:
+                  card:
+                    type: custom:button-card
                     entity: light.kitchen_pendants
                     template: lr_chip
                     variables:
                       label: Pendants
-                c3:
+                c4:
                   card:
                     type: custom:button-card
                     entity: light.kitchenled
                     template: lr_chip
                     variables:
                       label: Kitchen Bench
-                c4:
+                c5:
                   card:
                     type: custom:button-card
                     entity: light.sonoff_1000dbd8b7
                     template: lr_chip
                     variables:
                       label: Media Downlights
-                c5:
-                  card:
-                    type: custom:button-card
-                    entity: switch.sonoff_100090d020
-                    template: lr_chip
-                    variables:
-                      label: Lamp
                 c6:
                   card:
                     type: custom:button-card
@@ -4587,20 +4577,16 @@ views:
             template: lr_room
             triggers_update:
               - light.corridor_light
-              - light.tall_lamp
               - light.aarlo_samar_cam
               - light.hallway_light
-              - switch.sonoff_1000e5018c
               - switch.sonoff_1000e54df1
             variables:
               title: Hallways & Bedrooms
               icon: mdi:bed
               ents:
                 - light.corridor_light
-                - light.tall_lamp
                 - light.aarlo_samar_cam
                 - light.hallway_light
-                - switch.sonoff_1000e5018c
                 - switch.sonoff_1000e54df1
             custom_fields:
                 sw:
@@ -4610,10 +4596,8 @@ views:
                     variables:
                       ents:
                         - light.corridor_light
-                        - light.tall_lamp
                         - light.aarlo_samar_cam
                         - light.hallway_light
-                        - switch.sonoff_1000e5018c
                         - switch.sonoff_1000e54df1
                 s1:
                   card:
@@ -4623,17 +4607,13 @@ views:
                       pct: 25
                       ents:
                         - light.corridor_light
-                        - light.tall_lamp
                         - light.aarlo_samar_cam
                         - light.hallway_light
-                        - switch.sonoff_1000e5018c
                         - switch.sonoff_1000e54df1
                     triggers_update:
                       - light.corridor_light
-                      - light.tall_lamp
                       - light.aarlo_samar_cam
                       - light.hallway_light
-                      - switch.sonoff_1000e5018c
                       - switch.sonoff_1000e54df1
                 s2:
                   card:
@@ -4643,17 +4623,13 @@ views:
                       pct: 50
                       ents:
                         - light.corridor_light
-                        - light.tall_lamp
                         - light.aarlo_samar_cam
                         - light.hallway_light
-                        - switch.sonoff_1000e5018c
                         - switch.sonoff_1000e54df1
                     triggers_update:
                       - light.corridor_light
-                      - light.tall_lamp
                       - light.aarlo_samar_cam
                       - light.hallway_light
-                      - switch.sonoff_1000e5018c
                       - switch.sonoff_1000e54df1
                 s3:
                   card:
@@ -4663,17 +4639,13 @@ views:
                       pct: 75
                       ents:
                         - light.corridor_light
-                        - light.tall_lamp
                         - light.aarlo_samar_cam
                         - light.hallway_light
-                        - switch.sonoff_1000e5018c
                         - switch.sonoff_1000e54df1
                     triggers_update:
                       - light.corridor_light
-                      - light.tall_lamp
                       - light.aarlo_samar_cam
                       - light.hallway_light
-                      - switch.sonoff_1000e5018c
                       - switch.sonoff_1000e54df1
                 s4:
                   card:
@@ -4683,17 +4655,13 @@ views:
                       pct: 100
                       ents:
                         - light.corridor_light
-                        - light.tall_lamp
                         - light.aarlo_samar_cam
                         - light.hallway_light
-                        - switch.sonoff_1000e5018c
                         - switch.sonoff_1000e54df1
                     triggers_update:
                       - light.corridor_light
-                      - light.tall_lamp
                       - light.aarlo_samar_cam
                       - light.hallway_light
-                      - switch.sonoff_1000e5018c
                       - switch.sonoff_1000e54df1
                 c1:
                   card:
@@ -4705,30 +4673,18 @@ views:
                 c2:
                   card:
                     type: custom:button-card
-                    entity: light.tall_lamp
-                    template: lr_chip
-                    variables:
-                      label: Tall Lamp
-                c3:
-                  card:
-                    type: custom:button-card
                     entity: light.aarlo_samar_cam
                     template: lr_chip
                     variables:
                       label: Samar Night Light
-                c4:
+                c3:
                   card:
                     type: custom:button-card
                     entity: light.hallway_light
                     template: lr_chip
                     variables:
                       label: Hallway Light
-                c5:
-                  card:
-                    type: custom:button-card
-                    entity: switch.sonoff_1000e5018c
-                    template: lr_chip
-                c6:
+                c4:
                   card:
                     type: custom:button-card
                     entity: switch.sonoff_1000e54df1
@@ -4737,7 +4693,7 @@ views:
             styles:
               grid:
                 - grid-template-areas: |
-                    [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"'; ]]]
+                    [[[ const dim = (variables.ents || []).some(id => { const m = states[id]?.attributes?.supported_color_modes; return Array.isArray(m) && m.some(x => x !== 'onoff'); }); return dim ? '"head head head sw" "s1 s2 s3 s4" "c1 c1 c2 c2" "c3 c3 c4 c4"' : '"head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4"'; ]]]
               custom_fields:
                 s1:
                   - display: |
