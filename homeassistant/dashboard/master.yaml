@@ -800,7 +800,7 @@ button_card_templates:
       card:
         - border-radius: 30px
         - padding: 18px
-        - min-height: 560px
+        - min-height: 620px
         - background: |
             [[[
               const E = variables.ents || [];
@@ -856,10 +856,11 @@ button_card_templates:
         ]]]
       pills: |
         [[[
-          return (variables.areas || []).map(a => {
+          const items = (variables.areas || []).map(a => {
             const n = a.ents.filter(id => states[id]?.state === 'on').length;
-            return `<span style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;margin-right:8px;border-radius:99px;font-size:15px;font-weight:600;background:var(--glass-field);border:1px solid var(--glass-border)"><span style="width:10px;height:10px;border-radius:50%;background:${n ? '#f59e0b' : 'var(--secondary-text-color)'};opacity:${n ? 1 : 0.45};${n ? 'box-shadow:0 0 8px #f59e0b' : ''}"></span>${a.name} ${n}/${a.ents.length}</span>`;
+            return `<span style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:99px;font-size:15px;font-weight:600;background:var(--glass-field);border:1px solid var(--glass-border)"><span style="width:10px;height:10px;border-radius:50%;background:${n ? '#f59e0b' : 'var(--secondary-text-color)'};opacity:${n ? 1 : 0.45};${n ? 'box-shadow:0 0 8px #f59e0b' : ''}"></span>${a.name} ${n}/${a.ents.length}</span>`;
           }).join('');
+          return `<div style="display:flex;flex-wrap:wrap;gap:8px;text-align:left">${items}</div>`;
         ]]]
     styles:
       card:
@@ -874,9 +875,8 @@ button_card_templates:
         count:
           - justify-self: start
         pills:
-          - justify-self: start
-          - white-space: nowrap
-          - overflow: hidden
+          - justify-self: stretch
+          - min-width: 0
         gn:
           - justify-self: end
         aoff:
@@ -4676,7 +4676,7 @@ views:
             styles:
               grid:
                 - grid-template-areas: >-
-                    "head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6"
+                    "head head head sw" "c1 c1 c1 c1" "c2 c2 c2 c2" "c3 c3 c3 c3" "c4 c4 c4 c4" "c5 c5 c5 c5" "c6 c6 c6 c6"
               custom_fields:
                 c1:
                   - justify-self: stretch
@@ -4967,12 +4967,12 @@ views:
                             text-overflow: clip !important;
                             line-height: 1.2;
                           }
-                gl: '<div style="text-align:left;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--secondary-text-color);padding:6px 4px 0">Garage</div>'
+                gl: '<div style="text-align:left;font-size:15px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--primary-text-color);padding:10px 4px 2px;border-top:1px solid var(--glass-border);margin-top:4px">Garage</div>'
 
             styles:
               grid:
                 - grid-template-areas: >-
-                    "head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "gl gl gl gl" "c5 c5 . ."
+                    "head head head sw" "c1 c1 c1 c1" "c2 c2 c2 c2" "c3 c3 c3 c3" "c4 c4 c4 c4" "gl gl gl gl" "c5 c5 c5 c5"
               custom_fields:
                 gl:
                   - justify-self: stretch
@@ -5361,7 +5361,7 @@ views:
             styles:
               grid:
                 - grid-template-areas: >-
-                    "head head head sw" "c1 c1 c2 c2" "c3 c3 c4 c4" "c5 c5 c6 c6" "c7 c7 . ."
+                    "head head head sw" "c1 c1 c1 c1" "c2 c2 c2 c2" "c3 c3 c3 c3" "c4 c4 c4 c4" "c5 c5 c5 c5" "c6 c6 c6 c6" "c7 c7 c7 c7"
               custom_fields:
                 c1:
                   - justify-self: stretch
