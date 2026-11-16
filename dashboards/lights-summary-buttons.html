@@ -15,20 +15,19 @@ h1{font-size:18px;margin:0 0 4px}p{margin:0 0 12px;font-size:13px;color:var(--tx
 .stack{display:flex;flex-direction:column;gap:8px}.stack .b{width:170px;height:42px}
 .note{font-size:12.5px;color:var(--tx2);margin-top:6px}
 :focus-visible{outline:3px solid #3b6cff;outline-offset:2px}
-</style></head><body>
+.bar.col{flex-direction:column;align-items:stretch;gap:12px}.bar.col>.pills{flex:none}.top{display:flex;align-items:center;gap:20px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.row3 .b{width:auto}.cap.full{width:100%}.cap.full .b{flex:1;width:auto}</style></head><body>
 <h1>Lights summary bar – Good Evening, Good Night, All off</h1>
-<p>All three buttons share one size and style. Tap one to see the pressed state. Each option is shown at the real width of the bar on your tablet (about 1070px), so you can see how the area pills sit beside them.</p>
+<p>Revised: the buttons moved to their own row so they can never overlap the area pills. All three buttons share one size and style. Tap one to see the pressed state. Both options are shown at the bar's real width and again narrower (resize the window to test).</p>
 <div class="ctl"><button id="dk">Dark mode</button></div>
 <div id="out"></div>
 <script>
 const I={eve:'M3 17h18v2H3zM6.3 11.3A6 6 0 0 1 17.7 11.3l-2 .7a4 4 0 0 0-7.4 0zM11 4h2v3h-2zM4.2 6.6l1.4-1.4 2.1 2.1-1.4 1.4zM18.4 7.3l2.1-2.1 1.4 1.4-2.1 2.1z',moon:'M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z',pwr:'M11 2h2v10h-2zM6.3 5.3l1.4 1.4a7 7 0 1 0 8.6 0l1.4-1.4A9 9 0 1 1 6.3 5.3Z'};
 const btn=(k,t)=>`<div class="b" tabindex="0" role="button"><svg viewBox="0 0 24 24"><path d="${I[k]}"/></svg>${t}</div>`;
 const all=btn('eve','Good Evening')+btn('moon','Good Night')+btn('pwr','All off');
-const left=`<div class="n">7<small> of 18 lights on</small></div><div class="pills"><div class="pill"><i></i>Living &amp; Kitchen 5/6</div><div class="pill"><i class="o"></i>Hallways, Bedrooms &amp; Garage 0/5</div><div class="pill"><i></i>Outdoor 2/7</div></div>`;
+const left=`<div class="top"><div class="n">7<small> of 18 lights on</small></div><div class="pills"><div class="pill"><i></i>Living &amp; Kitchen 5/6</div><div class="pill"><i class="o"></i>Hallways, Bedrooms &amp; Garage 0/5</div><div class="pill"><i></i>Outdoor 2/7</div></div></div>`;
 document.getElementById('out').innerHTML=`
-<h2>Option A · Three equal pills in a row</h2><div class="bar A">${left}<div class="grp">${all}</div></div><div class="note">Same 172×52 pill, icon beside label. Simplest. The area pills wrap to two lines to make room.</div>
-<h2>Option B · One segmented capsule</h2><div class="bar">${left}<div class="cap">${all}</div></div><div class="note">The three scenes sit in one capsule with thin dividers. Looks tidier and takes the least width, so the area pills stay on fewer lines.</div>
-<h2>Option C · Stacked column</h2><div class="bar">${left}<div class="stack">${all}</div></div><div class="note">Three equal buttons stacked at the right. Uses the least width, but makes the bar taller (about 170px).</div>`;
+<h2>Option D · Buttons on their own row, three equal columns</h2><div class="bar col">${left}<div class="row3">${all}</div></div><div class="note">Count and area pills on the first row, which can wrap freely. The three scenes sit on a second row and share the width equally, so they always match and nothing can overlap.</div>
+<h2>Option E · Same, as one segmented capsule</h2><div class="bar col">${left}<div class="cap full">${all}</div></div><div class="note">Same second row, drawn as one capsule with thin dividers.</div>`;
 document.querySelectorAll('.b').forEach(b=>{b.onclick=()=>{b.classList.add('p');setTimeout(()=>b.classList.remove('p'),400)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}}});
 document.getElementById('dk').onclick=e=>{document.body.classList.toggle('dark');e.target.textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode'};
 </script></body></html>
