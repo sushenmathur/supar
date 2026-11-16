@@ -824,10 +824,10 @@ button_card_templates:
     layout: icon_name
     styles:
       card:
-        - height: 52px
-        - width: 170px
-        - border-radius: 26px
-        - padding: 0 18px
+        - height: 46px
+        - width: 116px
+        - border-radius: 23px
+        - padding: 0 14px
         - background: var(--glass-bg-soft)
         - border: 1px solid var(--glass-border)
         - box-shadow: inset 0 1px 0 var(--glass-hi)
@@ -835,7 +835,7 @@ button_card_templates:
         - width: 22px
         - color: var(--primary-text-color)
       name:
-        - font-size: 15px
+        - font-size: 14px
         - font-weight: 700
         - white-space: nowrap
         - color: var(--primary-text-color)
@@ -852,29 +852,20 @@ button_card_templates:
           const n = A.filter(id => states[id]?.state === 'on').length;
           return `<div style="text-align:left;white-space:nowrap"><span style="font-size:46px;font-weight:800;letter-spacing:-.03em;line-height:1">${n}</span> <span style="font-size:15px;font-weight:600;color:var(--secondary-text-color)">of ${A.length} lights on</span></div>`;
         ]]]
-      pills: |
-        [[[
-          const items = (variables.areas || []).map(a => {
-            const n = a.ents.filter(id => states[id]?.state === 'on').length;
-            return `<span style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:99px;font-size:15px;font-weight:600;background:var(--glass-field);border:1px solid var(--glass-border)"><span style="width:10px;height:10px;border-radius:50%;background:${n ? '#f59e0b' : 'var(--secondary-text-color)'};opacity:${n ? 1 : 0.45};${n ? 'box-shadow:0 0 8px #f59e0b' : ''}"></span>${a.name} ${n}/${a.ents.length}</span>`;
-          }).join('');
-          return `<div style="display:flex;flex-wrap:wrap;gap:8px;text-align:left">${items}</div>`;
-        ]]]
     styles:
       card:
         - border-radius: 30px
         - padding: 14px 24px
       grid:
-        - grid-template-areas: '"count pills gn aoff"'
-        - grid-template-columns: auto 1fr auto auto
-        - column-gap: 20px
+        - grid-template-areas: '"count ge gn aoff"'
+        - grid-template-columns: 1fr auto auto auto
+        - column-gap: 10px
         - align-items: center
       custom_fields:
         count:
           - justify-self: start
-        pills:
-          - justify-self: stretch
-          - min-width: 0
+        ge:
+          - justify-self: end
         gn:
           - justify-self: end
         aoff:
@@ -4291,38 +4282,25 @@ views:
                 - light.backyard_light
                 - light.laundry_light
                 - switch.festive_lights
-              areas:
-                - name: Living & Kitchen
-                  ents:
-                    - light.dining_light
-                    - light.tall_lamp
-                    - light.kitchen_pendants
-                    - light.kitchenled
-                    - light.sonoff_1000dbd8b7
-                    - light.kitchen_downlights
-                - name: Hallways, Bedrooms & Garage
-                  ents:
-                    - light.corridor_light
-                    - light.aarlo_samar_cam
-                    - light.hallway_light
-                    - switch.sonoff_1000e54df1
-                    - light.garage_light
-                - name: Outdoor
-                  ents:
-                    - light.driveway_light
-                    - switch.sonoff_1000905c71
-                    - switch.sonoff_100053e676
-                    - switch.patio_lights
-                    - light.backyard_light
-                    - light.laundry_light
-                    - switch.festive_lights
             custom_fields:
+              ge:
+                card:
+                  type: custom:button-card
+                  entity: scene.good_evening
+                  icon: mdi:weather-sunset
+                  name: Evening
+                  template: lr_btn
+                  tap_action:
+                    action: perform-action
+                    perform_action: scene.turn_on
+                    target:
+                      entity_id: scene.good_evening
               gn:
                 card:
                   type: custom:button-card
                   entity: scene.good_night
                   icon: mdi:weather-night
-                  name: Good Night
+                  name: Night
                   template: lr_btn
                   tap_action:
                     action: perform-action
