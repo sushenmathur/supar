@@ -1,0 +1,38 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robbie dock error – options</title>
+<style>
+:root{--tx:#14203a;--tx2:rgba(20,32,58,.74);--bg:radial-gradient(900px 600px at 6% 8%,rgba(255,150,130,.7),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(90,200,250,.7),transparent 62%),radial-gradient(760px 600px at 98% 70%,rgba(179,136,255,.7),transparent 62%),linear-gradient(160deg,#eef3ff,#e6ecfa);--soft:rgba(255,255,255,.5);--bd:rgba(255,255,255,.8);--hi:rgba(255,255,255,.95)}
+body.dark{--tx:#fff;--tx2:rgba(255,255,255,.7);--bg:radial-gradient(900px 600px at 6% 8%,rgba(91,61,245,.55),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(10,167,160,.45),transparent 62%),linear-gradient(160deg,#080d1e,#0f1730 55%,#0a1a26);--soft:rgba(255,255,255,.09);--bd:rgba(255,255,255,.26);--hi:rgba(255,255,255,.4)}
+*{box-sizing:border-box}body{margin:0;padding:18px 22px 30px;font-family:Roboto,system-ui,sans-serif;color:var(--tx);background:var(--bg) fixed;min-height:100vh}
+h1{font-size:18px;margin:0 0 4px}p{margin:0 0 14px;font-size:13px;color:var(--tx2);max-width:760px}
+.ctl{display:flex;gap:10px;align-items:center;margin-bottom:18px;font-size:13px;flex-wrap:wrap}.ctl select,.ctl button{font:inherit;border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:99px;padding:6px 14px;cursor:pointer}
+h2{font-size:14px;margin:18px 0 8px}small{color:var(--tx2);display:block;margin:-4px 0 8px;font-size:12.5px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.t{width:104px;height:96px;border-radius:24px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12.5px;font-weight:600;text-align:center;line-height:1.15;padding:6px;position:relative}
+.t svg{width:28px;height:28px;fill:currentColor}.t.cap{width:auto;min-width:150px;padding:0 14px;color:var(--tx2);font-weight:500;border:none;background:none;box-shadow:none;align-items:flex-start}
+.t.err{background:linear-gradient(145deg,rgba(239,68,68,.62),rgba(190,18,60,.42));border-color:rgba(239,68,68,.95);color:#fff;animation:p 1.3s ease-in-out infinite}
+@keyframes p{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0),inset 0 1px 0 var(--hi)}50%{box-shadow:0 0 26px 5px rgba(239,68,68,.8),inset 0 1px 0 var(--hi)}}
+.t.err small{font-size:11px;font-weight:600;opacity:.95;display:block;margin:0;color:#fff}
+.badge{position:absolute;top:8px;right:12px;width:22px;height:22px;border-radius:50%;background:#ef4444;color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.t.b.err{background:var(--soft);color:var(--tx);border-color:rgba(239,68,68,.95)}.t.b.err svg{fill:#ef4444}.t.b.err small{color:#ef4444;font-weight:700}
+body.dark .t.b.err svg,body.dark .t.b.err small{filter:brightness(1.25)}
+.t.ok{opacity:1}
+@media (prefers-reduced-motion:reduce){.t.err{animation:none}}
+</style></head><body>
+<h1>Robbie tile – dock error</h1>
+<p>Shown when <code>sensor.robbie_dock_dock_error</code> is anything other than "ok". Pick a state to preview. The vacuum's own error state (already red) is unchanged.</p>
+<div class="ctl"><label>Dock error state <select id="st"></select></label><button id="dk">Dark mode</button></div>
+<h2>Today (no dock error)</h2><div class="row"><div class="t"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-3 7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/></svg>Robbie</div></div>
+<h2>Option A · Red tint, pulsing, alert robot icon</h2><small>Whole tile turns red and pulses, like the existing vacuum error. The label shows the actual fault.</small><div class="row" id="A"></div>
+<h2>Option B · Calm tile with a red alert sign</h2><small>The tile stays glass, with a red outline, red icon, a small "!" badge and the fault text in red. Less shouty on a wall tablet.</small><div class="row" id="B"></div>
+<script>
+const S=['ok','auto_empty_dock_fan_error','Duct blockage','auto_empty_dock_voltage_error','Water empty','Waste water tank full','maintenance_brush_jammed','Dirty tank latch open','No dustbin','Cleaning tank full or blocked','unavailable','unknown'];
+const $=id=>document.getElementById(id);
+$('st').innerHTML=S.map(x=>`<option ${x==='Water empty'?'selected':''}>${x}</option>`).join('');
+const ROB='M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-3 7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z';
+const ALERT='M12 2 1 21h22L12 2Zm1 14h-2v-2h2v2Zm0-4h-2V8h2v4Z';
+const pretty=s=>s.replace(/_/g,' ').replace(/^./,c=>c.toUpperCase());
+function render(){const st=$('st').value,err=st!=='ok';
+ const t=(cls,svg,extra)=>err?`<div class="t ${cls} err">${extra||''}<svg viewBox="0 0 24 24"><path d="${svg}"/></svg><div>Robbie<small>${pretty(st)}</small></div></div>`:`<div class="t"><svg viewBox="0 0 24 24"><path d="${ROB}"/></svg>Robbie</div>`;
+ $('A').innerHTML=t('a',ALERT);$('B').innerHTML=t('b',ROB,'<span class="badge">!</span>')}
+$('st').onchange=render;$('dk').onclick=e=>{document.body.classList.toggle('dark');e.target.textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode'};render();
+</script></body></html>
