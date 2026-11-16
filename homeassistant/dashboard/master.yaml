@@ -1234,13 +1234,17 @@ navbar-templates:
           action: open-popup
       - badge:
           count: |
-            [[[ return Object.values(states).filter(e =>
-                  e.entity_id.startsWith('light.') &&
-                  !e.entity_id.startsWith('light.browser') && e.entity_id !== 'light.kitchen_tab_screen' && e.state === 'on').length; ]]]
+            [[[ const skipId = ['light.kitchen_tab_screen', 'light.kitchen_pendants', 'light.kitchen_pendant_lights', 'light.supar_kitchen_tab_screen'];
+                  const skipName = ['kitchen tab screen', 'kitchen pendants', 'kitchen pendant lights', 'supar kitchen tab screen'];
+                  const lit = e => e.entity_id.startsWith('light.') && !e.entity_id.startsWith('light.browser') &&
+                    !skipId.includes(e.entity_id) && !skipName.includes(String(e.attributes.friendly_name || '').toLowerCase()) && e.state === 'on';
+                  return Object.values(states).filter(lit).length; ]]]
           show: |
-            [[[ return Object.values(states).some(e =>
-                  e.entity_id.startsWith('light.') &&
-                  !e.entity_id.startsWith('light.browser') && e.entity_id !== 'light.kitchen_tab_screen' && e.state === 'on'); ]]]
+            [[[ const skipId = ['light.kitchen_tab_screen', 'light.kitchen_pendants', 'light.kitchen_pendant_lights', 'light.supar_kitchen_tab_screen'];
+                  const skipName = ['kitchen tab screen', 'kitchen pendants', 'kitchen pendant lights', 'supar kitchen tab screen'];
+                  const lit = e => e.entity_id.startsWith('light.') && !e.entity_id.startsWith('light.browser') &&
+                    !skipId.includes(e.entity_id) && !skipName.includes(String(e.attributes.friendly_name || '').toLowerCase()) && e.state === 'on';
+                  return Object.values(states).some(lit); ]]]
         icon: mdi:lightbulb-outline
         icon_selected: mdi:lightbulb-on
         label: Lights
