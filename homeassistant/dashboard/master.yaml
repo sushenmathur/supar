@@ -2465,14 +2465,18 @@ views:
                               media_content_type: image/png
                   - type: custom:button-card
                     entity: vacuum.robbie
-                    icon: mdi:robot-vacuum
+                    icon: |
+                      [[[
+                        const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
+                        return dockErr ? 'mdi:alert' : 'mdi:robot-vacuum';
+                      ]]]
                     name: |
                       [[[
                         const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
                         const s = entity.state;
                         if (dockErr) {
                           const f = String(dk).replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
-                          return `Robbie<br><span style="font-size:11px;font-weight:700;color:#ef4444">${f}</span>`;
+                          return `Robbie<br><span style="font-size:11px;font-weight:700;color:#ffffff">${f}</span>`;
                         }
                         return s === 'docked' ? 'Robbie' : s === 'cleaning' ? 'Cleaning' : s === 'returning' ? 'Returning'
                           : s === 'paused' ? 'Paused' : s === 'error' ? 'Error' : s.charAt(0).toUpperCase() + s.slice(1);
@@ -2500,37 +2504,21 @@ views:
 
                       @media (prefers-reduced-motion: reduce) { * { animation:
                       none !important; } }
-                    custom_fields:
-                      badge: |
-                        [[[
-                          const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
-                          return dockErr ? '<div style="width:22px;height:22px;border-radius:50%;background:#ef4444;color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;box-shadow:0 0 0 2px rgba(255,255,255,0.85)">!</div>' : '';
-                        ]]]
                     styles:
-                      custom_fields:
-                        badge:
-                          - position: absolute
-                          - top: 8px
-                          - right: 12px
-                          - pointer-events: none
                       card:
                         - animation: |
                             [[[
+                              const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
                               const s = entity.state;
                               return s === 'cleaning' ? 'robbie-glow 2.4s ease-in-out infinite'
-                                : s === 'error' ? 'robbie-alert 1.3s ease-in-out infinite' : 'none';
+                                : (s === 'error' || dockErr) ? 'robbie-alert 1.3s ease-in-out infinite' : 'none';
                             ]]]
                         - background: |
                             [[[
-                              return entity.state === 'error'
+                              const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
+                              return (entity.state === 'error' || dockErr)
                                 ? 'linear-gradient(145deg, rgba(239,68,68,0.62), rgba(190,18,60,0.42))'
                                 : 'var(--glass-bg-soft)';
-                            ]]]
-                        - position: relative
-                        - box-shadow: |
-                            [[[
-                              const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
-                              return dockErr ? '0 0 18px rgba(239,68,68,0.55), inset 0 1px 0 var(--glass-hi)' : 'inset 0 1px 0 var(--glass-hi)';
                             ]]]
                         - border-color: |
                             [[[
@@ -2541,22 +2529,29 @@ views:
                                 : s === 'error' ? 'rgba(239,68,68,0.95)'
                                 : 'color-mix(in srgb, var(--glass-robbie, #2dd4bf) 70%, transparent)';
                             ]]]
+                      name:
+                        - color: |
+                            [[[
+                              const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
+                              return (entity.state === 'error' || dockErr) ? '#ffffff' : 'var(--primary-text-color)';
+                            ]]]
                       icon:
                         - transform-origin: center
                         - color: |
                             [[[
                               const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
                               const s = entity.state;
-                              if (dockErr) return '#ef4444';
+                              if (dockErr) return '#ffffff';
                               return s === 'docked' ? 'var(--primary-text-color)'
                                 : s === 'error' ? '#ffffff' : 'var(--glass-robbie, #2dd4bf)';
                             ]]]
                         - animation: |
                             [[[
+                              const dk = states['sensor.robbie_dock_dock_error']?.state; const dockErr = !!dk && !['ok', 'unavailable', 'unknown'].includes(dk) && entity.state !== 'error';
                               const s = entity.state;
                               return s === 'cleaning' ? 'robbie-spin 3s linear infinite'
                                 : s === 'returning' ? 'robbie-pulse 1.4s ease-in-out infinite'
-                                : s === 'error' ? 'robbie-pulse 1.0s ease-in-out infinite' : 'none';
+                                : (s === 'error' || dockErr) ? 'robbie-pulse 1.0s ease-in-out infinite' : 'none';
                             ]]]
                     tap_action:
                       action: fire-dom-event
