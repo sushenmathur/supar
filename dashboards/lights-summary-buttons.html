@@ -1,0 +1,34 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lights summary bar – three scene buttons</title>
+<style>
+:root{--tx:#14203a;--tx2:rgba(20,32,58,.74);--bg:radial-gradient(900px 600px at 6% 8%,rgba(255,150,130,.7),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(90,200,250,.7),transparent 62%),radial-gradient(760px 600px at 98% 70%,rgba(179,136,255,.7),transparent 62%),linear-gradient(160deg,#eef3ff,#e6ecfa);--soft:rgba(255,255,255,.5);--glass:linear-gradient(145deg,rgba(255,255,255,.55),rgba(255,255,255,.22));--bd:rgba(255,255,255,.8);--hi:rgba(255,255,255,.95);--field:rgba(255,255,255,.55);--on:linear-gradient(145deg,rgba(255,222,140,.95),rgba(255,170,70,.75))}
+body.dark{--tx:#fff;--tx2:rgba(255,255,255,.7);--bg:radial-gradient(900px 600px at 6% 8%,rgba(91,61,245,.55),transparent 62%),radial-gradient(800px 560px at 60% 12%,rgba(10,167,160,.45),transparent 62%),linear-gradient(160deg,#080d1e,#0f1730 55%,#0a1a26);--soft:rgba(255,255,255,.09);--glass:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.04));--bd:rgba(255,255,255,.26);--hi:rgba(255,255,255,.4);--field:rgba(255,255,255,.1);--on:linear-gradient(145deg,rgba(255,222,140,.95),rgba(255,170,70,.8))}
+*{box-sizing:border-box}body{margin:0;padding:18px 22px 30px;font-family:Roboto,system-ui,sans-serif;color:var(--tx);background:var(--bg) fixed;min-height:100vh}
+h1{font-size:18px;margin:0 0 4px}p{margin:0 0 12px;font-size:13px;color:var(--tx2);max-width:820px}h2{font-size:14px;margin:20px 0 6px}
+.ctl{display:flex;gap:8px;margin-bottom:6px}.ctl button{font:inherit;border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:99px;padding:6px 14px;cursor:pointer}
+.bar{width:1070px;max-width:100%;border-radius:30px;background:var(--glass);border:1px solid var(--bd);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 var(--hi),0 12px 30px rgba(50,60,120,.18);padding:14px 24px;display:flex;align-items:center;gap:20px}
+.n{font-size:46px;font-weight:800;line-height:1;letter-spacing:-.03em;white-space:nowrap}.n small{font-size:15px;font-weight:600;color:var(--tx2);letter-spacing:0}
+.pills{flex:1;display:flex;flex-wrap:wrap;gap:8px;min-width:0}.pill{padding:10px 18px;border-radius:99px;background:var(--field);border:1px solid var(--bd);font-size:15px;font-weight:600;display:flex;gap:8px;align-items:center;white-space:nowrap}.pill i{width:10px;height:10px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px #f59e0b}.pill i.o{background:var(--tx2);opacity:.45;box-shadow:none}
+.b{height:52px;border-radius:26px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:15px;cursor:pointer;color:var(--tx);white-space:nowrap}.b svg{width:22px;height:22px;fill:currentColor;flex:none}
+.b:active,.b.p{background:var(--on);color:#2a1700}
+.A .b{width:172px}.grp{display:flex;gap:10px}
+.cap{display:flex;border-radius:28px;background:var(--soft);border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--hi);overflow:hidden}.cap .b{border:none;background:none;box-shadow:none;border-radius:0;width:172px;border-right:1px solid var(--bd)}.cap .b:last-child{border-right:none}
+.stack{display:flex;flex-direction:column;gap:8px}.stack .b{width:170px;height:42px}
+.note{font-size:12.5px;color:var(--tx2);margin-top:6px}
+:focus-visible{outline:3px solid #3b6cff;outline-offset:2px}
+</style></head><body>
+<h1>Lights summary bar – Good Evening, Good Night, All off</h1>
+<p>All three buttons share one size and style. Tap one to see the pressed state. Each option is shown at the real width of the bar on your tablet (about 1070px), so you can see how the area pills sit beside them.</p>
+<div class="ctl"><button id="dk">Dark mode</button></div>
+<div id="out"></div>
+<script>
+const I={eve:'M3 17h18v2H3zM6.3 11.3A6 6 0 0 1 17.7 11.3l-2 .7a4 4 0 0 0-7.4 0zM11 4h2v3h-2zM4.2 6.6l1.4-1.4 2.1 2.1-1.4 1.4zM18.4 7.3l2.1-2.1 1.4 1.4-2.1 2.1z',moon:'M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z',pwr:'M11 2h2v10h-2zM6.3 5.3l1.4 1.4a7 7 0 1 0 8.6 0l1.4-1.4A9 9 0 1 1 6.3 5.3Z'};
+const btn=(k,t)=>`<div class="b" tabindex="0" role="button"><svg viewBox="0 0 24 24"><path d="${I[k]}"/></svg>${t}</div>`;
+const all=btn('eve','Good Evening')+btn('moon','Good Night')+btn('pwr','All off');
+const left=`<div class="n">7<small> of 18 lights on</small></div><div class="pills"><div class="pill"><i></i>Living &amp; Kitchen 5/6</div><div class="pill"><i class="o"></i>Hallways, Bedrooms &amp; Garage 0/5</div><div class="pill"><i></i>Outdoor 2/7</div></div>`;
+document.getElementById('out').innerHTML=`
+<h2>Option A · Three equal pills in a row</h2><div class="bar A">${left}<div class="grp">${all}</div></div><div class="note">Same 172×52 pill, icon beside label. Simplest. The area pills wrap to two lines to make room.</div>
+<h2>Option B · One segmented capsule</h2><div class="bar">${left}<div class="cap">${all}</div></div><div class="note">The three scenes sit in one capsule with thin dividers. Looks tidier and takes the least width, so the area pills stay on fewer lines.</div>
+<h2>Option C · Stacked column</h2><div class="bar">${left}<div class="stack">${all}</div></div><div class="note">Three equal buttons stacked at the right. Uses the least width, but makes the bar taller (about 170px).</div>`;
+document.querySelectorAll('.b').forEach(b=>{b.onclick=()=>{b.classList.add('p');setTimeout(()=>b.classList.remove('p'),400)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}}});
+document.getElementById('dk').onclick=e=>{document.body.classList.toggle('dark');e.target.textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode'};
+</script></body></html>
