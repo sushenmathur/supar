@@ -30,7 +30,7 @@ body.dark{--tx:#fff;--tx2:rgba(255,255,255,.7);--bg:radial-gradient(900px 600px 
 <g id="arcs"></g><circle class="dialbg" cx="180" cy="180" r="150"/><g id="dial"></g></svg><div class="ctr" id="ctr">–</div></div><div class="msg" id="msg">Enter passcode</div></div>
 <div><div class="chips"><div class="chip a" data-p="Sushen">Sushen</div><div class="chip" data-p="Paro">Paro</div></div><div class="pad" id="pad"></div></div></div></div>
 <script>
-const $=id=>document.getElementById(id);let code='',busy=false,ang=0;const LEN=6;
+const $=id=>document.getElementById(id);let code='',busy=false,ang=0;const LEN=4;
 // dial: ticks + digits
 let g='';for(let i=0;i<120;i++){const a=i*3,long=i%12===0,len=long?14:(i%3===0?9:5);g+=`<line x1="180" y1="${180-146}" x2="180" y2="${180-146+len}" stroke="var(--tick)" stroke-width="${long?2:1}" transform="rotate(${a} 180 180)"/>`}
 for(let d=0;d<10;d++){const a=d*36,rad=108;const x=180+rad*Math.sin(a*Math.PI/180),y=180-rad*Math.cos(a*Math.PI/180);g+=`<text class="dg" data-d="${d}" x="${x}" y="${y}" transform="rotate(${a} ${x} ${y})">${d}</text>`}
