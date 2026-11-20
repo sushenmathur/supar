@@ -20,7 +20,8 @@ they would appear as pills or overlays in the same space.
 
 Three new options for the Home view (`hubhome`), on the same 1600×1000 stage. Each has a light and a dark
 theme that follows the system setting; press **T** to switch, or add `?theme=dark` to the URL.
-Previews: `previews/redesign-<option>-light.png` and `-dark.png`. Data lives in `redesign-data.js`.
+Previews: `previews/redesign-<option>-light.png` and `-dark.png`. Each HTML file is self-contained (scripts, fonts and the
+camera still are inlined) so it opens in any viewer. `redesign-data.js` and `fonts/` are the editable sources; re-inline after changing them.
 
 | Option | Idea | Navigation | What leads |
 |---|---|---|---|
