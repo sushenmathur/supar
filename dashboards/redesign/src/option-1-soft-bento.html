@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Soft Bento</title>
+
+
+<style>
+/* Shared base for the redesign mock-ups: 1600x1000 stage that scales to the window, review toolbar. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform-origin:center;overflow:hidden;transform:translate(-50%,-50%) scale(var(--s,1))}
+@media (max-width:1600px),(max-height:1000px){:root{--s:0.95}}
+@media (max-width:1520px),(max-height:950px){:root{--s:0.90}}
+@media (max-width:1440px),(max-height:900px){:root{--s:0.85}}
+@media (max-width:1360px),(max-height:850px){:root{--s:0.80}}
+@media (max-width:1280px),(max-height:800px){:root{--s:0.75}}
+@media (max-width:1200px),(max-height:750px){:root{--s:0.70}}
+@media (max-width:1120px),(max-height:700px){:root{--s:0.65}}
+@media (max-width:1040px),(max-height:650px){:root{--s:0.60}}
+@media (max-width:960px),(max-height:600px){:root{--s:0.55}}
+@media (max-width:880px),(max-height:550px){:root{--s:0.50}}
+@media (max-width:800px),(max-height:500px){:root{--s:0.45}}
+@media (max-width:720px),(max-height:450px){:root{--s:0.40}}
+@media (max-width:640px),(max-height:400px){:root{--s:0.35}}
+@media (max-width:560px),(max-height:350px){:root{--s:0.30}}
+@media (max-width:480px),(max-height:300px){:root{--s:0.25}}
+
+.ic{display:block;flex:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+[data-tog],[role=button],button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid #3b82f6;outline-offset:3px}
+.day-only,.night-only{transition:opacity .4s ease}
+html:not([data-mode=night]) .night-only{display:none!important}
+html[data-mode=night] .day-only{display:none!important}
+/* review toolbar (not part of the design) */
+#review{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99;display:flex;gap:4px;padding:4px;border-radius:999px;
+ background:rgba(17,24,39,.82);backdrop-filter:blur(10px);font:600 13px/1 system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#review span{color:#cbd5e1;padding:10px 12px 10px 14px}
+#review button{color:#e5e7eb;padding:10px 16px;border-radius:999px;min-height:36px}
+#review button[aria-pressed=true]{background:#fff;color:#111827}
+html.shot #review{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+:root{--bg:#F2F1EC;--card:#FFFFFF;--ink:#1C1B19;--mut:#6B6860;--line:#E7E4DB;--soft:#F6F5F1;--sh:0 1px 2px rgba(28,27,25,.04),0 8px 24px rgba(28,27,25,.06);
+ --amber:#B45309;--amberbg:#FFF1D6;--amberic:#F59E0B;--blue:#1D4ED8;--bluebg:#E3ECFF;--green:#15803D;--greenbg:#DDF5E5;--red:#B91C1C;--redbg:#FDE2E2;--accent:#1C1B19;--onaccent:#fff}
+html[data-mode=night]{--bg:#0D0C0A;--card:#191815;--ink:#ECE6D8;--mut:#9C968A;--line:#2A2824;--soft:#22201C;--sh:none;
+ --amber:#F7C46C;--amberbg:#3A2C14;--amberic:#F7C46C;--blue:#9DB8FF;--bluebg:#1C2438;--green:#86D9A2;--greenbg:#16291D;--red:#FCA5A5;--redbg:#3A1717;--accent:#ECE6D8;--onaccent:#0D0C0A}
+body{background:var(--bg);font-family:'Work Sans',system-ui,sans-serif;color:var(--ink)}
+#stage{background:var(--bg);transition:background .5s}
+h1,h2,h3,.num,.ttl{font-family:Outfit,system-ui,sans-serif}
+.card{background:var(--card);border-radius:28px;box-shadow:var(--sh);border:1px solid var(--line);position:relative;overflow:hidden}
+.lbl{font:600 13px/1 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.mut{color:var(--mut)}
+
+/* rail */
+#rail{position:absolute;left:24px;top:24px;bottom:24px;width:96px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 0}
+.logo{width:52px;height:52px;border-radius:18px;background:var(--accent);color:var(--onaccent);display:grid;place-items:center;margin-bottom:22px}
+.nv{width:84px;height:74px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:500 13px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--mut);position:relative}
+.nv.act{background:var(--card);color:var(--ink);box-shadow:var(--sh);border:1px solid var(--line)}
+.bd{position:absolute;top:8px;right:16px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#DC2626;color:#fff;font:700 11px/20px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:center}
+.mode{margin-top:auto;width:64px;height:64px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;box-shadow:var(--sh)}
+
+/* day grid */
+#day{position:absolute;left:144px;right:24px;top:24px;bottom:24px;display:grid;gap:16px;
+ grid-template-columns:repeat(12,1fr);grid-template-rows:120px 120px 76px 96px 1fr 1fr;
+ grid-template-areas:
+ "hero hero hero hero hero ppl ppl ppl cam cam cam cam"
+ "hero hero hero hero hero sec sec sec cam cam cam cam"
+ "qa qa qa qa qa sec sec sec cam cam cam cam"
+ "rooms rooms rooms rooms rooms rooms rooms rooms cam cam cam cam"
+ "tv tv tv tv lt lt lt lt cal cal cal cal"
+ "ac ac ac ac lt lt lt lt veh veh en en"}
+.hero{grid-area:hero;padding:28px 32px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,#FFE7C7 0%,#FFD6C2 45%,#E9DDFF 100%);border:0}
+html[data-mode=night] .hero{background:linear-gradient(135deg,#2a2015,#1f1a24)}
+.hero .g{font:500 22px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#5B4636}
+.hero .t{font:300 108px/0.9 Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.04em;color:#2A1F17}
+.hero .t small{font-size:30px;font-weight:500;letter-spacing:0;margin-left:8px}
+.hero .row{display:flex;justify-content:space-between;align-items:flex-end}
+.wx{display:flex;align-items:center;gap:12px;color:#2A1F17}
+.wx b{font:400 52px/1 Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.02em}
+.wx span{font:500 15px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#5B4636;display:block}
+.zones{display:flex;gap:8px;margin-top:10px}
+.zones i{font:500 14px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-style:normal;background:rgba(255,255,255,.55);padding:8px 12px;border-radius:999px;color:#3d2e22}
+
+.ppl{grid-area:ppl;padding:16px 20px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.pr{display:flex;align-items:center;gap:12px}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font:600 16px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;flex:none}
+.pr b{font:600 16px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:block}.pr span{font-size:13px;color:var(--mut)}
+.ring{margin-left:auto;display:flex;align-items:center;gap:6px;font:600 14px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--mut)}
+.pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;font:600 13px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.pill.ok{background:var(--greenbg);color:var(--green)}
+
+.sec{grid-area:sec;padding:20px;display:flex;flex-direction:column;gap:12px}
+.alarm{display:flex;align-items:center;gap:14px}
+.alarm .badge{width:48px;height:48px;border-radius:16px;background:var(--greenbg);color:var(--green);display:grid;place-items:center}
+.alarm b{font:600 18px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:block}.alarm span{font-size:14px;color:var(--mut)}
+.arm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.arm button{height:48px;border-radius:16px;background:var(--soft);font:600 14px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line)}
+.srow{display:flex;align-items:center;gap:10px;font:500 15px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:2px 0}
+.srow .ic{color:var(--mut)}.srow em{margin-left:auto;font-style:normal;color:var(--green);font-weight:600;font-size:14px}
+
+.qa{grid-area:qa;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.qb{border-radius:22px;background:var(--card);border:1px solid var(--line);box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:600 14px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.qb .ic{color:var(--mut)}
+
+.cam{grid-area:cam;border:0;background:#111}
+.cam svg{position:absolute;inset:0}
+.cam .ov{position:absolute;left:0;right:0;bottom:0;padding:20px 22px;display:flex;align-items:flex-end;justify-content:space-between;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.cam .ov b{font:600 22px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:block}.cam .ov span{font-size:14px;opacity:.8}
+.live{position:absolute;left:18px;top:18px;display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font:600 13px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;backdrop-filter:blur(8px)}
+.live:before{content:"";width:8px;height:8px;border-radius:50%;background:#ef4444}
+.camacts{display:flex;gap:8px}
+.camacts button{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.18);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center}
+
+.rooms{grid-area:rooms;display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.rm{border-radius:24px;background:var(--card);border:1px solid var(--line);box-shadow:var(--sh);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.rm .rb{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--soft);color:var(--ink);flex:none}
+.rm b{font:600 16px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:block}.rm span{font-size:13px;color:var(--mut)}
+.rm.lit .rb{background:var(--amberbg);color:var(--amberic)}.rm.lit span{color:var(--amber);font-weight:600}
+
+/* devices */
+.dev{padding:22px;display:flex;flex-direction:column;transition:background .25s,border-color .25s}
+.dev .top{display:flex;justify-content:space-between;align-items:flex-start}
+.dev .db{width:52px;height:52px;border-radius:18px;background:var(--soft);display:grid;place-items:center;color:var(--mut);transition:inherit}
+.dev h3{font:600 20px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;margin-top:auto}
+.dev .st{font-size:15px;color:var(--mut);margin-top:4px}
+.sw{width:52px;height:32px;border-radius:16px;background:var(--line);position:relative;transition:background .2s}
+.sw:after{content:"";position:absolute;left:4px;top:4px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s cubic-bezier(.3,1.4,.6,1)}
+.on .sw{background:var(--accent)}.on .sw:after{transform:translateX(20px)}
+html[data-mode=night] .sw:after{background:#3a3832}html[data-mode=night] .on .sw:after{background:#0D0C0A}
+.tv{grid-area:tv}.ac{grid-area:ac}
+.wide{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto 1fr auto;column-gap:16px;align-items:start}
+.wide .db{grid-row:1}.wide .nm{grid-column:2;grid-row:1}.wide .sw{grid-column:3;grid-row:1}
+.wide h3{margin-top:2px}.wide .foot{grid-column:1/4;grid-row:3;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.wide .src{margin-top:0}.wide .step{margin-top:0;width:180px}
+.l1.on,.l2.on,.l3.on{background:var(--amberbg);border-color:transparent}.l1.on .db,.l2.on .db,.l3.on .db{color:var(--amberic)}
+.tv.on{background:var(--bluebg);border-color:transparent}.tv.on .db{background:var(--card);color:var(--blue)}
+.src{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.src i{font-style:normal;font:500 13px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:7px 10px;border-radius:10px;background:var(--soft)}
+.ac .temp{font:300 64px/1 Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.03em;margin-top:auto}.ac .temp small{font-size:24px;vertical-align:top;margin-left:2px}
+.step{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.step button{height:52px;border-radius:16px;background:var(--soft);display:grid;place-items:center;border:1px solid var(--line)}
+.ac.on{background:var(--bluebg);border-color:transparent}.ac.on .db{background:var(--card);color:var(--blue)}
+
+.lt{grid-area:lt;padding:18px;display:flex;flex-direction:column;gap:12px}
+.lt .hd{display:flex;justify-content:space-between;align-items:center;padding:0 4px}
+.lt .hd b{font:600 18px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.lt .hd span{font-size:14px;color:var(--mut)}
+.lg{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:10px}
+.li{border-radius:20px;background:var(--soft);padding:14px;display:flex;flex-direction:column;justify-content:space-between;transition:background .25s,color .25s}
+.li .ic{color:var(--mut)}
+.li b{font:600 15px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:block;line-height:1.2}.li span{font-size:13px;color:var(--mut)}
+.li.on{background:var(--amberbg)}.li.on .ic{color:var(--amberic)}.li.on span{color:var(--amber);font-weight:600}
+
+.cal{grid-area:cal;padding:20px 22px;display:flex;align-items:flex-start;gap:20px}
+.evs{flex:1;display:flex;flex-direction:column;gap:10px}
+.ev{display:flex;gap:12px;padding:12px 14px;border-radius:16px;background:var(--soft)}
+.ev:before{content:"";width:4px;border-radius:2px;background:var(--c,#3B82F6)}
+.ev b{font:600 16px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:block}.ev span{font-size:13px;color:var(--mut)}
+.dt{width:72px;height:80px;border-radius:20px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dt small{font:600 12px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:.08em;color:#DC2626;text-transform:uppercase}.dt b{font:500 34px/1 Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.cal h3{font:600 20px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.cal p{font-size:14px;color:var(--mut);margin-top:4px}
+.cal .nx{margin-left:auto;font-size:14px;color:var(--mut);text-align:right;line-height:1.5}
+.veh{grid-area:veh;padding:16px 18px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.vr{display:flex;align-items:center;gap:10px}
+.vr b{font:600 15px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:block}.vr span{font-size:13px;color:var(--mut)}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:3px;background:var(--green)}
+.en{grid-area:en;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between}
+.en .big{font:500 34px/1 Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.02em}.en .big small{font-size:15px;color:var(--mut);font-weight:500;margin-left:4px}
+.en .f{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}
+.en .f b{display:block;color:var(--ink);font:600 15px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+
+/* night layout */
+#night{position:absolute;left:144px;right:24px;top:24px;bottom:24px;display:grid;gap:16px;grid-template-columns:repeat(12,1fr);grid-template-rows:1fr 1fr 1fr 230px;
+ grid-template-areas:"clk clk clk clk clk clk clk nsec nsec nsec nsec nsec" "clk clk clk clk clk clk clk nsec nsec nsec nsec nsec" "clk clk clk clk clk clk clk nst nst nst nst nst" "gn gn gn l1 l1 l2 l2 l3 l3 ncam ncam ncam"}
+.clk{grid-area:clk;padding:44px 48px;display:flex;flex-direction:column;justify-content:space-between;background:var(--card)}
+.clk .t{font:200 240px/0.85 Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.05em;color:var(--ink)}
+.clk .t .colon{opacity:.45}
+.clk .d{font:400 28px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--mut)}
+.clk .nx{display:flex;gap:28px;font-size:18px;color:var(--mut)}.clk .nx b{color:var(--ink);font-weight:500;display:block;font-size:22px;font-family:Outfit}
+.nsec{grid-area:nsec;padding:32px;display:flex;flex-direction:column;gap:18px}
+.nsec .alarm b{font-size:26px}.nsec .alarm span{font-size:17px}
+.nsec .alarm .badge{width:64px;height:64px;border-radius:22px}
+.bigarm{margin-top:auto;height:96px;border-radius:26px;background:var(--amberbg);color:var(--amber);font:600 24px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;gap:12px}
+.nst{grid-area:nst;padding:24px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-content:center}
+.nst div{display:flex;flex-direction:column;gap:8px;font:500 16px 'Work Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.nst .ic{color:var(--green)}.nst span{color:var(--mut);font-size:14px}
+.gn{grid-area:gn;padding:26px;background:linear-gradient(140deg,#2b2140,#1c1a2a)!important;border:0!important;color:#E9E2FF;display:flex;flex-direction:column;justify-content:space-between}
+.gn h3{font:600 26px Outfit,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.gn p{color:#B7AEDA;font-size:15px;margin-top:4px}
+.l1{grid-area:l1}.l2{grid-area:l2}.l3{grid-area:l3}
+.ncam{grid-area:ncam;background:#000;border:0}.ncam svg{position:absolute;inset:0;opacity:.8}
+</style></head>
+<body>
+<div id="stage">
+  <nav id="rail" aria-label="Main">
+    <div class="logo" data-i="home" data-s="26"></div>
+    <a class="nv act" data-i="home">Home</a>
+    <a class="nv" data-i="rooms">Rooms</a>
+    <a class="nv" data-i="bulb">Lights<b class="bd">12</b></a>
+    <a class="nv" data-i="therm">Climate</a>
+    <a class="nv" data-i="shield">Security<b class="bd">1</b></a>
+    <a class="nv" data-i="music">Media</a>
+    <a class="nv" data-i="more">More</a>
+    <button class="mode day-only" data-setmode="night" aria-label="Switch to night layout" data-i="moon"></button>
+    <button class="mode night-only" data-setmode="day" aria-label="Switch to day layout" data-i="sun"></button>
+  </nav>
+
+  <!-- DAY -->
+  <main id="day" class="day-only">
+    <section class="card hero">
+      <div class="g">Good evening, Sushen · Friday 6 November</div>
+      <div class="row">
+        <div class="t"><span data-time></span><small>PM</small></div>
+        <div style="text-align:right">
+          <div class="wx" style="justify-content:flex-end"><span data-i="cloudmoon" data-s="40"></span><b>21°</b></div>
+          <div class="zones"><i>India 5:04 pm</i><i>Austin 5:34 am</i></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card ppl" aria-label="People">
+      <div class="pr"><div class="av" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">S</div><div><b>Sushen</b><span>Home</span></div><div class="ring"><span data-i="battery" data-s="18"></span>30%</div></div>
+      <div class="pr"><div class="av" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">P</div><div><b>Paro</b><span>Home</span></div><div class="ring"><span data-i="battery" data-s="18"></span>41%</div></div>
+    </section>
+
+    <section class="card sec" aria-label="Security">
+      <div class="alarm"><div class="badge" data-i="shieldok"></div><div><b>Alarm disarmed</b><span>Everyone is home</span></div></div>
+      <div class="arm"><button data-i="home" data-s="18">Arm home</button><button data-i="lock" data-s="18">Arm away</button></div>
+      <div class="srow" data-i="door" data-s="20">Front door<em>Locked</em></div>
+      <div class="srow" data-i="garage" data-s="20">Garage<em>Closed</em></div>
+    </section>
+
+    <section class="qa" aria-label="Quick actions">
+      <button class="qb" data-i="moon" data-s="20">Good night</button>
+      <button class="qb" data-i="mega" data-s="20">Announce</button>
+      <button class="qb" data-i="phone" data-s="20">Find phone</button>
+      <button class="qb" data-i="wifi" data-s="20">Wi-Fi</button>
+      <button class="qb" data-i="robot" data-s="20">Robbie</button>
+    </section>
+
+    <section class="card cam" data-cam="night" aria-label="Front door camera">
+      <span class="live">Live</span>
+      <div class="ov"><div><b>Front door</b><span>No motion · 9:31 pm</span></div>
+        <div class="camacts"><button aria-label="Talk" data-i="mega" data-s="20"></button><button aria-label="Unlock door" data-i="unlock" data-s="20"></button></div></div>
+    </section>
+
+    <section class="rooms" aria-label="Rooms">
+      <a class="rm lit"><div class="rb" data-i="sofa"></div><div><b>Living</b><span>4 on</span></div></a>
+      <a class="rm"><div class="rb" data-i="kids"></div><div><b>Kids</b><span>Samar in</span></div></a>
+      <a class="rm"><div class="rb" data-i="garage"></div><div><b>Garage</b><span>Closed</span></div></a>
+      <a class="rm lit"><div class="rb" data-i="tree"></div><div><b>Outdoor</b><span>2 on</span></div></a>
+      <a class="rm"><div class="rb" data-i="washer"></div><div><b>Laundry</b><span>Idle</span></div></a>
+      <a class="rm"><div class="rb" data-i="media"></div><div><b>Media</b><span>All off</span></div></a>
+    </section>
+
+    <section class="card dev tv wide" data-tog>
+      <div class="db" data-i="tv" data-s="26"></div>
+      <div class="nm"><h3>Living room TV</h3><div class="st"><span data-st data-on="On · Netflix" data-off="Off">Off</span></div></div>
+      <div class="sw"></div>
+      <div class="foot"><div class="src"><i>Netflix</i><i>YouTube</i><i>Foxtel</i><i>Plex</i></div></div>
+    </section>
+
+    <section class="card dev ac wide" data-tog>
+      <div class="db" data-i="snow" data-s="26"></div>
+      <div class="nm"><h3>Aircon</h3><div class="st"><span data-st data-on="Cooling · 23° inside" data-off="Off · 23° inside">Off · 23° inside</span></div></div>
+      <div class="sw"></div>
+      <div class="foot"><div class="temp">25<small>°C</small></div>
+      <div class="step"><button aria-label="Cooler" data-i="minus"></button><button aria-label="Warmer" data-i="plus"></button></div></div>
+    </section>
+
+    <section class="card lt" aria-label="Favourite lights">
+      <div class="hd"><b>Favourite lights</b><span id="lc">3 of 6 on</span></div>
+      <div class="lg">
+        <div class="li on" data-tog><span data-i="pendant" data-s="26"></span><div><b>Kitchen pendants</b><span data-st data-on="80%" data-off="Off">80%</span></div></div>
+        <div class="li" data-tog><span data-i="dining" data-s="26"></span><div><b>Dining</b><span data-st data-on="100%" data-off="Off">Off</span></div></div>
+        <div class="li on" data-tog><span data-i="ceiling" data-s="26"></span><div><b>Media room</b><span data-st data-on="60%" data-off="Off">60%</span></div></div>
+        <div class="li on" data-tog><span data-i="lamp" data-s="26"></span><div><b>Lamp</b><span data-st data-on="40%" data-off="Off">40%</span></div></div>
+        <div class="li" data-tog><span data-i="ceiling" data-s="26"></span><div><b>Corridor</b><span data-st data-on="100%" data-off="Off">Off</span></div></div>
+        <div class="li" data-tog><span data-i="ceiling" data-s="26"></span><div><b>Hallway</b><span data-st data-on="100%" data-off="Off">Off</span></div></div>
+      </div>
+    </section>
+
+    <section class="card cal" aria-label="Calendar">
+      <div class="dt"><small>Fri</small><b>6</b></div>
+      <div class="evs">
+        <div class="ev" style="--c:#8B5CF6"><div><b>Day off work</b><span>Today · All day</span></div></div>
+        <div class="ev" style="--c:#16A34A"><div><b>Bin night · Recycling</b><span>Mon 9 Nov · 7:00 pm</span></div></div>
+        <div class="ev" style="--c:#F59E0B"><div><b>Swimming</b><span>Tue 10 Nov · 4:30 pm</span></div></div>
+      </div>
+    </section>
+
+    <section class="card veh" aria-label="Vehicles">
+      <div class="vr"><span data-i="car" data-s="22"></span><div style="flex:1"><b>Sorento</b><span>Home · 100%</span><div class="bar"><i style="width:100%"></i></div></div></div>
+      <div class="vr"><span data-i="car" data-s="22"></span><div style="flex:1"><b>Bluey</b><span>Home · 42%</span><div class="bar"><i style="width:42%;background:#F59E0B"></i></div></div></div>
+    </section>
+
+    <section class="card en" aria-label="Energy">
+      <div class="lbl">Energy today</div>
+      <div class="big">$5.05<small>· 640 W</small></div>
+      <div class="f"><div>Solar<b>0 W</b></div><div>Sold<b style="color:var(--green)">$0.32</b></div><div>Rate<b>Shoulder</b></div></div>
+    </section>
+  </main>
+
+  <!-- NIGHT -->
+  <main id="night" class="night-only">
+    <section class="card clk">
+      <div class="d">Friday 6 November · 21° clear</div>
+      <div class="t" data-time="split"></div>
+      <div class="nx"><div>Tomorrow<b>Day off work</b></div><div>Sunrise<b>5:48 am</b></div><div>Inside<b>23°</b></div></div>
+    </section>
+    <section class="card nsec">
+      <div class="alarm"><div class="badge" data-i="shieldok" data-s="30"></div><div><b>Alarm disarmed</b><span>Arm before bed</span></div></div>
+      <div class="arm"><button data-i="home" data-s="18">Arm home</button><button data-i="lock" data-s="18">Arm away</button></div>
+      <button class="bigarm" data-i="moon" data-s="28">Arm night</button>
+    </section>
+    <section class="card nst">
+      <div><span data-i="door" data-s="26"></span>Front door<span>Locked</span></div>
+      <div><span data-i="garage" data-s="26"></span>Garage<span>Closed</span></div>
+      <div><span data-i="users" data-s="26"></span>Everyone<span>Home</span></div>
+    </section>
+    <section class="card gn" role="button" tabindex="0">
+      <span data-i="bed" data-s="34"></span>
+      <div><h3>Good night</h3><p>Lights off, lock up, arm night</p></div>
+    </section>
+    <section class="card dev l1" data-tog><div class="top"><div class="db" data-i="ceiling" data-s="26"></div><div class="sw"></div></div><h3>Hallway</h3><div class="st"><span data-st data-on="20%" data-off="Off">Off</span></div></section>
+    <section class="card dev l2 on" data-tog><div class="top"><div class="db" data-i="lamp" data-s="26"></div><div class="sw"></div></div><h3>Lamp</h3><div class="st"><span data-st data-on="40%" data-off="Off">40%</span></div></section>
+    <section class="card dev l3" data-tog><div class="top"><div class="db" data-i="pendant" data-s="26"></div><div class="sw"></div></div><h3>Kitchen</h3><div class="st"><span data-st data-on="30%" data-off="Off">Off</span></div></section>
+    <section class="card ncam" data-cam="night"><span class="live">Front door</span></section>
+  </main>
+</div>
+<div id="review"><span>Soft Bento</span><button data-setmode="day">Day</button><button data-setmode="night">Night</button></div>
+<script>
+/* Shared kit for the redesign mock-ups: icon sprite, stage scaling, toggles, day/night switch, clock, camera art.
+   Icons are Lucide-style 24px stroke paths (inline, no network). */
+(function () {
+  const P = {
+    home: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+    rooms: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h9M12 3v18M12 16h9"/>',
+    bulb: '<path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>',
+    therm: '<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+    shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+    shieldok: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+    music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-14.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+    cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+    cloudmoon: '<path d="M10.19 4.5a5 5 0 0 0 6.31 6.31 5 5 0 0 1-6.31-6.31Z"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>',
+    mega: '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+    phone: '<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
+    wifi: '<path d="M12 20h.01M2 8.82a15 15 0 0 1 20 0M5 12.86a10 10 0 0 1 14 0M8.5 16.43a5 5 0 0 1 7 0"/>',
+    robot: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3"/>',
+    sofa: '<path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"/><path d="M4 18v2M20 18v2"/>',
+    kids: '<circle cx="12" cy="13" r="8"/><circle cx="6" cy="5" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M9.5 15.5s1 1.2 2.5 1.2 2.5-1.2 2.5-1.2M9.5 11h.01M14.5 11h.01"/>',
+    garage: '<path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12M6 14h12"/><path d="M6 22V10h12v12"/>',
+    tree: '<path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/><path d="M7 16v6M13 19v3"/><path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"/>',
+    washer: '<rect width="18" height="20" x="3" y="2" rx="2"/><path d="M3 6h18"/><circle cx="12" cy="14" r="5"/><path d="M7 4h.01M10 4h.01"/>',
+    media: '<rect width="20" height="15" x="2" y="7" rx="2"/><path d="m17 2-5 5-5-5"/>',
+    tv: '<rect width="20" height="14" x="2" y="4" rx="2"/><path d="M8 21h8M12 18v3"/>',
+    snow: '<path d="M2 12h20M12 2v20m-8-6 4-4-4-4m16 8-4-4 4-4M10 4l2 2 2-2m-4 16 2-2 2 2"/>',
+    lock: '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    unlock: '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
+    car: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+    zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+    cal: '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    door: '<path d="M13 4h3a2 2 0 0 1 2 2v14M2 20h3m8 0h9"/><path d="M10 12v.01"/><path d="M13 4.56v16.157a.6.6 0 0 1-.763.578l-5.358-1.53A2 2 0 0 1 5 17.84V5.766a2 2 0 0 1 1.205-1.835l4.088-1.752A1.9 1.9 0 0 1 13 4.56z"/>',
+    video: '<path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+    pendant: '<path d="M12 2v5M6 7h12l4 9H2l4-9Z"/><path d="M9.17 16a3 3 0 1 0 5.66 0"/>',
+    ceiling: '<path d="M2 8h20"/><path d="M6 8a6 6 0 0 0 12 0"/><path d="M12 18v2M7 17l-1 1.5M17 17l1 1.5"/>',
+    lamp: '<path d="M8 2h8l4 10H4z"/><path d="M12 12v6M8 22v-2c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v2z"/>',
+    dining: '<path d="M12 2v4M5 10h14l-2-4H7z"/><path d="M8 14a4 4 0 0 0 8 0"/>',
+    power: '<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.79 0"/>',
+    chev: '<path d="m9 18 6-6-6-6"/>',
+    plus: '<path d="M5 12h14M12 5v14"/>',
+    minus: '<path d="M5 12h14"/>',
+    solar: '<rect x="3" y="9" width="18" height="10" rx="1"/><path d="M3 14h18M9 9v10M15 9v10M12 2v3M5.6 4.6l1.4 1.4M18.4 4.6 17 6"/>',
+    grid: '<path d="M12 2 4 22M12 2l8 20M6 14h12M8 9h8M12 2v20"/>',
+    battery: '<rect width="16" height="10" x="2" y="7" rx="2"/><path d="M22 11v2"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+    bed: '<path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>'
+  };
+  const sprite = '<svg xmlns="http://www.w3.org/2000/svg" style="display:none">' +
+    Object.entries(P).map(([k, v]) => `<symbol id="i-${k}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${v}</symbol>`).join('') + '</svg>';
+
+  window.ic = (n, s = 24, cls = '') => `<svg class="ic ${cls}" width="${s}" height="${s}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+
+  /* Stylised night-time porch frame used as the camera stand-in (no live feed in a mock-up). */
+  let camN = 0;
+  window.camArt = (tone = 'night') => {
+    const warm = tone === 'night', u = 'c' + (++camN);
+    return `<svg viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <radialGradient id="${u}glow" cx="62%" cy="10%" r="60%"><stop offset="0" stop-color="${warm ? '#ffd9a0' : '#fff6e6'}" stop-opacity=".85"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+        <linearGradient id="${u}wall" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${warm ? '#2a2f3a' : '#9aa3ad'}"/><stop offset="1" stop-color="${warm ? '#14171d' : '#6b737c'}"/></linearGradient>
+        <linearGradient id="${u}path" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${warm ? '#3b3a38' : '#b9b3a6'}"/><stop offset="1" stop-color="${warm ? '#1d1c1b' : '#8d877b'}"/></linearGradient>
+      </defs>
+      <rect width="640" height="400" fill="url(#${u}wall)"/>
+      <polygon points="0,400 230,250 470,250 640,400" fill="url(#${u}path)"/>
+      <rect x="20" y="40" width="190" height="300" rx="6" fill="${warm ? '#4a2c1c' : '#7a4a2e'}"/>
+      <rect x="34" y="54" width="162" height="272" rx="4" fill="${warm ? '#1b1f26' : '#3d4550'}" opacity=".9"/>
+      <g stroke="${warm ? '#2b313b' : '#56606b'}" stroke-width="2">${Array.from({ length: 13 }, (_, i) => `<line x1="34" x2="196" y1="${70 + i * 20}" y2="${70 + i * 20}"/>`).join('')}</g>
+      <rect x="420" y="30" width="160" height="230" fill="${warm ? '#3a3f48' : '#c5c8cc'}"/>
+      <g fill="${warm ? '#4a505a' : '#d8dbde'}">${Array.from({ length: 8 }, (_, r) => Array.from({ length: 4 }, (_, c) => `<rect x="${424 + c * 40 + (r % 2) * 20}" y="${34 + r * 28}" width="36" height="24" rx="2"/>`).join('')).join('')}</g>
+      <rect x="250" y="190" width="70" height="60" rx="30" fill="${warm ? '#2e4a2a' : '#4f7a46'}"/>
+      <circle cx="400" cy="20" r="7" fill="#ffe7b8"/>
+      <rect width="640" height="400" fill="url(#${u}glow)"/>
+    </svg>`;
+  };
+
+  function fit() {
+    const st = document.getElementById('stage');
+    if (!st) return;
+    const s = Math.min(innerWidth / 1600, innerHeight / 1000);
+    st.style.transform = `translate(-50%,-50%) scale(${s})`;
+  }
+
+  function clock() {
+    const d = new Date(2026, 10, 6, 21, 34);
+    document.querySelectorAll('[data-time]').forEach(el => {
+      const h = d.getHours() % 12 || 12, m = String(d.getMinutes()).padStart(2, '0');
+      el.innerHTML = el.dataset.time === 'split' ? `${h}<span class="colon">:</span>${m}` : `${h}:${m}`;
+    });
+  }
+
+  function setMode(m) {
+    document.documentElement.dataset.mode = m;
+    document.querySelectorAll('[data-setmode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.setmode === m));
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const baked = document.documentElement.hasAttribute('data-baked');
+    if (!baked) document.body.insertAdjacentHTML('afterbegin', sprite);
+    if (!baked) document.querySelectorAll('[data-i]').forEach(el => { el.innerHTML = ic(el.dataset.i, +(el.dataset.s || 24)) + el.innerHTML; });
+    if (!baked) document.querySelectorAll('[data-cam]').forEach(el => { el.insertAdjacentHTML('afterbegin', camArt(el.dataset.cam || 'night')); });
+    document.querySelectorAll('[data-tog]').forEach(el => {
+      el.setAttribute('role', 'button'); el.tabIndex = 0;
+      el.setAttribute('aria-pressed', el.classList.contains('on'));
+      const go = () => {
+        const on = el.classList.toggle('on');
+        el.setAttribute('aria-pressed', on);
+        const s = el.querySelector('[data-st]');
+        if (s) s.textContent = on ? (s.dataset.on || 'On') : (s.dataset.off || 'Off');
+        document.dispatchEvent(new CustomEvent('tog'));
+      };
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+    document.querySelectorAll('[data-setmode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.setmode)));
+    const q = new URLSearchParams(location.search);
+    if (q.get('mode')) setMode(q.get('mode')); else document.querySelectorAll('[data-setmode=day]').forEach(b => b.setAttribute('aria-pressed', true));
+    if (q.has('shot')) document.documentElement.classList.add('shot');
+    if (!baked) clock();
+    fit();
+  });
+  addEventListener('resize', fit);
+})();
+</script>
+<script>
+document.addEventListener('tog',()=>{const n=document.querySelectorAll('#day .li.on').length;document.getElementById('lc').textContent=n+' of 6 on'});
+</script>
+</body></html>
