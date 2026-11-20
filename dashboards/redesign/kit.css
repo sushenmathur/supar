@@ -1,0 +1,19 @@
+/* Shared base for the redesign mock-ups: 1600x1000 stage that scales to the window, review toolbar. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform-origin:center;overflow:hidden}
+.ic{display:block;flex:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+[data-tog],[role=button],button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid #3b82f6;outline-offset:3px}
+.day-only,.night-only{transition:opacity .4s ease}
+html[data-mode=day] .night-only{display:none!important}
+html[data-mode=night] .day-only{display:none!important}
+/* review toolbar (not part of the design) */
+#review{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99;display:flex;gap:4px;padding:4px;border-radius:999px;
+ background:rgba(17,24,39,.82);backdrop-filter:blur(10px);font:600 13px/1 system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#review span{color:#cbd5e1;padding:10px 12px 10px 14px}
+#review button{color:#e5e7eb;padding:10px 16px;border-radius:999px;min-height:36px}
+#review button[aria-pressed=true]{background:#fff;color:#111827}
+html.shot #review{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

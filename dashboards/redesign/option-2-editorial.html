@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Editorial Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css">
+<style>
+:root{--bg:#F4F3EE;--ink:#111110;--mut:#6E6D68;--rule:rgba(17,17,16,.16);--soft:#E9E8E2;--sig:#E8480C;--sigbg:#FBE3D6;--ok:#17803D;--onsig:#fff}
+html[data-mode=night]{--bg:#000;--ink:#D9D6CC;--mut:#7D7A72;--rule:rgba(217,214,204,.14);--soft:#141413;--sig:#FF7A45;--sigbg:#2A140A;--ok:#7FD39B;--onsig:#000}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+#stage{background:var(--bg);transition:background .5s}
+.sg{font-family:'Space Grotesk',system-ui,sans-serif}
+.mut{color:var(--mut)}
+.k{font:500 13px/1 Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);display:flex;gap:10px;align-items:baseline}
+.k b{color:var(--ink);font-weight:600}
+
+/* top bar */
+#top{position:absolute;left:40px;right:40px;top:28px;height:60px;display:flex;align-items:center;gap:36px;border-bottom:1px solid var(--rule)}
+.brand{font:600 22px 'Space Grotesk';letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.brand i{width:12px;height:12px;background:var(--sig);display:block}
+nav.tabs{display:flex;gap:4px;height:100%}
+.tab{display:flex;align-items:center;gap:6px;padding:0 14px;font:500 16px Inter;color:var(--mut);position:relative;min-width:44px}
+.tab.act{color:var(--ink)}
+.tab.act:after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:3px;background:var(--ink)}
+.tab sup{font:600 11px Inter;color:var(--sig);margin-left:2px}
+.who{margin-left:auto;display:flex;gap:22px;align-items:center;font:500 15px Inter}
+.who span{display:flex;align-items:center;gap:8px}
+.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:600 13px Inter;background:var(--ink);color:var(--bg)}
+.who em{font-style:normal;color:var(--mut);font-size:14px}
+.modeb{height:44px;padding:0 16px;border:1px solid var(--ink);display:flex;align-items:center;gap:8px;font:600 14px Inter}
+
+/* day */
+#day{position:absolute;left:40px;right:40px;top:88px;bottom:28px;display:flex;flex-direction:column}
+.hero{height:260px;display:grid;grid-template-columns:1.25fr 1fr 1fr;border-bottom:1px solid var(--rule)}
+.hero>div{padding:28px 32px 28px 0}
+.hero>div+div{padding-left:32px;border-left:1px solid var(--rule)}
+.time{font:300 196px/0.8 'Space Grotesk';letter-spacing:-.06em;margin-top:22px;display:flex;align-items:flex-start}
+.time small{font:500 26px 'Space Grotesk';letter-spacing:0;margin:10px 0 0 10px}
+.date{font:400 44px/1.05 'Space Grotesk';letter-spacing:-.02em;margin-top:14px}
+.wx{display:flex;gap:22px;margin-top:22px;font-size:15px;color:var(--mut)}
+.wx b{display:block;font:500 28px 'Space Grotesk';color:var(--ink);letter-spacing:-.01em}
+.state{font:400 27px/1.3 'Space Grotesk';letter-spacing:-.01em;margin-top:14px}
+.state u{text-decoration:none;color:var(--ok);font-weight:500}
+.btns{display:flex;gap:8px;margin-top:20px}
+.ob{height:48px;padding:0 18px;border:1px solid var(--ink);display:flex;align-items:center;gap:8px;font:600 14px Inter}
+.ob.fill{background:var(--ink);color:var(--bg)}
+
+.body{flex:1;display:grid;grid-template-columns:1fr 1fr 1.3fr 1fr;border-bottom:1px solid var(--rule);min-height:0}
+.col{padding:24px 28px 20px 0;display:flex;flex-direction:column;min-height:0}
+.col+.col{padding-left:28px;border-left:1px solid var(--rule)}
+.col:last-child{padding-right:0}
+.list{margin-top:14px;display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:14px;height:56px;border-top:1px solid var(--rule);font:500 17px Inter}
+.row:last-child{border-bottom:1px solid var(--rule)}
+.row .ic{color:var(--mut)}
+.row .v{margin-left:auto;font:500 15px Inter;color:var(--mut);min-width:44px;text-align:right}
+.row.on .ic{color:var(--sig)}.row.on .v{color:var(--sig)}
+.tg{width:46px;height:26px;border:1.5px solid var(--ink);position:relative;flex:none}
+.tg:after{content:"";position:absolute;left:3px;top:3px;width:17px;height:17px;background:var(--ink);transition:transform .2s ease}
+.on .tg{background:var(--sig);border-color:var(--sig)}.on .tg:after{transform:translateX(20px);background:var(--onsig)}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:14px;font-size:14px;color:var(--mut)}
+.lnk{font:600 14px Inter;color:var(--ink);display:flex;align-items:center;gap:4px;min-height:44px}
+
+.acn{margin-top:18px;padding-top:16px;border-top:1px solid var(--rule)}
+.acn .big{font:300 92px/0.9 'Space Grotesk';letter-spacing:-.05em;display:flex;align-items:flex-start}
+.acn .big small{font:400 26px 'Space Grotesk';margin:8px 0 0 6px}
+.acn .ctl{display:flex;gap:8px;margin-top:14px}
+.acn .ctl button{width:56px;height:52px;border:1px solid var(--ink);display:grid;place-items:center}
+.acn .ctl .mode{flex:1;display:flex;border:1px solid var(--ink)}
+.acn .ctl .mode i{flex:1;display:grid;place-items:center;font:600 13px Inter;font-style:normal}
+.acn .ctl .mode i.s{background:var(--ink);color:var(--bg)}
+
+.cam{position:relative;margin-top:14px;flex:1;overflow:hidden;background:#111;min-height:0}
+.cam>svg{position:absolute;inset:0}
+.cam .cap{position:absolute;left:0;bottom:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--bg);font:500 14px Inter}
+.cam .cap b{font-weight:600}
+.live{position:absolute;left:12px;top:12px;background:var(--sig);color:#fff;font:600 12px Inter;letter-spacing:.08em;padding:6px 8px}
+.ev{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--rule)}
+.ev:last-child{border-bottom:1px solid var(--rule)}
+.ev .d{font:500 14px Inter;color:var(--mut)}.ev .d b{display:block;font:500 26px/1 'Space Grotesk';color:var(--ink)}
+.ev h4{font:500 17px Inter}.ev p{font-size:14px;color:var(--mut);margin-top:2px}
+
+.figs{display:grid;grid-template-columns:1fr 1fr;margin-top:14px;border-top:1px solid var(--rule)}
+.fig{padding:14px 0;border-bottom:1px solid var(--rule)}
+.fig:nth-child(odd){padding-right:14px;border-right:1px solid var(--rule)}.fig:nth-child(even){padding-left:14px}
+.fig span{font-size:13px;color:var(--mut);display:block}
+.fig b{font:400 34px/1.1 'Space Grotesk';letter-spacing:-.02em;display:block;margin-top:4px}
+.fig em{font-style:normal;font-size:13px;color:var(--mut)}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.qa .ob{justify-content:flex-start;height:52px}
+
+.rooms{height:84px;display:grid;grid-template-columns:repeat(6,1fr)}
+.rm{display:flex;align-items:center;gap:14px;padding:0 20px 0 0}
+.rm+.rm{padding-left:20px;border-left:1px solid var(--rule)}
+.rm .n{font:500 13px Inter;color:var(--mut);align-self:flex-start;margin-top:22px}
+.rm b{font:500 20px 'Space Grotesk';display:block}.rm span{font-size:14px;color:var(--mut)}
+.rm.lit span{color:var(--sig);font-weight:600}
+.rm .ic{margin-left:auto;color:var(--mut)}
+
+/* night */
+#night{position:absolute;left:40px;right:40px;top:88px;bottom:28px;display:grid;grid-template-columns:1.6fr 1fr}
+.nl{padding:30px 40px 30px 0;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--rule)}
+.nt{font:300 400px/0.78 'Space Grotesk';letter-spacing:-.07em;margin-left:-14px}
+.nt .colon{color:var(--sig)}
+.nd{font:400 34px 'Space Grotesk';color:var(--mut);letter-spacing:-.01em}
+.nr{padding:30px 0 0 40px;display:flex;flex-direction:column}
+.nr .state{font-size:30px;margin-top:16px}
+.nact{display:flex;align-items:center;justify-content:space-between;height:84px;border-top:1px solid var(--rule);font:400 30px 'Space Grotesk';letter-spacing:-.01em}
+.nact .ic{color:var(--sig)}
+.nlist{margin-top:auto}
+</style></head>
+<body>
+<div id="stage">
+  <header id="top">
+    <div class="brand"><i></i>Home</div>
+    <nav class="tabs" aria-label="Main">
+      <a class="tab act">Overview</a><a class="tab">Rooms</a><a class="tab">Lights<sup>12</sup></a><a class="tab">Climate</a><a class="tab">Security<sup>1</sup></a><a class="tab">Media</a><a class="tab">More</a>
+    </nav>
+    <div class="who">
+      <span><i class="dot">S</i>Sushen <em>30%</em></span>
+      <span><i class="dot">P</i>Paro <em>41%</em></span>
+      <button class="modeb day-only" data-setmode="night" data-i="moon" data-s="18">Night</button>
+      <button class="modeb night-only" data-setmode="day" data-i="sun" data-s="18">Day</button>
+    </div>
+  </header>
+
+  <!-- DAY -->
+  <main id="day" class="day-only">
+    <section class="hero">
+      <div><div class="k">Good evening</div><div class="time"><span data-time></span><small>PM</small></div></div>
+      <div>
+        <div class="k">Today</div>
+        <div class="date">Friday<br>6 November</div>
+        <div class="wx"><div><b>21°</b>Cloudy</div><div><b>5:04</b>India pm</div><div><b>5:34</b>Austin am</div></div>
+      </div>
+      <div>
+        <div class="k">House</div>
+        <p class="state">The alarm is <u>disarmed</u>. Front door locked, garage closed. Everyone is home.</p>
+        <div class="btns"><button class="ob fill" data-i="home" data-s="18">Arm home</button><button class="ob" data-i="lock" data-s="18">Arm away</button></div>
+      </div>
+    </section>
+
+    <section class="body">
+      <div class="col">
+        <div class="k"><b>01</b>Favourite lights</div>
+        <div class="list">
+          <div class="row on" data-tog><span data-i="pendant" data-s="20"></span>Kitchen pendants<span class="v" data-st data-on="80%" data-off="Off">80%</span><i class="tg"></i></div>
+          <div class="row" data-tog><span data-i="dining" data-s="20"></span>Dining<span class="v" data-st data-on="100%" data-off="Off">Off</span><i class="tg"></i></div>
+          <div class="row on" data-tog><span data-i="ceiling" data-s="20"></span>Media room<span class="v" data-st data-on="60%" data-off="Off">60%</span><i class="tg"></i></div>
+          <div class="row on" data-tog><span data-i="lamp" data-s="20"></span>Lamp<span class="v" data-st data-on="40%" data-off="Off">40%</span><i class="tg"></i></div>
+          <div class="row" data-tog><span data-i="ceiling" data-s="20"></span>Corridor<span class="v" data-st data-on="100%" data-off="Off">Off</span><i class="tg"></i></div>
+          <div class="row" data-tog><span data-i="ceiling" data-s="20"></span>Hallway<span class="v" data-st data-on="100%" data-off="Off">Off</span><i class="tg"></i></div>
+        </div>
+        <div class="foot"><span id="lc">3 of 6 on</span><a class="lnk">All lights<span data-i="chev" data-s="16"></span></a></div>
+      </div>
+
+      <div class="col">
+        <div class="k"><b>02</b>Climate &amp; TV</div>
+        <div class="list">
+          <div class="row" data-tog><span data-i="tv" data-s="20"></span>Living room TV<span class="v" data-st data-on="Netflix" data-off="Off">Off</span><i class="tg"></i></div>
+          <div class="row" data-tog><span data-i="snow" data-s="20"></span>Aircon<span class="v" data-st data-on="Cool" data-off="Off">Off</span><i class="tg"></i></div>
+        </div>
+        <div class="acn">
+          <div class="k">Set to · 23° inside</div>
+          <div class="big">25<small>°C</small></div>
+          <div class="ctl"><button aria-label="Cooler" data-i="minus"></button><div class="mode"><i class="s">Cool</i><i>Heat</i><i>Auto</i></div><button aria-label="Warmer" data-i="plus"></button></div>
+        </div>
+        <div class="foot"><span>Fan auto</span><a class="lnk">Climate<span data-i="chev" data-s="16"></span></a></div>
+      </div>
+
+      <div class="col">
+        <div class="k"><b>03</b>Front door</div>
+        <div class="cam" data-cam="night"><span class="live">LIVE</span>
+          <div class="cap"><span><b>No motion</b> · last 9:31 pm</span><span style="display:flex;gap:16px"><a class="lnk" data-i="mega" data-s="16">Talk</a><a class="lnk" data-i="unlock" data-s="16">Unlock</a></span></div></div>
+        <div style="margin-top:16px">
+          <div class="ev"><div class="d">Fri<b>6</b></div><div><h4>Day off work</h4><p>All day</p></div></div>
+          <div class="ev"><div class="d">Mon<b>9</b></div><div><h4>Bin night · Recycling</h4><p>7:00 pm</p></div></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="k"><b>04</b>Cars &amp; energy</div>
+        <div class="figs">
+          <div class="fig"><span>Sorento · Home</span><b>100%</b></div>
+          <div class="fig"><span>Bluey · Home</span><b>42%</b></div>
+          <div class="fig"><span>Energy today</span><b>$5.05</b><em>Shoulder rate</em></div>
+          <div class="fig"><span>Using now</span><b>640 W</b><em>Solar 0 W</em></div>
+        </div>
+        <div class="qa">
+          <button class="ob" data-i="moon" data-s="18">Good night</button>
+          <button class="ob" data-i="mega" data-s="18">Announce</button>
+          <button class="ob" data-i="phone" data-s="18">Find phone</button>
+          <button class="ob" data-i="robot" data-s="18">Robbie</button>
+          <button class="ob" data-i="wifi" data-s="18">Guest Wi-Fi</button>
+          <button class="ob" data-i="garage" data-s="18">Garage</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="rooms" aria-label="Rooms">
+      <a class="rm lit"><span class="n">01</span><div><b>Living</b><span>4 on</span></div><span data-i="chev" data-s="18"></span></a>
+      <a class="rm"><span class="n">02</span><div><b>Kids</b><span>Samar in</span></div><span data-i="chev" data-s="18"></span></a>
+      <a class="rm"><span class="n">03</span><div><b>Garage</b><span>Closed</span></div><span data-i="chev" data-s="18"></span></a>
+      <a class="rm lit"><span class="n">04</span><div><b>Outdoor</b><span>2 on</span></div><span data-i="chev" data-s="18"></span></a>
+      <a class="rm"><span class="n">05</span><div><b>Laundry</b><span>Idle</span></div><span data-i="chev" data-s="18"></span></a>
+      <a class="rm"><span class="n">06</span><div><b>Media</b><span>All off</span></div><span data-i="chev" data-s="18"></span></a>
+    </section>
+  </main>
+
+  <!-- NIGHT -->
+  <main id="night" class="night-only">
+    <section class="nl">
+      <div class="nd">Friday 6 November · 21° clear</div>
+      <div class="nt" data-time="split"></div>
+      <div class="wx" style="margin:0"><div><b>Day off work</b>Tomorrow</div><div><b>5:48 am</b>Sunrise</div><div><b>23°</b>Inside</div></div>
+    </section>
+    <section class="nr">
+      <div class="k">House</div>
+      <p class="state">Alarm <u>disarmed</u>. Doors locked, garage closed. Everyone is home.</p>
+      <div class="cam" data-cam="night" style="flex:none;height:210px;margin-top:24px;opacity:.75"><span class="live">FRONT DOOR</span></div>
+      <div class="nlist">
+        <div class="nact" role="button" tabindex="0">Arm night<span data-i="moon" data-s="30"></span></div>
+        <div class="nact" role="button" tabindex="0">Good night scene<span data-i="bed" data-s="30"></span></div>
+        <div class="list" style="margin-top:0">
+          <div class="row" data-tog><span data-i="ceiling" data-s="20"></span>Hallway<span class="v" data-st data-on="20%" data-off="Off">Off</span><i class="tg"></i></div>
+          <div class="row on" data-tog><span data-i="lamp" data-s="20"></span>Lamp<span class="v" data-st data-on="40%" data-off="Off">40%</span><i class="tg"></i></div>
+          <div class="row" data-tog><span data-i="pendant" data-s="20"></span>Kitchen<span class="v" data-st data-on="30%" data-off="Off">Off</span><i class="tg"></i></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="review"><span>Editorial</span><button data-setmode="day">Day</button><button data-setmode="night">Night</button></div>
+<script src="kit.js"></script>
+<script>
+document.addEventListener('tog',()=>{const n=document.querySelectorAll('#day .col:first-child .row.on').length;document.getElementById('lc').textContent=n+' of 6 on'});
+</script>
+</body></html>

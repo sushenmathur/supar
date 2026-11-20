@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ambient Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css">
+<style>
+:root{--bg:#0E1117;--tile:#171B24;--tile2:#1D2230;--ink:#F3F5F9;--mut:#8C93A3;--line:rgba(255,255,255,.07);
+ --amber:#FFB547;--cyan:#4FD1E8;--violet:#A78BFA;--green:#4ADE80;--red:#F87171}
+html[data-mode=night]{--bg:#030304;--tile:#0B0B0D;--tile2:#111114;--ink:#C9B8A8;--mut:#6E655D;--line:rgba(255,220,190,.06);--amber:#E89A5C;--cyan:#8AA9B0;--green:#9DBF8F}
+body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+#stage{background:radial-gradient(900px 600px at 20% -10%,rgba(79,209,232,.10),transparent 60%),radial-gradient(800px 600px at 100% 30%,rgba(167,139,250,.10),transparent 60%),radial-gradient(700px 500px at 40% 110%,rgba(255,181,71,.08),transparent 60%),var(--bg);transition:background .5s}
+html[data-mode=night] #stage{background:radial-gradient(700px 500px at 50% 45%,rgba(232,154,92,.06),transparent 70%),var(--bg)}
+.mut{color:var(--mut)}
+.t{background:var(--tile);border:1px solid var(--line);border-radius:26px;position:relative;overflow:hidden;transition:background .3s,box-shadow .3s,border-color .3s}
+.lbl{font:600 12px/1 'Plus Jakarta Sans';letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+
+/* top bar */
+#top{position:absolute;left:28px;right:28px;top:24px;height:72px;display:flex;align-items:center;gap:20px}
+.hello{display:flex;align-items:baseline;gap:16px}
+.hello .tm{font:300 52px/1 'Plus Jakarta Sans';letter-spacing:-.03em}
+.hello .tm small{font-size:20px;font-weight:500;margin-left:4px;color:var(--mut)}
+.hello .gr b{font:600 17px 'Plus Jakarta Sans';display:block}.hello .gr span{font-size:14px;color:var(--mut)}
+.chips{display:flex;gap:10px;margin-left:auto}
+.chip{height:48px;padding:0 16px 0 12px;border-radius:24px;background:var(--tile);border:1px solid var(--line);display:flex;align-items:center;gap:10px;font:600 14px 'Plus Jakarta Sans'}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.chip span{color:var(--mut);font-weight:500}
+.chip .ic{color:var(--mut)}
+.wxc{display:flex;align-items:center;gap:10px;font:300 34px 'Plus Jakarta Sans';margin-left:8px}
+.ppl{display:flex}
+.av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font:700 17px 'Plus Jakarta Sans';color:#fff;border:3px solid var(--bg);position:relative}
+.av+.av{margin-left:-10px}
+.av em{position:absolute;bottom:-6px;right:-6px;font:700 10px/1 'Plus Jakarta Sans';font-style:normal;background:var(--tile2);color:var(--ink);padding:3px 5px;border-radius:8px;border:1px solid var(--line)}
+
+/* day grid */
+#day{position:absolute;left:28px;right:28px;top:116px;bottom:124px;display:grid;gap:16px;grid-template-columns:290px 1fr 500px}
+.rooms{display:flex;flex-direction:column;gap:12px}
+.rm{flex:1;display:flex;align-items:center;gap:14px;padding:0 18px}
+.rm .rb{width:48px;height:48px;border-radius:16px;background:var(--tile2);display:grid;place-items:center;color:var(--mut);flex:none}
+.rm b{font:600 17px 'Plus Jakarta Sans';display:block}.rm span{font-size:14px;color:var(--mut)}
+.rm .ic.chev{margin-left:auto;color:var(--mut)}
+.rm.lit{background:linear-gradient(100deg,rgba(255,181,71,.16),var(--tile) 70%)}
+.rm.lit .rb{background:rgba(255,181,71,.18);color:var(--amber);box-shadow:0 0 24px rgba(255,181,71,.25)}
+.rm.lit span{color:var(--amber)}
+.rm.occ .rb{background:rgba(167,139,250,.16);color:var(--violet)}.rm.occ span{color:var(--violet)}
+
+.mid{display:grid;grid-template-rows:1fr 210px;gap:16px;min-height:0}
+.cam{background:#000}
+.cam>svg{position:absolute;inset:0}
+.cam .ov{position:absolute;inset:auto 0 0 0;padding:22px 24px;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.cam .ov b{font:600 24px 'Plus Jakarta Sans';display:block}.cam .ov span{font-size:14px;color:rgba(255,255,255,.7)}
+.live{position:absolute;left:20px;top:20px;height:32px;padding:0 12px;border-radius:16px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);display:flex;align-items:center;gap:8px;font:600 13px 'Plus Jakarta Sans';color:#fff}
+.live:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red)}
+.cb{display:flex;gap:10px}
+.cb button{height:52px;padding:0 18px;border-radius:26px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);color:#fff;display:flex;align-items:center;gap:8px;font:600 14px 'Plus Jakarta Sans'}
+.under{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:16px}
+.cal{padding:22px}
+.cal .d{display:flex;align-items:baseline;gap:10px;margin-top:14px}
+.cal .d b{font:300 54px/1 'Plus Jakarta Sans';letter-spacing:-.03em}
+.cal .d span{font:600 16px 'Plus Jakarta Sans';color:var(--mut)}
+.cal h4{font:600 19px 'Plus Jakarta Sans';margin-top:12px}.cal p{font-size:14px;color:var(--mut);margin-top:2px}
+.veh{padding:22px;display:flex;flex-direction:column}
+.veh .ic{color:var(--mut)}
+.veh h4{font:600 18px 'Plus Jakarta Sans';margin-top:auto}.veh p{font-size:14px;color:var(--mut)}
+.ringv{position:absolute;right:18px;top:18px}
+.ringv text{font:700 15px 'Plus Jakarta Sans';fill:var(--ink)}
+
+.fav{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto 150px 1fr;gap:12px;min-height:0}
+.fh{grid-column:1/4;display:flex;justify-content:space-between;align-items:center;padding:2px 4px 0}
+.fh b{font:600 18px 'Plus Jakarta Sans'}
+.big2{grid-column:span 3;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dv{padding:18px;display:flex;flex-direction:column;justify-content:space-between}
+.dv .ic{color:var(--mut);transition:color .3s}
+.dv b{font:600 16px 'Plus Jakarta Sans';display:block;line-height:1.25}.dv span{font-size:13px;color:var(--mut)}
+.dv.on{border-color:rgba(255,181,71,.35);background:radial-gradient(120% 90% at 20% 0%,rgba(255,181,71,.28),rgba(255,181,71,.06) 60%),var(--tile);box-shadow:0 10px 40px -10px rgba(255,181,71,.35)}
+.dv.on .ic{color:var(--amber);filter:drop-shadow(0 0 8px rgba(255,181,71,.7))}
+.dv.on span{color:var(--amber)}
+.lights{grid-column:1/4;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:12px}
+.ac{grid-template-columns:1fr auto;display:grid;align-items:center}
+.ac.on,.tvt.on{border-color:rgba(79,209,232,.35);background:radial-gradient(120% 90% at 20% 0%,rgba(79,209,232,.22),rgba(79,209,232,.04) 60%),var(--tile);box-shadow:0 10px 40px -10px rgba(79,209,232,.35)}
+.ac.on .ic,.tvt.on .ic{color:var(--cyan)}.ac.on span,.tvt.on span{color:var(--cyan)}
+.dial{position:relative;width:118px;height:118px}
+.dial svg{position:absolute;inset:0}
+.dial b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:300 36px 'Plus Jakarta Sans';letter-spacing:-.02em}
+.dial b small{font-size:14px}
+.ac .st{display:flex;flex-direction:column;gap:6px;height:100%;justify-content:space-between}
+.pm{display:flex;gap:8px}
+.pm button{width:44px;height:44px;border-radius:14px;background:var(--tile2);display:grid;place-items:center;border:1px solid var(--line)}
+
+/* dock */
+#dock{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);height:84px;padding:0 10px;border-radius:30px;display:flex;align-items:center;gap:4px;
+ background:rgba(23,27,36,.85);border:1px solid var(--line);backdrop-filter:blur(20px);box-shadow:0 20px 50px rgba(0,0,0,.45)}
+html[data-mode=night] #dock{background:rgba(11,11,13,.9)}
+.nv{width:78px;height:64px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:600 12px 'Plus Jakarta Sans';color:var(--mut);position:relative}
+.nv.act{background:var(--tile2);color:var(--ink)}
+.bd{position:absolute;top:6px;right:16px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--red);color:#111;font:700 11px/18px 'Plus Jakarta Sans';text-align:center}
+.sep{width:1px;height:44px;background:var(--line);margin:0 10px}
+.qb{width:60px;height:60px;border-radius:50%;background:var(--tile2);display:grid;place-items:center;color:var(--ink);border:1px solid var(--line)}
+.qb.night{background:linear-gradient(140deg,#4C3D8F,#2A2350);color:#E4DCFF;border:0}
+
+/* night */
+#night{position:absolute;inset:0 0 124px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px}
+.halo{position:relative;width:520px;height:520px;display:grid;place-items:center}
+.halo>svg{position:absolute;inset:0}
+.halo .c{text-align:center}
+.halo .c b{display:block;font:200 150px/1 'Plus Jakarta Sans';letter-spacing:-.05em}
+.halo .c>span{font:500 20px 'Plus Jakarta Sans';color:var(--mut)}
+.halo .c .colon{opacity:.5}
+.orbit{position:absolute;display:flex;align-items:center;gap:8px;font:600 15px 'Plus Jakarta Sans';color:var(--mut)}
+.orbit .ic{color:var(--green)}
+.nbtns{display:flex;gap:22px}
+.nb{width:150px;height:150px;border-radius:50%;background:var(--tile);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font:600 16px 'Plus Jakarta Sans'}
+.nb .ic{color:var(--mut)}
+.nb.on{background:radial-gradient(circle at 50% 30%,rgba(232,154,92,.25),var(--tile) 70%);border-color:rgba(232,154,92,.3)}.nb.on .ic{color:var(--amber)}
+.nb.arm{background:radial-gradient(circle at 50% 30%,rgba(157,191,143,.18),var(--tile) 70%)}.nb.arm .ic{color:var(--green)}
+.nb small{font-size:13px;color:var(--mut);font-weight:500;margin-top:-6px}
+</style></head>
+<body>
+<div id="stage">
+  <header id="top">
+    <div class="hello"><div class="tm day-only"><span data-time></span><small>PM</small></div><div class="gr"><b>Good evening, Sushen</b><span>Friday 6 November</span></div></div>
+    <div class="chips day-only">
+      <div class="chip"><i></i>Disarmed</div>
+      <div class="chip"><span data-i="door" data-s="18"></span>Locked</div>
+      <div class="chip"><span data-i="garage" data-s="18"></span>Closed</div>
+      <div class="chip"><span data-i="zap" data-s="18"></span>640 W <span>· $5.05</span></div>
+    </div>
+    <div class="wxc day-only"><span data-i="cloudmoon" data-s="30"></span>21°</div>
+    <div class="ppl" style="margin-left:auto" aria-label="People">
+      <div class="av" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">S<em>30%</em></div>
+      <div class="av" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">P<em>41%</em></div>
+    </div>
+  </header>
+
+  <!-- DAY -->
+  <main id="day" class="day-only">
+    <section class="rooms" aria-label="Rooms">
+      <a class="t rm lit"><div class="rb" data-i="sofa"></div><div><b>Living</b><span>4 lights on</span></div></a>
+      <a class="t rm occ"><div class="rb" data-i="kids"></div><div><b>Kids</b><span>Samar in</span></div></a>
+      <a class="t rm"><div class="rb" data-i="garage"></div><div><b>Garage</b><span>Closed · lights off</span></div></a>
+      <a class="t rm lit"><div class="rb" data-i="tree"></div><div><b>Outdoor</b><span>2 on</span></div></a>
+      <a class="t rm"><div class="rb" data-i="washer"></div><div><b>Laundry</b><span>Idle</span></div></a>
+      <a class="t rm"><div class="rb" data-i="media"></div><div><b>Media</b><span>All off</span></div></a>
+    </section>
+
+    <section class="mid">
+      <div class="t cam" data-cam="night"><span class="live">Live · Front door</span>
+        <div class="ov"><div><b>Front door</b><span>No motion since 9:31 pm</span></div>
+          <div class="cb"><button data-i="mega" data-s="18">Talk</button><button data-i="unlock" data-s="18">Unlock</button></div></div></div>
+      <div class="under">
+        <div class="t cal"><div class="lbl">Next up</div><div class="d"><b>Today</b><span>All day</span></div><h4>Day off work</h4><p>Then Mon 9 · Bin night</p></div>
+        <div class="t veh"><span data-i="car" data-s="28"></span>
+          <svg class="ringv" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" stroke="#4ADE80" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="0" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle">100</text></svg>
+          <h4>Sorento</h4><p>Home · charged</p></div>
+        <div class="t veh"><span data-i="car" data-s="28"></span>
+          <svg class="ringv" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" stroke="#FFB547" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="94.8" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle">42</text></svg>
+          <h4>Bluey</h4><p>Home · not charging</p></div>
+      </div>
+    </section>
+
+    <section class="fav" aria-label="Favourites">
+      <div class="fh"><b>Favourites</b><span class="mut" id="lc" style="font-size:14px">3 of 6 lights on</span></div>
+      <div class="big2">
+        <div class="t dv tvt" data-tog style="height:150px"><span data-i="tv" data-s="28"></span><div><b>Living room TV</b><span data-st data-on="On · Netflix" data-off="Off">Off</span></div></div>
+        <div class="t dv ac" data-tog style="height:150px">
+          <div class="st"><span data-i="snow" data-s="28"></span><div><b>Aircon</b><span data-st data-on="Cooling · 23°" data-off="Off · 23° in">Off · 23° in</span></div></div>
+          <div class="dial"><svg viewBox="0 0 118 118"><circle cx="59" cy="59" r="50" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8" stroke-dasharray="235.6 314.2" stroke-linecap="round" transform="rotate(135 59 59)"/><circle cx="59" cy="59" r="50" fill="none" stroke="#4FD1E8" stroke-width="8" stroke-dasharray="141 314.2" stroke-linecap="round" transform="rotate(135 59 59)"/></svg><b>25<small>°</small></b></div>
+        </div>
+      </div>
+      <div class="lights">
+        <div class="t dv on" data-tog><span data-i="pendant" data-s="28"></span><div><b>Kitchen pendants</b><span data-st data-on="80%" data-off="Off">80%</span></div></div>
+        <div class="t dv" data-tog><span data-i="dining" data-s="28"></span><div><b>Dining</b><span data-st data-on="100%" data-off="Off">Off</span></div></div>
+        <div class="t dv on" data-tog><span data-i="ceiling" data-s="28"></span><div><b>Media room</b><span data-st data-on="60%" data-off="Off">60%</span></div></div>
+        <div class="t dv on" data-tog><span data-i="lamp" data-s="28"></span><div><b>Lamp</b><span data-st data-on="40%" data-off="Off">40%</span></div></div>
+        <div class="t dv" data-tog><span data-i="ceiling" data-s="28"></span><div><b>Corridor</b><span data-st data-on="100%" data-off="Off">Off</span></div></div>
+        <div class="t dv" data-tog><span data-i="ceiling" data-s="28"></span><div><b>Hallway</b><span data-st data-on="100%" data-off="Off">Off</span></div></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- NIGHT -->
+  <main id="night" class="night-only">
+    <div class="halo">
+      <svg viewBox="0 0 520 520"><circle cx="260" cy="260" r="240" fill="none" stroke="rgba(255,220,190,.06)" stroke-width="2"/><circle cx="260" cy="260" r="240" fill="none" stroke="rgba(232,154,92,.45)" stroke-width="2" stroke-dasharray="6 14"/><circle cx="260" cy="260" r="200" fill="rgba(232,154,92,.03)"/></svg>
+      <div class="c"><b data-time="split"></b><span>Friday 6 November · 21° clear</span></div>
+      <div class="orbit" style="top:40px;left:50%;transform:translateX(-50%)"><span data-i="shieldok" data-s="18"></span>Disarmed</div>
+      <div class="orbit" style="left:-180px;top:50%;transform:translateY(-50%)"><span data-i="door" data-s="18"></span>Front door locked</div>
+      <div class="orbit" style="right:-150px;top:50%;transform:translateY(-50%)"><span data-i="garage" data-s="18"></span>Garage closed</div>
+      <div class="orbit" style="bottom:40px;left:50%;transform:translateX(-50%)"><span data-i="users" data-s="18"></span>Everyone home</div>
+    </div>
+    <div class="nbtns">
+      <button class="nb arm" data-i="moon" data-s="34">Arm night<small>Perimeter only</small></button>
+      <button class="nb" data-i="bed" data-s="34">Good night<small>All off, lock up</small></button>
+      <div class="nb" data-tog data-i="ceiling" data-s="34">Hallway<small data-st data-on="20%" data-off="Off">Off</small></div>
+      <div class="nb on" data-tog data-i="lamp" data-s="34">Lamp<small data-st data-on="40%" data-off="Off">40%</small></div>
+    </div>
+  </main>
+
+  <nav id="dock" aria-label="Main">
+    <a class="nv act" data-i="home" data-s="22">Home</a>
+    <a class="nv" data-i="rooms" data-s="22">Rooms</a>
+    <a class="nv" data-i="bulb" data-s="22">Lights<b class="bd">12</b></a>
+    <a class="nv" data-i="therm" data-s="22">Climate</a>
+    <a class="nv" data-i="shield" data-s="22">Security<b class="bd">1</b></a>
+    <a class="nv" data-i="music" data-s="22">Media</a>
+    <a class="nv" data-i="more" data-s="22">More</a>
+    <span class="sep"></span>
+    <button class="qb night day-only" aria-label="Good night" data-i="moon" data-s="22"></button>
+    <button class="qb" aria-label="Announce" data-i="mega" data-s="22"></button>
+    <button class="qb" aria-label="Find phone" data-i="phone" data-s="22"></button>
+    <button class="qb" aria-label="Guest Wi-Fi" data-i="wifi" data-s="22"></button>
+    <button class="qb" aria-label="Robbie" data-i="robot" data-s="22"></button>
+    <span class="sep"></span>
+    <button class="qb day-only" data-setmode="night" aria-label="Night layout" data-i="moon" data-s="22" style="background:transparent"></button>
+    <button class="qb night-only" data-setmode="day" aria-label="Day layout" data-i="sun" data-s="22" style="background:transparent"></button>
+  </nav>
+</div>
+<div id="review"><span>Ambient</span><button data-setmode="day">Day</button><button data-setmode="night">Night</button></div>
+<script src="kit.js"></script>
+<script>
+document.addEventListener('tog',()=>{const n=document.querySelectorAll('#day .lights .dv.on').length;document.getElementById('lc').textContent=n+' of 6 lights on'});
+</script>
+</body></html>
