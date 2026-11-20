@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swatch – Home view option A</title>
+<style>
+@font-face{font-family:Figtree;font-style:normal;font-weight:300 900;font-display:swap;src:url("fonts/figtree-latin.woff2") format("woff2")}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --ground:#e9ece9;--paper:#fbfbf9;--paper2:#f2f4f2;--ink:#18201d;--mut:#55605b;--faint:#8a948f;--line:#d9deda;
+ --rail:#1d2925;--railInk:#c9d5cf;--shadow:0 1px 2px rgba(24,32,29,.06),0 8px 22px -10px rgba(24,32,29,.18);
+ --lamp:#f1ae2f;--lampInk:#3b2603;--ok:#1d7a52;--warn:#b4561b;
+ --c-living:#4f8a63;--c-kids:#d9536f;--c-garage:#4d6a8a;--c-outdoor:#c08a1c;--c-laundry:#23827f;--c-media:#6650cf;
+ --quiet:14%;--quietInk:color-mix(in oklab,var(--c) 72%,var(--ink));
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --ground:#111513;--paper:#1a1f1d;--paper2:#222826;--ink:#eef2ef;--mut:#a7b1ac;--faint:#7c8681;--line:#2c3330;
+ --rail:#0b0e0d;--railInk:#9aa8a1;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -12px rgba(0,0,0,.7);
+ --lamp:#f3b440;--ok:#5fcf98;--warn:#f0995c;--quiet:22%;--quietInk:color-mix(in oklab,var(--c) 45%,#fff)}}
+:root[data-theme=dark]{
+ --ground:#111513;--paper:#1a1f1d;--paper2:#222826;--ink:#eef2ef;--mut:#a7b1ac;--faint:#7c8681;--line:#2c3330;
+ --rail:#0b0e0d;--railInk:#9aa8a1;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -12px rgba(0,0,0,.7);
+ --lamp:#f3b440;--ok:#5fcf98;--warn:#f0995c;--quiet:22%;--quietInk:color-mix(in oklab,var(--c) 45%,#fff)}
+html,body{height:100%;overflow:hidden;background:var(--ground);color:var(--ink);font-family:Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+::selection{background:color-mix(in oklab,var(--c-media) 35%,transparent)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--c-media);outline-offset:2px}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform-origin:center;background:var(--ground);
+ display:grid;grid-template-columns:84px 1fr;gap:24px;padding:24px}
+.card{background:var(--paper);border-radius:16px;box-shadow:var(--shadow)}
+.h{font-size:15px;font-weight:700;letter-spacing:-.005em;display:flex;align-items:center;gap:8px}
+.h .ic{color:var(--faint)}
+.mut{color:var(--mut)}
+
+/* nav rail */
+nav{background:var(--rail);border-radius:22px;display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:6px}
+nav .home{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;margin-bottom:14px;
+ background:conic-gradient(var(--c-living) 0 60deg,var(--c-kids) 0 120deg,var(--c-garage) 0 180deg,var(--c-outdoor) 0 240deg,var(--c-laundry) 0 300deg,var(--c-media) 0);color:#fff}
+nav .home span{width:30px;height:30px;border-radius:10px;background:var(--rail);display:grid;place-items:center}
+nav button{width:68px;height:70px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--railInk);position:relative}
+nav button.act{background:var(--paper);color:var(--ink)}
+nav .bd{position:absolute;top:7px;right:13px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--c-kids);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
+nav .sp{flex:1}
+
+main{display:grid;grid-template-rows:104px 1fr;gap:20px;min-height:0}
+/* header */
+header{display:flex;align-items:center;gap:20px}
+.clock{display:flex;align-items:baseline;gap:6px;font-weight:700;letter-spacing:-.035em}
+.clock b{font-size:76px;line-height:1}.clock small{font-size:22px;letter-spacing:0;color:var(--mut)}
+.when{display:grid;gap:4px;padding-left:6px}
+.when .g{font-size:21px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.when .d{font-size:14.5px;color:var(--mut);display:flex;gap:12px;align-items:center;white-space:nowrap}
+.when .d i{font-style:normal;display:inline-flex;align-items:center;gap:5px;color:var(--ink);font-weight:600}
+.when .d .sun{color:var(--c-outdoor)}
+.ppl{margin-left:auto;display:flex;gap:10px}
+.pp{display:flex;align-items:center;gap:11px;padding:10px 16px 10px 10px;height:68px}
+.av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px;position:relative}
+.av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:var(--faint);border:2.5px solid var(--paper)}
+.av.home::after{background:var(--ok)}
+.pp b{display:block;font-size:15.5px}.pp span{font-size:13px;color:var(--mut)}
+.batt{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--mut);margin-top:2px}
+.batt u{display:block;width:26px;height:9px;border-radius:3px;border:1.5px solid currentColor;position:relative;text-decoration:none}
+.batt u::before{content:"";position:absolute;inset:1.5px;right:auto;width:calc(var(--p) * 1% * .88);border-radius:1px;background:currentColor}
+.qa{display:flex;gap:10px}
+.qa button{width:84px;height:84px;border-radius:16px;background:var(--paper);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12.5px;font-weight:600;transition:transform .15s}
+.qa button:active{transform:scale(.96)}
+.qa button .ic{color:var(--ink)}
+
+/* body grid */
+.body{display:grid;grid-template-columns:432px 470px 1fr;gap:20px;min-height:0}
+.col{display:flex;flex-direction:column;gap:16px;min-height:0}
+
+/* signature: paint-chip rooms */
+.deck{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto repeat(3,1fr);gap:12px;height:100%}
+.deck .h{grid-column:1/-1;justify-content:space-between;padding:0 4px}
+.deck .h em{font-style:normal;font-weight:500;font-size:13.5px;color:var(--mut)}
+.chip{--c:#888;border-radius:16px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow);display:grid;grid-template-rows:1fr auto;text-align:left;transition:transform .15s}
+.chip:active{transform:scale(.98)}
+.chip .f{background:color-mix(in oklab,var(--c) var(--quiet),var(--paper));padding:16px;display:flex;flex-direction:column;justify-content:space-between;color:var(--quietInk);transition:background .25s}
+.chip .f .ic{opacity:.9}
+.chip .f .st{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.chip:not(.busy) .f .st{display:none}
+.chip .f .st small{display:block;font-size:13px;font-weight:600;letter-spacing:0;margin-top:5px;opacity:.85}
+.chip .l{padding:11px 16px 13px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.chip .l b{font-size:17px;font-weight:700}
+.chip .l span{font-size:12.5px;color:var(--faint);font-weight:600;letter-spacing:.02em}
+.chip.busy .f{background:var(--c);color:#fff}
+.chip.busy .l span{color:var(--c)}
+
+/* tiles */
+.media{padding:18px 20px;display:grid;grid-template-columns:auto 1fr;gap:14px 16px;align-items:center}
+.media .art{width:64px;height:64px;border-radius:14px;background:var(--c-media);color:#fff;display:grid;place-items:center}
+.media b{font-size:19px;display:block}.media span{font-size:14px;color:var(--mut)}
+.media .ctl{grid-column:1/-1;display:flex;gap:8px}
+.media .ctl button{flex:1;height:48px;border-radius:12px;background:var(--paper2);display:grid;place-items:center}
+.media .ctl button.pri{background:var(--ink);color:var(--paper);flex:1.4}
+.ac{padding:14px 18px;display:flex;align-items:center;gap:14px}
+.ac .ib{width:44px;height:44px;border-radius:12px;background:var(--paper2);display:grid;place-items:center;color:var(--mut)}
+.ac b{display:block;font-size:16.5px}.ac span{font-size:13.5px;color:var(--mut)}
+.ac .set{margin-left:auto;display:flex;align-items:center;gap:6px}
+.ac .set button{width:40px;height:40px;border-radius:12px;background:var(--paper2);font-size:20px;font-weight:600}
+.ac .set output{font-size:26px;font-weight:700;letter-spacing:-.02em;min-width:64px;text-align:center}
+.lights{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lt{height:104px;border-radius:14px;background:var(--paper);box-shadow:var(--shadow);padding:13px 14px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;transition:background .2s,color .2s,transform .15s}
+.lt:active{transform:scale(.97)}
+.lt .ic{color:var(--faint)}
+.lt b{font-size:14.5px;line-height:1.2;font-weight:700}
+.lt small{display:block;font-size:12px;color:var(--faint);font-weight:600;margin-top:2px}
+.lt.on{background:var(--lamp);color:var(--lampInk)}
+.lt.on .ic,.lt.on small{color:var(--lampInk)}
+.cal{padding:16px 18px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0}
+.cal .row{display:grid;grid-template-columns:110px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:15px}
+.cal .row:first-of-type{border-top:0}
+.cal .row span{color:var(--mut);font-weight:600;font-size:13.5px;padding-top:1px}
+.cal .row b{font-weight:600}
+.cal .next{margin-top:auto;font-size:13.5px;color:var(--mut)}
+.cal .next b{color:var(--ink)}
+
+/* security */
+.sec{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:12px}
+.sc{padding:14px 13px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.sc .t{display:flex;align-items:center;gap:9px;white-space:nowrap}
+.sc .t .ib{width:32px;height:32px;flex:none;border-radius:11px;background:color-mix(in oklab,var(--ok) 14%,var(--paper));color:var(--ok);display:grid;place-items:center}
+.sc b{display:block;font-size:15.5px}.sc span{font-size:13px;color:var(--mut)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--paper2);border-radius:11px;padding:3px;gap:3px}
+.seg button{height:34px;border-radius:9px;font-size:12.5px;font-weight:700;color:var(--mut)}
+.seg button.on{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sc .act{margin-top:auto;height:36px;border-radius:10px;background:var(--paper2);font-size:13px;font-weight:700}
+.camrow{flex:1;min-height:0;display:grid}
+.cam{position:relative;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);background:#222}
+.cam img{width:100%;height:100%;object-fit:cover;display:block}
+.cam .lb{position:absolute;left:12px;bottom:12px;display:flex;gap:8px;align-items:center;padding:6px 11px;border-radius:9px;background:rgba(10,14,12,.72);color:#fff;font-size:13px;font-weight:700}
+.cam .lb i{width:7px;height:7px;border-radius:50%;background:#ff5a5a}
+
+.cars{display:grid;gap:4px;border-top:1px solid var(--line);padding-top:10px}
+.car{display:grid;grid-template-columns:36px 1fr 150px 52px;gap:12px;align-items:center;padding:4px 0}
+.car .ib{width:36px;height:36px;border-radius:10px;background:var(--paper2);display:grid;place-items:center;color:var(--mut)}
+.car b{font-size:15px;display:block}.car span{font-size:12.5px;color:var(--mut)}
+.car .pct{font-size:17px;font-weight:800;text-align:right}
+.car .bar{height:8px;border-radius:4px;background:var(--paper2);overflow:hidden}
+.car .bar i{display:block;height:100%;width:calc(var(--p)*1%);background:var(--ok);border-radius:4px}
+
+/* energy */
+.en{padding:16px 18px;display:grid;gap:12px}
+.en .top{display:flex;gap:12px;align-items:center}.en .top .self{margin-left:auto}
+.tariff{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:8px;background:color-mix(in oklab,var(--ok) 14%,var(--paper));color:var(--ok)}
+.money{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.money div{display:grid;gap:2px}
+.money b{font-size:24px;font-weight:800;letter-spacing:-.025em}
+.money span{font-size:12.5px;color:var(--mut);font-weight:600}
+.money .sold b{color:var(--ok)}
+.flow{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;background:var(--paper2);border-radius:12px;padding:12px 6px;position:relative}
+.node{display:grid;justify-items:center;gap:4px;font-size:12.5px;color:var(--mut);font-weight:600;position:relative;z-index:1}
+.node .ib{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--paper)}
+.node b{font-size:19px;color:var(--ink);font-weight:800;letter-spacing:-.02em}
+.node.solar .ib{color:var(--c-outdoor)}.node.home .ib{color:var(--ink)}.node.grid .ib{color:var(--ok)}
+.flow>svg{position:absolute;left:0;top:0;width:100%;height:100%}
+.flow>svg path{fill:none;stroke-width:2.5;stroke-dasharray:3 7;stroke-linecap:round;animation:run 1.4s linear infinite}
+@keyframes run{to{stroke-dashoffset:-20}}
+@media (prefers-reduced-motion:reduce){.flow>svg path{animation:none}}
+.evs{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;font-size:13px}
+.evs div{display:flex;align-items:center;gap:8px;color:var(--mut)}
+.evs div b{color:var(--ink);font-size:14px}
+.self{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:var(--ok)}
+</style></head>
+<body>
+<div id="stage">
+ <nav id="nav"></nav>
+ <main>
+  <header>
+   <div class="clock"><b id="time"></b><small id="ampm"></small></div>
+   <div class="when"><div class="g" id="greet"></div><div class="d" id="when"></div></div>
+   <div class="ppl" id="ppl"></div>
+   <div class="qa" id="qa"></div>
+  </header>
+  <div class="body">
+   <section class="deck" id="deck" aria-label="Rooms"></section>
+   <div class="col">
+    <div class="card media" id="media"></div>
+    <div class="card ac" id="ac"></div>
+    <div class="lights" id="lights" aria-label="Favourite lights"></div>
+    <div class="card cal" id="cal"></div>
+   </div>
+   <div class="col">
+    <div class="sec" id="sec"></div>
+    <div class="camrow"><div class="cam"><img src="previews/front-door-still.jpg" alt="Front door camera"><div class="lb"><i></i>Front Door</div></div></div>
+    <div class="card en" id="en"></div>
+   </div>
+  </div>
+ </main>
+</div>
+<script src="shared.js"></script>
+<script src="redesign-data.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const hue = { living:'--c-living', kids:'--c-kids', garage:'--c-garage', outdoor:'--c-outdoor', laundry:'--c-laundry', media:'--c-media' };
+$('nav').innerHTML = `<div class="home"><span>${ic('home',18,2)}</span></div>` + H.nav.map(n =>
+  `<button class="${n.active?'act':''}">${ic(n.icon,22)}${n.name}${n.badge?`<span class="bd">${n.badge}</span>`:''}</button>`).join('');
+$('time').textContent = H.now.time; $('ampm').textContent = H.now.ampm;
+$('greet').textContent = `${H.now.day} ${H.now.date}`;
+$('when').innerHTML = `<i><span class="sun">${ic('sun',18,2)}</span>${H.weather.temp}° ${H.weather.sky}</i><span>${H.clocks.map(c=>`${c[0]} ${c[1]} ${c[2]}`).join(' · ')}</span>`;
+const avc = ['#3f6f8f','#b5476a'];
+$('ppl').innerHTML = H.people.map((p,i) => `<div class="card pp"><div class="av ${p.home?'home':''}" style="background:${avc[i]}">${p.init}</div><div><b>${p.name}</b><span>${p.place}</span><div class="batt"><u style="--p:${p.batt}"></u>${p.batt}%</div></div></div>`).join('');
+$('qa').innerHTML = H.quick.map(q => `<button>${ic(q.icon,24)}${q.name}</button>`).join('');
+
+$('deck').innerHTML = `<div class="h">Rooms <em>2 rooms active</em></div>` + H.rooms.map(r =>
+  `<button class="chip ${r.busy?'busy':''}" style="--c:var(${hue[r.id]})" data-toggle-busy>
+    <div class="f">${ic(r.icon,26,1.9)}<div class="st">${r.busy ? (r.id==='media'?'Playing':'Occupied') : 'Quiet'}<small>${r.sub}</small></div></div>
+    <div class="l"><b>${r.name}</b><span>${r.busy?'Active':r.sub}</span></div></button>`).join('');
+
+$('media').innerHTML = `<div class="art">${ic('tv',30,1.8)}</div><div><b>${H.tv.name} · ${H.tv.state}</b><span>${H.tv.src} · Media room</span></div>
+ <div class="ctl"><button aria-label="Power">${ic('power',20)}</button><button aria-label="Previous">${ic('prev',20)}</button><button class="pri" aria-label="Pause">${ic('pause',20)}</button><button aria-label="Next">${ic('next',20)}</button></div>`;
+$('ac').innerHTML = `<div class="ib">${ic('fan',22)}</div><div><b>Aircon</b><span>${H.ac.state} · inside ${H.ac.inside}°</span></div><div class="set"><button aria-label="Cooler">−</button><output>${H.ac.set}°</output><button aria-label="Warmer">+</button></div>`;
+const lightsHTML = () => H.lights.map((l,i) => `<button class="lt ${l.on?'on':''}" data-i="${i}">${ic(l.icon,22)}<div><b>${l.name}</b><small>${l.on?l.lvl+'%':'Off'}</small></div></button>`).join('');
+$('lights').innerHTML = lightsHTML();
+$('lights').addEventListener('click', e => { const b = e.target.closest('.lt'); if(!b) return; const l = H.lights[b.dataset.i]; l.on = !l.on; l.lvl = l.lvl || 100; $('lights').innerHTML = lightsHTML(); badge(); });
+function badge(){ const n = H.lights.filter(l=>l.on).length; const b = document.querySelectorAll('nav .bd')[0]; if(b){ b.textContent = n; b.style.display = n?'':'none'; } }
+$('cal').innerHTML = `<div class="h">${ic('cal',18,2)}Today · ${H.now.short} <span class="mut" style="margin-left:auto;font-weight:600;font-size:13.5px">${H.weather.lo}° – ${H.weather.hi}°</span></div>` +
+  H.agenda.map(a => `<div class="row"><span>${a.t}</span><b>${a.title}</b></div>`).join('') +
+  `<div class="next">Next up <b>Summer Sixes</b> in 4 h 46 min</div>`;
+
+$('sec').innerHTML = `<div class="card sc"><div class="t"><div class="ib">${ic('shield',20,2)}</div><div><b>Home Alarm</b><span>${H.security.alarm}</span></div></div>
+   <div class="seg" data-seg><button class="on">Off</button><button>Home</button><button>Away</button></div></div>
+ <div class="card sc"><div class="t"><div class="ib">${ic('garage',20,2)}</div><div><b>Garage</b><span>${H.security.garage}</span></div></div><button class="act">Open</button></div>
+ <div class="card sc"><div class="t"><div class="ib">${ic('lock',20,2)}</div><div><b>Front Door</b><span>${H.security.front}</span></div></div><button class="act">Unlock</button></div>`;
+const E = H.energy;
+$('en').innerHTML = `<div class="top"><div class="h">${ic('zap',18,2)}Energy</div><span class="self">${ic('sun',16,2.2)}${E.self}% self-powered</span><span class="tariff">${E.period} · $${E.rate}/kWh</span></div>
+ <div class="money"><div><b>$${E.today}</b><span>Today</span></div><div class="sold"><b>$${E.sold}</b><span>Sold</span></div><div><b>$${E.bill}</b><span>Bill to date</span></div><div><b>$${E.est}</b><span>Est. bill</span></div></div>
+ <div class="flow"><svg viewBox="0 0 460 110" preserveAspectRatio="none"><path d="M120 46 H 190" stroke="var(--ok)" style="animation-direction:reverse"/><path d="M270 46 H 340" stroke="var(--c-outdoor)" style="animation-direction:reverse"/></svg>
+   <div class="node grid"><div class="ib">${ic('grid2',22,1.9)}</div><b>${E.grid.toFixed(1)} kW</b>Exporting</div>
+   <div class="node home"><div class="ib">${ic('home',22,1.9)}</div><b>${E.home.toFixed(1)} kW</b>Home</div>
+   <div class="node solar"><div class="ib">${ic('sun',22,1.9)}</div><b>${E.solar.toFixed(1)} kW</b>Solar</div></div>
+ <div class="cars">${H.cars.map((c,i)=>`<div class="car"><span class="ib">${ic('car',20)}</span><div><b>${c.name}</b><span>${c.sub} · ${E.evs[i?0:1][1].toLowerCase()}</span></div><div class="bar"><i style="--p:${c.pct}"></i></div><b class="pct">${c.pct}%</b></div>`).join('')}</div>`;
+badge();
+</script>
+</body></html>

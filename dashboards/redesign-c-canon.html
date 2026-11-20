@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classic – Home view option C</title>
+<style>
+@font-face{font-family:Roboto;font-style:normal;font-weight:100 900;font-display:swap;src:url("fonts/roboto-latin.woff2") format("woff2")}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --wall:linear-gradient(160deg,#cfd9e6 0%,#e6dccf 55%,#d9cfc4 100%);
+ --side:rgba(255,255,255,.55);--tile:rgba(255,255,255,.5);--tileOn:#fff;--ink:#16191d;--mut:rgba(22,25,29,.6);--faint:rgba(22,25,29,.42);
+ --sel:rgba(22,25,29,.08);--amber:#f5a300;--blue:#2f7df6;--green:#2fa35a;--red:#e5483d;--purple:#7a5af5;
+ --shadow:0 1px 2px rgba(0,0,0,.05),0 6px 16px -8px rgba(0,0,0,.18);--blur:saturate(160%) blur(30px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --wall:linear-gradient(160deg,#1d2633 0%,#2a2320 60%,#1b1a1f 100%);
+ --side:rgba(28,28,32,.6);--tile:rgba(60,60,66,.55);--tileOn:#f4f4f5;--ink:#f5f5f7;--mut:rgba(245,245,247,.62);--faint:rgba(245,245,247,.42);--sel:rgba(255,255,255,.1);
+ --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 20px -10px rgba(0,0,0,.6)}}
+:root[data-theme=dark]{
+ --wall:linear-gradient(160deg,#1d2633 0%,#2a2320 60%,#1b1a1f 100%);
+ --side:rgba(28,28,32,.6);--tile:rgba(60,60,66,.55);--tileOn:#f4f4f5;--ink:#f5f5f7;--mut:rgba(245,245,247,.62);--faint:rgba(245,245,247,.42);--sel:rgba(255,255,255,.1);
+ --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 20px -10px rgba(0,0,0,.6)}
+html,body{height:100%;overflow:hidden;background:#111;color:var(--ink);font-family:Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform-origin:center;background:var(--wall);display:grid;grid-template-columns:236px 1fr}
+aside{background:var(--side);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);padding:28px 14px;display:flex;flex-direction:column;gap:2px}
+aside .me{display:flex;align-items:center;gap:10px;padding:0 10px 22px;font-weight:700;font-size:17px}
+aside .me i{width:34px;height:34px;border-radius:10px;background:var(--amber);display:grid;place-items:center;color:#fff}
+aside button{height:46px;border-radius:11px;padding:0 12px;display:flex;align-items:center;gap:12px;font-size:16px;font-weight:500;color:var(--ink)}
+aside button .ic{color:var(--blue)}
+aside button.act{background:var(--sel);font-weight:700}
+aside button em{margin-left:auto;font-style:normal;font-size:13.5px;color:var(--mut);font-weight:500}
+aside h4{font-size:13px;font-weight:600;color:var(--mut);padding:18px 12px 6px}
+aside .pp{display:flex;align-items:center;gap:10px;padding:6px 12px;font-size:14.5px}
+aside .pp .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+aside .pp span{color:var(--mut);font-size:13px;display:block}
+aside .pp b{font-weight:600}
+
+main{padding:26px 28px 24px;display:grid;grid-template-rows:auto auto auto 1fr;gap:16px;min-height:0}
+.title{display:flex;align-items:baseline;gap:18px}
+.title h1{font-size:40px;font-weight:700;letter-spacing:-.01em}
+.title .meta{color:var(--mut);font-size:16px;display:flex;gap:16px;align-items:baseline}
+.title .meta b{color:var(--ink);font-weight:500}
+.title .clock{margin-left:auto;font-size:40px;font-weight:300;letter-spacing:-.01em}
+.title .clock small{font-size:18px;color:var(--mut);margin-left:4px}
+.chips{display:flex;gap:10px}
+.chip{height:56px;padding:0 18px 0 12px;border-radius:28px;background:var(--tile);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.chip .ci{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.chip b{display:block;font-size:14.5px;font-weight:700}.chip span{font-size:13px;color:var(--mut)}
+.sh{font-size:19px;font-weight:700;margin:4px 2px 10px;display:flex;align-items:center;gap:8px}
+.sh .ic{color:var(--faint)}
+.scenes{display:flex;gap:10px}
+.scene{height:52px;padding:0 18px 0 8px;border-radius:14px;background:var(--tile);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px}
+.scene .ci{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--sel)}
+
+.grid{display:grid;grid-template-columns:1fr 440px;gap:24px;min-height:0}
+.fav{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:104px;gap:12px}
+.tile{border-radius:16px;background:var(--tile);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--shadow);padding:0 14px;display:flex;align-items:center;gap:12px;transition:background .2s,color .2s,transform .12s}
+.tile:active{transform:scale(.97)}
+.tile .ti{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--sel);color:var(--ink)}
+.tile b{display:block;font-size:15px;font-weight:600;line-height:1.2}
+.tile span{display:block;font-size:13.5px;color:var(--mut);margin-top:2px}
+.tile.on{background:var(--tileOn);color:#16191d}
+.tile.on span{color:rgba(22,25,29,.6)}
+.tile.on .ti{background:var(--acc,var(--amber));color:#fff}
+.rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.room{border-radius:16px;background:var(--tile);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--shadow);padding:14px 18px;display:flex;flex-direction:column;gap:4px;height:100px;justify-content:center}
+.room b{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.room span{font-size:13.5px;color:var(--mut)}
+.room.busy span{color:var(--ink);font-weight:500}
+.room .dot{width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.right{display:flex;flex-direction:column;min-height:0}
+.cam{position:relative;border-radius:18px;overflow:hidden;height:290px;box-shadow:var(--shadow)}
+.cam img{width:100%;height:100%;object-fit:cover;display:block}
+.cam .lb{position:absolute;left:12px;top:12px;font-size:13px;font-weight:600;color:#fff;padding:5px 10px;border-radius:8px;background:rgba(0,0,0,.45);backdrop-filter:blur(10px)}
+.widget{border-radius:18px;background:var(--tile);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--shadow);padding:14px 16px}
+.agenda div{display:flex;gap:12px;font-size:14.5px;padding:5px 0}
+.agenda div span{color:var(--mut);width:104px;flex:none}
+.agenda div b{font-weight:500}
+.en{display:grid;gap:10px}
+.en .row{display:flex;justify-content:space-between}
+.en .row b{font-size:21px;font-weight:700;display:block}
+.en .row span{font-size:12.5px;color:var(--mut)}
+.en .sold b{color:var(--green)}
+.en .bar{height:10px;border-radius:5px;background:var(--sel);display:flex;overflow:hidden;gap:2px}
+.en .bar i{display:block;height:100%}
+.en .leg{display:flex;gap:14px;font-size:13px;color:var(--mut);flex-wrap:wrap}
+.en .leg b{color:var(--ink);font-weight:600}
+.en .leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.tag{font-size:12.5px;font-weight:600;padding:3px 9px;border-radius:7px;background:rgba(47,163,90,.16);color:var(--green);margin-left:auto}
+</style></head>
+<body>
+<div id="stage">
+ <aside id="side"></aside>
+ <main>
+  <div class="title"><h1>Home</h1><div class="meta" id="meta"></div><div class="clock" id="clock"></div></div>
+  <div class="chips" id="chips"></div>
+  <div><div class="sh">Scenes</div><div class="scenes" id="scenes"></div></div>
+  <div class="grid">
+   <div style="display:flex;flex-direction:column;min-height:0">
+    <div class="sh">Favourites</div>
+    <div class="fav" id="fav"></div>
+    <div class="sh" style="margin-top:18px">Rooms</div>
+    <div class="rooms" id="rooms"></div>
+   </div>
+   <div class="right">
+    <div class="sh">Cameras</div>
+    <div class="cam"><img src="previews/front-door-still.jpg" alt="Front door camera"><span class="lb">Front Door</span></div>
+    <div class="sh" style="margin-top:16px">Today</div>
+    <div class="widget agenda" id="agenda"></div>
+    <div class="widget en" id="en" style="margin-top:10px"></div>
+   </div>
+  </div>
+ </main>
+</div>
+<script src="shared.js"></script>
+<script src="redesign-data.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const avc = ['#3d77b8','#c0507c'];
+$('side').innerHTML = `<div class="me"><i>${ic('home',20,2.2)}</i>Our Home</div>` +
+  H.nav.map(n=>`<button class="${n.active?'act':''}">${ic(n.icon,22)}${n.name}${n.badge?`<em>${n.badge}</em>`:''}</button>`).join('') +
+  `<h4>People</h4>` + H.people.map((p,i)=>`<div class="pp"><div class="av" style="background:${avc[i]}">${p.init}</div><div><b>${p.name}</b><span>${p.place} · ${p.batt}% battery</span></div></div>`).join('') +
+  `<h4>Cars</h4>` + H.cars.map(c=>`<div class="pp"><div class="av" style="background:var(--sel);color:var(--ink)">${ic('car',16,2)}</div><div><b>${c.name} · ${c.pct}%</b><span>${c.sub}</span></div></div>`).join('');
+$('meta').innerHTML = `<span><b>${H.now.day} ${H.now.date}</b></span><span>${H.weather.temp}° ${H.weather.sky}</span><span>${H.clocks.map(c=>`${c[0]} ${c[1]} ${c[2]}`).join(' · ')}</span>`;
+$('clock').innerHTML = `${H.now.time}<small>${H.now.ampm.toLowerCase()}</small>`;
+const chips = [
+  ['therm','#f08a24','Climate',`Aircon off · ${H.ac.inside}° inside`],
+  ['bulb','#f5a300','Lights','2 on'],
+  ['shield','#2fa35a','Security','Disarmed · all closed'],
+  ['zap','#2fa35a','Energy',`${H.energy.self}% solar · exporting`],
+  ['tv','#7a5af5','Media','TV playing']];
+$('chips').innerHTML = chips.map(c=>`<button class="chip"><span class="ci" style="background:${c[1]}">${ic(c[0],18,2.2)}</span><span><b>${c[2]}</b><span>${c[3]}</span></span></button>`).join('');
+$('scenes').innerHTML = H.quick.filter(q=>q.name!=='Robbie').map(q=>`<button class="scene"><span class="ci">${ic(q.icon,20,2)}</span>${q.name}</button>`).join('');
+const fav = () => [
+  { n:'TV', s:`${H.tv.state} · ${H.tv.src}`, i:'tv', on:true, acc:'var(--purple)' },
+  { n:'Aircon', s:`Off · set ${H.ac.set}°`, i:'fan', on:false, acc:'var(--blue)' },
+  { n:'Home Alarm', s:H.security.alarm, i:'shield', on:false, acc:'var(--green)' },
+  { n:'Robbie', s:'Docked', i:'bot', on:false, acc:'var(--blue)' },
+  { n:'Garage Door', s:H.security.garage, i:'garage', on:false, acc:'var(--blue)' },
+  { n:'Front Door', s:H.security.front, i:'lock', on:false, acc:'var(--blue)' },
+  ...H.lights.map(l=>({ n:l.name, s:l.on?l.lvl+'%':'Off', i:l.icon, on:l.on, acc:'var(--amber)', light:true }))
+];
+let F = fav();
+const draw = () => $('fav').innerHTML = F.map((t,k)=>`<button class="tile ${t.on?'on':''}" data-k="${k}" style="--acc:${t.acc}"><span class="ti">${ic(t.i,20,2)}</span><span><b>${t.n}</b><span>${t.s}</span></span></button>`).join('');
+draw();
+$('fav').addEventListener('click', e=>{ const b=e.target.closest('.tile'); if(!b) return; const t=F[b.dataset.k]; if(!t.light) return; t.on=!t.on; t.s=t.on?'100%':'Off'; draw(); });
+$('rooms').innerHTML = H.rooms.map(r=>`<button class="room ${r.busy?'busy':''}"><b>${r.busy?'<span class="dot"></span>':''}${r.name}</b><span>${r.sub}</span></button>`).join('');
+$('agenda').innerHTML = H.agenda.map(a=>`<div><span>${a.t}</span><b>${a.title}</b></div>`).join('');
+const E = H.energy;
+$('en').innerHTML = `<div style="display:flex;align-items:center"><div class="sh" style="margin:0">${ic('zap',18,2)}Energy</div><span class="tag">${E.period} · $${E.rate}/kWh</span></div>
+ <div class="row"><div><b>$${E.today}</b><span>Today</span></div><div class="sold"><b>$${E.sold}</b><span>Sold</span></div><div><b>$${E.bill}</b><span>Bill to date</span></div><div><b>$${E.est}</b><span>Est. bill</span></div></div>
+ <div class="bar"><i style="width:${E.home/E.solar*100}%;background:var(--amber)"></i><i style="flex:1;background:var(--green)"></i></div>
+ <div class="leg"><span><i style="background:var(--amber)"></i>Solar <b>${E.solar} kW</b></span><span>Home <b>${E.home} kW</b></span><span><i style="background:var(--green)"></i>Exporting <b>${E.grid} kW</b></span><span>Tesla, Kia <b>not charging</b></span></div>`;
+</script>
+</body></html>

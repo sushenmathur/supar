@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Almanac – Home view option B</title>
+<style>
+@font-face{font-family:Atkinson;font-style:normal;font-weight:200 800;font-display:swap;src:url("fonts/atkinson-hyperlegible-next-latin.woff2") format("woff2")}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --ground:#e4ecef;--panel:#f7fafb;--panel2:#edf2f4;--ink:#0d2433;--mut:#4b6270;--faint:#7d929e;--line:#d3dee3;
+ --deep:#0f3147;--deepInk:#d9e8ef;--deepMut:#8fb0c0;
+ --sun:#e59a1c;--sunSoft:rgba(229,154,28,.22);--off:#2b8a6a;--sh:#6f8fa0;--peak:#d6553f;--now:#d6553f;
+ --lamp:#f0ac34;--lampInk:#3a2504;--ok:#1f7f5e;
+ --shadow:0 1px 2px rgba(13,36,51,.06),0 10px 24px -14px rgba(13,36,51,.25);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --ground:#081521;--panel:#0f202d;--panel2:#162a39;--ink:#e6f0f4;--mut:#9db5c2;--faint:#6f8898;--line:#1f3545;
+ --deep:#0b2536;--deepInk:#e6f0f4;--deepMut:#86a6b6;--sunSoft:rgba(240,170,60,.22);--sun:#f0aa3c;--ok:#59c99c;--off:#47b08b;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -14px rgba(0,0,0,.8)}}
+:root[data-theme=dark]{
+ --ground:#081521;--panel:#0f202d;--panel2:#162a39;--ink:#e6f0f4;--mut:#9db5c2;--faint:#6f8898;--line:#1f3545;
+ --deep:#0b2536;--deepInk:#e6f0f4;--deepMut:#86a6b6;--sunSoft:rgba(240,170,60,.22);--sun:#f0aa3c;--ok:#59c99c;--off:#47b08b;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -14px rgba(0,0,0,.8)}
+html,body{height:100%;overflow:hidden;background:var(--ground);color:var(--ink);font-family:Atkinson,system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+::selection{background:var(--sunSoft)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform-origin:center;background:var(--ground);padding:20px 24px 24px;display:grid;grid-template-rows:56px 268px 1fr;gap:16px}
+.panel{background:var(--panel);border-radius:14px;box-shadow:var(--shadow)}
+.h{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.h .ic{color:var(--faint)}
+
+/* top bar: tabs */
+.top{display:flex;align-items:center;gap:6px}
+.tab{height:48px;padding:0 16px;border-radius:12px;display:flex;align-items:center;gap:9px;font-size:16px;font-weight:600;color:var(--mut);position:relative}
+.tab.act{background:var(--deep);color:var(--deepInk)}
+.tab .bd{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--now);color:#fff;font-size:12.5px;font-weight:700;display:grid;place-items:center}
+.top .sp{flex:1}
+.pp{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px 0 6px;border-radius:12px;background:var(--panel);box-shadow:var(--shadow)}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
+.pp b{font-size:15px}.pp span{font-size:14px;color:var(--mut)}
+.pp .dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}.pp .dot.home{background:var(--ok)}
+
+/* signature: the day ribbon */
+.day{background:var(--deep);color:var(--deepInk);border-radius:18px;display:grid;grid-template-columns:330px 1fr;overflow:hidden;box-shadow:var(--shadow)}
+.now{padding:22px 26px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid rgba(255,255,255,.08)}
+.now .t{font-size:92px;font-weight:300;letter-spacing:-.04em;line-height:.9}
+.now .t small{font-size:24px;font-weight:600;letter-spacing:0;margin-left:6px;color:var(--deepMut)}
+.now .d{font-size:21px;font-weight:700;margin-top:10px}
+.now .w{display:flex;align-items:center;gap:10px;font-size:17px;color:var(--deepMut)}
+.now .w b{color:var(--deepInk);font-size:26px;font-weight:700}
+.now .w .ic{color:var(--sun)}
+.now .cl{display:flex;gap:18px;font-size:14px;color:var(--deepMut)}
+.now .cl b{color:var(--deepInk);font-weight:700;margin-left:4px}
+.rib{position:relative;padding:18px 22px 14px 18px}
+.rib svg{display:block;width:100%;height:100%;overflow:visible}
+.rib text{font-family:Atkinson,system-ui,sans-serif;fill:var(--deepMut);font-size:13px}
+.rib .lbl{fill:var(--deepInk);font-weight:700;font-size:14px}
+.rib .ev{fill:#fff;font-weight:700;font-size:13.5px}
+
+/* body */
+.body{display:grid;grid-template-columns:420px 520px 1fr;gap:16px;min-height:0}
+.col{display:flex;flex-direction:column;gap:14px;min-height:0}
+.house{padding:16px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.house .h{margin-bottom:4px}.house .h em,.lights .h em{margin-left:auto}
+.house .h em{font-style:normal;font-weight:600;font-size:13.5px;color:var(--ok)}
+.row{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:15.5px}
+.row:first-of-type{border-top:0}
+.row .ic{color:var(--faint)}
+.row span{color:var(--mut);font-size:14.5px}
+.row.hot .ic{color:var(--sun)}
+.row.hot b{font-weight:700}
+.row .pill{font-size:13px;font-weight:700;height:32px;padding:0 12px;border-radius:9px;background:var(--panel2);display:grid;place-items:center}
+.seg{display:grid;grid-template-columns:repeat(3,58px);background:var(--panel2);border-radius:9px;padding:3px;gap:2px}
+.seg button{height:28px;border-radius:7px;font-size:12.5px;font-weight:700;color:var(--mut)}
+.seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.qa{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.qa button{height:78px;border-radius:12px;background:var(--panel);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:700}
+
+.tv{padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.tv b{font-size:19px;display:block}.tv span{font-size:14.5px;color:var(--mut)}
+.tv .ctl{display:flex;gap:6px}
+.tv .ctl button{width:50px;height:50px;border-radius:12px;background:var(--panel2);display:grid;place-items:center}
+.tv .ctl button.pri{background:var(--sun);color:#2a1a02}
+.tv .prog{grid-column:1/-1;height:4px;border-radius:2px;background:var(--panel2);overflow:hidden}
+.tv .prog i{display:block;height:100%;width:38%;background:var(--sun)}
+.ac{padding:12px 18px;display:flex;align-items:center;gap:14px}
+.ac b{display:block;font-size:16.5px}.ac span{font-size:14px;color:var(--mut)}
+.ac .ic{color:var(--faint)}
+.ac .set{margin-left:auto;display:flex;align-items:center;gap:6px}
+.ac .set button{width:44px;height:44px;border-radius:11px;background:var(--panel2);font-size:22px}
+.ac .set output{font-size:30px;font-weight:300;min-width:66px;text-align:center}
+.ac .set .pw{width:auto;white-space:nowrap;margin-right:6px;height:44px;padding:0 16px;border-radius:11px;background:var(--panel2);font-weight:700;font-size:14px}
+.lights{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto repeat(3,1fr);gap:8px;flex:1}
+.lights .h{grid-column:1/-1;margin-bottom:4px}
+.lights .h em{font-style:normal;font-size:13.5px;font-weight:600;color:var(--mut)}
+.lt{border-radius:11px;background:var(--panel2);padding:0 14px;display:flex;align-items:center;gap:12px;text-align:left;transition:background .2s,color .2s}
+.lt .ic{color:var(--faint)}
+.lt b{font-size:15px;font-weight:700;display:block;line-height:1.15}
+.lt small{font-size:12.5px;color:var(--faint);font-weight:600}
+.lt.on{background:var(--lamp);color:var(--lampInk)}
+.lt.on .ic,.lt.on small{color:var(--lampInk)}
+
+.cam{position:relative;border-radius:14px;overflow:hidden;flex:1;min-height:0;box-shadow:var(--shadow);background:#111}
+.cam img{width:100%;height:100%;object-fit:cover;display:block}
+.cam .lb{position:absolute;left:12px;top:12px;padding:6px 11px;border-radius:9px;background:rgba(6,18,27,.75);color:#fff;font-size:13.5px;font-weight:700;display:flex;gap:8px;align-items:center}
+.cam .lb i{width:7px;height:7px;border-radius:50%;background:#ff5d4a}
+.cam .acts{position:absolute;right:12px;bottom:12px;display:flex;gap:8px}
+.cam .acts button{height:40px;padding:0 14px;border-radius:10px;background:rgba(6,18,27,.75);color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:7px}
+.en{padding:14px 18px;display:grid;gap:10px}
+.en .hd{display:flex;align-items:center;gap:10px}
+.tariff{margin-left:auto;font-size:13px;font-weight:700;padding:5px 10px;border-radius:8px;background:color-mix(in oklab,var(--off) 16%,var(--panel));color:var(--off)}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi b{display:block;font-size:23px;font-weight:700;letter-spacing:-.01em}
+.kpi span{font-size:12.5px;color:var(--mut);font-weight:600}
+.kpi .g b{color:var(--ok)}
+.live{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.live div{background:var(--panel2);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:10px}
+.live b{font-size:17px;display:block}.live span{font-size:12.5px;color:var(--mut)}
+.live .ic{color:var(--faint)}.live .s .ic{color:var(--sun)}.live .x .ic{color:var(--ok)}
+.cars{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.car{display:flex;align-items:center;gap:10px;font-size:14px;border-top:1px solid var(--line);padding-top:9px}
+.car .ic{color:var(--faint)}
+.car b{font-size:15px}.car span{color:var(--mut);font-size:13px;display:block}
+.car .pct{margin-left:auto;font-size:19px;font-weight:700}
+</style></head>
+<body>
+<div id="stage">
+ <div class="top" id="top"></div>
+ <section class="day" aria-label="Today">
+  <div class="now">
+   <div><div class="t" id="time"></div><div class="d" id="date"></div></div>
+   <div class="w" id="wx"></div>
+   <div class="cl" id="cl"></div>
+  </div>
+  <div class="rib"><svg id="rib" viewBox="0 0 1180 236" preserveAspectRatio="none"></svg></div>
+ </section>
+ <div class="body">
+  <div class="col">
+   <div class="panel house" id="house"></div>
+   <div class="qa" id="qa"></div>
+  </div>
+  <div class="col">
+   <div class="panel tv" id="tv"></div>
+   <div class="panel ac" id="ac"></div>
+   <div class="panel lights" id="lights"></div>
+  </div>
+  <div class="col">
+   <div class="cam"><img src="previews/front-door-still.jpg" alt="Front door camera"><div class="lb"><i></i>Front Door · live</div><div class="acts"><button id="talk">Talk</button><button>Unlock</button></div></div>
+   <div class="panel en" id="en"></div>
+  </div>
+ </div>
+</div>
+<script src="shared.js"></script>
+<script src="redesign-data.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const avc = ['#2f6f94','#b04a72'];
+$('top').innerHTML = H.nav.map(n => `<button class="tab ${n.active?'act':''}">${ic(n.icon,20)}${n.name}${n.badge?`<span class="bd">${n.badge}</span>`:''}</button>`).join('') +
+ '<span class="sp"></span>' + H.people.map((p,i)=>`<div class="pp"><div class="av" style="background:${avc[i]}">${p.init}</div><span class="dot ${p.home?'home':''}"></span><b>${p.name}</b><span>${p.place} · ${p.batt}%</span></div>`).join('');
+$('time').innerHTML = `${H.now.time}<small>${H.now.ampm}</small>`;
+$('date').textContent = `${H.now.day} ${H.now.date}`;
+$('wx').innerHTML = `${ic('sun',30,2)}<b>${H.weather.temp}°</b>${H.weather.sky} · ${H.weather.lo}–${H.weather.hi}°`;
+$('cl').innerHTML = H.clocks.map(c=>`<span>${c[0]}<b>${c[1]} ${c[2]}</b></span>`).join('');
+
+/* Day ribbon: 4 am to midnight. Solar curve, tariff bands, events, now line. */
+(function ribbon(){
+  const W = 1180, Hh = 236, t0 = 3, t1 = 24, x = h => (h - t0) / (t1 - t0) * W;
+  const base = 168, top = 40;
+  const sunrise = 4.85, sunset = 18.43, peakKw = 6.2, nowH = 12.23;
+  const kw = h => h < sunrise || h > sunset ? 0 : peakKw * Math.pow(Math.sin(Math.PI * (h - sunrise) / (sunset - sunrise)), 1.6);
+  const y = v => base - v / peakKw * (base - top);
+  const pts = (a, b) => { const r = []; for (let h = a; h <= b + 1e-6; h += 0.1) r.push(`${x(h).toFixed(1)},${y(kw(h)).toFixed(1)}`); return r; };
+  const past = pts(sunrise, nowH), fut = pts(nowH, sunset);
+  const tariff = [[t0, 9, 'Shoulder', 'var(--sh)'], [9, 16, 'Off-peak', 'var(--off)'], [16, 21, 'Peak', 'var(--peak)'], [21, t1, 'Shoulder', 'var(--sh)']];
+  let s = `<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--sun)" stop-opacity=".55"/><stop offset="1" stop-color="var(--sun)" stop-opacity=".05"/></linearGradient></defs>`;
+  for (let h = 6; h <= 22; h += 2) s += `<line x1="${x(h)}" x2="${x(h)}" y1="${top-8}" y2="${base}" stroke="rgba(255,255,255,.07)"/><text x="${x(h)}" y="${base+18}" text-anchor="middle">${h===12?'12 pm':h<12?h+' am':(h-12)+' pm'}</text>`;
+  s += `<line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="rgba(255,255,255,.18)"/>`;
+  s += `<polygon points="${x(sunrise)},${base} ${past.join(' ')} ${x(nowH)},${base}" fill="url(#sg)"/>`;
+  s += `<polyline points="${past.join(' ')}" fill="none" stroke="var(--sun)" stroke-width="3"/>`;
+  s += `<polyline points="${fut.join(' ')}" fill="none" stroke="var(--sun)" stroke-width="2" stroke-dasharray="4 6" opacity=".7"/>`;
+  s += `<text x="${x(sunrise)-4}" y="${base-8}" text-anchor="end">Sunrise 4:51</text><text x="${x(sunset)+6}" y="${base-8}" text-anchor="start">Sunset 6:26</text>`;
+  tariff.forEach(([a,b,n,c]) => { s += `<rect x="${x(a)+1}" y="${base+30}" width="${x(b)-x(a)-2}" height="22" rx="5" fill="${c}" opacity=".9"/><text x="${(x(a)+x(b))/2}" y="${base+45.5}" text-anchor="middle" style="fill:#fff;font-weight:700;font-size:12.5px">${n}</text>`; });
+  // all-day events across the top
+  s += `<rect x="0" y="0" width="${W}" height="24" rx="6" fill="rgba(255,255,255,.08)"/><text x="10" y="16.5" class="lbl" style="font-size:13px">All day · Day off work · Working day</text>`;
+  // timed event
+  const ea = x(17), eb = x(17.75);
+  s += `<rect x="${ea}" y="${top+22}" width="${Math.max(eb-ea, 8)}" height="${base-top-22}" fill="rgba(255,255,255,.14)" rx="4"/><text x="${eb+8}" y="${top+40}" class="ev">Summer Sixes</text><text x="${eb+8}" y="${top+58}">5:00 – 5:45 pm</text>`;
+  // now
+  s += `<line x1="${x(nowH)}" x2="${x(nowH)}" y1="${top-10}" y2="${base+4}" stroke="var(--now)" stroke-width="2.5"/><circle cx="${x(nowH)}" cy="${y(kw(nowH))}" r="7" fill="var(--sun)" stroke="var(--deep)" stroke-width="3"/>`;
+  s += `<rect x="${x(nowH)+10}" y="${y(kw(nowH))-30}" width="92" height="24" rx="6" fill="var(--now)"/><text x="${x(nowH)+56}" y="${y(kw(nowH))-13.5}" text-anchor="middle" style="fill:#fff;font-weight:700">Solar ${H.energy.solar} kW</text>`;
+  $('rib').innerHTML = s;
+})();
+
+$('house').innerHTML = `<div class="h">${ic('home',18,2)}House <em>Secure · 2 rooms active</em></div>
+ <div class="row">${ic('shield',22)}<div><b>Home Alarm</b><br><span>${H.security.alarm}</span></div><div class="seg" data-seg><button class="on">Off</button><button>Home</button><button>Away</button></div></div>
+ <div class="row">${ic('garage',22)}<div><b>Garage door</b> <span>· ${H.security.garage}</span></div><button class="pill">Open</button></div>
+ <div class="row">${ic('lock',22)}<div><b>Front door</b> <span>· ${H.security.frontSub}</span></div><button class="pill">Unlock</button></div>` +
+ H.rooms.map(r => `<div class="row ${r.busy?'hot':''}">${ic(r.icon,22)}<div><b>${r.name}</b> <span>· ${r.sub}</span></div>${ic('chev',18)}</div>`).join('');
+$('qa').innerHTML = H.quick.map(q => `<button>${ic(q.icon,24)}${q.name}</button>`).join('');
+$('tv').innerHTML = `<div><b>TV · ${H.tv.state}</b><span>${H.tv.src} · Media room</span></div><div class="ctl"><button aria-label="Power">${ic('power',20)}</button><button aria-label="Previous">${ic('prev',20)}</button><button class="pri" aria-label="Pause">${ic('pause',20)}</button><button aria-label="Next">${ic('next',20)}</button></div><div class="prog"><i></i></div>`;
+$('ac').innerHTML = `${ic('fan',26)}<div><b>Aircon</b><span>${H.ac.state} · inside ${H.ac.inside}°</span></div><div class="set"><button class="pw">Turn on</button><button aria-label="Cooler">−</button><output>${H.ac.set}°</output><button aria-label="Warmer">+</button></div>`;
+const lightsHTML = () => { const n = H.lights.filter(l=>l.on).length; return `<div class="h">${ic('bulb',18,2)}Lights <em>${n} on</em></div>` + H.lights.map((l,i) => `<button class="lt ${l.on?'on':''}" data-i="${i}">${ic(l.icon,22)}<div><b>${l.name}</b><small>${l.on?l.lvl+'%':'Off'}</small></div></button>`).join(''); };
+$('lights').innerHTML = lightsHTML();
+$('lights').addEventListener('click', e => { const b = e.target.closest('.lt'); if(!b) return; const l = H.lights[b.dataset.i]; l.on=!l.on; l.lvl=l.lvl||100; $('lights').innerHTML = lightsHTML(); const n=H.lights.filter(l=>l.on).length, bd=document.querySelector('.tab .bd'); bd.textContent=n; bd.style.display=n?'':'none'; });
+const E = H.energy;
+$('en').innerHTML = `<div class="hd"><div class="h">${ic('zap',18,2)}Energy</div><span class="tariff">${E.period} · $${E.rate}/kWh</span></div>
+ <div class="kpi"><div><b>$${E.today}</b><span>Today</span></div><div class="g"><b>$${E.sold}</b><span>Sold</span></div><div><b>$${E.bill}</b><span>Bill to date</span></div><div><b>$${E.est}</b><span>Est. bill</span></div></div>
+ <div class="live"><div class="s">${ic('sun',22)}<span><b>${E.solar} kW</b>Solar</span></div><div>${ic('home',22)}<span><b>${E.home} kW</b>Home</span></div><div class="x">${ic('grid2',22)}<span><b>${E.grid} kW</b>Exporting</span></div></div>
+ <div class="cars">${H.cars.map((c,i)=>`<div class="car">${ic('car',22)}<div><b>${c.name}</b><span>${c.sub} · ${E.evs[i?0:1][1].toLowerCase()}</span></div><span class="pct">${c.pct}%</span></div>`).join('')}</div>`;
+</script>
+</body></html>
