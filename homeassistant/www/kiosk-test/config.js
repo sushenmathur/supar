@@ -1,6 +1,6 @@
 // Page version. Bumped by tools/kiosk-test/bump-version.mjs, which also
 // rewrites the matching ?v= query on every module import.
-export const VERSION = '1';
+export const VERSION = '2';
 
 // Lovelace dashboards to read entities from, by url_path (null = default dashboard).
 // 'dashboard-hub' is inferred from the navigation paths in homeassistant/dashboard/master.yaml

@@ -1,8 +1,8 @@
 // Tile rendering and controls. Each tile is built once and then updated in place.
-import { CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=1';
+import { CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=2';
 import {
   domainOf, isUnavailable, binarySensorText, stepValue, climateStep, redact, isLocalImage,
-} from './entities.js?v=1';
+} from './entities.js?v=2';
 
 // ---- Icons: one small inline SVG per domain ----
 
@@ -24,6 +24,7 @@ const ICON_PATHS = {
   binary_sensor: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   camera: '<path d="M3 7h4l2-3h6l2 3h4v13H3z"/><circle cx="12" cy="13" r="4"/>',
   person: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  area: '<path d="M3 11 12 4l9 7"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/>',
   alarm_control_panel: '<path d="m12 2 8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/>',
   default: '<circle cx="12" cy="12" r="9"/>',
 };
@@ -37,6 +38,23 @@ export function icon(domain) {
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
 }
 
+// Control glyphs as SVG (Unicode symbols such as ⏭ render as emoji on Android).
+const GLYPHS = {
+  up: '<path d="m6 15 6-6 6 6"/>',
+  down: '<path d="m6 9 6 6 6-6"/>',
+  stop: '<rect x="7" y="7" width="10" height="10" rx="1.5"/>',
+  play: '<path d="M8 5.5v13l10-6.5z"/>',
+  pause: '<path d="M8.5 5.5v13M15.5 5.5v13"/>',
+  next: '<path d="M6 5.5v13l9-6.5zM18 5.5v13"/>',
+  minus: '<path d="M6 12h12"/>',
+  plus: '<path d="M12 6v12M6 12h12"/>',
+};
+const glyph = (name) => `<svg class="glyph" viewBox="0 0 24 24" aria-hidden="true">${GLYPHS[name]}</svg>`;
+
+// Domains whose tile toggles on tap, like the dashboard's glass_toggle tiles.
+export const TOGGLE_DOMAINS = new Set(['light', 'switch', 'fan', 'input_boolean', 'automation']);
+const LONG_PRESS_MS = 500;
+
 // ---- Small DOM helpers ----
 
 function el(tag, className, text) {
@@ -46,8 +64,10 @@ function el(tag, className, text) {
   return node;
 }
 
+/** A control button. `label` is text, or `{glyph}` for an SVG glyph (then `aria` names it). */
 function button(label, onTap, aria) {
-  const b = el('button', 'ctl', label);
+  const b = el('button', 'ctl');
+  if (typeof label === 'string') b.textContent = label; else b.innerHTML = glyph(label.glyph);
   b.type = 'button';
   if (aria) b.setAttribute('aria-label', aria);
   b.addEventListener('click', (e) => { e.stopPropagation(); onTap(b); });
@@ -63,7 +83,7 @@ function confirmed(action, needsConfirm = () => true) {
       disarm(b);
       return action();
     }
-    b.dataset.label = b.textContent;
+    b.dataset.label = b.innerHTML;
     b.textContent = 'Tap again';
     b.classList.add('armed');
     b.dataset.armed = String(setTimeout(() => disarm(b), CONFIRM_WINDOW_MS));
@@ -73,7 +93,7 @@ function confirmed(action, needsConfirm = () => true) {
 function disarm(b) {
   delete b.dataset.armed;
   b.classList.remove('armed');
-  if (b.dataset.label !== undefined) b.textContent = b.dataset.label;
+  if (b.dataset.label !== undefined) b.innerHTML = b.dataset.label;
 }
 
 const name = (s, id) => s?.attributes?.friendly_name || id;
@@ -130,43 +150,68 @@ export function createTile(entityId, ctx) {
 
   const body = el('button', 'tile-body');
   body.type = 'button';
-  body.innerHTML = icon(domain);
+  const head = el('span', 'tile-head');
+  head.innerHTML = `<span class="well">${icon(domain)}</span>`;
+  const text = el('span', 'tile-text');
   const title = el('span', 'tile-name', entityId);
   const line = el('span', 'tile-state');
-  body.append(title, line);
-  body.addEventListener('click', () => ctx.openSheet(entityId));
+  text.append(title, line);
+  body.append(head, text);
   root.append(body);
 
   let state = null;
   const call = (svc, data = {}) => ctx.callService(svc.split('.')[0], svc.split('.')[1], { entity_id: entityId, ...data });
+  const toggles = TOGGLE_DOMAINS.has(domain);
+
+  // Tap: toggle (toggle domains) or open details. Hold: always open details.
+  let holdTimer = 0;
+  let held = false;
+  body.addEventListener('pointerdown', () => {
+    held = false;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => { held = true; ctx.openSheet(entityId); }, LONG_PRESS_MS);
+  });
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) body.addEventListener(ev, () => clearTimeout(holdTimer));
+  body.addEventListener('contextmenu', (e) => e.preventDefault());
+  body.addEventListener('click', () => {
+    if (held) { held = false; return; }
+    if (!toggles) return ctx.openSheet(entityId);
+    if (!isUnavailable(state)) call(`${domain}.toggle`);
+  });
+  if (toggles) {
+    root.classList.add('toggles');
+    head.append(el('span', 'switch'));
+  }
   const controls = el('div', 'tile-controls');
   const controlButtons = [];
   const add = (b) => { controlButtons.push(b); controls.append(b); return b; };
   let refresh = () => {};
 
   switch (domain) {
-    case 'light': case 'switch': case 'fan': case 'input_boolean': case 'automation': {
-      const t = add(button('', () => call(`${domain}.toggle`)));
-      t.classList.add('toggle');
+    case 'light': case 'switch': case 'fan': case 'input_boolean': case 'automation':
       refresh = (s) => {
         const on = s?.state === 'on';
-        t.textContent = on ? 'On' : 'Off';
-        t.setAttribute('aria-pressed', String(on));
+        body.setAttribute('aria-pressed', String(on));
         root.classList.toggle('on', on);
       };
       break;
-    }
     case 'cover': {
       const guarded = () => ['garage', 'gate'].includes(state?.attributes.device_class);
-      add(button('▲', confirmed(() => call('cover.open_cover'), guarded), 'Open'));
-      add(button('■', () => call('cover.stop_cover'), 'Stop'));
-      add(button('▼', confirmed(() => call('cover.close_cover'), guarded), 'Close'));
+      add(button({ glyph: 'up' }, confirmed(() => call('cover.open_cover'), guarded), 'Open'));
+      add(button({ glyph: 'stop' }, () => call('cover.stop_cover'), 'Stop'));
+      add(button({ glyph: 'down' }, confirmed(() => call('cover.close_cover'), guarded), 'Close'));
+      refresh = (s) => {
+        // Open garage doors and gates read as a warning; other open covers just as active.
+        const open = ['open', 'opening'].includes(s?.state);
+        root.classList.toggle('warn', open && guarded());
+        root.classList.toggle('on', open && !guarded());
+      };
       break;
     }
     case 'lock':
       add(button('Lock', () => call('lock.lock')));
       add(button('Unlock', confirmed(() => call('lock.unlock'))));
-      refresh = (s) => root.classList.toggle('on', s?.state === 'unlocked');
+      refresh = (s) => root.classList.toggle('warn', s?.state === 'unlocked');
       break;
     case 'climate': {
       const stepper = numberStepper({
@@ -203,12 +248,17 @@ export function createTile(entityId, ctx) {
       const art = el('img', 'art');
       art.alt = '';
       art.hidden = true;
-      body.prepend(art);
-      const pp = add(button('▶', () => call('media_player.media_play_pause'), 'Play or pause'));
-      add(button('⏭', () => call('media_player.media_next_track'), 'Next'));
+      head.querySelector('.well').append(art);
+      const pp = add(button({ glyph: 'play' }, () => call('media_player.media_play_pause'), 'Play or pause'));
+      add(button({ glyph: 'next' }, () => call('media_player.media_next_track'), 'Next'));
       let lastPicture = null;
       refresh = (s) => {
-        pp.textContent = s?.state === 'playing' ? '❚❚' : '▶';
+        const playing = s?.state === 'playing';
+        if (pp.dataset.playing !== String(playing)) {
+          pp.dataset.playing = String(playing);
+          pp.innerHTML = glyph(playing ? 'pause' : 'play');
+        }
+        root.classList.toggle('on', playing);
         const pic = s?.attributes.entity_picture;
         if (pic !== lastPicture) {
           lastPicture = pic;
@@ -225,6 +275,7 @@ export function createTile(entityId, ctx) {
     case 'camera': {
       const img = el('img', 'snapshot');
       img.alt = '';
+      root.classList.add('tile-camera');
       body.prepend(img);
       ctx.cameras.observe(img, entityId);
       break;
@@ -263,7 +314,7 @@ function numberStepper({ read, step, min, max, unit, send }) {
     clearTimeout(timer);
     timer = setTimeout(() => { const v = pending; pending = null; send(v); }, 600);
   };
-  const buttons = [button('−', nudge(-1), 'Decrease'), button('+', nudge(1), 'Increase')];
+  const buttons = [button({ glyph: 'minus' }, nudge(-1), 'Decrease'), button({ glyph: 'plus' }, nudge(1), 'Increase')];
   return {
     value,
     buttons,

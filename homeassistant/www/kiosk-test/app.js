@@ -1,12 +1,12 @@
 // Boot, data loading, routing and layout.
-import { VERSION, SOURCE_DASHBOARDS } from './config.js?v=1';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=1';
+import { VERSION, SOURCE_DASHBOARDS } from './config.js?v=2';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=2';
 import {
   parseDashParam, isStrategyDashboard, extractEntities, mergeExtractions, fallbackEntities,
-  groupByArea, groupByDomain, applyEntityDiff,
-} from './entities.js?v=1';
-import { createTile, Sheet, CameraRefresher } from './tiles.js?v=1';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=1';
+  groupByArea, groupByDomain, applyEntityDiff, domainOf, UNASSIGNED,
+} from './entities.js?v=2';
+import { createTile, Sheet, CameraRefresher, TOGGLE_DOMAINS, icon } from './tiles.js?v=2';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=2';
 
 // One line per document load, so reloads can be told apart from hash switches.
 console.info(`kiosk-test loaded v${VERSION}`);
@@ -140,6 +140,17 @@ async function load() {
 
 // ---- Layout ----
 
+// Entities counted in "N of M on" (automations are left out: "on" only means enabled).
+const COUNTED = new Set([...TOGGLE_DOMAINS].filter((d) => d !== 'automation'));
+const panels = [];
+
+const make = (tag, className, text) => {
+  const n = document.createElement(tag);
+  if (className) n.className = className;
+  if (text !== undefined) n.textContent = text;
+  return n;
+};
+
 function render(groups, ctx) {
   const chips = $('#chips');
   const sections = $('#sections');
@@ -147,21 +158,59 @@ function render(groups, ctx) {
   sections.replaceChildren();
   for (const g of groups) {
     chips.append(chip(g.id, g.name));
-    const section = document.createElement('section');
+    const section = make('section', 'panel');
     section.dataset.area = g.id;
-    const h = document.createElement('h2');
-    h.textContent = g.name;
-    const grid = document.createElement('div');
-    grid.className = 'grid';
-    for (const id of g.entityIds) {
+
+    const head = make('header', 'panel-head');
+    const well = make('span', 'well');
+    well.innerHTML = icon(g.id === UNASSIGNED ? 'default' : 'area');
+    const titles = make('div', 'panel-titles');
+    const count = make('p', 'panel-count');
+    titles.append(make('h2', '', g.name), count);
+    head.append(well, titles);
+
+    const grid = make('div', 'grid');
+    g.entityIds.forEach((id, i) => {
       const tile = createTile(id, ctx);
+      tile.el.style.setProperty('--i', String(Math.min(i, 12)));
       tiles.set(id, tile);
       tile.update(states.get(id) ?? null);
       grid.append(tile.el);
-    }
-    section.append(h, grid);
+    });
+    section.append(head, grid);
     sections.append(section);
+    panels.push({ group: g, count, lights: g.entityIds.filter((id) => domainOf(id) === 'light') });
   }
+  updateCounts();
+}
+
+const isOn = (id) => states.get(id)?.state === 'on';
+
+/** Refreshes the panel subtitles and the lights summary bar. */
+function updateCounts() {
+  let lightsOn = 0;
+  let lightsTotal = 0;
+  const pills = [];
+  for (const { group, count, lights } of panels) {
+    const counted = group.entityIds.filter((id) => COUNTED.has(domainOf(id)));
+    const on = counted.filter(isOn).length;
+    count.textContent = counted.length
+      ? (on ? `${on} of ${counted.length} on` : 'All off')
+      : `${group.entityIds.length} ${group.entityIds.length === 1 ? 'item' : 'items'}`;
+    if (lights.length) {
+      const lit = lights.filter(isOn).length;
+      lightsOn += lit;
+      lightsTotal += lights.length;
+      const pill = make('a', `pill${lit ? ' lit' : ''}`, `${group.name} ${lit}/${lights.length}`);
+      pill.href = `#${encodeURIComponent(group.id)}`;
+      pills.push(pill);
+    }
+  }
+  const summary = $('#summary');
+  summary.hidden = lightsTotal === 0;
+  $('#lights-on').textContent = String(lightsOn);
+  $('#lights-total').textContent = `of ${lightsTotal} ${lightsTotal === 1 ? 'light' : 'lights'} on`;
+  $('#summary-pills').replaceChildren(...pills);
 }
 
 function chip(id, label) {
@@ -189,6 +238,7 @@ function route() {
     if (active) c.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
   $('#not-found').hidden = found;
+  $('#sections').dataset.view = target === 'all' ? 'all' : 'one';
   window.scrollTo(0, 0);
 }
 
@@ -204,10 +254,13 @@ async function subscribe(entityIds, sheet) {
   await conn.subscribeMessage((msg) => {
     const changed = applyEntityDiff(states, msg, replace);
     replace = false;
+    let counts = false;
     for (const id of changed) {
       tiles.get(id)?.update(states.get(id) ?? null);
       sheet.update(id);
+      counts ||= COUNTED.has(domainOf(id));
     }
+    if (counts) updateCounts();
   }, { type: 'subscribe_entities', entity_ids: entityIds });
 }
 

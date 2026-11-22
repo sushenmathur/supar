@@ -14,7 +14,7 @@ It's a test. Nothing else in this repo or in Home Assistant changes, and the pag
 | `homeassistant/www/kiosk-test/entities.js` | Pure logic (no DOM): entity extraction, grouping, state diffs, redaction. Also imported by Node |
 | `homeassistant/www/kiosk-test/tiles.js` | Tiles, controls, confirmation taps, details sheet, camera refresh |
 | `homeassistant/www/kiosk-test/config.js` | `VERSION`, `SOURCE_DASHBOARDS`, timings |
-| `homeassistant/www/kiosk-test/styles.css` | Light/dark colours via `prefers-color-scheme`, KS insets |
+| `homeassistant/www/kiosk-test/styles.css` | Glass theme styling (light/dark via `prefers-color-scheme`), KS insets |
 | `homeassistant/www/kiosk-test/vendor/haws.mjs` | home-assistant-js-websocket, vendored (see below) |
 | `tests/kiosk-test/` | `node --test tests/kiosk-test`, with synthetic fixtures (not the real dashboard) |
 | `tools/kiosk-test/smoke.mjs` | Live read-only check against HA (needs `HA_URL` and `HA_TOKEN`) |
@@ -70,7 +70,8 @@ No HA URL or token is stored anywhere in the page.
 
 - One `subscribe_entities` subscription filtered to the page's entity IDs. Each message is applied as a diff, and only the tiles whose entities changed are updated.
 - Camera snapshots refresh every 10 s, only for tiles on screen (IntersectionObserver). They pause while the KS screensaver is active or the page is hidden, and re-read `entity_picture` each time because its token rotates. Images are only loaded from HA itself. An external `entity_picture` (e.g. remotely accessible media artwork) is skipped.
-- The details sheet (tap a tile body) shows the friendly name, state, relative `last_changed` and attributes. It redacts any attribute or URL query parameter named `token`, `access_token`, `api_key`, `key` or `password`. In KS it calls `setInteractionActive(true)` while the sheet is open and `false` when it closes.
+- **Tap and hold, as on the dashboard:** tapping a light, switch, fan, input boolean or automation tile toggles it. Tapping any other tile opens the details sheet. Holding any tile for half a second opens the details sheet.
+- The details sheet shows the friendly name, state, relative `last_changed` and attributes. It redacts any attribute or URL query parameter named `token`, `access_token`, `api_key`, `key` or `password`. In KS it calls `setInteractionActive(true)` while the sheet is open and `false` when it closes.
 - Unlocking a lock, and opening or closing a cover with device class `garage` or `gate`, needs a second tap within 3 s (the button shows "Tap again").
 - The console gets one `kiosk-test loaded v<version>` line per document load, a summary line (entity and group counts, connection type) and short error codes. Attributes and URLs are never logged.
 
@@ -85,6 +86,23 @@ npm i home-assistant-js-websocket@9.8.1 esbuild@0.24.2
 ```bash
 npx esbuild node_modules/home-assistant-js-websocket/dist/index.js --bundle --format=esm --minify --legal-comments=none --banner:js="/* home-assistant-js-websocket 9.8.1 (Apache-2.0) bundled with esbuild 0.24.2. Do not edit; see docs/kiosk-test.md. */" --outfile=homeassistant/www/kiosk-test/vendor/haws.mjs
 ```
+
+## Styling
+
+The page copies the look of the SuPar Home dashboard and the Glass theme (`homeassistant/themes/glass.yaml`):
+
+- **Background:** the theme's light and dark gradient wallpaper, on a fixed layer.
+- **Area panels:** frosted glass (radius 30), each with a 52 px icon well, the area name, and "N of M on".
+- **Tiles:** radius 22 with 48 px icon wells. Anything on (a light, a switch, a playing speaker) uses the amber gradient and glow; toggle tiles also get the 52×30 switch.
+- **Warnings:** unlocked locks and open garage doors or gates use the soft red warning fill.
+- **Lights summary bar:** like the Lights view, with "N of M lights on" and a pill per area.
+- **Details sheet:** uses the Glass popup fill and blurred scrim.
+
+The colours are copied from `glass.yaml` into `styles.css`, because a `/local/` page doesn't get HA theme variables. If the theme changes, update both.
+
+To keep the tablet responsive, only the panels, summary bar and banners use `backdrop-filter`; tiles are translucent fills inside an already blurred panel. Entry animations (a short staggered fade-up) are turned off when the system asks for reduced motion.
+
+No fonts are downloaded: the system font stack is used, which is Roboto on the Android tablet, the same as HA's own dashboard.
 
 ## Cache busting
 
@@ -144,7 +162,7 @@ Nothing else was changed.
 ## Out of scope
 
 - Live camera video. Use KS's own **Camera streams** feature.
-- Recreating Bubble Card, Mushroom or button-card visuals, and porting the Bluey card or garage card.
+- Pixel-for-pixel recreation of Bubble Card, Mushroom or button-card cards (the page borrows the Glass look, not the cards themselves), and porting the Bluey card or garage card.
 - History graphs, editing dashboards, setting this page as the kiosk's default dashboard, and changing the kiosk's HA user.
 
 ## Manual test checklist (for Sushen)

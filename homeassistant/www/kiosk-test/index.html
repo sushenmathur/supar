@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <title>SuPar Test</title>
-  <link rel="stylesheet" href="styles.css?v=1">
-  <script type="module" src="app.js?v=1"
+  <link rel="stylesheet" href="styles.css?v=2">
+  <script type="module" src="app.js?v=2"
     onerror="document.querySelector('#message p').textContent = 'This page\'s files did not load. Check that all of www/kiosk-test/ was copied, then reload.'"></script>
 </head>
 <body>
@@ -14,8 +14,13 @@
     <p>Loading…</p>
     <noscript><p>This page needs JavaScript.</p></noscript>
   </div>
+  <div class="wallpaper" aria-hidden="true"></div>
   <div id="app" hidden>
     <nav id="chips" aria-label="Areas"></nav>
+    <section id="summary" class="summary" hidden aria-label="Lights">
+      <p class="summary-count"><span id="lights-on">0</span> <span id="lights-total"></span></p>
+      <div id="summary-pills" class="pills"></div>
+    </section>
     <div id="status" class="status" hidden></div>
     <div id="banners"></div>
     <p id="not-found" class="banner" hidden>No area matches this address. <a href="#all">Show all</a></p>
