@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>SuPar Test</title>
+  <link rel="stylesheet" href="styles.css?v=1">
+  <script type="module" src="app.js?v=1"
+    onerror="document.querySelector('#message p').textContent = 'This page\'s files did not load. Check that all of www/kiosk-test/ was copied, then reload.'"></script>
+</head>
+<body>
+  <div id="message" role="status" aria-live="polite">
+    <p>Loading…</p>
+    <noscript><p>This page needs JavaScript.</p></noscript>
+  </div>
+  <div id="app" hidden>
+    <nav id="chips" aria-label="Areas"></nav>
+    <div id="status" class="status" hidden></div>
+    <div id="banners"></div>
+    <p id="not-found" class="banner" hidden>No area matches this address. <a href="#all">Show all</a></p>
+    <main id="sections"></main>
+  </div>
+  <div id="toast" role="alert" hidden></div>
+</body>
+</html>
