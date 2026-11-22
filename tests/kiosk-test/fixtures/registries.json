@@ -1,0 +1,25 @@
+{
+  "areas": [
+    { "area_id": "kitchen", "name": "Kitchen" },
+    { "area_id": "garage", "name": "Garage" },
+    { "area_id": "lounge", "name": "lounge room" }
+  ],
+  "devices": [
+    { "id": "dev_kitchen_fan", "area_id": "kitchen" },
+    { "id": "dev_garage", "area_id": "garage" },
+    { "id": "dev_orphan", "area_id": null }
+  ],
+  "entities": {
+    "entity_categories": { "0": "config", "1": "diagnostic" },
+    "entities": [
+      { "ei": "light.kitchen_main", "pl": "hue", "ai": "kitchen" },
+      { "ei": "fan.kitchen", "pl": "zha", "di": "dev_kitchen_fan" },
+      { "ei": "sensor.kitchen_temperature", "pl": "zha", "di": "dev_kitchen_fan", "ai": "lounge" },
+      { "ei": "cover.garage_door", "pl": "ratgdo", "di": "dev_garage" },
+      { "ei": "lock.front_door", "pl": "zwave_js", "di": "dev_orphan" },
+      { "ei": "climate.lounge", "pl": "daikin", "ai": "lounge" },
+      { "ei": "sensor.unused_hidden", "pl": "template", "hb": true },
+      { "ei": "light.hallway", "pl": "hue", "ai": "deleted_area" }
+    ]
+  }
+}

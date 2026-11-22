@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "description": "Lets `node --test tests/kiosk-test` resolve this folder to its test file.",
+  "main": "entities.test.mjs"
+}

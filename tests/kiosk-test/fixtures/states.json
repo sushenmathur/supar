@@ -1,0 +1,7 @@
+[
+  "light.kitchen_main", "light.hallway", "fan.kitchen", "sensor.kitchen_temperature",
+  "binary_sensor.kitchen_motion", "cover.garage_door", "lock.front_door", "sensor.front_door_battery",
+  "sensor.outdoor_temperature", "sensor.dotted_power", "sensor.living_humidity", "switch.coffee_machine",
+  "scene.movie_night", "climate.lounge", "media_player.lounge_speaker",
+  "sensor.unused_hidden", "camera.driveway"
+]
