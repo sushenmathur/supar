@@ -24,7 +24,6 @@
   --dabu: #2f6a3e;
   --pass-blend: multiply;
   --sel: rgba(240, 174, 46, 0.45);
-  --buti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='16' viewBox='0 0 22 16'%3E%3Cg fill='%231b2559'%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(0 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(72 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(144 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(216 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(288 10 8)'/%3E%3C/g%3E%3Ccircle cx='10' cy='8' r='1.7' fill='%23f7f9fd'/%3E%3Ccircle cx='20.5' cy='8' r='1' fill='%231b2559'/%3E%3C/svg%3E");
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -32,14 +31,12 @@
     --ground: #0f1636; --cloth: #172150; --ink: #eef1fb; --ink-2: #b4bde2; --key: rgba(226, 231, 250, 0.34);
     --well: #e3e8fb; --well-ink: #172150; --turmeric: #f2b53f; --madder: #c0402e; --madder-text: #ff9a85; --dabu: #93d0a2;
     --pass-blend: normal; --weather-ic: #f2b53f;
-    --buti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='16' viewBox='0 0 22 16'%3E%3Cg fill='%23b4bde2'%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(0 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(72 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(144 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(216 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(288 10 8)'/%3E%3C/g%3E%3Ccircle cx='10' cy='8' r='1.7' fill='%23172150'/%3E%3Ccircle cx='20.5' cy='8' r='1' fill='%23b4bde2'/%3E%3C/svg%3E");
   }
 }
 :root[data-theme="dark"] {
   --ground: #0f1636; --cloth: #172150; --ink: #eef1fb; --ink-2: #b4bde2; --key: rgba(226, 231, 250, 0.34);
   --well: #e3e8fb; --well-ink: #172150; --turmeric: #f2b53f; --madder: #c0402e; --madder-text: #ff9a85; --dabu: #93d0a2;
   --pass-blend: normal; --weather-ic: #f2b53f;
-  --buti: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='16' viewBox='0 0 22 16'%3E%3Cg fill='%23b4bde2'%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(0 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(72 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(144 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(216 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(288 10 8)'/%3E%3C/g%3E%3Ccircle cx='10' cy='8' r='1.7' fill='%23172150'/%3E%3Ccircle cx='20.5' cy='8' r='1' fill='%23b4bde2'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; margin: 0; }
@@ -87,8 +84,6 @@ button:disabled { cursor: default; }
 .well { width: 40px; height: 40px; border-radius: 5px 4px 6px 4px; display: grid; place-items: center; flex: none; background: var(--well); color: var(--well-ink); }
 .b.alert .well { background: rgba(255, 255, 255, 0.92); color: var(--madder); }
 
-/* Printed border repeat (buti), used as the tab bar's lower edge and the clock card's head. */
-.buti { height: 16px; background: var(--buti) repeat-x left center / 22px 16px; }
 
 .sub { display: block; color: var(--ink-2); font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .name { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -110,8 +105,7 @@ button:disabled { cursor: default; }
 
 /* ---- Day column ---- */
 .day { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; gap: 12px; min-height: 0; }
-.time { padding: 0 20px 14px; overflow: hidden; }
-.time .buti { margin: 0 -20px 12px; }
+.time { padding: 16px 20px 14px; overflow: hidden; }
 .hello { color: var(--ink-2); font-weight: 600; font-size: 15px; }
 .clock { font-size: 88px; font-weight: 600; letter-spacing: -0.03em; line-height: .9; margin-top: 10px; }
 .clock small { font-size: 24px; letter-spacing: 0; margin-left: 4px; color: var(--ink-2); font-weight: 600; }

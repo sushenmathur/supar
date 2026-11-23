@@ -295,7 +295,7 @@ None. The system is flat ink on cloth: no box shadows, no blur, no gradients on 
 
 Square-ish and hand-made. Blocks round to unequal corners (6, 5, 7, 5px clockwise from top left); icon wells and monograms to 5, 4, 6, 4px; the sheet to 7px; controls (tabs, buttons, segments, fields) to an even 5px; calendar date stamps and count badges to 4px; meters (battery, self-powered) to 2px. Outlines use the key-line weighting (2px top and left, 1.5px right and bottom) on blocks, date stamps, segments, fields and the sheet; internal rules are a single 1.5px key line.
 
-The **buti** is the system's one ornament: a 22 by 16px repeat of a five-petal printed flower with a small dot between repeats, run as a 16px border strip. By day the petals are solid Indigo Ink with a Cloth centre; by night they are Faded Indigo (`night-faded`) with a Night Cloth centre. It is never printed in a state colour. It heads the clock block and nowhere else (the tab bar dropped it at the owner's request).
+The **buti** is the system's one ornament: a 22 by 16px repeat of a five-petal printed flower with a small dot between repeats, run as a 16px border strip. By day the petals are solid Indigo Ink with a Cloth centre; by night they are Faded Indigo (`night-faded`) with a Night Cloth centre. It is never printed in a state colour. It is retired: the owner removed it from the tab bar and the clock block, so the system now has no ornament. The flowers are kept here only as a record.
 
 **The Uneven Corner Rule.** Block and well corners are deliberately unequal. Do not "fix" them to a uniform radius.
 
@@ -356,6 +356,6 @@ The toast is a madder bar with white 600 text, bottom centre, 6px corners. The f
 - **Don't** put white text on turmeric, or fill a block with dabu green.
 - **Don't** add a third state colour or a second accent; the dyes carry meaning, not decoration.
 - **Don't** use the monogram or bin-lid colours anywhere but the monogram and the lid swatches.
-- **Don't** print the buti anywhere but the head of the clock block; it is an edge, not a background.
+- **Don't** add ornament (the buti strip was tried and removed); the print reads through the colour passes, key lines and carved wells alone.
 - **Don't** even out the block corners or the key-line weights.
 - **Don't** introduce a second typeface or weights below 500.
