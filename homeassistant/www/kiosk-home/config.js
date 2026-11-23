@@ -1,0 +1,129 @@
+// Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home
+export const VERSION = '1';
+
+// Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
+export const E = {
+  weather: 'weather.north_lakes_weather',
+  sun: 'sun.sun',
+  quietHour: 'input_boolean.quiet_hour',
+  snooze: 'input_boolean.alert_banner_snooze',
+  keepGarage: 'input_boolean.keep_garage_door_open',
+  keepSide: 'input_boolean.keep_side_door_open',
+  garageContact: 'binary_sensor.garage_door_sensor_contact',
+  sideContact: 'binary_sensor.side_door_contact',
+  screenContact: 'binary_sensor.crimsafe_door_contact',
+  frontContact: 'binary_sensor.front_door_contact',
+  patioContact: 'binary_sensor.patio_door_contact',
+  laundryContact: 'binary_sensor.laundrydoorsensor_contact',
+  hallwayContact: 'binary_sensor.hallwaydoorsensor_contact',
+  sideBattery: 'sensor.side_battery',
+  robbieDock: 'sensor.robbie_dock_dock_error',
+  robbie: 'vacuum.robbie',
+  goodNight: 'scene.good_night',
+  festive: 'switch.festive_lights',
+  announceMessage: 'input_text.announce_message',
+  announceSpeaker: 'input_select.announce_speaker',
+  announceVolume: 'input_number.announce_volume',
+  garageCover: 'cover.garage_door_v2',
+  garageLight: 'light.garage_light',
+  garageState: 'input_select.garage_door_state',
+  frontDoor: 'input_boolean.front_door',
+  alarm: 'alarm_control_panel.home_alarm',
+  tv: 'media_player.tv',
+  aircon: 'climate.living_room',
+  calendar: 'calendar.supar_family',
+  camera: 'camera.front_door_snapshot_2',
+  cameraLive: 'camera.front_door_live_view_2',
+  washer: 'sensor.washer_current_status',
+  washerEnd: 'sensor.washer_remaining_time',
+  dryer: 'sensor.dryer_current_status',
+  dryerEnd: 'sensor.dryer_remaining_time',
+  tariff: 'select.grid_import_tariff',
+  rate: 'sensor.current_energy_rate',
+  costToday: 'sensor.daily_import_cost',
+  solarCredit: 'sensor.daily_solar_credit',
+  billToDate: 'sensor.electricity_bill_to_date',
+  billEstimate: 'sensor.electricity_estimated_bill',
+  solarPower: 'sensor.sh50rs_a21c2106894_mppt_total_power',
+  importPower: 'sensor.sh50rs_a21c2106894_purchased_power',
+  exportPower: 'sensor.sh50rs_a21c2106894_total_export_active_power',
+  teslaCharger: 'sensor.sonic_charger_power',
+  kiaCharger: 'sensor.kia_charger_power',
+  shanaya: 'binary_sensor.shanaya_room_occupancy_status',
+  samar: 'binary_sensor.samar_room_occupancy_new',
+  bedroomTv: 'switch.bedroom_tv',
+};
+
+export const PEOPLE = [
+  { id: 'person.sushenmathur', battery: 'sensor.sushen_iphone_battery_level', charge: 'sensor.sushen_iphone_battery_state', colour: '#3a4aa6' },
+  { id: 'person.paro', battery: 'sensor.paro_phone_battery', charge: 'sensor.paro_iphone_battery_state', colour: '#b4362b' },
+];
+
+export const CARS = [
+  { name: 'Sorento', tracker: 'device_tracker.kia_gps_location', battery: 'input_number.kia_battery_estimate', chargingPower: 'sensor.kia_charger_power' },
+  { name: 'Bluey', tracker: 'device_tracker.tesla', battery: 'sensor.sonic_battery', chargingFlag: 'binary_sensor.sonic_charging' },
+];
+
+// Favourite lights (the six dynamic slots) and the 18-light pool they draw from.
+export const FAV = ['light.kitchen_pendants', 'light.dining_light', 'light.sonoff_1000dbd8b7', 'light.tall_lamp', 'light.corridor_light', 'light.hallway_light'];
+export const LIGHT_POOL = [...FAV, 'light.kitchenled', 'light.kitchen_downlights', 'light.aarlo_samar_cam', 'switch.sonoff_1000e54df1',
+  'light.garage_light', 'light.driveway_light', 'switch.sonoff_1000905c71', 'switch.sonoff_100053e676',
+  'switch.patio_lights', 'light.backyard_light', 'light.laundry_light', 'switch.festive_lights'];
+export const LIGHT_META = {
+  'light.kitchen_pendants': ['Kitchen Pendants', 'pendant'],
+  'light.dining_light': ['Dining', 'pendant'],
+  'light.sonoff_1000dbd8b7': ['Media Room', 'downlight'],
+  'light.tall_lamp': ['Tall Lamp', 'lamp'],
+  'light.corridor_light': ['Corridor', 'downlight'],
+  'light.hallway_light': ['Hallway', 'downlight'],
+  'light.kitchenled': ['Kitchen Bench', 'downlight'],
+  'light.kitchen_downlights': ['Kitchen Downlights', 'downlight'],
+  'light.aarlo_samar_cam': ['Samar Night Light', 'downlight'],
+  'switch.sonoff_1000e54df1': [null, 'downlight'],
+  'light.garage_light': ['Garage Downlight', 'downlight'],
+  'light.driveway_light': ['Driveway Floodlight', 'spot'],
+  'switch.sonoff_1000905c71': ['Door Downlight', 'downlight'],
+  'switch.sonoff_100053e676': ['Outdoor Lights', 'bulb'],
+  'switch.patio_lights': ['Patio Lights', 'sparkle'],
+  'light.backyard_light': ['Backyard Spotlight', 'spot'],
+  'light.laundry_light': ['Laundry Spotlight', 'spot'],
+  'switch.festive_lights': ['Festive Light', 'sparkle'],
+};
+
+export const ROOM_LIGHTS = {
+  living: ['light.dining_light', 'light.kitchen_pendants', 'light.kitchen_downlights', 'light.kitchenled', 'light.sonoff_1000dbd8b7', 'light.tall_lamp'],
+  kids: ['light.aarlo_samar_cam', 'light.tall_lamp'],
+  outdoor: ['switch.patio_lights', 'light.backyard_light', 'light.driveway_light', 'light.laundry_light', 'switch.sonoff_100053e676', 'switch.sonoff_1000905c71'],
+};
+
+export const SECURITY_CONTACTS = ['binary_sensor.garage_door_sensor_contact', 'binary_sensor.front_door_contact', 'binary_sensor.hallwaydoorsensor_contact',
+  'binary_sensor.patio_door_contact', 'binary_sensor.side_door_contact', 'binary_sensor.laundrydoorsensor_contact'];
+
+export const MEDIA = {
+  skip: ['media_player.browser_', 'media_player.aarlo_', 'media_player.home_speakers_2', 'media_player.bluey_media_player', 'media_player.stremio_mathur_sushen_gmail_com_stremio'],
+  names: { 'media_player.hubs_bedroom_apple_tv': 'Bedroom Apple TV', 'media_player.media_apple_tv': 'Media Apple TV', 'media_player.tv': 'TV' },
+  switches: { 'switch.bedroom_tv': { name: 'Bedroom TV', player: 'media_player.hubs_bedroom_apple_tv' } },
+};
+
+export const BINS = [
+  { id: 'sensor.general_waste', label: 'General', lid: 'r' },
+  { id: 'sensor.garden_organics', label: 'Garden', lid: 'g' },
+  { id: 'sensor.recycling', label: 'Recycling', lid: 'y' },
+];
+
+export const ROBBIE_ROOMS = [
+  ['button.robbie_kitchen_clean', 'Kitchen'], ['button.robbie_media_clean', 'Media Room'], ['button.robbie_media_kitchen2', 'Media & Kitchen'],
+  ['button.robbie_coffee_station_clean', 'Coffee Station'], ['button.robbie_tiled_area_clean', 'Mop Tiled Area'], ['button.robbie_hallways', 'Hallways'],
+];
+
+// Guest WiFi QR, the same image the dashboard's WiFi popup shows.
+export const WIFI_QR = '/api/image/serve/50750ef2d78e15cc901576e1c9fa2bae/512x512';
+
+// Navigation to the existing Lovelace views (same origin, so Kiosk Satellite keeps them in the kiosk).
+export const NAV = [
+  ['Home', 'home', null], ['Rooms', 'rooms', '/dashboard-hub/living-room'], ['Lights', 'bulb', '/dashboard-hub/lights'],
+  ['Climate', 'thermo', '/dashboard-hub/homeclimate'], ['Security', 'shield', '/dashboard-hub/security'], ['Music', 'music', '/dashboard-hub/music'],
+];
+
+export const CAMERA_REFRESH_MS = 10_000;
+export const CONFIRM_WINDOW_MS = 3_000;

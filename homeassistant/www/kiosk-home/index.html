@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>SuPar Home</title>
+<link rel="stylesheet" href="styles.css?v=1">
+<script type="module" src="app.js?v=1"
+  onerror="document.querySelector('#message p').textContent = 'This page\'s files did not load. Check that all of www/kiosk-home/ was copied, then reload.'"></script>
+</head>
+<body>
+<div id="message" role="status" aria-live="polite"><p>Loading…</p></div>
+
+<div class="stage" id="stage">
+  <nav class="bar b" aria-label="Views">
+    <div class="tabs" id="tabs"><div class="brand">SuPar <span>Home</span></div></div>
+    <div class="buti" aria-hidden="true"></div>
+  </nav>
+
+  <div class="body">
+    <aside class="day">
+      <section class="time b">
+        <div class="buti" aria-hidden="true"></div>
+        <div class="hello" id="hello"></div>
+        <div class="clock num"><span id="clock"></span><small id="ampm"></small></div>
+        <div class="wx" id="wx"></div>
+      </section>
+      <div class="zones">
+        <div class="b"><small>India</small><b class="num" id="india"></b></div>
+        <div class="b"><small>Austin</small><b class="num" id="austin"></b></div>
+      </div>
+      <div class="people" id="people"></div>
+      <section class="cal b" aria-label="Family calendar"><h2>Family calendar</h2><div id="cal"><p class="empty">Loading…</p></div></section>
+      <div class="cars" id="cars"></div>
+    </aside>
+
+    <main class="work">
+      <section class="banner b" id="banner" role="status" aria-live="polite"></section>
+      <section class="row6" id="actions" aria-label="Quick actions"></section>
+      <section class="row6" id="rooms" aria-label="Rooms"></section>
+      <section class="lower">
+        <div class="stack s1">
+          <div class="pair" id="media"></div>
+          <div class="lights b" id="lights"></div>
+        </div>
+        <div class="stack s2" style="grid-template-rows: minmax(0, 1fr) 84px">
+          <section class="energy b" id="energy" aria-label="Energy"></section>
+          <div class="util" id="util"></div>
+        </div>
+        <div class="stack s3">
+          <section class="alarm b" id="alarm" aria-label="Home alarm"></section>
+          <div id="gdoor" style="display:grid"></div>
+          <div id="fdoor" style="display:grid"></div>
+          <figure class="cam b" id="cam"><img alt="Front door camera snapshot" id="camimg" hidden><figcaption class="cap"><span>Front Door</span><small id="camtime"></small></figcaption></figure>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<dialog class="sheet" id="sheet"></dialog>
+<div id="toast" role="alert" hidden></div>
+</body>
+</html>
