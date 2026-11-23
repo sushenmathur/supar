@@ -1,0 +1,38 @@
+<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard background options (no purple)</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:18px 20px 30px;font-family:Roboto,system-ui,sans-serif;background:#10131c;color:#fff}
+h1{font-size:18px;margin:0 0 4px}p.s{font-size:13px;opacity:.75;margin:0 0 14px;max-width:820px}.ctl button{font:inherit;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:99px;padding:6px 14px;cursor:pointer;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pn{border-radius:26px;overflow:hidden;position:relative;min-height:540px;padding:16px;color:var(--tx);background:var(--bg);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.pn h2{font-size:14px;margin:0 0 2px}.pn small{display:block;color:var(--tx2);font-size:12px;margin-bottom:12px}
+.g{background:var(--glass);border:1px solid var(--bd);border-radius:24px;backdrop-filter:blur(18px) saturate(180%);box-shadow:inset 0 1px 0 var(--hi),0 8px 22px rgba(0,0,0,.14)}
+.hello{padding:14px 18px;margin-bottom:12px}.hello div:first-child{font-size:12px;color:var(--tx2);font-weight:600}.hello .t{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.row{display:flex;gap:8px;margin-bottom:12px}.room{flex:1;padding:10px;border-radius:18px;font-size:12.5px;font-weight:700;background:var(--soft);border:1px solid var(--bd)}.room span{display:block;font-weight:500;color:var(--tx2);font-size:11.5px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.tile{border-radius:20px;padding:12px;background:var(--soft);border:1px solid var(--bd);font-size:13px;font-weight:600;min-height:64px;box-shadow:inset 0 1px 0 var(--hi)}.tile.on{background:linear-gradient(145deg,rgba(255,222,140,.95),rgba(255,170,70,.8));color:#2a1700}.tile small{display:block;font-weight:500;opacity:.75;font-size:11.5px}.tile.on small{color:rgba(42,23,0,.82);opacity:1}
+.btns{display:flex;gap:8px}.b{flex:1;height:42px;border-radius:21px;background:var(--soft);border:1px solid var(--bd);display:grid;place-items:center;font-size:12.5px;font-weight:700}
+.energy{padding:12px 16px;margin-top:12px;font-size:12px}.energy b{font-size:15px}
+/* A: soft aurora (teal, sky, mint, peach) */
+.A{--tx:#10263a;--tx2:rgba(16,38,58,.72);--bg:radial-gradient(520px 380px at 8% 6%,rgba(255,190,150,.75),transparent 62%),radial-gradient(520px 400px at 70% 4%,rgba(110,225,235,.8),transparent 62%),radial-gradient(500px 420px at 96% 70%,rgba(120,220,180,.7),transparent 62%),radial-gradient(460px 360px at 10% 98%,rgba(255,225,150,.6),transparent 62%),linear-gradient(160deg,#eefaf8,#e4f3f6);--soft:rgba(255,255,255,.55);--glass:linear-gradient(145deg,rgba(255,255,255,.6),rgba(255,255,255,.25));--bd:rgba(255,255,255,.85);--hi:rgba(255,255,255,.95)}
+.dark .A{--tx:#f2fbfa;--tx2:rgba(242,251,250,.72);--bg:radial-gradient(520px 380px at 8% 6%,rgba(20,120,130,.55),transparent 62%),radial-gradient(520px 400px at 70% 4%,rgba(14,165,160,.4),transparent 62%),radial-gradient(500px 420px at 96% 70%,rgba(16,120,90,.4),transparent 62%),linear-gradient(160deg,#07161c,#0b2229 55%,#08181a);--soft:rgba(255,255,255,.09);--glass:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));--bd:rgba(255,255,255,.24);--hi:rgba(255,255,255,.4)}
+/* B: warm sunset (coral, apricot, gold, rose) */
+.B{--tx:#3a1f14;--tx2:rgba(58,31,20,.72);--bg:radial-gradient(520px 380px at 6% 6%,rgba(255,150,120,.8),transparent 62%),radial-gradient(520px 400px at 72% 4%,rgba(255,205,130,.85),transparent 62%),radial-gradient(500px 420px at 96% 72%,rgba(255,140,150,.6),transparent 62%),radial-gradient(460px 360px at 10% 98%,rgba(255,230,160,.7),transparent 62%),linear-gradient(160deg,#fff4ea,#fbe9de);--soft:rgba(255,255,255,.55);--glass:linear-gradient(145deg,rgba(255,255,255,.6),rgba(255,255,255,.25));--bd:rgba(255,255,255,.85);--hi:rgba(255,255,255,.95)}
+.dark .B{--tx:#fff4ea;--tx2:rgba(255,244,234,.72);--bg:radial-gradient(520px 380px at 6% 6%,rgba(190,80,50,.5),transparent 62%),radial-gradient(520px 400px at 72% 4%,rgba(200,130,40,.4),transparent 62%),radial-gradient(500px 420px at 96% 72%,rgba(170,50,70,.35),transparent 62%),linear-gradient(160deg,#170d0b,#241410 55%,#1a100c);--soft:rgba(255,255,255,.09);--glass:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));--bd:rgba(255,255,255,.24);--hi:rgba(255,255,255,.4)}
+/* C: mist & slate (calm neutral, blue-grey and sage) */
+.C{--tx:#1c2733;--tx2:rgba(28,39,51,.72);--bg:radial-gradient(520px 380px at 8% 6%,rgba(190,205,215,.9),transparent 62%),radial-gradient(520px 400px at 72% 4%,rgba(200,225,235,.9),transparent 62%),radial-gradient(500px 420px at 96% 72%,rgba(190,215,200,.8),transparent 62%),linear-gradient(160deg,#f1f4f6,#e6ebef);--soft:rgba(255,255,255,.6);--glass:linear-gradient(145deg,rgba(255,255,255,.65),rgba(255,255,255,.3));--bd:rgba(255,255,255,.9);--hi:rgba(255,255,255,.95)}
+.dark .C{--tx:#eef2f5;--tx2:rgba(238,242,245,.72);--bg:radial-gradient(520px 380px at 8% 6%,rgba(80,100,120,.45),transparent 62%),radial-gradient(520px 400px at 72% 4%,rgba(70,110,130,.35),transparent 62%),radial-gradient(500px 420px at 96% 72%,rgba(70,100,90,.3),transparent 62%),linear-gradient(160deg,#0d1116,#151b22 55%,#0f1419);--soft:rgba(255,255,255,.08);--glass:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.035));--bd:rgba(255,255,255,.2);--hi:rgba(255,255,255,.35)}
+@media (max-width:1100px){.grid{grid-template-columns:1fr}}
+</style></head><body>
+<h1>Dashboard background – three options, no purple</h1>
+<p class="s">Each panel shows the Home view's glass cards over the new background, in light and dark. The purple and magenta glows are gone from all three. Use the toggle to compare modes.</p>
+<div class="ctl"><button id="dk">Dark mode</button></div>
+<div class="grid" id="g"></div>
+<script>
+const PN=(k,t,sub)=>`<div class="pn ${k}"><h2>${t}</h2><small>${sub}</small>
+<div class="g hello"><div>Good afternoon · 23rd November · Cloudy</div><div class="t">2:02 PM</div></div>
+<div class="row"><div class="room">Living<span>1 on</span></div><div class="room">Kids<span>All off</span></div><div class="room">Garage<span>Closed</span></div></div>
+<div class="tiles"><div class="tile on">Tall Lamp<small>88%</small></div><div class="tile">Dining<small>Off</small></div><div class="tile on">Media Room<small>On</small></div><div class="tile">Corridor<small>Off</small></div></div>
+<div class="btns"><div class="b">Evening</div><div class="b">Night</div><div class="b">All off</div></div>
+<div class="g energy"><div>ENERGY</div><b>$2.23</b> today · 600 W from grid · 0% self-powered</div></div>`;
+document.getElementById('g').innerHTML=PN('A','A · Soft aurora','Teal, sky blue, mint and a touch of peach. Fresh and airy.')+PN('B','B · Warm sunset','Coral, apricot and gold. Cosy and bright. Dark mode is a warm charcoal.')+PN('C','C · Mist and slate','Calm blue-grey and sage. The most neutral, so lights and alerts stand out.');
+document.getElementById('dk').onclick=e=>{document.body.classList.toggle('dark');e.target.textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode'};
+</script></body></html>
