@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=3';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=3';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=3';
-import * as H from './home.js?v=3';
-import { injectIcons, ic } from './icons.js?v=3';
-import { VIEWS, viewEntityIds } from './views.js?v=3';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=3';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=4';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=4';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=4';
+import * as H from './home.js?v=4';
+import { injectIcons, ic } from './icons.js?v=4';
+import { VIEWS, viewEntityIds } from './views.js?v=4';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=4';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -250,7 +250,8 @@ function onRoute() {
   renderAll();
 }
 regions.subview = () => (VIEWS[route] ? VIEWS[route].render(viewCtx) : '');
-const viewCtx = { get, esc, ic, armed, label, H, E, tz: () => tz, fmtTime, isUnavailable, tile };
+const viewCtx = { get, esc, ic, armed, label, H, E, tz: () => tz, fmtTime, isUnavailable, tile, call, quiet,
+  openSheet: (...a) => openSheet(...a), mediaIds: () => mediaIds, isLocalImage: (u) => isLocalImage(u, location.origin) };
 
 // Region output is only written when it changes, so taps and focus survive unrelated updates.
 const last = new Map();
@@ -301,7 +302,17 @@ const ACTIONS = {
   'sheet-close': closeSheet,
   go: (arg) => { if (arg.startsWith('#')) location.hash = arg; else location.href = arg; },
   rooms: () => openSheet(`<h2>Rooms</h2><div class="acts">${ROOM_ROUTES.map(([r, n, i]) => `<button class="tile b" data-act="go" data-arg="#${r}">${ic(i)}${n}</button>`).join('')}</div>`),
-  call: (arg) => { const [svc, id, data] = arg.split('|'); const [d, s] = svc.split('.'); quiet(call(d, s, { entity_id: id, ...(data ? JSON.parse(data) : {}) })); },
+  // "domain.service|entity_id[,entity_id…]|{json}"
+  call: (arg) => { const [svc, id, data] = arg.split('|'); const [d, s] = svc.split('.'); const ids = id.split(','); quiet(call(d, s, { entity_id: ids.length > 1 ? ids : id, ...(data ? JSON.parse(data) : {}) })); },
+  temp: (arg) => {
+    const [id, dir] = arg.split('|');
+    const a = get(id)?.attributes ?? {};
+    if (a.temperature == null) return;
+    const step = a.target_temp_step ?? 0.5;
+    const v = Math.min(a.max_temp ?? 32, Math.max(a.min_temp ?? 16, Math.round((a.temperature + Number(dir) * step) * 10) / 10));
+    quiet(call('climate', 'set_temperature', { entity_id: id, temperature: v }));
+  },
+  'cam-live': (id) => liveCamSheet(id),
   'call-confirm': (arg) => confirmOr(arg, () => ACTIONS.call(arg)),
   toggle: (arg) => quiet(call('homeassistant', 'toggle', { entity_id: arg })),
   'good-night': () => confirmOr('good-night', () => quiet(call('scene', 'turn_on', { entity_id: E.goodNight }))),
@@ -463,6 +474,8 @@ function camUrl(id) {
 }
 function refreshCam() {
   if (camPaused.size) return;
+  // Sub-view camera tiles: re-read entity_picture (its token rotates) and bust the cache.
+  document.querySelectorAll('#subview img[data-cam]').forEach((img) => { const u = camUrl(img.dataset.cam); if (u) img.src = u; });
   const url = camUrl(E.camera);
   const img = $('#camimg');
   if (url) img.src = url;
@@ -471,15 +484,27 @@ function refreshCam() {
 }
 $('#camimg').addEventListener('error', (e) => e.target.classList.add('err'));
 $('#camimg').addEventListener('load', (e) => { e.target.classList.remove('err'); e.target.hidden = false; });
+function liveCamSheet(id) {
+  const name = get(id)?.attributes?.friendly_name ?? 'Camera';
+  openSheet(`<h2>${esc(name)}</h2><img id="live" alt="${esc(name)} live view" style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin-top:12px;border-radius:6px">`, (d) => {
+    const live = d.querySelector('#live');
+    const draw = () => { const u = camUrl(id); if (u) live.src = u; };
+    draw(); liveTimer = setInterval(draw, 2000);
+  });
+}
+
 function camSheet() {
-  openSheet(`<h2>Front Door</h2><img id="live" alt="Front door live view" style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin-top:12px;border-radius:6px;background:#000">
-    <div class="acts"><button class="tile b" data-act="go" data-arg="/dashboard-hub/security">${ic('shield')}Open Security</button></div>`, (d) => {
+  openSheet(`<h2>Front Door</h2><img id="live" alt="Front door live view" style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin-top:12px;border-radius:6px">
+    <div class="acts"><button class="tile b" data-act="go" data-arg="#security">${ic('shield')}Open Security</button></div>`, (d) => {
     const live = d.querySelector('#live');
     const draw = () => { const u = camUrl(E.cameraLive) ?? camUrl(E.camera); if (u) live.src = u; };
     draw(); liveTimer = setInterval(draw, 2000);
   });
 }
 function stopLiveCam() { clearInterval(liveTimer); liveTimer = 0; }
+
+// Sub-view actions get the same context as their render.
+for (const v of Object.values(VIEWS)) for (const [k, fn] of Object.entries(v.actions ?? {})) ACTIONS[k] = (arg) => fn(arg, viewCtx);
 
 // ---- Click delegation ----
 document.addEventListener('click', (e) => {

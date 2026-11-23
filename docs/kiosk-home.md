@@ -41,7 +41,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - WiFi QR.
   - Robbie: start or pause, dock, stop, and the six room-clean buttons.
 - **Rooms**
-  - The six tiles with the same labels. Tapping one opens that Lovelace view.
+  - The six tiles with the same labels. Tapping one opens that room's view on this page.
   - An open garage prints in madder here too.
 - **TV and Aircon**
   - TV runs `script.media_tv_power`.
@@ -58,9 +58,32 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - Front door: second tap to unlock.
   - Front-door snapshot, refreshed every 10 s and paused while the screensaver is up or the page is hidden. Tapping it opens the live view.
 - **Tab bar**
-  - Links to the existing Rooms, Lights, Climate, Security and Music views.
+  - Opens the sub-views below (Rooms opens a room picker).
   - **More** opens Phones, Settings, Dev tools and Restart Home Assistant (second tap to restart; a non-admin kiosk user can't restart, and the page says so).
   - The Lights and Security badges are counted the same way as the navbar's. Lights is an ink badge; Security turns madder because an open door needs attention.
+
+### Sub-views (same page, hash routes)
+
+The tab bar and room tiles open the other `master.yaml` views inside the same page, so Kiosk Satellite switches between them without reloading and keeps one Home Assistant connection. To give a view its own Kiosk Satellite entry, use the same path with the hash, e.g. `/local/kiosk-home.html#lights`.
+
+| Route | From | What it has |
+|---|---|---|
+| `#lights` | Lights | "N of 18 lights on", Evening, Night (two taps), All off (two taps); three room panels with a master switch, every light as a toggle, and a brightness picker (10–100%) on dimmable lights that are on |
+| `#homeclimate` | Climate | Average temperature badge, AC off-timer (room, duration, Start, Cancel, running timers); four rooms with room temperature, target −/+ and HVAC modes |
+| `#security` | Security | Alarm arm/disarm, garage Open (two taps) / Stop / Close (two taps), front door lock (unlock takes two taps), all seven door sensors, seven camera snapshots (tap for live), patio and backyard motion |
+| `#living-room` | Living Room | The floor plan with tappable light buttons (and Aircon, which opens Climate), Robbie controls and the five clean buttons, motion badges |
+| `#garage` | Garage | Door open/stop/close, garage light, keep-open, garage camera, sensor chips; Bluey and Kia with location, driving/parked, battery, charging, and their controls (lock and boot take two taps) |
+| `#kidsroom` | Kids Rooms | Samar and Shanaya: sensor chips (night light, tall lamp and occupancy toggle), live camera, aircon target and cool/heat/off |
+| `#outdoor` | Outdoor | Backyard & Patio, Front (front door, downlight, outdoor lights, driveway, outdoor plug), Side & Laundry |
+| `#laundry` | Laundry | Drying advice, water leak and laundry door badges; washer and dryer status, last run, last start, energy and cost, notify toggles, dryer power |
+| `#music` | Music | Every media player with now playing, previous / play-pause / next and volume; a button to Music Assistant |
+
+Differences from the Lovelace sub-views, on purpose or because the source isn't in the repo:
+
+- **No history graphs** on Climate: the page shows the current room temperature instead of the 12-hour line.
+- **Music** uses a third-party card (homeii-music-flow) whose code isn't in the repo, so this is a plain player list.
+- **Garage door and washer/dryer cards** are third-party too. The page uses the same entities from their config, with plain controls.
+- Two things in `master.yaml` look like typos and are copied as they are: Outdoor reads `binary_sensor.patio_door` (the navbar uses `binary_sensor.patio_door_contact`), and the dryer's notify toggle points at `automation.washing_machine_finished_announcement`.
 
 Differences from the Lovelace view, on purpose:
 

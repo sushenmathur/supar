@@ -283,3 +283,51 @@ a.brand { color: inherit; text-decoration: none; min-height: 48px; display: flex
 .kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-weight: 600; }
 .kv span:nth-child(odd) { color: var(--ink-2); }
 .kv span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }
+.vbody { height: 100%; }
+.vbody > .panel, .vbody > .stackv { min-height: 0; }
+.vbody.scroll { overflow-y: auto; align-content: start; }
+.stackv { display: grid; gap: 12px; align-content: start; min-height: 0; }
+.panel.fill { height: 100%; grid-template-rows: auto minmax(0, 1fr); }
+.phead { display: flex; align-items: center; gap: 12px; min-height: 40px; }
+.phead > div { min-width: 0; }
+.phead .well { width: 40px; height: 40px; }
+.phead .grow { flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 14px; font-weight: 600; white-space: nowrap; }
+.chip .ic { width: 20px; height: 20px; }
+.seg .chip { border-width: 2px 1.5px 1.5px 2px; }
+.seg button .ic { width: 20px; height: 20px; vertical-align: -4px; margin-right: 6px; }
+.seg button { display: inline-flex; align-items: center; justify-content: center; }
+.seg button:disabled { opacity: .5; }
+/* Room master switch (lr_sw): 52×30 pill in a 48px target */
+.switch-btn { width: 64px; min-height: 48px; display: grid; place-items: center; }
+.switch-btn i { width: 52px; height: 30px; border-radius: 15px; background: rgba(127, 127, 127, .35); position: relative; transition: background .2s ease; }
+.switch-btn i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); transition: transform .2s ease; }
+.switch-btn.on i { background: var(--turmeric); }
+.switch-btn.on i::after { transform: translateX(22px); }
+.dimwrap { display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: 6px; }
+.dimbtn { display: grid; place-items: center; min-height: 48px; }
+.clim { display: grid; gap: 10px; margin-top: 6px; }
+.temprow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sq { width: 52px; height: 52px; display: grid; place-items: center; }
+.camgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 10px; min-height: 0; height: 100%; }
+.camgrid .camtile { min-height: 0; }
+.camtile { display: block; width: 100%; text-align: left; background: var(--well); }
+.camtile .cap small { font-weight: 500; opacity: .9; }
+.plan { position: relative; min-height: 0; height: 100%; }
+.plan img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.pin { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 12px; font-weight: 700; }
+.carimg { display: block; max-width: 92%; max-height: 150px; margin: 0 auto; object-fit: contain; }
+.mrow { display: flex; align-items: center; gap: 12px; }
+.art { width: 72px; height: 72px; object-fit: cover; border-radius: 5px; flex: none; }
+.panel.alert .sub, .panel.on .sub { color: inherit; }
+
+.brand span { margin-left: .28em; }
+/* Column layouts fill the view height; scrolling lists don't. */
+.vbody { grid-auto-rows: minmax(0, 1fr); align-content: stretch; }
+.vbody.scroll { grid-auto-rows: auto; align-content: start; }
+.stackv { grid-auto-rows: auto; }
+.pair2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pair2 .seg button { padding: 0 10px; flex: 1; }
+.panel .grid { align-content: start; }
+.plan { aspect-ratio: 1; height: 100%; max-width: 100%; margin: 0 auto; }
+.plan img { object-fit: fill; }

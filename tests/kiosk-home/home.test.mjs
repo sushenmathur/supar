@@ -113,3 +113,30 @@ test('subscribe_entities diffs update only what changed', () => {
   assert.deepEqual([...changed], ['light.a']);
   assert.equal(states.get('light.b'), b);
 });
+
+import { averageTemp, acTimerText, dryingText, VIEWS, viewEntityIds } from '../../homeassistant/www/kiosk-home/views.js';
+
+test('climate badge: average of numeric sources only', () => {
+  assert.equal(averageTemp([25.8, null, 23.4, Number.NaN]), 24.6);
+  assert.equal(averageTemp([null]), null);
+});
+
+test('AC off timer picks the soonest active timer', () => {
+  const now = Date.parse('2026-11-23T08:00:00Z');
+  const t = (mins, state = 'active') => ({ state, attributes: { finishes_at: new Date(now + mins * 60000).toISOString() } });
+  assert.deepEqual(acTimerText([['Living AC', t(95)], ['Samar Room AC', t(47)], ['Bedroom AC', t(5, 'idle')]], now), { text: 'Samar Room AC · 47m', active: true });
+  assert.deepEqual(acTimerText([['Living AC', t(125)]], now), { text: 'Living AC · 2h 5m', active: true });
+  assert.equal(acTimerText([], now).active, false);
+});
+
+test('laundry drying advice follows the badge thresholds', () => {
+  assert.equal(dryingText({ state: 'rainy', attributes: { humidity: 40 } }).level, 'bad');
+  assert.equal(dryingText({ state: 'sunny', attributes: { humidity: 80 } }).level, 'bad');
+  assert.equal(dryingText({ state: 'sunny', attributes: { humidity: 64 } }).level, 'mid');
+  assert.equal(dryingText({ state: 'sunny', attributes: { humidity: 40 } }).level, 'good');
+});
+
+test('every master.yaml sub-view has a route', () => {
+  assert.deepEqual(Object.keys(VIEWS).sort(), ['garage', 'homeclimate', 'kidsroom', 'laundry', 'lights', 'living-room', 'music', 'outdoor', 'security']);
+  assert.ok(viewEntityIds().includes('lock.front_door_lock'));
+});
