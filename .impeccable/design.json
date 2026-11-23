@@ -1,0 +1,537 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-23T06:44:35.961632+00:00",
+  "title": "Design System: SuPar Home",
+  "extensions": {
+    "colorMeta": {
+      "blued-cotton": {
+        "role": "neutral",
+        "displayName": "Blued Cotton",
+        "canonical": "#e9eef7",
+        "purpose": "Page ground (light).",
+        "tonalRamp": [
+          "#3a3c3e",
+          "#696b6f",
+          "#979ba1",
+          "#c6cad2",
+          "#edf1f9",
+          "#f3f6fb",
+          "#f8fafd",
+          "#fdfdfe"
+        ],
+        "darkCounterpart": "indigo-night"
+      },
+      "cloth": {
+        "role": "neutral",
+        "displayName": "Cloth",
+        "canonical": "#f7f9fd",
+        "purpose": "Block and sheet fill (light).",
+        "tonalRamp": [
+          "#3e3e3f",
+          "#6f7072",
+          "#a1a2a4",
+          "#d2d4d7",
+          "#f9fafd",
+          "#fbfcfe",
+          "#fdfdfe",
+          "#fefeff"
+        ],
+        "darkCounterpart": "night-cloth"
+      },
+      "indigo-ink": {
+        "role": "primary",
+        "displayName": "Indigo Ink",
+        "canonical": "#1b2559",
+        "purpose": "Text, icon wells, meters (light).",
+        "tonalRamp": [
+          "#070916",
+          "#0c1128",
+          "#12183a",
+          "#171f4c",
+          "#49517a",
+          "#8287a4",
+          "#bbbecd",
+          "#e8e9ee"
+        ],
+        "darkCounterpart": "night-ink",
+        "darkWellCounterpart": "night-well"
+      },
+      "faded-indigo": {
+        "role": "neutral",
+        "displayName": "Faded Indigo",
+        "canonical": "#47527f",
+        "purpose": "Secondary text (light).",
+        "tonalRamp": [
+          "#121420",
+          "#202539",
+          "#2e3553",
+          "#3c466c",
+          "#6c7599",
+          "#9aa0b9",
+          "#c8cbd9",
+          "#edeef2"
+        ],
+        "darkCounterpart": "night-faded"
+      },
+      "key-line": {
+        "role": "primary",
+        "displayName": "Key Line",
+        "canonical": "rgba(27, 37, 89, 0.42)",
+        "purpose": "Block outline at 42% alpha (light).",
+        "tonalRamp": [
+          "#070916",
+          "#0c1128",
+          "#12183a",
+          "#171f4c",
+          "#49517a",
+          "#8287a4",
+          "#bbbecd",
+          "#e8e9ee"
+        ],
+        "darkCanonical": "rgba(226, 231, 250, 0.34)"
+      },
+      "turmeric": {
+        "role": "secondary",
+        "displayName": "Turmeric",
+        "canonical": "#f0ae2e",
+        "purpose": "On pass, current tab, focus ring.",
+        "tonalRamp": [
+          "#3c2c0c",
+          "#6c4e15",
+          "#9c711e",
+          "#cc9427",
+          "#f3be58",
+          "#f7d28c",
+          "#fae7c0",
+          "#fef7ea"
+        ],
+        "darkCounterpart": "night-turmeric"
+      },
+      "turmeric-ink": {
+        "role": "secondary",
+        "displayName": "Turmeric Ink",
+        "canonical": "#2a1c00",
+        "purpose": "Text on turmeric, both modes.",
+        "tonalRamp": [
+          "#0a0700",
+          "#130d00",
+          "#1b1200",
+          "#241800",
+          "#554933",
+          "#8a8273",
+          "#bfbbb2",
+          "#eae8e6"
+        ]
+      },
+      "madder": {
+        "role": "tertiary",
+        "displayName": "Madder",
+        "canonical": "#b4362b",
+        "purpose": "Attention pass, badges, toast (light).",
+        "tonalRamp": [
+          "#2d0e0b",
+          "#511813",
+          "#75231c",
+          "#992e25",
+          "#c35e55",
+          "#d6908a",
+          "#e8c3bf",
+          "#f8ebea"
+        ],
+        "darkCounterpart": "night-madder"
+      },
+      "madder-text": {
+        "role": "tertiary",
+        "displayName": "Madder Text",
+        "canonical": "#9e2c22",
+        "purpose": "Red read as text on cloth (light).",
+        "tonalRamp": [
+          "#280b08",
+          "#47140f",
+          "#671d16",
+          "#86251d",
+          "#b1564e",
+          "#ca8b85",
+          "#e2c0bd",
+          "#f5eae9"
+        ],
+        "darkCounterpart": "night-madder-text"
+      },
+      "dabu-green": {
+        "role": "tertiary",
+        "displayName": "Dabu Green",
+        "canonical": "#2f6a3e",
+        "purpose": "OK text only (light).",
+        "tonalRamp": [
+          "#0c1a10",
+          "#15301c",
+          "#1f4528",
+          "#285a35",
+          "#598865",
+          "#8dad95",
+          "#c1d2c5",
+          "#eaf0ec"
+        ],
+        "darkCounterpart": "night-dabu"
+      },
+      "indigo-night": {
+        "role": "neutral",
+        "displayName": "Indigo Night",
+        "canonical": "#0f1636",
+        "purpose": "Page ground (dark).",
+        "tonalRamp": [
+          "#04060e",
+          "#070a18",
+          "#0a0e23",
+          "#0d132e",
+          "#3f455e",
+          "#7b7f90",
+          "#b7b9c3",
+          "#e7e8eb"
+        ]
+      },
+      "night-cloth": {
+        "role": "neutral",
+        "displayName": "Night Cloth",
+        "canonical": "#172150",
+        "purpose": "Block fill (dark).",
+        "tonalRamp": [
+          "#060814",
+          "#0a0f24",
+          "#0f1534",
+          "#141c44",
+          "#454d73",
+          "#7f859f",
+          "#b9bcca",
+          "#e8e9ee"
+        ]
+      },
+      "night-ink": {
+        "role": "primary",
+        "displayName": "Night Ink",
+        "canonical": "#eef1fb",
+        "purpose": "Text (dark).",
+        "tonalRamp": [
+          "#3c3c3f",
+          "#6b6c71",
+          "#9b9da3",
+          "#cacdd5",
+          "#f1f4fc",
+          "#f6f7fd",
+          "#fafbfe",
+          "#fdfeff"
+        ]
+      },
+      "night-faded": {
+        "role": "neutral",
+        "displayName": "Night Faded",
+        "canonical": "#b4bde2",
+        "purpose": "Secondary text (dark).",
+        "tonalRamp": [
+          "#2d2f38",
+          "#515566",
+          "#757b93",
+          "#99a1c0",
+          "#c3cae8",
+          "#d6dbef",
+          "#e8ebf6",
+          "#f8f8fc"
+        ]
+      },
+      "night-well": {
+        "role": "primary",
+        "displayName": "Night Well",
+        "canonical": "#e3e8fb",
+        "purpose": "Icon well fill (dark).",
+        "tonalRamp": [
+          "#393a3f",
+          "#666871",
+          "#9497a3",
+          "#c1c5d5",
+          "#e9edfc",
+          "#f0f2fd",
+          "#f7f8fe",
+          "#fcfdff"
+        ]
+      },
+      "night-turmeric": {
+        "role": "secondary",
+        "displayName": "Night Turmeric",
+        "canonical": "#f2b53f",
+        "purpose": "On pass (dark).",
+        "tonalRamp": [
+          "#3c2d10",
+          "#6d511c",
+          "#9d7629",
+          "#ce9a36",
+          "#f5c465",
+          "#f8d695",
+          "#fbe9c5",
+          "#fef8ec"
+        ]
+      },
+      "night-madder": {
+        "role": "tertiary",
+        "displayName": "Night Madder",
+        "canonical": "#c0402e",
+        "purpose": "Attention pass (dark).",
+        "tonalRamp": [
+          "#30100c",
+          "#561d15",
+          "#7d2a1e",
+          "#a33627",
+          "#cd6658",
+          "#dc968c",
+          "#ecc6c0",
+          "#f9ecea"
+        ]
+      },
+      "night-madder-text": {
+        "role": "tertiary",
+        "displayName": "Night Madder Text",
+        "canonical": "#ff9a85",
+        "purpose": "Red as text (dark).",
+        "tonalRamp": [
+          "#402621",
+          "#73453c",
+          "#a66456",
+          "#d98371",
+          "#ffae9d",
+          "#ffc7bc",
+          "#ffe1da",
+          "#fff5f3"
+        ]
+      },
+      "night-dabu": {
+        "role": "tertiary",
+        "displayName": "Night Dabu",
+        "canonical": "#93d0a2",
+        "purpose": "OK text (dark).",
+        "tonalRamp": [
+          "#253428",
+          "#425e49",
+          "#608769",
+          "#7db18a",
+          "#a9d9b5",
+          "#c4e5cc",
+          "#dff1e3",
+          "#f4faf6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Clock",
+        "purpose": "The clock only; tabular figures."
+      },
+      "headline": {
+        "displayName": "Sheet Title",
+        "purpose": "Dialog titles."
+      },
+      "title": {
+        "displayName": "Name / Block Head",
+        "purpose": "Tile names and block heads; key figures step up to 18-19px."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default text and buttons."
+      },
+      "label": {
+        "displayName": "Subtitle",
+        "purpose": "The line under every name; counts and captions."
+      }
+    },
+    "shadows": [],
+    "registration": {
+      "passOffset": "translate(3px, 3px)",
+      "passBlendLight": "multiply",
+      "passBlendDark": "normal",
+      "keyLineWidths": "2px 1.5px 1.5px 2px",
+      "purpose": "State colour pass printed out of register over the key line; replaces elevation."
+    },
+    "focus": {
+      "value": "3px solid turmeric, 3px offset"
+    },
+    "backdrop": {
+      "value": "rgba(15, 22, 54, 0.55)",
+      "purpose": "Sheet backdrop."
+    },
+    "ornament": {
+      "name": "buti",
+      "size": "22px x 12px",
+      "use": "12px border strip at the tab bar foot and the clock block head only",
+      "light": "madder petals, indigo centre",
+      "dark": "turmeric petals, madder centre"
+    },
+    "motion": [
+      {
+        "name": "print-in",
+        "value": "0.34s cubic-bezier(.2, .9, .3, 1)",
+        "purpose": "A colour pass slides from register to its 3px offset when it appears; reduced-motion safe."
+      },
+      {
+        "name": "pass-settle",
+        "value": "background .2s ease, transform .3s cubic-bezier(.2, .9, .3, 1)",
+        "purpose": "Pass colour and offset transitions."
+      },
+      {
+        "name": "press",
+        "value": "translate(1px, 1px)",
+        "purpose": "Pressed tile nudge, only when motion is allowed."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stage",
+        "value": "1280px x 800px fixed, uniformly scaled to fit"
+      }
+    ],
+    "iconography": {
+      "source": "in-house SVG sprite",
+      "stroke": "2.1, round caps and joins",
+      "size": "24px (19-21px in dense rows)"
+    }
+  },
+  "components": [
+    {
+      "name": "Tile (calm)",
+      "kind": "card",
+      "refersTo": "tile",
+      "description": "The everyday control: block, carved well, name and subtitle.",
+      "html": "<button class=\"ds-b ds-tile\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z\"/></svg></span><span><span class=\"ds-name\">Kitchen Pendant</span><span class=\"ds-sub\">Off</span></span></button>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:rgba(255,255,255,.86)}"
+    },
+    {
+      "name": "Tile (on)",
+      "kind": "card",
+      "refersTo": "tile-on",
+      "description": "Turmeric pass printed 3px out of register over the key line.",
+      "html": "<button class=\"ds-b ds-tile on\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z\"/></svg></span><span><span class=\"ds-name\">Kitchen Pendant</span><span class=\"ds-sub\">On · 80%</span></span></button>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:rgba(255,255,255,.86)}"
+    },
+    {
+      "name": "Tile (alert)",
+      "kind": "card",
+      "refersTo": "tile-alert",
+      "description": "Madder pass; the well inverts to near-white with a madder icon.",
+      "html": "<button class=\"ds-b ds-tile alert\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 9.5 12 4l9 5.5V20H3z\"/><path d=\"M7 20v-8h10v8M7 14.5h10M7 17h10\"/></svg></span><span><span class=\"ds-name\">Garage</span><span class=\"ds-sub\">Open 12 min</span></span></button>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:rgba(255,255,255,.86)}"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-current",
+      "description": "Block-wide nav; current tab is a turmeric fill, badges in madder, buti strip at the foot.",
+      "html": "<nav class=\"ds-b ds-bar\"><div class=\"ds-tabs\"><span class=\"ds-brand\">SuPar <span>Home</span></span><span class=\"ds-tab cur\">Home</span><a class=\"ds-tab\" href=\"#\">Lights<span class=\"ds-count\">3</span></a><a class=\"ds-tab\" href=\"#\">Security</a></div><div class=\"ds-buti\"></div></nav>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-bar{display:grid;grid-template-rows:60px 12px;overflow:hidden;width:520px}.ds-tabs{display:flex;align-items:center;gap:4px;padding:0 8px 0 18px}.ds-brand{font-weight:700;font-size:19px;margin-right:18px}.ds-brand span{color:#47527f;font-weight:500}.ds-tab{min-height:48px;padding:0 14px;border-radius:5px;display:flex;align-items:center;gap:8px;font-weight:600;color:#47527f;text-decoration:none}.ds-tab:hover{color:#1b2559}.ds-tab:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tab.cur{background:#f0ae2e;color:#2a1c00}.ds-count{min-width:22px;height:20px;padding:0 6px;border-radius:4px;background:#b4362b;color:#fff;font-size:12.5px;font-weight:700;display:grid;place-items:center}.ds-buti{height:12px;background:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12' viewBox='0 0 22 12'%3E%3Cg fill='%23b4362b'%3E%3Cellipse cx='11' cy='3.2' rx='1.6' ry='2.4'/%3E%3Cellipse cx='11' cy='8.8' rx='1.6' ry='2.4'/%3E%3Cellipse cx='8.2' cy='6' rx='2.4' ry='1.6'/%3E%3Cellipse cx='13.8' cy='6' rx='2.4' ry='1.6'/%3E%3C/g%3E%3Ccircle cx='11' cy='6' r='1.3' fill='%231b2559'/%3E%3Ccircle cx='0' cy='6' r='1' fill='%231b2559'/%3E%3Ccircle cx='22' cy='6' r='1' fill='%231b2559'/%3E%3C/svg%3E\") repeat-x left center/22px 12px}"
+    },
+    {
+      "name": "Alert Banner Buttons",
+      "kind": "button",
+      "refersTo": "button-on-alert",
+      "description": "Actions on a madder banner: solid white primary, outlined secondary, turmeric when armed for confirm.",
+      "html": "<div class=\"ds-b alert ds-banner\"><b>Garage door open</b><button class=\"ds-btn solid\">Close</button><button class=\"ds-btn line\">Snooze</button><button class=\"ds-btn armed\">Tap again to close</button></div>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-banner{display:flex;align-items:center;gap:14px;padding:4px 6px 4px 14px;min-height:58px}.ds-banner b{font-size:18px;flex:1}.ds-btn{min-height:48px;padding:0 18px;border-radius:5px;font:700 15px Hind,system-ui,sans-serif;border:1.5px solid transparent;background:none;cursor:pointer}.ds-btn:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-btn.solid{background:#fff;color:#b4362b}.ds-btn.line{border-color:rgba(255,255,255,.75);color:#fff}.ds-btn.armed{background:#f0ae2e;color:#2a1c00}.ds-btn:active{transform:translate(1px,1px)}"
+    },
+    {
+      "name": "Alarm Segments",
+      "kind": "button",
+      "refersTo": "segment",
+      "description": "Key-line outlined modes; current mode is a solid indigo fill.",
+      "html": "<div class=\"ds-segs\"><button class=\"ds-seg cur\">Disarmed</button><button class=\"ds-seg\">Arm away</button></div>",
+      "css": ".ds-segs{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:320px}.ds-seg{min-height:48px;border-radius:5px;border:solid rgba(27,37,89,.42);border-width:2px 1.5px 1.5px 2px;background:#f7f9fd;color:#1b2559;font:700 15px Hind,system-ui,sans-serif;cursor:pointer}.ds-seg:hover{background:#e9eef7}.ds-seg:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-seg.cur{background:#1b2559;color:#f7f9fd;border-color:transparent}"
+    },
+    {
+      "name": "Sheet Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "48px field on blued cotton inside a sheet, key-line outline.",
+      "html": "<input class=\"ds-field\" placeholder=\"Message to announce\">",
+      "css": ".ds-field{width:320px;min-height:48px;padding:0 12px;font:500 15px Hind,system-ui,sans-serif;color:#1b2559;background:#e9eef7;border:solid rgba(27,37,89,.42);border-width:2px 1.5px 1.5px 2px;border-radius:5px}.ds-field:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}"
+    },
+    {
+      "name": "Meter",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Battery / self-powered meter: 1.5px ink outline, flat fill.",
+      "html": "<span class=\"ds-meter\"><i style=\"--lvl:62%\"></i><b>62%</b></span>",
+      "css": ".ds-meter{display:inline-flex;align-items:center;gap:8px;font:700 15px Hind,system-ui,sans-serif;color:#1b2559;font-variant-numeric:tabular-nums}.ds-meter i{width:120px;height:12px;border:1.5px solid #1b2559;border-radius:2px;position:relative}.ds-meter i::after{content:'';position:absolute;left:1.5px;top:1.5px;bottom:1.5px;width:calc(var(--lvl) - 3px);background:#f0ae2e}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Block-Printed Wall Cloth",
+    "overview": "The home is a length of hand-blocked cotton pinned to the kitchen wall. Every block of content is a cloth panel outlined by an indigo key line, pressed by hand, so the line is heavier on the top and left edges and the corners are never quite equal. Nothing glows, floats or frosts. State is not a badge or a toggle switch: it is a second colour pass printed over the block, turmeric when something is on, madder when something needs attention, and that pass lands slightly out of register with the key line, the way a real second block does.\n\nThe surface is dense and fixed: a single 1280 by 800 landscape stage on a wall tablet, read from across the room and tapped up close. Calm is the resting state (cloth, indigo, nothing printed over it); colour only arrives with meaning, so a glance across the kitchen counts the turmeric and madder blocks and knows what is happening. Light and dark follow the device: by day, indigo ink on neel-blued cotton; by night, the cloth is indigo-dyed and the ink turns pale.",
+    "keyCharacteristics": [
+      "Indigo key line on every block, hand-weighted (2px top and left, 1.5px right and bottom) with unequal corners.",
+      "State printed as a flat colour pass, offset 3px down and right, overprinting the key line.",
+      "Carved icon wells: solid indigo squares with the line icon cut out of them.",
+      "A printed buti border repeat used sparingly as a selvedge edge.",
+      "One humanist family (Hind) at heavy weights, tabular figures for every number.",
+      "Flat throughout: no shadows, no gradients, no glass."
+    ],
+    "rules": [
+      {
+        "name": "The Two Passes Rule",
+        "body": "A block carries at most one colour pass: turmeric for on, madder for attention. Calm blocks carry none. Never invent a third fill colour for state; green speaks only as text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Overprint Rule",
+        "body": "In light mode the pass prints with `multiply` blending so the key line shows through it; in dark mode it prints `normal`. The overprint is the look, not a bug to clean up.",
+        "section": "colors"
+      },
+      {
+        "name": "The Real Things Exception",
+        "body": "Literal object colours stay literal: the family's monogram colours (a deep indigo and the madder) and the bin-lid swatches (charcoal, yellow, green) are the actual colours of those things and are not system tokens.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every live number (clock, temperatures, percentages, kWh, money, counts, dates) is set with tabular figures so values do not jitter as they update.",
+        "section": "typography"
+      },
+      {
+        "name": "The Heavy Hand Rule",
+        "body": "Nothing on the stage is lighter than 500. Names and figures are 700; supporting lines are 600. Thin type does not survive the across-the-kitchen glance.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Stage Rule",
+        "body": "Design at 1280 by 800 and let the stage scale; do not reflow into breakpoints. Rows that can overflow clamp or ellipsize their text instead of growing.",
+        "section": "layout"
+      },
+      {
+        "name": "The 48px Floor Rule",
+        "body": "Every tappable thing (tile, tab, button, segment, field) is at least 48px tall; sheet actions are 52px.",
+        "section": "layout"
+      },
+      {
+        "name": "The Printed, Not Lifted Rule",
+        "body": "If something needs to stand out, give it a colour pass or a carved well, never a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Uneven Corner Rule",
+        "body": "Block and well corners are deliberately unequal. Do not \"fix\" them to a uniform radius.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do put every container on cloth with the hand-weighted key line (2px top and left, 1.5px right and bottom) and the unequal block corners.",
+      "Do show state as a colour pass printed 3px out of register: turmeric for on, madder for attention, nothing for calm.",
+      "Do carve icons out of solid indigo wells; keep icons in the one sprite at a 2.1 stroke.",
+      "Do set every live number in tabular figures, names at 700, supporting lines at 600.",
+      "Do use Madder Text, not Madder, wherever red must be read as text on cloth.",
+      "Do keep every tappable target at least 48px tall and design on the fixed 1280 by 800 stage.",
+      "Do define every colour for both light and dark; dark mode prints the pass `normal` instead of `multiply`."
+    ],
+    "donts": [
+      "Don't use shadows, blur, glass or gradients on blocks; depth is printed, not lifted.",
+      "Don't put white text on turmeric, or fill a block with dabu green.",
+      "Don't add a third state colour or a second accent; the dyes carry meaning, not decoration.",
+      "Don't spread the buti beyond selvedge edges (tab bar foot, clock head); it is an edge, not a background.",
+      "Don't even out the block corners or the key-line weights.",
+      "Don't introduce a second typeface or weights below 500."
+    ]
+  }
+}
