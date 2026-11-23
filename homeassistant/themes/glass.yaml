@@ -59,7 +59,7 @@ Glass:
       popup-background-color: "rgba(255,255,255,0.86)"
       ha-dialog-surface-background: "rgba(236,242,255,0.62)"
       glass-popup-fill: "rgba(236,242,255,0.62)"
-      lovelace-background: "radial-gradient(900px 640px at 6% 8%, rgba(255,150,130,0.80), transparent 62%), radial-gradient(820px 600px at 60% 12%, rgba(90,200,250,0.75), transparent 62%), radial-gradient(760px 620px at 98% 70%, rgba(179,136,255,0.75), transparent 62%), radial-gradient(700px 520px at 12% 98%, rgba(255,211,110,0.70), transparent 62%), linear-gradient(160deg, #eef3ff, #e6ecfa)"
+      lovelace-background: "radial-gradient(900px 640px at 6% 8%, rgba(190,205,215,0.90), transparent 62%), radial-gradient(820px 600px at 60% 12%, rgba(200,225,235,0.90), transparent 62%), radial-gradient(760px 620px at 98% 70%, rgba(190,215,200,0.80), transparent 62%), linear-gradient(160deg, #f1f4f6, #e6ebef)"
       # ---- added: shared popup, chip, accent, alert and level colours ----
       glass-popup-bg: "linear-gradient(145deg, rgba(255,255,255,0.72), rgba(214,226,255,0.50))"
       glass-popup-border: "rgba(255,255,255,0.80)"
@@ -93,7 +93,7 @@ Glass:
       popup-background-color: "rgba(24,30,58,0.88)"
       ha-dialog-surface-background: "rgba(30,38,78,0.62)"
       glass-popup-fill: "rgba(30,38,78,0.62)"
-      lovelace-background: "radial-gradient(900px 640px at 6% 8%, rgba(91,61,245,0.55), transparent 62%), radial-gradient(820px 600px at 60% 12%, rgba(10,167,160,0.45), transparent 62%), radial-gradient(760px 620px at 98% 70%, rgba(192,38,211,0.45), transparent 62%), radial-gradient(700px 520px at 12% 98%, rgba(30,64,175,0.50), transparent 62%), linear-gradient(160deg, #080d1e, #0f1730 55%, #0a1a26)"
+      lovelace-background: "radial-gradient(900px 640px at 6% 8%, rgba(80,100,120,0.45), transparent 62%), radial-gradient(820px 600px at 60% 12%, rgba(70,110,130,0.35), transparent 62%), radial-gradient(760px 620px at 98% 70%, rgba(70,100,90,0.30), transparent 62%), linear-gradient(160deg, #0d1116, #151b22 55%, #0f1419)"
       # ---- added: shared popup, chip, accent, alert and level colours ----
       glass-popup-bg: "linear-gradient(145deg, rgba(52,62,118,0.80), rgba(18,24,56,0.74))"
       glass-popup-border: "rgba(255,255,255,0.22)"
