@@ -27,6 +27,7 @@ colors:
   lid-charcoal: "#5b6170"
   lid-yellow: "#e8c21c"
   lid-green: "#3f9a52"
+  lid-red: "#c8372b"
   monogram-indigo: "#3a4aa6"
   monogram-aubergine: "#6b4a8e"
 typography:
@@ -250,7 +251,7 @@ A small dyer's palette: indigo ink and blued cotton for structure, three natural
 
 **The Overprint Rule.** In light mode the pass prints with `multiply` blending so the key line shows through it; in dark mode the pass is opaque (`normal`), so the key line is redrawn above it in the Overprint Line. The overprint is the look, not a bug to clean up.
 
-**The Real Things Exception.** Literal object colours stay literal: the family's monogram colours (`monogram-indigo`, `monogram-aubergine`, kept clear of the state colours) and the bin-lid swatches (`lid-charcoal`, `lid-yellow`, `lid-green`) are the actual colours of those things. They are recorded so they read as intentional, but they are not UI colours: never use them for text, fills, passes or ornament.
+**The Real Things Exception.** Literal object colours stay literal: the family's monogram colours (`monogram-indigo`, `monogram-aubergine`, kept clear of the state colours) and the bin-lid swatches (`lid-red` for general waste, `lid-yellow`, `lid-green`, `lid-charcoal`) are the actual colours of those things. The red lid is the one red that isn't an alert, because it's the bin's real colour. They are recorded so they read as intentional, but they are not UI colours: never use them for text, fills, passes or ornament.
 
 ## Typography
 
@@ -294,7 +295,7 @@ None. The system is flat ink on cloth: no box shadows, no blur, no gradients on 
 
 Square-ish and hand-made. Blocks round to unequal corners (6, 5, 7, 5px clockwise from top left); icon wells and monograms to 5, 4, 6, 4px; the sheet to 7px; controls (tabs, buttons, segments, fields) to an even 5px; calendar date stamps and count badges to 4px; meters (battery, self-powered) to 2px. Outlines use the key-line weighting (2px top and left, 1.5px right and bottom) on blocks, date stamps, segments, fields and the sheet; internal rules are a single 1.5px key line.
 
-The **buti** is the system's one ornament: a 22 by 16px repeat of a five-petal printed flower with a small dot between repeats, run as a 16px border strip. By day the petals are solid Indigo Ink with a Cloth centre; by night they are Faded Indigo (`night-faded`) with a Night Cloth centre. It is never printed in a state colour. It edges the bottom of the tab bar and heads the clock block, and nowhere else.
+The **buti** is the system's one ornament: a 22 by 16px repeat of a five-petal printed flower with a small dot between repeats, run as a 16px border strip. By day the petals are solid Indigo Ink with a Cloth centre; by night they are Faded Indigo (`night-faded`) with a Night Cloth centre. It is never printed in a state colour. It heads the clock block and nowhere else (the tab bar dropped it at the owner's request).
 
 **The Uneven Corner Rule.** Block and well corners are deliberately unequal. Do not "fix" them to a uniform radius.
 
@@ -307,6 +308,9 @@ Every container is a block: cloth fill, hand-weighted key line, unequal corners.
 - **Dark mode:** the pass is opaque, and the key line is redrawn above it in the Overprint Line on on and alert blocks.
 - **Unavailable:** the whole block at 50% opacity, disabled.
 - **Motion:** when a pass appears it prints in, sliding from register to its 3px offset over 0.34s on a quick ease-out, unless reduced motion is requested. A pressed tile nudges 1px down and right.
+- **Living motion (state only, transform/opacity only):** energy flow lines march their dashes in the direction power moves (13.2s for 12 dash steps); the icon of something running (Robbie cleaning, washer, dryer) turns slowly (three turns per 9.6s); an urgent banner's madder pass drifts 2px; the clock stamps (scale .965 to 1, 0.26s) when the minute changes; a view fades up 6px over 0.18s when opened. Re-rendered animations resume at their current phase. All of it pauses while the kiosk screensaver is up or the page is hidden, and none of it runs under reduced motion.
+- **Ambient:** a faint wash across the top 260px of the ground follows `sun.sun`: turmeric at dawn, madder at dusk, deeper indigo at night, none by day. It changes only when the sun's phase does.
+- **Weather picture:** the clock card's weather is a printed picture (sun, moon, cloud, sun and cloud, rain) in turmeric and cloth with an ink key line, not a line icon.
 
 ### Tiles
 The everyday control: a block with a carved icon well, a 700-weight name and a 600-weight subtitle. Two anatomies ship:
@@ -318,7 +322,7 @@ The everyday control: a block with a carved icon well, a 700-weight name and a 6
 A solid indigo square with a line icon knocked out in cloth colour: 40px with a 24px icon by default, 44px with a 26px icon in the energy flow, 30 to 36px in dense tiles. Icons are a single in-house sprite at a 2.1 stroke with round caps and joins. Monograms for people reuse the 40px well shape with an 18px white initial on the person's monogram colour.
 
 ### Navigation (tab bar)
-A full-width block: brand wordmark ("SuPar" 700 with "Home" in Faded Indigo 500), then text-and-icon tabs (48px, 600, Faded Indigo, 20px icons). The current tab is a turmeric fill with Turmeric Ink text, not an underline. Count badges (20px tall, 12.5px 700, 4px corners) sit inside a tab: a neutral count (Lights) is a solid ink badge with a cloth figure, carved like an icon well (pale with an indigo figure in dark); only a count that is a problem (Security) is madder with a white figure. The last tab, More, opens a sheet rather than a page. The connection status sits right-aligned in Madder Text. The buti strip runs along the bar's lower edge.
+A full-width block: brand wordmark ("SuPar" 700 with "Home" in Faded Indigo 500), then text-and-icon tabs (48px, 600, Faded Indigo, 20px icons). The current tab is a turmeric fill with Turmeric Ink text, not an underline. Count badges (20px tall, 12.5px 700, 4px corners) sit inside a tab: a neutral count (Lights) is a solid ink badge with a cloth figure, carved like an icon well (pale with an indigo figure in dark); only a count that is a problem (Security) is madder with a white figure. The last tab, More, opens a sheet rather than a page. The connection status sits right-aligned in Madder Text. The bar has no ornament.
 
 ### Status Banner
 A 56px block across the work grid. Calm: no pass, ink text. Alert: madder pass with action buttons; the primary action is a white button with madder text, secondary actions are white-outlined, and a two-tap confirm turns the button turmeric ("armed") before it acts.
@@ -352,6 +356,6 @@ The toast is a madder bar with white 600 text, bottom centre, 6px corners. The f
 - **Don't** put white text on turmeric, or fill a block with dabu green.
 - **Don't** add a third state colour or a second accent; the dyes carry meaning, not decoration.
 - **Don't** use the monogram or bin-lid colours anywhere but the monogram and the lid swatches.
-- **Don't** spread the buti beyond selvedge edges (tab bar foot, clock head); it is an edge, not a background.
+- **Don't** print the buti anywhere but the head of the clock block; it is an edge, not a background.
 - **Don't** even out the block corners or the key-line weights.
 - **Don't** introduce a second typeface or weights below 500.

@@ -65,3 +65,16 @@ export function injectIcons() {
 }
 
 export const ic = (name, cls = 'ic') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+
+// Printed weather pictures for the clock card: flat colour blocks with an ink key line, like the rest of the page.
+const RAYS = Array.from({ length: 8 }, (_, k) => `<path d="M28 ${k % 2 ? 6 : 4}v6" transform="rotate(${k * 45} 28 28)"/>`).join('');
+const SUN = (cx = 28, cy = 28, r = 11) => `<g stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round">${RAYS}</g><circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--turmeric)" stroke="var(--ink)" stroke-width="2.2"/>`;
+const CLOUD = (dx = 0, dy = 0, fill = 'var(--cloth)') => `<path transform="translate(${dx} ${dy})" d="M14 44h28a9 9 0 0 0 0-18 12 12 0 0 0-23-3 8 8 0 0 0-5 21z" fill="${fill}" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>`;
+const ART = {
+  sun: SUN(),
+  moon: '<path d="M37 9a19 19 0 1 0 10 31A16 16 0 0 1 37 9z" fill="var(--turmeric)" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/><circle cx="14" cy="14" r="1.6" fill="var(--ink)"/><circle cx="46" cy="18" r="1.4" fill="var(--ink)"/>',
+  cloudsun: `<g transform="translate(-6 -6) scale(.8)">${SUN()}</g>${CLOUD(4, 4)}`,
+  cloud: CLOUD(0, -2),
+  rain: `${CLOUD(0, -8)}<g stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"><path d="M20 42l-3 7M30 42l-3 7M40 42l-3 7"/></g>`,
+};
+export const weatherArt = (kind) => `<svg class="wxart" viewBox="0 0 56 56" aria-hidden="true">${ART[kind] ?? ART.cloud}</svg>`;

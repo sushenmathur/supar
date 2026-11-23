@@ -57,7 +57,7 @@ button:disabled { cursor: default; }
 .stage {
   position: absolute; left: 50%; top: 50%; width: 1280px; height: 800px;
   transform: translate(-50%, -50%) scale(var(--fit, 1));
-  display: grid; grid-template-rows: 68px minmax(0, 1fr); gap: 12px; padding: 12px 16px 14px;
+  display: grid; grid-template-rows: 60px minmax(0, 1fr); gap: 12px; padding: 12px 16px 14px;
 }
 
 /* ---- The block ----
@@ -94,7 +94,7 @@ button:disabled { cursor: default; }
 .name { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---- Top tab bar ---- */
-.bar { display: grid; grid-template-rows: 1fr 16px; padding: 0; overflow: hidden; }
+.bar { display: grid; grid-template-rows: 1fr; padding: 0; overflow: hidden; }
 .bar .tabs { display: flex; align-items: center; gap: 4px; padding: 0 8px 0 18px; }
 .brand { font-weight: 700; font-size: 19px; margin-right: 18px; white-space: nowrap; }
 .brand span { color: var(--ink-2); font-weight: 500; }
@@ -117,6 +117,7 @@ button:disabled { cursor: default; }
 .clock small { font-size: 24px; letter-spacing: 0; margin-left: 4px; color: var(--ink-2); font-weight: 600; }
 .wx { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1.5px solid var(--key); }
 .wx .ic { width: 32px; height: 32px; color: var(--weather-ic); stroke-width: 2.1; }
+.wxart { width: 52px; height: 52px; flex: none; }
 .wx b { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
 .wx span { color: var(--ink-2); font-weight: 600; line-height: 1.2; }
 .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -194,8 +195,10 @@ h2.head span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
 .flow .well { width: 44px; height: 44px; }
 .flow .well .ic { width: 26px; height: 26px; }
 .flow b { font-size: 19px; font-weight: 700; line-height: 1.1; margin-top: 2px; white-space: nowrap; }
-.flow .arrow { width: 36px; border-top: 2px dashed var(--ink); margin-top: 22px; }
-.flow .arrow.idle { border-top-color: var(--key); }
+/* Energy flow line: dashes march in the direction power is moving (transform only, so it stays on the compositor). */
+.flowline { width: 40px; height: 2px; margin-top: 22px; overflow: hidden; position: relative; }
+.flowline i { position: absolute; top: 0; left: -144px; right: -144px; height: 2px; background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px); }
+.flowline.idle i { background: repeating-linear-gradient(90deg, var(--key) 0 6px, transparent 6px 12px); }
 .evrow { display: flex; align-items: baseline; gap: 8px; font-weight: 700; white-space: nowrap; padding-top: 2px; border-top: 1.5px solid var(--key); }
 .evrow + .evrow { border-top: 0; padding-top: 0; }
 .evrow .sub { display: inline; }
@@ -213,6 +216,7 @@ h2.head span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
 .binlids i { width: 12px; height: 12px; border-radius: 2px; background: #5b6170; }
 .binlids i.y { background: #e8c21c; }
 .binlids i.g { background: #3f9a52; }
+.binlids i.r { background: #c8372b; }
 
 .alarm { padding: 10px 12px; display: grid; grid-template-rows: auto 1fr; gap: 8px; }
 .alarm .top { display: flex; align-items: center; gap: 10px; }
@@ -262,7 +266,7 @@ h2.head span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
 
 /* ---- Sub-views (Lights, Climate, Security, rooms, Media) ---- */
 a.brand { color: inherit; text-decoration: none; min-height: 48px; display: flex; align-items: center; }
-.sub { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; min-height: 0; }
+.subview { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; min-height: 0; }
 .vhead { display: flex; align-items: center; gap: 14px; padding: 10px 14px; min-height: 64px; }
 .vhead h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
 .vhead .sub-line { color: var(--ink-2); font-weight: 600; }
@@ -331,3 +335,35 @@ a.brand { color: inherit; text-decoration: none; min-height: 48px; display: flex
 .panel .grid { align-content: start; }
 .plan { aspect-ratio: 1; height: 100%; max-width: 100%; margin: 0 auto; }
 .plan img { object-fit: fill; }
+
+/* ---- Ambient: a faint time-of-day wash across the top of the ground (static; changes only with sun.sun) ---- */
+body { background-repeat: no-repeat; background-image: linear-gradient(to bottom, var(--sky, transparent), transparent 260px); }
+html[data-sky="dawn"] { --sky: color-mix(in srgb, var(--turmeric) 22%, transparent); }
+html[data-sky="dusk"] { --sky: color-mix(in srgb, var(--madder) 14%, transparent); }
+html[data-sky="night"] { --sky: color-mix(in srgb, var(--ink) 10%, transparent); }
+
+/* Calendar: today's stamp printed in turmeric. */
+.ev .d.today { background: var(--turmeric); color: var(--turmeric-ink); border-color: var(--ink); }
+.ev .d.today small { color: var(--turmeric-ink); }
+
+/* Lights view: share of a room's lights on, as a turmeric band. */
+.share { display: block; height: 6px; border-radius: 2px; background: color-mix(in srgb, var(--key) 40%, transparent); position: relative; overflow: hidden; }
+.share::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--lvl); background: var(--turmeric); }
+
+/* ---- Motion: state-driven, transform/opacity only; paused under the screensaver or when hidden ---- */
+html.still *, html.still *::before, html.still *::after { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Long cycles (12 dash steps, 3 turns) keep loop restarts, and the restyles they cost, rare. */
+  .flowline.to-right i { animation: march-r 13.2s linear infinite; }
+  .flowline.to-left i { animation: march-l 13.2s linear infinite; }
+  @keyframes march-r { from { transform: translateX(0); } to { transform: translateX(144px); } }
+  @keyframes march-l { from { transform: translateX(0); } to { transform: translateX(-144px); } }
+  .tile.spin .well .ic { animation: turn 9.6s linear infinite; animation-delay: var(--ph, 0s); }
+  @keyframes turn { to { transform: rotate(1080deg); } }
+  .banner.alert::after { animation: drift 2.6s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform: translate(3px, 3px); } to { transform: translate(5px, 4px); } }
+  #clock.stamp { display: inline-block; animation: stamp .26s cubic-bezier(.2, .9, .3, 1); }
+  @keyframes stamp { from { transform: scale(.965); opacity: .55; } to { transform: none; opacity: 1; } }
+  .enter { animation: enter .18s cubic-bezier(.2, .9, .3, 1); }
+  @keyframes enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}

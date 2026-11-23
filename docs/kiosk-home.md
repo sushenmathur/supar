@@ -92,6 +92,24 @@ Differences from the Lovelace view, on purpose:
 - The Festive action is always visible. The dashboard limits it to a date window.
 - **Bins (best effort):** the wheelie-bin sensors aren't defined in this repo. The page accepts days, dates or "Today"/"Tomorrow", and picks the soonest collection. Check it on the tablet.
 
+## Look and motion
+
+- **Weather and time of day:** the clock card shows a printed weather picture. The page background takes on a faint dawn, dusk or night tint from `sun.sun`.
+- **Calendar:** today's date stamp is turmeric.
+- **Moving only when something is happening:**
+  - Energy flow lines march in the direction power is moving.
+  - Robbie, washer and dryer icons turn while they run.
+  - An urgent alert's colour drifts slightly.
+  - The clock stamps on the minute.
+  - Views fade in.
+- **Kept light on the tablet:**
+  - Everything moving is transform/opacity only, so it runs on the GPU.
+  - Animations pause under the screensaver or when the page is hidden, and are off with reduced motion.
+  - Measured with Playwright on a 4× throttled CPU, with one live state change a second:
+    - every view holds 61 fps
+    - Lights and Security do no layout or style work while idle
+    - Home does one layout per real update, plus about 3 style recalculations a second for the running animations
+
 ## Deploy
 
 1. Copy `homeassistant/www/kiosk-home/` (with `vendor/` and `fonts/`) to `/config/www/kiosk-home/`.

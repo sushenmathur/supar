@@ -78,7 +78,7 @@ const lights = {
         const t = toggleTile(c, id, name, icon);
         return dim && on(c, id) ? `<div class="dimwrap">${t}<button class="dimbtn b" data-act="dim" data-arg="${id}" aria-label="Brightness">${c.ic('sun')}</button></div>` : t;
       }).join('');
-      return panel(c, { title: r.title, icon: r.icon, sub, right: sw, body: grid(1, tiles) });
+      return panel(c, { title: r.title, icon: r.icon, sub, right: sw, body: `<span class="share" style="--lvl:${Math.round((lit.length / ids.length) * 100)}%" aria-hidden="true"></span>` + grid(1, tiles) });
     }).join('');
     return head(c, { icon: 'bulb', title: 'Lighting', sub: `<b class="num">${n}</b> of ${ALL_LIGHTS.length} lights on`, right }) + cols('repeat(3, minmax(0, 1fr))', rooms);
   },

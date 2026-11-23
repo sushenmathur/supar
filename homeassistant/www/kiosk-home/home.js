@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=4';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=5';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -284,4 +284,13 @@ export function frontDoor(get) {
   const unlocked = st(get, E.frontDoor) !== 'off';
   const open = on(get, E.frontContact);
   return { label: `${unlocked ? 'Unlocked' : 'Locked'} · ${open ? 'Open' : 'Closed'}`, alert: unlocked || open, unlocked };
+}
+
+/** Time-of-day phase for the page's ambient tint: night, dawn, dusk or day (from sun.sun). */
+export function skyPhase(sun) {
+  if (!sun) return 'day';
+  if (sun.state === 'below_horizon') return 'night';
+  const el = Number(sun.attributes?.elevation);
+  if (Number.isFinite(el) && el < 12) return sun.attributes?.rising ? 'dawn' : 'dusk';
+  return 'day';
 }

@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=4';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=4';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=4';
-import * as H from './home.js?v=4';
-import { injectIcons, ic } from './icons.js?v=4';
-import { VIEWS, viewEntityIds } from './views.js?v=4';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=4';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=5';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=5';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=5';
+import * as H from './home.js?v=5';
+import { injectIcons, ic, weatherArt } from './icons.js?v=5';
+import { VIEWS, viewEntityIds } from './views.js?v=5';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=5';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -52,8 +52,13 @@ function confirmOr(key, fn) {
 const label = (key, text) => (armed.has(key) ? 'Tap again' : text);
 
 // ---- Small render helpers ----
+// Continuous animations restart when their element is re-rendered; a negative delay set to the
+// current phase keeps them moving smoothly instead of jumping back to the start.
+// The phase goes in as a placeholder so region output only differs when content does; renderAll fills it in on write.
+const phase = (ms) => `animation-delay:__PH${ms}__`;
+const fillPhase = (html) => html.replace(/__PH(\d+)__/g, (_, ms) => `-${((Date.now() % Number(ms)) / 1000).toFixed(2)}s`);
 const tile = ({ act, arg = '', icon, name, sub, on = false, alert = false, off = false, cls = '', key }) =>
-  `<button class="tile b ${cls}${on ? ' on' : ''}${alert ? ' alert' : ''}${off ? ' unavailable' : ''}" data-act="${act}" data-arg="${esc(arg)}"${off ? ' disabled' : ''}>
+  `<button class="tile b ${cls}${on ? ' on' : ''}${alert ? ' alert' : ''}${off ? ' unavailable' : ''}" data-act="${act}" data-arg="${esc(arg)}"${off ? ' disabled' : ''}${cls.includes('spin') ? ` style="--ph:__PH9600__"` : ''}>
     <span class="well">${ic(icon)}</span><span><span class="name">${esc(key ? label(key, name) : name)}</span><span class="sub">${esc(sub)}</span></span></button>`;
 
 function fmtTime(d, zone, opts = {}) {
@@ -78,7 +83,8 @@ const regions = {
     const w = get(E.weather);
     const t = parseFloat(w?.attributes?.temperature);
     const night = get(E.sun)?.state === 'below_horizon';
-    return `${ic(H.weatherIcon(w?.state, night))}<b class="num">${Number.isFinite(t) ? Math.round(t) : '–'}°</b><span>${esc(H.conditionText(w?.state) || 'Weather unavailable')}<br>North Lakes</span>`;
+    document.documentElement.dataset.sky = H.skyPhase(get(E.sun));
+    return `${weatherArt(H.weatherIcon(w?.state, night))}<b class="num">${Number.isFinite(t) ? Math.round(t) : '–'}°</b><span>${esc(H.conditionText(w?.state) || 'Weather unavailable')}<br>North Lakes</span>`;
   },
 
   people() {
@@ -105,7 +111,8 @@ const regions = {
       const time = allDay ? 'All day' : fmtTime(start, tz);
       const day = start.toLocaleDateString('en-AU', { timeZone: tz, weekday: 'short' }).toUpperCase();
       const date = start.toLocaleDateString('en-AU', { timeZone: tz, day: 'numeric' });
-      return `<div class="ev"><div class="d num"><small>${day}</small>${date}</div><div><span class="name">${esc(ev.summary)}</span><span class="sub">${esc(time)}${ev.location ? ` · ${esc(ev.location)}` : ''}</span></div></div>`;
+      const today = start.toLocaleDateString('en-AU', { timeZone: tz }) === new Date().toLocaleDateString('en-AU', { timeZone: tz });
+      return `<div class="ev"><div class="d num${today ? ' today' : ''}"><small>${today ? 'TODAY' : day}</small>${date}</div><div><span class="name">${esc(ev.summary)}</span><span class="sub">${esc(time)}${ev.location ? ` · ${esc(ev.location)}` : ''}</span></div></div>`;
     }).join('');
   },
 
@@ -145,7 +152,7 @@ const regions = {
       tile({ act: 'announce', icon: qh ? 'bellOff' : 'megaphone', name: qh ? 'Quiet' : 'Announce', sub: qh ? 'Quiet hour on' : 'Speak', on: qh }),
       tile({ act: 'lost-phone', icon: 'phone', name: 'Lost Phone', sub: 'Ring' }),
       tile({ act: 'wifi', icon: 'wifi', name: 'WiFi', sub: 'Guest QR' }),
-      tile({ act: 'robbie', icon: r.alert ? 'alert' : 'robot', name: 'Robbie', sub: r.label, on: r.on, alert: r.alert }),
+      tile({ act: 'robbie', icon: r.alert ? 'alert' : 'robot', name: 'Robbie', sub: r.label, on: r.on, alert: r.alert, cls: get(E.robbie)?.state === 'cleaning' ? 'spin' : '' }),
     ].join('');
   },
 
@@ -192,9 +199,9 @@ const regions = {
       </div>
       <div class="flow num">
         <div class="node"><span class="well">${ic('tower')}</span><b>${e.grid.value}</b><span class="sub">${e.grid.label}</span></div>
-        <span class="arrow${e.grid.dir === 'idle' ? ' idle' : ''}"></span>
+        <span class="flowline ${e.grid.dir === 'in' ? 'to-right' : e.grid.dir === 'out' ? 'to-left' : 'idle'}"><i style="${phase(13200)}"></i></span>
         <div class="node"><span class="well">${ic('home')}</span><b>${e.home}</b><span class="sub">Home</span></div>
-        <span class="arrow${e.solar.active ? '' : ' idle'}"></span>
+        <span class="flowline ${e.solar.active ? 'to-left' : 'idle'}"><i style="${phase(13200)}"></i></span>
         <div class="node"><span class="well">${ic(e.solar.active ? 'sun' : 'moon')}</span><b>${e.solar.value}</b><span class="sub">Solar</span></div>
       </div>
       <div><div class="evrow num">Tesla <span class="sub">${e.tesla.charging ? 'Charging' : 'Not charging'}</span><em>${e.tesla.value}</em></div>
@@ -208,8 +215,8 @@ const regions = {
     const d = H.machine(get, E.dryer, E.dryerEnd);
     const lids = bins ? `<span class="binlids">${bins.bins.map((b) => `<i class="${b.lid}" title="${b.label}"></i>`).join('')}</span>` : '';
     return `<div class="tile b"><span class="well">${ic('bin')}</span><span><span class="name">Bins</span><span class="sub">${bins ? esc(bins.when) : '—'}${lids}</span></span></div>`
-      + tile({ act: 'go', arg: '#laundry', icon: 'washer', name: 'Washer', sub: w.short ?? w.label, on: w.on })
-      + tile({ act: 'go', arg: '#laundry', icon: 'dryer', name: 'Dryer', sub: d.short ?? d.label, on: d.on });
+      + tile({ act: 'go', arg: '#laundry', icon: 'washer', name: 'Washer', sub: w.short ?? w.label, on: w.on, cls: w.on ? 'spin' : '' })
+      + tile({ act: 'go', arg: '#laundry', icon: 'dryer', name: 'Dryer', sub: d.short ?? d.label, on: d.on, cls: d.on ? 'spin' : '' });
   },
 
   alarm() {
@@ -248,6 +255,8 @@ function onRoute() {
   closeSheet();
   last.clear();
   renderAll();
+  const shown = route === 'home' ? $('#home-body') : $('#subview');
+  shown.classList.remove('enter'); void shown.offsetWidth; shown.classList.add('enter');
 }
 regions.subview = () => (VIEWS[route] ? VIEWS[route].render(viewCtx) : '');
 const viewCtx = { get, esc, ic, armed, label, H, E, tz: () => tz, fmtTime, isUnavailable, tile, call, quiet,
@@ -267,7 +276,7 @@ function renderAll() {
       if (last.get(name) === html) continue;
       last.set(name, html);
       const el = document.getElementById(name);
-      if (el) el.innerHTML = html;
+      if (el) el.innerHTML = fillPhase(html);
     }
   });
 }
@@ -277,12 +286,19 @@ function tick() {
   const now = new Date();
   const t = fmtTime(now, tz);
   const [hm, ap = ''] = t.split(/\s/);
-  $('#clock').textContent = hm;
-  $('#ampm').textContent = ap.toUpperCase();
+  const clk = $('#clock');
+  if (clk.textContent !== hm) {
+    // A small stamp when the minute changes (skipped on first paint).
+    if (clk.textContent) { clk.classList.remove('stamp'); void clk.offsetWidth; clk.classList.add('stamp'); }
+    clk.textContent = hm;
+  }
+  // Only touch the DOM when text changes: every write costs a restyle, more so while animations run.
+  const put = (sel, v) => { const el = $(sel); if (el.textContent !== v) el.textContent = v; };
+  put('#ampm', ap.toUpperCase());
   const hour = Number(now.toLocaleString('en-AU', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }));
-  $('#hello').textContent = `${H.greeting(hour)}, ${now.toLocaleDateString('en-AU', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long' })}`;
-  $('#india').textContent = fmtTime(now, 'Asia/Kolkata');
-  $('#austin').textContent = fmtTime(now, 'America/Chicago');
+  put('#hello', `${H.greeting(hour)}, ${now.toLocaleDateString('en-AU', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long' })}`);
+  put('#india', fmtTime(now, 'Asia/Kolkata'));
+  put('#austin', fmtTime(now, 'America/Chicago'));
 }
 
 // ---- Actions ----
@@ -596,9 +612,10 @@ async function boot() {
   setInterval(renderAll, 30_000);
   refreshCam();
   setInterval(refreshCam, CAMERA_REFRESH_MS);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) camPaused.add('hidden'); else { camPaused.delete('hidden'); refreshCam(); } });
+  const still = () => document.documentElement.classList.toggle('still', camPaused.size > 0);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) camPaused.add('hidden'); else { camPaused.delete('hidden'); refreshCam(); } still(); });
   if (inKioskSatellite()) {
-    const onKs = (s) => { if (s?.screensaver?.active) camPaused.add('saver'); else { camPaused.delete('saver'); refreshCam(); } };
+    const onKs = (s) => { if (s?.screensaver?.active) camPaused.add('saver'); else { camPaused.delete('saver'); refreshCam(); } still(); };
     addEventListener('kiosksatellite:kiosk-state', (e) => onKs(e.detail));
     quiet(Promise.resolve(ks.getKioskState?.()).then(onKs));
   }
