@@ -1,10 +1,10 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=1';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=1';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=1';
-import * as H from './home.js?v=1';
-import { injectIcons, ic } from './icons.js?v=1';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=1';
+import { VERSION, E, PEOPLE, CARS, NAV, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=2';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=2';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=2';
+import * as H from './home.js?v=2';
+import { injectIcons, ic } from './icons.js?v=2';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=2';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
