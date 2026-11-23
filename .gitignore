@@ -1,0 +1,7 @@
+# Impeccable skill: engine binary (downloaded on first run) and local runtime state
+**/skills/impeccable/scripts/bin/
+**/.impeccable/hook.cache.json
+**/.impeccable/hook.pending.json
+.impeccable/live/
+.impeccable/history/
+.impeccable/config.local.json
