@@ -76,12 +76,13 @@ The tab bar and room tiles open the other `master.yaml` views inside the same pa
 | `#kidsroom` | Kids Rooms | Samar and Shanaya: sensor chips (night light, tall lamp and occupancy toggle), live camera, aircon target and cool/heat/off |
 | `#outdoor` | Outdoor | Backyard & Patio, Front (front door, downlight, outdoor lights, driveway, outdoor plug), Side & Laundry |
 | `#laundry` | Laundry | Drying advice, water leak and laundry door badges; washer and dryer status, last run, last start, energy and cost, notify toggles, dryer power |
-| `#music` | Music | Every media player with now playing, previous / play-pause / next and volume; a button to Music Assistant |
+| `#music` | Music | The Music Assistant panel (`/d5369777_music_assistant`, set as `MUSIC_PANEL` in `config.js`) embedded under the tab bar, plus an Open full screen button |
 
 Differences from the Lovelace sub-views, on purpose or because the source isn't in the repo:
 
 - **No history graphs** on Climate: the page shows the current room temperature instead of the 12-hour line.
-- **Music** uses a third-party card (homeii-music-flow) whose code isn't in the repo, so this is a plain player list.
+- **Music** shows the Music Assistant panel itself rather than the dashboard's third-party music card. It uses a same-origin path, so no IP address is stored in the page.
+- **Live camera view** uses Home Assistant's MJPEG stream (`/api/camera_proxy_stream/…`), with a fall-back to 2-second snapshots. The stream closes when the pop-up does.
 - **Garage door and washer/dryer cards** are third-party too. The page uses the same entities from their config, with plain controls.
 - Two things in `master.yaml` look like typos and are copied as they are: Outdoor reads `binary_sensor.patio_door` (the navbar uses `binary_sensor.patio_door_contact`), and the dryer's notify toggle points at `automation.washing_machine_finished_announcement`.
 

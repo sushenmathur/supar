@@ -351,30 +351,12 @@ const laundry = {
   },
 };
 
-// ---- Music (players; the dashboard's Music view uses a third-party card) ----
-const SKIP = ['media_player.browser_', 'media_player.aarlo_'];
+// ---- Music: the Music Assistant panel, embedded so the tab bar stays to come back ----
 const music = {
   ids: [],
   render(c) {
-    const players = c.mediaIds().filter((id) => !SKIP.some((p) => id.startsWith(p)) && !off(c, id));
-    const card = (id) => {
-      const s = c.get(id);
-      const a = s.attributes ?? {};
-      const playing = s.state === 'playing';
-      const art = a.entity_picture && c.isLocalImage(a.entity_picture) ? `<img class="art" src="${c.esc(a.entity_picture)}" alt="">` : `<span class="well">${c.ic('music')}</span>`;
-      const vol = a.volume_level != null ? Math.round(a.volume_level * 100) : null;
-      return panel(c, { title: fname(c, id), sub: c.esc([a.media_title, a.media_artist].filter(Boolean).join(' — ') || cap(s.state)), cls: playing ? 'on' : '',
-        body: `<div class="mrow">${art}<div class="seg">
-          <button data-act="call" data-arg="media_player.media_previous_track|${id}" aria-label="Previous">${c.ic('prev')}</button>
-          <button data-act="call" data-arg="media_player.media_play_pause|${id}" aria-label="Play or pause">${c.ic(playing ? 'pause' : 'play')}</button>
-          <button data-act="call" data-arg="media_player.media_next_track|${id}" aria-label="Next">${c.ic('next')}</button>
-          ${vol != null ? `<button data-act="call" data-arg="media_player.volume_down|${id}" aria-label="Volume down">${c.ic('minus')}</button><span class="sub num">${vol}%</span><button data-act="call" data-arg="media_player.volume_up|${id}" aria-label="Volume up">${c.ic('plus')}</button>` : ''}
-        </div></div>` });
-    };
-    const list = players.length ? players.map(card).join('') : '<p class="empty">No media players found.</p>';
-    return head(c, { icon: 'music', title: 'Media', sub: `${players.filter((id) => st(c, id) === 'playing').length} playing`,
-      right: '<a class="btn line b" href="/music-assistant" style="display:flex;align-items:center;text-decoration:none;color:inherit">Open Music Assistant</a>' })
-      + `<div class="vbody scroll" style="grid-template-columns:repeat(3, minmax(0, 1fr))">${list}</div>`;
+    return head(c, { icon: 'music', title: 'Music', right: `<a class="btn line b" href="${c.musicPanel}" style="display:flex;align-items:center;text-decoration:none;color:inherit">Open full screen</a>` })
+      + `<div class="vbody"><iframe class="embed b" src="${c.musicPanel}" title="Music Assistant" allow="autoplay; fullscreen"></iframe></div>`;
   },
 };
 

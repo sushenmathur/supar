@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home
-export const VERSION = '6';
+export const VERSION = '7';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -117,6 +117,9 @@ export const ROBBIE_ROOMS = [
 ];
 
 // Guest WiFi QR, the same image the dashboard's WiFi popup shows.
+// Music Assistant's Home Assistant panel (same origin, so no host or IP in the page).
+export const MUSIC_PANEL = '/d5369777_music_assistant';
+
 export const WIFI_QR = '/api/image/serve/50750ef2d78e15cc901576e1c9fa2bae/512x512';
 
 // Navigation to the existing Lovelace views (same origin, so Kiosk Satellite keeps them in the kiosk).

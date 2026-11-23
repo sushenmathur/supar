@@ -227,7 +227,8 @@ h2.head span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
 .cam .cap small { font-weight: 500; opacity: .92; }
 
 /* ---- Sheet, toast, full-page message ---- */
-.sheet { width: min(560px, calc(100vw - 40px)); padding: 22px 24px; border: solid var(--key); border-width: 2px 1.5px 1.5px 2px; border-radius: 7px; background: var(--cloth); color: var(--ink); }
+/* margin: auto restores the dialog's own centring, which the global margin reset removes. */
+.sheet { margin: auto; max-height: calc(100vh - 48px); overflow-y: auto; width: min(560px, calc(100vw - 40px)); padding: 22px 24px; border: solid var(--key); border-width: 2px 1.5px 1.5px 2px; border-radius: 7px; background: var(--cloth); color: var(--ink); }
 .sheet::backdrop { background: rgba(15, 22, 54, 0.55); }
 .sheet h2 { font-size: 22px; font-weight: 700; }
 .sheet p { color: var(--ink-2); margin-top: 6px; }
@@ -361,3 +362,5 @@ html.still *, html.still *::before, html.still *::after { animation-play-state: 
   .enter { animation: enter .18s cubic-bezier(.2, .9, .3, 1); }
   @keyframes enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 }
+
+.embed { width: 100%; height: 100%; border-width: 2px 1.5px 1.5px 2px; border-style: solid; border-color: var(--key); border-radius: 6px; background: var(--cloth); padding: 0; }
