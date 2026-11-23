@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=7';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=7';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=7';
-import * as H from './home.js?v=7';
-import { injectIcons, ic, weatherArt } from './icons.js?v=7';
-import { VIEWS, viewEntityIds } from './views.js?v=7';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=7';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=8';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=8';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=8';
+import * as H from './home.js?v=8';
+import { injectIcons, ic, weatherArt } from './icons.js?v=8';
+import { VIEWS, viewEntityIds } from './views.js?v=8';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=8';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
