@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Home dashboard options</title>
+<style>
+@font-face { font-family: "Figtree"; font-weight: 300 900; font-display: swap; src: url("fonts/figtree-latin.woff2") format("woff2"); }
+:root { --bg: #f2f3f6; --ink: #161a24; --ink-2: #5a6070; --line: #dfe2e9; --card: #ffffff; }
+@media (prefers-color-scheme: dark) { :root { --bg: #11141b; --ink: #eef0f5; --ink-2: #9aa1b2; --line: #262b36; --card: #181c25; } }
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 500 15px/1.5 "Figtree", system-ui, sans-serif; padding: 32px 24px 48px; }
+main { max-width: 1240px; margin: 0 auto; }
+h1 { font-size: 30px; letter-spacing: -0.02em; line-height: 1.15; }
+.lede { color: var(--ink-2); max-width: 68ch; margin-top: 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 28px; }
+article { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+.frame { aspect-ratio: 16 / 10; position: relative; overflow: hidden; border-bottom: 1px solid var(--line); background: #0002; }
+.frame iframe { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; pointer-events: none; }
+.body { padding: 16px 18px 18px; display: grid; gap: 8px; flex: 1; align-content: start; }
+h2 { font-size: 19px; letter-spacing: -0.01em; }
+p { color: var(--ink-2); }
+dl { display: grid; grid-template-columns: 92px 1fr; gap: 4px 12px; font-size: 14px; }
+dt { color: var(--ink-2); }
+.open { justify-self: start; margin-top: 6px; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 10px; background: var(--ink); color: var(--bg); font-weight: 700; text-decoration: none; }
+.note { margin-top: 24px; color: var(--ink-2); font-size: 14px; max-width: 80ch; }
+kbd { font: 600 12px/1 ui-monospace, monospace; border: 1px solid var(--line); border-radius: 5px; padding: 2px 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>SuPar Home: three options for the kitchen wall tablet</h1>
+  <p class="lede">Static mock-ups at the tablet's 1280 × 800 landscape size, with sample data and every card from today's Home view. Tap lights and toggles to try them. Each option follows the tablet's light or dark mode; press <kbd>T</kbd> or the theme button to switch.</p>
+
+  <div class="grid">
+    <article>
+      <div class="frame"><iframe src="option-1-glass.html" title="Option 1 preview" loading="lazy" tabindex="-1"></iframe></div>
+      <div class="body">
+        <h2>1. Glass, evolved</h2>
+        <p>Today's Glass look with the noise taken out: one blur, fewer gradients, a clear top-to-bottom order from glance to touch. Lit rooms glow in their own colour.</p>
+        <dl><dt>Navigation</dt><dd>Side rail, as today</dd><dt>Type</dt><dd>Figtree</dd><dt>Feel</dt><dd>Familiar, soft, colourful</dd></dl>
+        <a class="open" href="option-1-glass.html">Open option 1</a>
+      </div>
+    </article>
+    <article>
+      <div class="frame"><iframe src="option-2-blockprint.html" title="Option 2 preview" loading="lazy" tabindex="-1"></iframe></div>
+      <div class="body">
+        <h2>2. Block print</h2>
+        <p>Hand-blocked cotton: indigo lines on blued white, with what's on printed in turmeric and alerts in madder, each pass slightly off register. A day column on the left, controls on the right.</p>
+        <dl><dt>Navigation</dt><dd>Top tab bar</dd><dt>Type</dt><dd>Hind</dd><dt>Feel</dt><dd>Crisp, warm, crafted</dd></dl>
+        <a class="open" href="option-2-blockprint.html">Open option 2</a>
+      </div>
+    </article>
+    <article>
+      <div class="frame"><iframe src="option-3-scoreboard.html" title="Option 3 preview" loading="lazy" tabindex="-1"></iframe></div>
+      <div class="body">
+        <h2>3. Scoreboard</h2>
+        <p>A heritage cricket scoreboard: the board across the top answers time, weather, who's home, lights on and alerts in big painted numerals. Plates below for control. Changed values swap like plates.</p>
+        <dl><dt>Navigation</dt><dd>Bottom dock</dd><dt>Type</dt><dd>Barlow Condensed and Barlow</dd><dt>Feel</dt><dd>Bold, legible from across the room</dd></dl>
+        <a class="open" href="option-3-scoreboard.html">Open option 3</a>
+      </div>
+    </article>
+  </div>
+  <p class="note">The front-door camera is a drawn stand-in, and names, events and figures are sample data. Fonts are self-hosted in <code>fonts/</code>, so the pages make no outside requests.</p>
+</main>
+<script>
+  const scale = () => document.querySelectorAll('.frame').forEach((f) => { f.querySelector('iframe').style.transform = `scale(${f.clientWidth / 1280})`; });
+  addEventListener('resize', scale); addEventListener('load', scale); scale();
+</script>
+</body>
+</html>

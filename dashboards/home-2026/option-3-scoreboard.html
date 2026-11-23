@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Home · Scoreboard</title>
+<style>
+@font-face { font-family: "Barlow Condensed"; font-weight: 500; font-display: swap; src: url("fonts/barlow-condensed-500-latin.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; font-display: swap; src: url("fonts/barlow-condensed-600-latin.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; font-display: swap; src: url("fonts/barlow-condensed-700-latin.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 400; font-display: swap; src: url("fonts/barlow-400-latin.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 500; font-display: swap; src: url("fonts/barlow-500-latin.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("fonts/barlow-600-latin.woff2") format("woff2"); }
+
+/* The board is scoreboard green in both modes. Light mode sets the rest on sightscreen white. */
+:root {
+  --board: #17402e;
+  --slot: #0c2619;
+  --paint: #f3f6ef;
+  --paint-2: rgba(243, 246, 239, 0.66);
+  --gold: #f2c230;
+  --gold-ink: #2a1f00;
+  --red: #c9361f;
+  --ground: #eef2ec;
+  --plate: #ffffff;
+  --plate-2: #e3ebe4;
+  --ink: #14301f;
+  --ink-2: #4b6455;
+  --rule: rgba(20, 48, 31, 0.16);
+  --ok: #1d7a3e;
+  --bad: #c2321f;
+  --sel: rgba(242, 194, 48, 0.45);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0b1d14; --plate: #143626; --plate-2: #1c4532; --ink: #f3f6ef; --ink-2: rgba(243, 246, 239, 0.68);
+    --rule: rgba(243, 246, 239, 0.12); --ok: #7fd69a; --bad: #ff8a73; --board: #123424; --slot: #081a10;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0b1d14; --plate: #143626; --plate-2: #1c4532; --ink: #f3f6ef; --ink-2: rgba(243, 246, 239, 0.68);
+  --rule: rgba(243, 246, 239, 0.12); --ok: #7fd69a; --bad: #ff8a73; --board: #123424; --slot: #081a10;
+}
+
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--ground); }
+body { font: 500 15px/1.3 "Barlow", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+::selection { background: var(--sel); }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; text-align: left; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ic { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.num { font-variant-numeric: tabular-nums; }
+.cond { font-family: "Barlow Condensed", "Barlow", sans-serif; }
+
+.stage {
+  position: absolute; left: 50%; top: 50%; width: 1280px; height: 800px;
+  transform: translate(-50%, -50%) scale(var(--fit, 1)); overflow: hidden;
+  background: var(--ground);
+  display: grid; grid-template-rows: 156px minmax(0, 1fr) 60px; gap: 14px; padding: 14px 16px;
+}
+
+/* ---- The board ---- */
+.board { background: var(--board); color: var(--paint); border-radius: 4px; padding: 10px 14px; display: grid; grid-template-rows: 1fr 28px; gap: 8px;
+  box-shadow: 0 6px 18px rgba(8, 26, 16, 0.25); }
+.slots { display: grid; grid-template-columns: 2.5fr 1.15fr 0.9fr 0.9fr 0.9fr 2.2fr; gap: 10px; }
+.slot { display: grid; grid-template-rows: auto 1fr; gap: 6px; min-width: 0; }
+.slot > span { font: 600 13px/1 "Barlow Condensed", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--paint-2); }
+.plate-n { padding-block: 4px; background: var(--slot); border-radius: 3px; display: flex; align-items: center; justify-content: center; gap: 8px; overflow: hidden;
+  font: 700 58px/1 "Barlow Condensed", sans-serif; letter-spacing: -0.01em; color: var(--paint); box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.35); }
+.plate-n small { font-size: 22px; font-weight: 600; color: var(--paint-2); align-self: flex-end; margin-bottom: 10px; letter-spacing: .04em; }
+.plate-n.time { justify-content: flex-start; padding-left: 16px; font-size: 76px; }
+.plate-n.wide { flex-direction: column; justify-content: center; align-items: flex-start; padding: 0 10px; gap: 6px; font-size: 26px; }
+.plate-n.wide small { font: 600 15px/1.2 "Barlow", sans-serif; color: var(--paint-2); margin: 0; letter-spacing: 0; }
+.plate-n .ic { width: 34px; height: 34px; color: var(--gold); }
+.plate-n.gold { color: var(--gold); }
+.zl { display: flex; align-items: baseline; gap: 6px; font-size: 21px; white-space: nowrap; }
+.zl em { font: 600 13px/1 "Barlow Condensed", sans-serif; font-style: normal; letter-spacing: .12em; text-transform: uppercase; color: var(--paint-2); width: 42px; }
+.lamp { width: 14px; height: 14px; border-radius: 50%; background: #ff5a3f; box-shadow: 0 0 0 3px rgba(255, 120, 100, 0.35); flex: none; }
+.alertslot .plate-n { justify-content: space-between; padding: 0 10px 0 14px; font-size: 26px; gap: 10px; }
+.alertslot .plate-n > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.alertslot .plate-n b { display: flex; align-items: center; gap: 10px; white-space: nowrap; font-weight: 700; }
+.alertslot .plate-n small { font: 600 14px/1.1 "Barlow", sans-serif; margin: 0; letter-spacing: 0; color: var(--paint-2); white-space: nowrap; }
+.alertslot .btns { display: grid; gap: 6px; flex: none; }
+.bb { min-height: 36px; padding: 0 12px; border-radius: 3px; font: 700 15px/1 "Barlow Condensed", sans-serif; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.bb.go { background: var(--paint); color: var(--board); }
+.bb.ghost { border: 1.5px solid rgba(243, 246, 239, 0.4); color: var(--paint); min-height: 32px; }
+.bb.armed { background: var(--gold); color: var(--gold-ink); }
+[data-alert].resolved .lamp { background: #3c6b52; box-shadow: none; }
+.ticker { display: flex; align-items: center; gap: 18px; background: var(--slot); border-radius: 3px; padding: 4px 14px; overflow: hidden; white-space: nowrap;
+  font: 600 16px/1 "Barlow Condensed", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--paint-2); }
+.ticker b { color: var(--paint); font-weight: 700; }
+.ticker .sep { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; flex: none; }
+
+/* ---- Plates below the board ---- */
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; min-height: 0; }
+.col { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
+h2 { font: 700 15px/1 "Barlow Condensed", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); display: flex; justify-content: space-between; padding: 2px 2px 0; }
+h2 span { letter-spacing: .06em; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.p { background: var(--plate); border: 1px solid var(--rule); border-radius: 3px; display: flex; align-items: center; gap: 10px; padding: 5px 12px; min-height: 48px; min-width: 0;
+  box-shadow: 0 1px 2px rgba(8, 26, 16, 0.08); transition: background .2s ease, color .2s ease; }
+.p .ic { color: var(--ink-2); }
+.p b { display: block; font: 700 18px/1.05 "Barlow Condensed", sans-serif; letter-spacing: .01em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p small { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p .val { margin-left: auto; font: 700 22px/1 "Barlow Condensed", sans-serif; }
+.p > span:not(.val):not(.mono) { min-width: 0; }
+.p.on { background: var(--gold); color: var(--gold-ink); border-color: transparent; }
+.p.on .ic, .p.on small { color: rgba(42, 31, 0, 0.75); }
+.p.bad { border-color: var(--bad); }
+.p.bad small { color: var(--bad); font-weight: 700; }
+.p .ok { color: var(--ok); font-weight: 700; }
+.p.tall { flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; min-height: 60px; padding: 7px 12px; }
+.p.tall .ic { width: 22px; height: 22px; }
+
+.mono { width: 38px; height: 38px; border-radius: 3px; display: grid; place-items: center; font: 700 20px/1 "Barlow Condensed", sans-serif; color: #fff; flex: none; }
+.batt { margin-left: auto; display: flex; align-items: center; gap: 8px; font: 700 20px/1 "Barlow Condensed", sans-serif; }
+.batt i { width: 40px; height: 12px; background: var(--plate-2); border-radius: 2px; overflow: hidden; }
+.batt i::after { content: ""; display: block; height: 100%; width: var(--lvl); background: var(--ok); }
+
+.energy { background: var(--plate); border: 1px solid var(--rule); border-radius: 3px; padding: 10px 12px; display: grid; gap: 8px; }
+.estats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.estats div { background: var(--plate-2); border-radius: 3px; padding: 5px 8px; }
+.estats b { display: block; font: 700 22px/1 "Barlow Condensed", sans-serif; }
+.estats small { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.estats .credit b { color: var(--ok); }
+.eflow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; }
+.eflow div { display: grid; justify-items: center; gap: 2px; }
+.eflow b { font: 700 20px/1 "Barlow Condensed", sans-serif; }
+.eflow small { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.eflow .ic { width: 22px; height: 22px; color: var(--ink-2); }
+.eline { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 6px; }
+.eline b { color: var(--ink); }
+
+.ev { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; min-height: 42px !important; padding: 0 12px 0 4px !important; }
+.ev .d { background: var(--slot); color: var(--paint); border-radius: 2px; text-align: center; padding: 3px 0; font: 700 18px/1 "Barlow Condensed", sans-serif; }
+.ev .d small { display: block; font-size: 10px; letter-spacing: .12em; color: var(--paint-2); margin-bottom: 1px; }
+
+.cam { position: relative; flex: 1; min-height: 0; border-radius: 3px; overflow: hidden; border: 1px solid var(--rule); }
+.cam svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cam .cap { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: baseline; padding: 18px 12px 8px; color: #fff; background: linear-gradient(transparent, rgba(8, 26, 16, 0.8)); }
+.cam .cap b { font: 700 19px/1 "Barlow Condensed", sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+.cam .cap small { font-size: 13px; font-weight: 600; opacity: .9; }
+.cam .tag { position: absolute; top: 8px; left: 8px; font: 700 12px/1 "Barlow Condensed", sans-serif; letter-spacing: .1em; text-transform: uppercase; background: var(--gold); color: var(--gold-ink); padding: 4px 7px; border-radius: 2px; }
+.bins { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; }
+.bins i { width: 11px; height: 11px; border-radius: 2px; background: #5d6a62; }
+.bins i.y { background: #e8c21c; }
+
+/* ---- Dock ---- */
+.dock { display: flex; align-items: stretch; gap: 6px; background: var(--board); border-radius: 4px; padding: 6px; color: var(--paint-2); }
+.dk { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 3px; font: 700 17px/1 "Barlow Condensed", sans-serif; letter-spacing: .1em; text-transform: uppercase; position: relative; }
+.dk.cur { background: var(--gold); color: var(--gold-ink); }
+.dk .ct { min-width: 22px; height: 20px; padding: 0 5px; border-radius: 3px; background: var(--red); color: #fff; font-size: 14px; letter-spacing: 0; display: grid; place-items: center; }
+.dk.theme { flex: 0 0 120px; }
+.sample { position: absolute; right: 20px; bottom: 76px; font-size: 11px; font-weight: 600; color: var(--ink-2); }
+
+/* Signature: a changed value swaps like a plate being changed. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-swap].swapping { animation: plate .34s cubic-bezier(.2, .9, .3, 1); }
+  @keyframes plate { 0% { transform: translateY(-55%); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .p:active, .dk:active { transform: translateY(1px); }
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <section class="board" aria-label="Home at a glance">
+    <div class="slots">
+      <div class="slot"><span data-greeting>Good evening</span><div class="plate-n time num"><span data-clock data-swap>6:42</span><small data-ampm>PM</small></div></div>
+      <div class="slot"><span>North Lakes</span><div class="plate-n num"><svg class="ic"><use href="#i-cloudsun"/></svg>27°</div></div>
+      <div class="slot"><span>Home</span><div class="plate-n num">2<small>/2</small></div></div>
+      <div class="slot"><span>Lights on</span><div class="plate-n gold num"><span data-lights-on data-swap>3</span><small>/<span data-lights-total>6</span></small></div></div>
+      <div class="slot"><span>Clocks</span><div class="plate-n wide num"><span class="zl"><em>India</em><span data-india>2:12 pm</span></span><span class="zl"><em>Austin</em><span data-austin>2:42 am</span></span></div></div>
+      <div class="slot alertslot" data-alert><span>Alert</span>
+        <div class="plate-n">
+          <div><b><i class="lamp"></i>Garage open</b><small>12 min · also: side door</small></div>
+          <div class="btns"><button class="bb go" data-confirm data-done="Closing">Close door</button><button class="bb ghost">Snooze 1 h</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="ticker"><span data-date-short>Sun 23 Nov</span><i class="sep"></i><span><b>Side door</b> open 3 min</span><i class="sep"></i><span><b>Washer</b> done 7:00 pm</span><i class="sep"></i><span><b>Bins</b> out Tuesday night</span><i class="sep"></i><span>Shoulder rate <b>$0.32</b>/kWh</span></div>
+  </section>
+
+  <div class="cols">
+    <div class="col">
+      <h2>Family</h2>
+      <div class="p"><span class="mono" style="background:#2f5d8a">S</span><span><b>Sushen</b><small class="ok">Home</small></span><span class="batt num">64%<i style="--lvl:64%"></i></span></div>
+      <div class="p"><span class="mono" style="background:#a63c52">P</span><span><b>Paro</b><small class="ok">Home</small></span><span class="batt num">41%<i style="--lvl:41%"></i></span></div>
+      <h2>Quick actions</h2>
+      <div class="grid3">
+        <button class="p tall" data-toggle="Running|Run scene"><svg class="ic"><use href="#i-moon"/></svg><span><b>Good Night</b><small data-state>Run scene</small></span></button>
+        <button class="p tall" data-toggle="On|Off"><svg class="ic"><use href="#i-sparkle"/></svg><span><b>Festive</b><small data-state>Off</small></span></button>
+        <button class="p tall" data-toggle="Quiet hour|Speakers on"><svg class="ic"><use href="#i-megaphone"/></svg><span><b>Announce</b><small data-state>Speakers on</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-phone"/></svg><span><b>Lost Phone</b><small>Ring</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-wifi"/></svg><span><b>WiFi</b><small>Guest QR</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-robot"/></svg><span><b>Robbie</b><small>Docked</small></span></button>
+      </div>
+      <h2>Rooms</h2>
+      <div class="grid3">
+        <button class="p tall on"><svg class="ic"><use href="#i-sofa"/></svg><span><b>Living</b><small>3 lights on</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-kids"/></svg><span><b>Kids</b><small>Samar in</small></span></button>
+        <button class="p tall on"><svg class="ic"><use href="#i-garage"/></svg><span><b>Garage</b><small>Open · light</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-tree"/></svg><span><b>Outdoor</b><small>All off</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-washer"/></svg><span><b>Laundry</b><small>Washer 18 min</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-tv"/></svg><span><b>Media</b><small>TV off</small></span></button>
+      </div>
+    </div>
+
+    <div class="col">
+      <h2>Favourite lights <span class="num"><span data-lights-on></span> of <span data-lights-total></span></span></h2>
+      <div class="grid2">
+        <button class="p on" data-light data-toggle="80%|Off"><svg class="ic"><use href="#i-pendant"/></svg><span><b>Kitchen Pendants</b><small data-state data-swap>80%</small></span></button>
+        <button class="p" data-light data-toggle="100%|Off"><svg class="ic"><use href="#i-pendant"/></svg><span><b>Dining</b><small data-state data-swap>Off</small></span></button>
+        <button class="p" data-light data-toggle="100%|Off"><svg class="ic"><use href="#i-downlight"/></svg><span><b>Media Room</b><small data-state data-swap>Off</small></span></button>
+        <button class="p on" data-light data-toggle="60%|Off"><svg class="ic"><use href="#i-lamp"/></svg><span><b>Tall Lamp</b><small data-state data-swap>60%</small></span></button>
+        <button class="p" data-light data-toggle="100%|Off"><svg class="ic"><use href="#i-downlight"/></svg><span><b>Corridor</b><small data-state data-swap>Off</small></span></button>
+        <button class="p on" data-light data-toggle="40%|Off"><svg class="ic"><use href="#i-downlight"/></svg><span><b>Hallway</b><small data-state data-swap>40%</small></span></button>
+      </div>
+      <h2>Living room</h2>
+      <div class="grid2">
+        <button class="p" data-toggle="On · Netflix|Off"><svg class="ic"><use href="#i-tv"/></svg><span><b>TV</b><small data-state data-swap>Off</small></span></button>
+        <button class="p on" data-toggle="Cooling · 24°|Off · 24°"><svg class="ic"><use href="#i-snow"/></svg><span><b>Aircon</b><small data-state data-swap class="num">Cooling · 24°</small></span></button>
+      </div>
+      <h2>Cars</h2>
+      <div class="grid2">
+        <div class="p"><svg class="ic"><use href="#i-car"/></svg><span><b>Sorento</b><small>Home</small></span><span class="val num">100%</span></div>
+        <div class="p"><svg class="ic"><use href="#i-car"/></svg><span><b>Bluey</b><small>Home</small></span><span class="val num">42%</span></div>
+      </div>
+      <h2>Family calendar</h2>
+      <div class="p ev"><div class="d num"><small>MON</small>24</div><span><b>Samar: swimming</b><small>4:30 pm · Aquatic centre</small></span></div>
+      <div class="p ev"><div class="d num"><small>TUE</small>25</div><span><b>Bin night</b><small>Recycling and general waste</small></span></div>
+      <div class="p ev"><div class="d num"><small>WED</small>26</div><span><b>Paro: dentist</b><small>9:15 am</small></span></div>
+    </div>
+
+    <div class="col">
+      <h2>Security</h2>
+      <div class="grid3">
+        <button class="p tall"><svg class="ic"><use href="#i-shield"/></svg><span><b>Alarm</b><small class="ok">Disarmed</small></span></button>
+        <button class="p tall bad"><svg class="ic"><use href="#i-garage"/></svg><span><b>Garage</b><small>Open</small></span></button>
+        <button class="p tall"><svg class="ic"><use href="#i-lock"/></svg><span><b>Front door</b><small class="ok">Locked</small></span></button>
+      </div>
+      <h2>Energy <span>Shoulder · $0.32/kWh</span></h2>
+      <div class="energy">
+        <div class="estats num">
+          <div><b>$5.05</b><small>Today</small></div>
+          <div class="credit"><b>$0.32</b><small>Solar credit</small></div>
+          <div><b>$116.40</b><small>Bill to date</small></div>
+          <div><b>$171.83</b><small>Est. bill</small></div>
+        </div>
+        <div class="eflow num">
+          <div><svg class="ic"><use href="#i-tower"/></svg><b>640 W</b><small>From grid</small></div>
+          <div><svg class="ic"><use href="#i-home"/></svg><b>640 W</b><small>Home</small></div>
+          <div><svg class="ic"><use href="#i-sun"/></svg><b>0 W</b><small>Solar</small></div>
+        </div>
+        <div class="eline num"><span>Tesla <b>0 W</b> · Kia <b>0 W</b></span><span>Self-powered <b>0%</b></span></div>
+      </div>
+      <div class="grid3">
+        <div class="p tall"><svg class="ic"><use href="#i-bin"/></svg><span><b>Bins</b><small>Tue<span class="bins"><i></i><i class="y"></i></span></small></span></div>
+        <div class="p tall on"><svg class="ic"><use href="#i-washer"/></svg><span><b>Washer</b><small class="num">18 min left</small></span></div>
+        <div class="p tall"><svg class="ic"><use href="#i-dryer"/></svg><span><b>Dryer</b><small>Idle</small></span></div>
+      </div>
+      <figure class="cam">
+        <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="400" height="200" fill="#26304a"/>
+          <rect x="0" y="140" width="400" height="60" fill="#3a3f45"/>
+          <rect x="150" y="22" width="104" height="150" rx="3" fill="#1a1f2b"/>
+          <rect x="160" y="32" width="84" height="132" fill="#2c3550"/>
+          <circle cx="232" cy="100" r="3" fill="#c9a96b"/>
+          <rect x="268" y="48" width="70" height="88" fill="#4a5470"/>
+          <rect x="274" y="54" width="58" height="76" fill="#f5c46a" opacity=".55"/>
+          <circle cx="110" cy="46" r="7" fill="#ffd27a"/><circle cx="110" cy="46" r="26" fill="#ffd27a" opacity=".18"/>
+          <path d="M0 140c30-22 60-26 90-8v68H0z" fill="#2f4a3a"/>
+        </svg>
+        <span class="tag">Stand-in image</span>
+        <figcaption class="cap"><b>Front door</b><small>6:40 pm</small></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <nav class="dock" aria-label="Views">
+    <button class="dk cur" aria-current="page"><svg class="ic"><use href="#i-home"/></svg>Home</button>
+    <button class="dk"><svg class="ic"><use href="#i-rooms"/></svg>Rooms</button>
+    <button class="dk"><svg class="ic"><use href="#i-bulb"/></svg>Lights <span class="ct num" data-lights-on></span></button>
+    <button class="dk"><svg class="ic"><use href="#i-thermo"/></svg>Climate</button>
+    <button class="dk"><svg class="ic"><use href="#i-shield"/></svg>Security <span class="ct">1</span></button>
+    <button class="dk"><svg class="ic"><use href="#i-music"/></svg>Music</button>
+    <button class="dk"><svg class="ic"><use href="#i-more"/></svg>More</button>
+    <button class="dk theme" data-theme-btn title="Theme (T)"><svg class="ic"><use href="#i-contrast"/></svg><span data-theme-label>Auto</span></button>
+  </nav>
+  <span class="sample">Sample data</span>
+</div>
+<script src="mock.js"></script>
+</body>
+</html>
