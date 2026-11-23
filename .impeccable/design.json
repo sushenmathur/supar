@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-23T06:44:35.961632+00:00",
+  "generatedAt": "2026-11-23T06:52:38.117464+00:00",
   "title": "Design System: SuPar Home",
   "extensions": {
     "colorMeta": {
@@ -42,7 +42,7 @@
         "role": "primary",
         "displayName": "Indigo Ink",
         "canonical": "#1b2559",
-        "purpose": "Text, icon wells, meters (light).",
+        "purpose": "Text, icon wells, neutral count badge, meters (light).",
         "tonalRamp": [
           "#070916",
           "#0c1128",
@@ -88,7 +88,7 @@
           "#bbbecd",
           "#e8e9ee"
         ],
-        "darkCanonical": "rgba(226, 231, 250, 0.34)"
+        "darkCounterpart": "night-key-line"
       },
       "turmeric": {
         "role": "secondary",
@@ -127,7 +127,7 @@
         "role": "tertiary",
         "displayName": "Madder",
         "canonical": "#b4362b",
-        "purpose": "Attention pass, badges, toast (light).",
+        "purpose": "Attention pass, Security count badge, armed destructive action, toast (light). Text on it is solid #fff.",
         "tonalRamp": [
           "#2d0e0b",
           "#511813",
@@ -173,6 +173,23 @@
           "#eaf0ec"
         ],
         "darkCounterpart": "night-dabu"
+      },
+      "weather-ochre": {
+        "role": "secondary",
+        "displayName": "Weather Ochre",
+        "canonical": "#9a6200",
+        "purpose": "Weather icon only (light); dark uses night-turmeric.",
+        "tonalRamp": [
+          "#261800",
+          "#452c00",
+          "#643f00",
+          "#825300",
+          "#ae8133",
+          "#c7a872",
+          "#e0cfb2",
+          "#f4efe5"
+        ],
+        "darkCounterpart": "night-turmeric"
       },
       "indigo-night": {
         "role": "neutral",
@@ -226,7 +243,7 @@
         "role": "neutral",
         "displayName": "Night Faded",
         "canonical": "#b4bde2",
-        "purpose": "Secondary text (dark).",
+        "purpose": "Secondary text and buti petals (dark).",
         "tonalRamp": [
           "#2d2f38",
           "#515566",
@@ -236,6 +253,38 @@
           "#d6dbef",
           "#e8ebf6",
           "#f8f8fc"
+        ]
+      },
+      "night-key-line": {
+        "role": "primary",
+        "displayName": "Night Key Line",
+        "canonical": "rgba(226, 231, 250, 0.34)",
+        "purpose": "Block outline (dark).",
+        "tonalRamp": [
+          "#38393e",
+          "#656770",
+          "#9296a2",
+          "#c0c4d4",
+          "#e7ebfb",
+          "#eff1fc",
+          "#f6f7fd",
+          "#fcfcfe"
+        ]
+      },
+      "night-overprint-line": {
+        "role": "primary",
+        "displayName": "Overprint Line",
+        "canonical": "rgba(10, 14, 40, 0.55)",
+        "purpose": "Key line redrawn above an opaque on/alert pass (dark only).",
+        "tonalRamp": [
+          "#02030a",
+          "#040612",
+          "#06091a",
+          "#080b22",
+          "#3b3e53",
+          "#787a88",
+          "#b5b6be",
+          "#e6e6e9"
         ]
       },
       "night-well": {
@@ -317,28 +366,136 @@
           "#dff1e3",
           "#f4faf6"
         ]
+      },
+      "lid-charcoal": {
+        "role": "literal",
+        "displayName": "Bin Lid Charcoal",
+        "canonical": "#5b6170",
+        "purpose": "Real Things Exception: general-waste lid swatch only.",
+        "tonalRamp": [
+          "#16181c",
+          "#282b32",
+          "#3b3f48",
+          "#4d525f",
+          "#7b808c",
+          "#a4a8b0",
+          "#cdcfd4",
+          "#eeeff0"
+        ]
+      },
+      "lid-yellow": {
+        "role": "literal",
+        "displayName": "Bin Lid Yellow",
+        "canonical": "#e8c21c",
+        "purpose": "Real Things Exception: recycling lid swatch only.",
+        "tonalRamp": [
+          "#3a3007",
+          "#68570c",
+          "#967e12",
+          "#c5a417",
+          "#ecce49",
+          "#f2dd82",
+          "#f8ecba",
+          "#fcf8e8"
+        ]
+      },
+      "lid-green": {
+        "role": "literal",
+        "displayName": "Bin Lid Green",
+        "canonical": "#3f9a52",
+        "purpose": "Real Things Exception: garden-organics lid swatch only.",
+        "tonalRamp": [
+          "#0f2614",
+          "#1c4524",
+          "#286435",
+          "#358245",
+          "#65ae74",
+          "#95c79f",
+          "#c5e0cb",
+          "#ebf4ed"
+        ]
+      },
+      "monogram-indigo": {
+        "role": "literal",
+        "displayName": "Monogram Indigo",
+        "canonical": "#3a4aa6",
+        "purpose": "Real Things Exception: one family member's monogram only.",
+        "tonalRamp": [
+          "#0e1229",
+          "#1a214a",
+          "#25306b",
+          "#313e8d",
+          "#616eb7",
+          "#929bce",
+          "#c3c8e4",
+          "#ebecf6"
+        ]
+      },
+      "monogram-aubergine": {
+        "role": "literal",
+        "displayName": "Monogram Aubergine",
+        "canonical": "#6b4a8e",
+        "purpose": "Real Things Exception: one family member's monogram only.",
+        "tonalRamp": [
+          "#1a1223",
+          "#30213f",
+          "#45305c",
+          "#5a3e78",
+          "#886ea4",
+          "#ad9bc0",
+          "#d2c8dd",
+          "#f0ecf3"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Clock",
-        "purpose": "The clock only; tabular figures."
+        "purpose": "Clock group: the 88px time only; tabular figures."
+      },
+      "reading": {
+        "displayName": "Clock Temperature",
+        "purpose": "Clock group: the 30px outdoor temperature beside the weather icon."
+      },
+      "display-suffix": {
+        "displayName": "Clock Suffix",
+        "purpose": "Clock group: AM/PM in Faded Indigo."
       },
       "headline": {
         "displayName": "Sheet Title",
-        "purpose": "Dialog titles."
+        "purpose": "Dialog titles and announce keypad keys."
+      },
+      "stamp": {
+        "displayName": "Date Stamp",
+        "purpose": "Figures group: calendar date-stamp numeral."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Figures group: world-clock times, energy flow figures; brand wordmark (700) and full-page message (600)."
+      },
+      "figure-small": {
+        "displayName": "Figure Small",
+        "purpose": "Figures group: energy stats, banner title, monogram initial."
       },
       "title": {
         "displayName": "Name / Block Head",
-        "purpose": "Tile names and block heads; key figures step up to 18-19px."
+        "purpose": "Names and Body group: block heads 16px; tile names 15.5px (14.5px in six-up rows)."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Default text and buttons."
+        "purpose": "Names and Body group: default text and buttons; banner subtitles at 14px."
       },
       "label": {
         "displayName": "Subtitle",
-        "purpose": "The line under every name; counts and captions."
+        "purpose": "Labels and Marks group: line under every name (13px in dense rows, counts, captions)."
+      },
+      "badge": {
+        "displayName": "Count Badge",
+        "purpose": "Labels and Marks group: tab count badges."
+      },
+      "stamp-day": {
+        "displayName": "Stamp Weekday",
+        "purpose": "Labels and Marks group: uppercase weekday on a date stamp."
       }
     },
     "shadows": [],
@@ -347,6 +504,7 @@
       "passBlendLight": "multiply",
       "passBlendDark": "normal",
       "keyLineWidths": "2px 1.5px 1.5px 2px",
+      "darkOverprint": "::before redraws the key line in rgba(10, 14, 40, 0.55) above the opaque pass on .on/.alert blocks (dark only)",
       "purpose": "State colour pass printed out of register over the key line; replaces elevation."
     },
     "focus": {
@@ -358,10 +516,11 @@
     },
     "ornament": {
       "name": "buti",
-      "size": "22px x 12px",
-      "use": "12px border strip at the tab bar foot and the clock block head only",
-      "light": "madder petals, indigo centre",
-      "dark": "turmeric petals, madder centre"
+      "size": "22px x 16px",
+      "shape": "five-petal flower, dot between repeats",
+      "use": "16px border strip at the tab bar foot and the clock block head only",
+      "light": "indigo-ink petals, cloth centre",
+      "dark": "night-faded petals, night-cloth centre"
     },
     "motion": [
       {
@@ -389,7 +548,12 @@
     "iconography": {
       "source": "in-house SVG sprite",
       "stroke": "2.1, round caps and joins",
-      "size": "24px (19-21px in dense rows)"
+      "size": "24px default; 26px in 44px flow wells; 20px in 32px two-line tile wells; 19-20px in tabs and utility tiles"
+    },
+    "confirm": {
+      "window": "3000ms",
+      "banner": "armed button turns turmeric",
+      "sheet": "destructive tile takes the madder pass, label \"Tap again to...\""
     }
   },
   "components": [
@@ -398,32 +562,40 @@
       "kind": "card",
       "refersTo": "tile",
       "description": "The everyday control: block, carved well, name and subtitle.",
-      "html": "<button class=\"ds-b ds-tile\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z\"/></svg></span><span><span class=\"ds-name\">Kitchen Pendant</span><span class=\"ds-sub\">Off</span></span></button>",
-      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:rgba(255,255,255,.86)}"
+      "html": "<button class=\"ds-b ds-tile\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z\"/></svg></span><span><span class=\"ds-name\">Kitchen Pendants</span><span class=\"ds-sub\">Off</span></span></button>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:3}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b::before{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:2;pointer-events:none;border-radius:inherit;border:solid transparent;border-width:2px 1.5px 1.5px 2px}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:#fff}"
     },
     {
       "name": "Tile (on)",
       "kind": "card",
       "refersTo": "tile-on",
       "description": "Turmeric pass printed 3px out of register over the key line.",
-      "html": "<button class=\"ds-b ds-tile on\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z\"/></svg></span><span><span class=\"ds-name\">Kitchen Pendant</span><span class=\"ds-sub\">On · 80%</span></span></button>",
-      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:rgba(255,255,255,.86)}"
+      "html": "<button class=\"ds-b ds-tile on\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z\"/></svg></span><span><span class=\"ds-name\">Kitchen Pendants</span><span class=\"ds-sub\">On · 80%</span></span></button>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:3}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b::before{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:2;pointer-events:none;border-radius:inherit;border:solid transparent;border-width:2px 1.5px 1.5px 2px}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:#fff}"
     },
     {
       "name": "Tile (alert)",
       "kind": "card",
       "refersTo": "tile-alert",
-      "description": "Madder pass; the well inverts to near-white with a madder icon.",
+      "description": "Madder pass; solid white text; the well inverts to near-white with a madder icon.",
       "html": "<button class=\"ds-b ds-tile alert\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 9.5 12 4l9 5.5V20H3z\"/><path d=\"M7 20v-8h10v8M7 14.5h10M7 17h10\"/></svg></span><span><span class=\"ds-name\">Garage</span><span class=\"ds-sub\">Open 12 min</span></span></button>",
-      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:rgba(255,255,255,.86)}"
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:3}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b::before{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:2;pointer-events:none;border-radius:inherit;border:solid transparent;border-width:2px 1.5px 1.5px 2px}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-tile{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:#fff}"
+    },
+    {
+      "name": "Tile (two-line)",
+      "kind": "card",
+      "refersTo": "tile-two-line",
+      "description": "Action, room and TV/Aircon tiles: 32px well and name on line one, summary full width below, top-aligned.",
+      "html": "<button class=\"ds-b ds-tile2\"><span class=\"ds-well\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z\"/></svg></span><span class=\"ds-name\">Living</span><span class=\"ds-sub\">3 of 6 lights on · 24°</span></button>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:3}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b::before{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:2;pointer-events:none;border-radius:inherit;border:solid transparent;border-width:2px 1.5px 1.5px 2px}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-well{width:40px;height:40px;border-radius:5px 4px 6px 4px;display:grid;place-items:center;flex:none;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd)}.ds-b.alert .ds-well{background:rgba(255,255,255,.92);color:#b4362b}.ds-ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-x{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:48px;min-width:200px;cursor:pointer;text-align:left}.ds-tile:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tile:active{transform:translate(1px,1px)}.ds-name{display:block;font-size:15.5px;font-weight:700;line-height:1.15}.ds-sub{display:block;font-size:13.5px;font-weight:600;color:#47527f}.ds-b.on .ds-sub{color:rgba(42,28,0,.78)}.ds-b.alert .ds-sub{color:#fff}.ds-tile2{display:grid;grid-template-columns:32px minmax(0,1fr);grid-template-rows:32px auto;align-content:start;column-gap:8px;row-gap:3px;padding:7px 10px;width:150px;min-height:80px;cursor:pointer;text-align:left}.ds-tile2 .ds-well{width:32px;height:32px}.ds-tile2 .ds-ic{width:20px;height:20px}.ds-tile2 .ds-name{font-size:14.5px;align-self:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ds-tile2 .ds-sub{grid-column:1/-1;font-size:13px;line-height:1.12;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.ds-tile2:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}"
     },
     {
       "name": "Tab Bar",
       "kind": "nav",
       "refersTo": "tab-current",
-      "description": "Block-wide nav; current tab is a turmeric fill, badges in madder, buti strip at the foot.",
-      "html": "<nav class=\"ds-b ds-bar\"><div class=\"ds-tabs\"><span class=\"ds-brand\">SuPar <span>Home</span></span><span class=\"ds-tab cur\">Home</span><a class=\"ds-tab\" href=\"#\">Lights<span class=\"ds-count\">3</span></a><a class=\"ds-tab\" href=\"#\">Security</a></div><div class=\"ds-buti\"></div></nav>",
-      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-bar{display:grid;grid-template-rows:60px 12px;overflow:hidden;width:520px}.ds-tabs{display:flex;align-items:center;gap:4px;padding:0 8px 0 18px}.ds-brand{font-weight:700;font-size:19px;margin-right:18px}.ds-brand span{color:#47527f;font-weight:500}.ds-tab{min-height:48px;padding:0 14px;border-radius:5px;display:flex;align-items:center;gap:8px;font-weight:600;color:#47527f;text-decoration:none}.ds-tab:hover{color:#1b2559}.ds-tab:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tab.cur{background:#f0ae2e;color:#2a1c00}.ds-count{min-width:22px;height:20px;padding:0 6px;border-radius:4px;background:#b4362b;color:#fff;font-size:12.5px;font-weight:700;display:grid;place-items:center}.ds-buti{height:12px;background:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12' viewBox='0 0 22 12'%3E%3Cg fill='%23b4362b'%3E%3Cellipse cx='11' cy='3.2' rx='1.6' ry='2.4'/%3E%3Cellipse cx='11' cy='8.8' rx='1.6' ry='2.4'/%3E%3Cellipse cx='8.2' cy='6' rx='2.4' ry='1.6'/%3E%3Cellipse cx='13.8' cy='6' rx='2.4' ry='1.6'/%3E%3C/g%3E%3Ccircle cx='11' cy='6' r='1.3' fill='%231b2559'/%3E%3Ccircle cx='0' cy='6' r='1' fill='%231b2559'/%3E%3Ccircle cx='22' cy='6' r='1' fill='%231b2559'/%3E%3C/svg%3E\") repeat-x left center/22px 12px}"
+      "description": "Block-wide nav; current tab is a turmeric fill; neutral count is an ink badge, problem count madder; buti strip at the foot.",
+      "html": "<nav class=\"ds-b ds-bar\"><div class=\"ds-tabs\"><span class=\"ds-brand\">SuPar <span>Home</span></span><span class=\"ds-tab cur\">Home</span><a class=\"ds-tab\" href=\"#\">Lights<span class=\"ds-count\">3</span></a><a class=\"ds-tab\" href=\"#\">Security<span class=\"ds-count alert\">1</span></a></div><div class=\"ds-buti\"></div></nav>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:3}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b::before{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:2;pointer-events:none;border-radius:inherit;border:solid transparent;border-width:2px 1.5px 1.5px 2px}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-bar{display:grid;grid-template-rows:1fr 16px;height:68px;overflow:hidden;width:560px}.ds-tabs{display:flex;align-items:center;gap:4px;padding:0 8px 0 18px}.ds-brand{font-weight:700;font-size:19px;margin-right:18px}.ds-brand span{color:#47527f;font-weight:500}.ds-tab{min-height:48px;padding:0 14px;border-radius:5px;display:flex;align-items:center;gap:8px;font-weight:600;color:#47527f;text-decoration:none}.ds-tab:hover{color:#1b2559}.ds-tab:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-tab.cur{background:#f0ae2e;color:#2a1c00}.ds-count{min-width:22px;height:20px;padding:0 6px;border-radius:4px;background:var(--well,#1b2559);color:var(--well-ink,#f7f9fd);font-size:12.5px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}.ds-count.alert{background:#b4362b;color:#fff}.ds-buti{height:16px;background:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='16' viewBox='0 0 22 16'%3E%3Cg fill='%231b2559'%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(0 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(72 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(144 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(216 10 8)'/%3E%3Cellipse cx='10' cy='4.1' rx='2.6' ry='3.1' transform='rotate(288 10 8)'/%3E%3C/g%3E%3Ccircle cx='10' cy='8' r='1.7' fill='%23f7f9fd'/%3E%3Ccircle cx='20.5' cy='8' r='1' fill='%231b2559'/%3E%3C/svg%3E\") repeat-x left center/22px 16px}"
     },
     {
       "name": "Alert Banner Buttons",
@@ -431,7 +603,15 @@
       "refersTo": "button-on-alert",
       "description": "Actions on a madder banner: solid white primary, outlined secondary, turmeric when armed for confirm.",
       "html": "<div class=\"ds-b alert ds-banner\"><b>Garage door open</b><button class=\"ds-btn solid\">Close</button><button class=\"ds-btn line\">Snooze</button><button class=\"ds-btn armed\">Tap again to close</button></div>",
-      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:2}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-banner{display:flex;align-items:center;gap:14px;padding:4px 6px 4px 14px;min-height:58px}.ds-banner b{font-size:18px;flex:1}.ds-btn{min-height:48px;padding:0 18px;border-radius:5px;font:700 15px Hind,system-ui,sans-serif;border:1.5px solid transparent;background:none;cursor:pointer}.ds-btn:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-btn.solid{background:#fff;color:#b4362b}.ds-btn.line{border-color:rgba(255,255,255,.75);color:#fff}.ds-btn.armed{background:#f0ae2e;color:#2a1c00}.ds-btn:active{transform:translate(1px,1px)}"
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:3}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b::before{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:2;pointer-events:none;border-radius:inherit;border:solid transparent;border-width:2px 1.5px 1.5px 2px}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-banner{display:flex;align-items:center;gap:14px;padding:4px 6px 4px 10px;min-height:56px}.ds-banner b{font-size:18px;flex:1}.ds-btn{min-height:48px;padding:0 18px;border-radius:5px;font:700 15px Hind,system-ui,sans-serif;border:1.5px solid transparent;background:none;cursor:pointer}.ds-btn:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-btn.solid{background:#fff;color:#b4362b}.ds-btn.line{border-color:rgba(255,255,255,.75);color:#fff}.ds-btn.armed{background:#f0ae2e;color:#2a1c00}.ds-btn:active{transform:translate(1px,1px)}"
+    },
+    {
+      "name": "Sheet Actions (two-tap restart)",
+      "kind": "button",
+      "refersTo": "sheet-action-armed",
+      "description": "52px sheet tiles with inline icons; a destructive action arms with the madder pass before it acts.",
+      "html": "<div class=\"ds-acts\"><button class=\"ds-b ds-act\">Settings</button><button class=\"ds-b ds-act alert\">Tap again to restart</button></div>",
+      "css": ".ds-b{position:relative;isolation:isolate;background:var(--cloth,#f7f9fd);color:var(--ink,#1b2559);border:solid var(--key,rgba(27,37,89,.42));border-width:2px 1.5px 1.5px 2px;border-radius:6px 5px 7px 5px;font:500 15px/1.3 Hind,system-ui,sans-serif}.ds-b>*{position:relative;z-index:3}.ds-b::after{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:1;pointer-events:none;border-radius:inherit;background:var(--pass,transparent);mix-blend-mode:multiply;transform:translate(3px,3px);transition:background .2s ease,transform .3s cubic-bezier(.2,.9,.3,1)}.ds-b::before{content:'';position:absolute;inset:-2px -1.5px -1.5px -2px;z-index:2;pointer-events:none;border-radius:inherit;border:solid transparent;border-width:2px 1.5px 1.5px 2px}.ds-b.on{--pass:#f0ae2e;color:#2a1c00}.ds-b.alert{--pass:#b4362b;color:#fff}.ds-acts{display:grid;grid-template-columns:repeat(2,minmax(150px,1fr));gap:10px;width:360px}.ds-act{min-height:52px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 12px}.ds-act:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-act:active{transform:translate(1px,1px)}"
     },
     {
       "name": "Alarm Segments",
@@ -439,7 +619,7 @@
       "refersTo": "segment",
       "description": "Key-line outlined modes; current mode is a solid indigo fill.",
       "html": "<div class=\"ds-segs\"><button class=\"ds-seg cur\">Disarmed</button><button class=\"ds-seg\">Arm away</button></div>",
-      "css": ".ds-segs{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:320px}.ds-seg{min-height:48px;border-radius:5px;border:solid rgba(27,37,89,.42);border-width:2px 1.5px 1.5px 2px;background:#f7f9fd;color:#1b2559;font:700 15px Hind,system-ui,sans-serif;cursor:pointer}.ds-seg:hover{background:#e9eef7}.ds-seg:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-seg.cur{background:#1b2559;color:#f7f9fd;border-color:transparent}"
+      "css": ".ds-segs{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:320px}.ds-seg{min-height:48px;border-radius:5px;border:solid rgba(27,37,89,.42);border-width:2px 1.5px 1.5px 2px;background:#f7f9fd;color:#1b2559;font:700 15px Hind,system-ui,sans-serif;cursor:pointer}.ds-seg:focus-visible{outline:3px solid #f0ae2e;outline-offset:3px}.ds-seg.cur{background:#1b2559;color:#f7f9fd;border-color:transparent}"
     },
     {
       "name": "Sheet Field",
@@ -477,12 +657,12 @@
       },
       {
         "name": "The Overprint Rule",
-        "body": "In light mode the pass prints with `multiply` blending so the key line shows through it; in dark mode it prints `normal`. The overprint is the look, not a bug to clean up.",
+        "body": "In light mode the pass prints with `multiply` blending so the key line shows through it; in dark mode the pass is opaque (`normal`), so the key line is redrawn above it in the Overprint Line. The overprint is the look, not a bug to clean up.",
         "section": "colors"
       },
       {
         "name": "The Real Things Exception",
-        "body": "Literal object colours stay literal: the family's monogram colours (a deep indigo and the madder) and the bin-lid swatches (charcoal, yellow, green) are the actual colours of those things and are not system tokens.",
+        "body": "Literal object colours stay literal: the family's monogram colours (`monogram-indigo`, `monogram-aubergine`, kept clear of the state colours) and the bin-lid swatches (`lid-charcoal`, `lid-yellow`, `lid-green`) are the actual colours of those things. They are recorded so they read as intentional, but they are not UI colours: never use them for text, fills, passes or ornament.",
         "section": "colors"
       },
       {
@@ -521,14 +701,16 @@
       "Do show state as a colour pass printed 3px out of register: turmeric for on, madder for attention, nothing for calm.",
       "Do carve icons out of solid indigo wells; keep icons in the one sprite at a 2.1 stroke.",
       "Do set every live number in tabular figures, names at 700, supporting lines at 600.",
-      "Do use Madder Text, not Madder, wherever red must be read as text on cloth.",
+      "Do use Madder Text, not Madder, wherever red must be read as text on cloth, and solid white wherever text sits on a madder pass.",
       "Do keep every tappable target at least 48px tall and design on the fixed 1280 by 800 stage.",
-      "Do define every colour for both light and dark; dark mode prints the pass `normal` instead of `multiply`."
+      "Do define every colour for both light and dark; dark mode prints the pass `normal` instead of `multiply` and redraws the key line above it.",
+      "Do confirm a destructive or alarming action in two taps, armed by a colour pass."
     ],
     "donts": [
       "Don't use shadows, blur, glass or gradients on blocks; depth is printed, not lifted.",
       "Don't put white text on turmeric, or fill a block with dabu green.",
       "Don't add a third state colour or a second accent; the dyes carry meaning, not decoration.",
+      "Don't use the monogram or bin-lid colours anywhere but the monogram and the lid swatches.",
       "Don't spread the buti beyond selvedge edges (tab bar foot, clock head); it is an edge, not a background.",
       "Don't even out the block corners or the key-line weights.",
       "Don't introduce a second typeface or weights below 500."

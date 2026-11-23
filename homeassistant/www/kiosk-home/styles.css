@@ -171,7 +171,6 @@ button:disabled { cursor: default; }
 .lower { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.95fr); gap: 12px; min-height: 0; }
 .stack { display: grid; gap: 12px; min-height: 0; min-width: 0; }
 .s1 { grid-template-rows: 62px minmax(0, 1fr); }
-.s2 { grid-template-rows: minmax(0, 1fr) 48px 84px; }
 .s3 { grid-template-rows: 112px 56px 56px minmax(0, 1fr); }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
@@ -206,10 +205,6 @@ h2.head span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
 .selfp i::after { content: ""; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; width: var(--lvl, 0%); max-width: calc(100% - 3px); background: var(--turmeric); }
 .selfp b { color: var(--ink); }
 
-.ticker { display: flex; align-items: center; gap: 10px; padding: 0 12px; font-size: 14px; color: var(--ink-2); white-space: nowrap; overflow: hidden; }
-.ticker b { color: var(--ink); }
-.ticker .dot { width: 9px; height: 9px; border-radius: 2px; background: var(--madder); flex: none; }
-.ticker .dot.calm { background: var(--dabu); }
 .util { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .util .tile { flex-direction: column; align-items: flex-start; justify-content: center; padding: 8px 10px; gap: 4px; }
 .util .well { width: 30px; height: 30px; }
