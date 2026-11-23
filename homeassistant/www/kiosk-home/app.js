@@ -1,9 +1,10 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=3';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=3';
 import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=3';
 import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=3';
 import * as H from './home.js?v=3';
 import { injectIcons, ic } from './icons.js?v=3';
+import { VIEWS, viewEntityIds } from './views.js?v=3';
 import { callService as hawsCallService } from './vendor/haws.mjs?v=3';
 
 console.info(`kiosk-home loaded v${VERSION}`);
@@ -64,12 +65,12 @@ const regions = {
   tabs() {
     const lights = H.lightsOn(get);
     const sec = H.securityOpen(get);
-    return `<div class="brand">SuPar <span>Home</span></div>` + NAV.map(([name, icon, href]) => {
+    const cur = ROOM_ROUTES.some(([r]) => r === route) ? 'rooms' : route;
+    return `<a class="brand" href="#home">SuPar <span>Home</span></a>` + NAV.map(([name, icon, r]) => {
       const badge = name === 'Lights' && lights ? `<span class="count num">${lights}</span>` : name === 'Security' && sec ? `<span class="count alert num">${sec}</span>` : '';
-      if (href === '#more') return `<button class="tab" data-act="more">${ic(icon)}${name}</button>`;
-      return href
-        ? `<a class="tab" href="${href}">${ic(icon)}${name}${badge}</a>`
-        : `<span class="tab cur" aria-current="page">${ic(icon)}${name}</span>`;
+      const here = r === cur ? ' cur" aria-current="page' : '';
+      if (r === 'more' || r === 'rooms') return `<button class="tab${here}" data-act="${r}">${ic(icon)}${name}${badge}</button>`;
+      return `<a class="tab${here}" href="#${r}">${ic(icon)}${name}${badge}</a>`;
     }).join('') + `<span class="grow"></span><span class="conn" id="conn"></span>`;
   },
 
@@ -150,7 +151,7 @@ const regions = {
 
   rooms() {
     const r = H.rooms(get, mediaIds);
-    const t = (path, icon, name, x) => tile({ act: 'go', arg: `/dashboard-hub/${path}`, icon, name, sub: x.label, on: x.on && !x.alert, alert: x.alert });
+    const t = (path, icon, name, x) => tile({ act: 'go', arg: `#${path}`, icon, name, sub: x.label, on: x.on && !x.alert, alert: x.alert });
     return t('living-room', 'sofa', 'Living', r.living) + t('kidsroom', 'kids', 'Kids', r.kids) + t('garage', 'garage', 'Garage', r.garage)
       + t('outdoor', 'tree', 'Outdoor', r.outdoor) + t('laundry', 'washer', 'Laundry', r.laundry) + t('media', 'tv', 'Media', r.media);
   },
@@ -207,8 +208,8 @@ const regions = {
     const d = H.machine(get, E.dryer, E.dryerEnd);
     const lids = bins ? `<span class="binlids">${bins.bins.map((b) => `<i class="${b.lid}" title="${b.label}"></i>`).join('')}</span>` : '';
     return `<div class="tile b"><span class="well">${ic('bin')}</span><span><span class="name">Bins</span><span class="sub">${bins ? esc(bins.when) : '—'}${lids}</span></span></div>`
-      + tile({ act: 'go', arg: '/dashboard-hub/laundry', icon: 'washer', name: 'Washer', sub: w.short ?? w.label, on: w.on })
-      + tile({ act: 'go', arg: '/dashboard-hub/laundry', icon: 'dryer', name: 'Dryer', sub: d.short ?? d.label, on: d.on });
+      + tile({ act: 'go', arg: '#laundry', icon: 'washer', name: 'Washer', sub: w.short ?? w.label, on: w.on })
+      + tile({ act: 'go', arg: '#laundry', icon: 'dryer', name: 'Dryer', sub: d.short ?? d.label, on: d.on });
   },
 
   alarm() {
@@ -237,6 +238,20 @@ const regions = {
   },
 };
 
+// ---- Routing (hash) ----
+let route = 'home';
+function onRoute() {
+  const r = decodeURIComponent(location.hash.slice(1)) || 'home';
+  route = r === 'home' || VIEWS[r] ? r : 'home';
+  $('#home-body').hidden = route !== 'home';
+  $('#subview').hidden = route === 'home';
+  closeSheet();
+  last.clear();
+  renderAll();
+}
+regions.subview = () => (VIEWS[route] ? VIEWS[route].render(viewCtx) : '');
+const viewCtx = { get, esc, ic, armed, label, H, E, tz: () => tz, fmtTime, isUnavailable, tile };
+
 // Region output is only written when it changes, so taps and focus survive unrelated updates.
 const last = new Map();
 let pending = 0;
@@ -245,6 +260,8 @@ function renderAll() {
   pending = requestAnimationFrame(() => {
     pending = 0;
     for (const [name, fn] of Object.entries(regions)) {
+      // Home regions only render while Home is on screen; the sub-view only while one is.
+      if (name !== 'tabs' && (name === 'subview') === (route === 'home')) continue;
       const html = fn();
       if (last.get(name) === html) continue;
       last.set(name, html);
@@ -282,7 +299,10 @@ sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(
 const ACTIONS = {
   noop() {},
   'sheet-close': closeSheet,
-  go: (arg) => { location.href = arg; },
+  go: (arg) => { if (arg.startsWith('#')) location.hash = arg; else location.href = arg; },
+  rooms: () => openSheet(`<h2>Rooms</h2><div class="acts">${ROOM_ROUTES.map(([r, n, i]) => `<button class="tile b" data-act="go" data-arg="#${r}">${ic(i)}${n}</button>`).join('')}</div>`),
+  call: (arg) => { const [svc, id, data] = arg.split('|'); const [d, s] = svc.split('.'); quiet(call(d, s, { entity_id: id, ...(data ? JSON.parse(data) : {}) })); },
+  'call-confirm': (arg) => confirmOr(arg, () => ACTIONS.call(arg)),
   toggle: (arg) => quiet(call('homeassistant', 'toggle', { entity_id: arg })),
   'good-night': () => confirmOr('good-night', () => quiet(call('scene', 'turn_on', { entity_id: E.goodNight }))),
   'close-garage': () => confirmOr('close-garage', () => quiet(call('cover', 'close_cover', { entity_id: E.garageCover }))),
@@ -508,6 +528,7 @@ function entityIds(allStates) {
   mediaIds = allStates.map((s) => s.entity_id).filter((id) => id.startsWith('media_player.'));
   mediaIds.forEach((i) => ids.add(i));
   ids.add('switch.bedroom_tv');
+  viewEntityIds().forEach((i) => ids.add(i));
   return [...ids];
 }
 
@@ -530,7 +551,8 @@ async function boot() {
   console.info(`kiosk-home: ${ids.length} entities via ${via}, time zone ${tz}`);
 
   tick(); setInterval(tick, 1000);
-  renderAll();
+  addEventListener('hashchange', onRoute);
+  onRoute();
   $('#message').hidden = true;
 
   let replace = true;

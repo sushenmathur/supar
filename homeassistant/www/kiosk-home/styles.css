@@ -259,3 +259,27 @@ h2.head span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
 .row6 .name, .pair .name { grid-row: 1; align-self: center; position: relative; z-index: 3; }
 .row6 .sub, .pair .sub { grid-column: 1 / -1; grid-row: 2; position: relative; z-index: 3; }
 .s2 { grid-template-rows: minmax(0, 1fr) 84px; }
+
+/* ---- Sub-views (Lights, Climate, Security, rooms, Media) ---- */
+a.brand { color: inherit; text-decoration: none; min-height: 48px; display: flex; align-items: center; }
+.sub { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; min-height: 0; }
+.vhead { display: flex; align-items: center; gap: 14px; padding: 10px 14px; min-height: 64px; }
+.vhead h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.vhead .sub-line { color: var(--ink-2); font-weight: 600; }
+.vhead .grow { flex: 1; }
+.vbody { display: grid; gap: 12px; min-height: 0; grid-auto-rows: minmax(0, auto); align-content: start; overflow: hidden; }
+.panel { padding: 12px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel .grid { display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 10px; }
+.panel .tile { min-height: 60px; }
+.big { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.meter { height: 12px; border: 1.5px solid var(--ink); border-radius: 2px; position: relative; }
+.meter::after { content: ""; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; width: var(--lvl, 0%); max-width: calc(100% - 3px); background: var(--ink); }
+.seg { display: flex; gap: 8px; flex-wrap: wrap; }
+.seg button { min-height: 48px; padding: 0 14px; border-radius: 5px; border: solid var(--key); border-width: 2px 1.5px 1.5px 2px; font-weight: 700; }
+.seg button.cur { background: var(--well); color: var(--well-ink); border-color: transparent; }
+.camtile { position: relative; overflow: hidden; padding: 0; min-height: 160px; }
+.camtile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+.camtile .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 12px 8px; color: #fff; font-weight: 700; display: flex; justify-content: space-between; background: linear-gradient(transparent, rgba(10, 16, 40, 0.78)); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-weight: 600; }
+.kv span:nth-child(odd) { color: var(--ink-2); }
+.kv span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }

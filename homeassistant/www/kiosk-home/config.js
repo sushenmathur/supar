@@ -120,11 +120,13 @@ export const ROBBIE_ROOMS = [
 export const WIFI_QR = '/api/image/serve/50750ef2d78e15cc901576e1c9fa2bae/512x512';
 
 // Navigation to the existing Lovelace views (same origin, so Kiosk Satellite keeps them in the kiosk).
+// Routes are hashes on this page, so Kiosk Satellite switches views without a reload.
 export const NAV = [
-  ['Home', 'home', null], ['Rooms', 'rooms', '/dashboard-hub/living-room'], ['Lights', 'bulb', '/dashboard-hub/lights'],
-  ['Climate', 'thermo', '/dashboard-hub/homeclimate'], ['Security', 'shield', '/dashboard-hub/security'], ['Music', 'music', '/dashboard-hub/music'],
-  ['More', 'more', '#more'],
+  ['Home', 'home', 'home'], ['Rooms', 'rooms', 'rooms'], ['Lights', 'bulb', 'lights'],
+  ['Climate', 'thermo', 'homeclimate'], ['Security', 'shield', 'security'], ['Music', 'music', 'music'],
+  ['More', 'more', 'more'],
 ];
+export const ROOM_ROUTES = [['living-room', 'Living', 'sofa'], ['kidsroom', 'Kids', 'kids'], ['garage', 'Garage', 'garage'], ['outdoor', 'Outdoor', 'tree'], ['laundry', 'Laundry', 'washer']];
 
 // The navbar's More menu.
 export const MORE = [['Phones', 'phone', '/ic3db-icloud3'], ['Settings', 'more', '/config'], ['Dev tools', 'key', '/developer-tools/yaml']];
