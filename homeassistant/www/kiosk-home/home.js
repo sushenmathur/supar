@@ -1,11 +1,11 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=8';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=9';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
 const numOf = (get, id) => { const v = parseFloat(st(get, id)); return Number.isFinite(v) ? v : NaN; };
 const changedAt = (get, id) => new Date(get(id)?.last_changed || 0).getTime();
-const titleCase = (s) => String(s).replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+export const titleCase = (s) => String(s).replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 const BAD_DOCK = (v) => Boolean(v) && !['ok', 'unavailable', 'unknown'].includes(v);
 
 // ---- Alert banner ----

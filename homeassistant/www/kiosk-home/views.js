@@ -31,7 +31,7 @@ const toggleTile = (c, id, name, icon) => {
   const s = c.get(id);
   const p = pct(s);
   const sub = c.isUnavailable(s) ? 'Unavailable' : s.state === 'on' ? (p != null ? `${p}%` : 'On') : 'Off';
-  return c.tile({ act: 'toggle', arg: id, icon, name: fname(c, id, name), sub, on: s?.state === 'on', off: c.isUnavailable(s) });
+  return c.tile({ act: 'toggle', arg: id, icon, name: fname(c, id, name), sub, on: s?.state === 'on', off: c.isUnavailable(s), hold: id });
 };
 /** A read-only door/contact tile: open reads as an alert. */
 const doorTile = (c, id, name, icon = 'door') => {
@@ -211,7 +211,7 @@ const livingRoom = {
   render(c) {
     const dark = matchMedia('(prefers-color-scheme: dark)').matches;
     const img = dark ? '/api/image/serve/cbbd3b4658275dd38c08c3e87ddacc41/512x512' : '/api/image/serve/4f7585416645db017d4cdb7d40e9bb2a/512x512';
-    const pins = PLAN.map(([id, name, x, y]) => `<button class="pin b${on(c, id) ? ' on' : ''}" style="left:${x}%;top:${y}%" data-act="toggle" data-arg="${id}" aria-label="${name}">${c.ic('bulb')}<span>${name}</span></button>`).join('')
+    const pins = PLAN.map(([id, name, x, y]) => `<button class="pin b${on(c, id) ? ' on' : ''}" style="left:${x}%;top:${y}%" data-act="toggle" data-arg="${id}" data-hold="${id}" aria-label="${name}">${c.ic('bulb')}<span>${name}</span></button>`).join('')
       + `<button class="pin b${['off', 'unavailable'].includes(st(c, 'climate.living_room')) ? '' : ' on'}" style="left:8%;top:22%" data-act="go" data-arg="#homeclimate" aria-label="Aircon">${c.ic('snow')}<span>Aircon</span></button>`;
     const plan = panel(c, { title: 'Floor plan', icon: 'rooms', cls: 'fill', body: `<div class="plan"><img src="${img}" alt="Living, kitchen and dining floor plan">${pins}</div>` });
     const v = st(c, 'vacuum.robbie');

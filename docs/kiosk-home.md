@@ -33,7 +33,14 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - Greeting, date, clock, weather and the India/Austin clocks.
   - Sushen and Paro with place, battery and charging.
   - The family calendar's next three events, live through `calendar/event/subscribe`.
-  - Sorento and Bluey with place, battery and charging.
+  - Sorento (Kia wordmark) and Bluey (Tesla photo thumbnail) with place, battery and charging.
+  - Tapping a car opens its pop-up, which updates live while open:
+    - photo, place, driving or parked, battery and charging
+    - Sorento: charge power, last charge, charger switch, on-road toggle, location
+    - Bluey: range, last charge, lock and boot (second tap to confirm), charger
+  - Sushen and Paro show their Home Assistant profile pictures.
+  - The weather is labelled Griffin.
+  - **Hold any light** (Home, the Lights view or the floor plan) for its details: on/off, brightness presets for dimmable lights, and when it last changed.
 - **Quick actions**
   - Good Night (second tap to confirm), Festive.
   - Announce: pick speakers, type a message, or start or end quiet hour.
@@ -82,7 +89,12 @@ Differences from the Lovelace sub-views, on purpose or because the source isn't 
 
 - **No history graphs** on Climate: the page shows the current room temperature instead of the 12-hour line.
 - **Music** shows the Music Assistant panel itself rather than the dashboard's third-party music card. It uses a same-origin path, so no IP address is stored in the page.
-- **Live camera view** uses Home Assistant's MJPEG stream (`/api/camera_proxy_stream/…`), with a fall-back to 2-second snapshots. The stream closes when the pop-up does.
+- **Live camera view** always streams the camera entity the pop-up is for. The Home card shows `camera.front_door_snapshot_2`, but its pop-up streams `camera.front_door_live_view_2`. The stream used, best first:
+  1. Home Assistant's HLS stream as real video, where the tablet can play it.
+  2. The MJPEG stream (`/api/camera_proxy_stream/…`, using the camera's own access token).
+  3. Snapshots of the same camera every 2 seconds.
+
+  The stream closes when the pop-up does.
 - **Garage door and washer/dryer cards** are third-party too. The page uses the same entities from their config, with plain controls.
 - Two things in `master.yaml` look like typos and are copied as they are: Outdoor reads `binary_sensor.patio_door` (the navbar uses `binary_sensor.patio_door_contact`), and the dryer's notify toggle points at `automation.washing_machine_finished_announcement`.
 

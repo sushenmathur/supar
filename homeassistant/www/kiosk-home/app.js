@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=8';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=8';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=8';
-import * as H from './home.js?v=8';
-import { injectIcons, ic, weatherArt } from './icons.js?v=8';
-import { VIEWS, viewEntityIds } from './views.js?v=8';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=8';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=9';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=9';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=9';
+import * as H from './home.js?v=9';
+import { injectIcons, ic, weatherArt } from './icons.js?v=9';
+import { VIEWS, viewEntityIds } from './views.js?v=9';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=9';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -57,8 +57,8 @@ const label = (key, text) => (armed.has(key) ? 'Tap again' : text);
 // The phase goes in as a placeholder so region output only differs when content does; renderAll fills it in on write.
 const phase = (ms) => `animation-delay:__PH${ms}__`;
 const fillPhase = (html) => html.replace(/__PH(\d+)__/g, (_, ms) => `-${((Date.now() % Number(ms)) / 1000).toFixed(2)}s`);
-const tile = ({ act, arg = '', icon, name, sub, on = false, alert = false, off = false, cls = '', key }) =>
-  `<button class="tile b ${cls}${on ? ' on' : ''}${alert ? ' alert' : ''}${off ? ' unavailable' : ''}" data-act="${act}" data-arg="${esc(arg)}"${off ? ' disabled' : ''}${cls.includes('spin') ? ` style="--ph:__PH9600__"` : ''}>
+const tile = ({ act, arg = '', icon, name, sub, on = false, alert = false, off = false, cls = '', key, hold }) =>
+  `<button class="tile b ${cls}${on ? ' on' : ''}${alert ? ' alert' : ''}${off ? ' unavailable' : ''}" data-act="${act}" data-arg="${esc(arg)}"${hold ? ` data-hold="${esc(hold)}"` : ''}${off ? ' disabled' : ''}${cls.includes('spin') ? ` style="--ph:__PH9600__"` : ''}>
     <span class="well">${ic(icon)}</span><span><span class="name">${esc(key ? label(key, name) : name)}</span><span class="sub">${esc(sub)}</span></span></button>`;
 
 function fmtTime(d, zone, opts = {}) {
@@ -84,7 +84,7 @@ const regions = {
     const t = parseFloat(w?.attributes?.temperature);
     const night = get(E.sun)?.state === 'below_horizon';
     document.documentElement.dataset.sky = H.skyPhase(get(E.sun));
-    return `${weatherArt(H.weatherIcon(w?.state, night))}<b class="num">${Number.isFinite(t) ? Math.round(t) : '–'}°</b><span>${esc(H.conditionText(w?.state) || 'Weather unavailable')}<br>North Lakes</span>`;
+    return `${weatherArt(H.weatherIcon(w?.state, night))}<b class="num">${Number.isFinite(t) ? Math.round(t) : '–'}°</b><span>${esc(H.conditionText(w?.state) || 'Weather unavailable')}<br>Griffin</span>`;
   },
 
   people() {
@@ -95,7 +95,9 @@ const regions = {
       const batt = parseFloat(get(p.battery)?.state);
       const charging = String(get(p.charge)?.state ?? '').toLowerCase() === 'charging';
       const band = H.batteryBand(batt);
-      return `<div class="person b"><span class="mono" style="background:${p.colour}">${esc(first[0] ?? '?')}</span>
+      const pic = s?.attributes?.entity_picture;
+      const face = isLocalImage(pic, location.origin) ? `<img class="avatar" src="${esc(pic)}" alt="">` : esc(first[0] ?? '?');
+      return `<div class="person b"><span class="mono" style="background:${p.colour}">${face}</span>
         <span><span class="name">${esc(first)}</span><span class="where${place === 'Home' ? '' : ' away'}">${esc(place)}</span></span>
         <span class="batt num${band === 'low' ? ' low' : ''}${charging ? ' chg' : ''}" title="${charging ? 'Charging' : ''}">${Number.isFinite(batt) ? `${Math.round(batt)}%` : '—'}<i style="--lvl:${Number.isFinite(batt) ? Math.round(batt) : 0}%"></i></span></div>`;
     }).join('');
@@ -117,10 +119,10 @@ const regions = {
   },
 
   cars() {
-    return CARS.map((c) => {
+    return CARS.map((c, i) => {
       const l = H.carLabel(get, c);
       const sub = [l.place, l.pct !== null ? `${l.pct}%` : null, l.charging ? 'charging' : null].filter(Boolean).join(' · ');
-      return `<div class="car b${l.charging ? ' on' : ''}"><span class="well">${ic('car')}</span><span><span class="name">${c.name}</span><span class="sub">${esc(sub)}</span></span></div>`;
+      return `<button class="car b${l.charging ? ' on' : ''}" data-act="car" data-arg="${i}">${carBadge(c)}<span><span class="name">${c.name}</span><span class="sub">${esc(sub)}</span></span></button>`;
     }).join('');
   },
 
@@ -183,7 +185,7 @@ const regions = {
       const isOn = s?.state === 'on';
       const bri = s?.attributes?.brightness;
       const sub = isUnavailable(s) ? 'Unavailable' : isOn ? (bri != null ? `${Math.round((bri / 255) * 100)}%` : 'On') : 'Off';
-      return `<button class="light b${isOn ? ' on' : ''}${isUnavailable(s) ? ' unavailable' : ''}" data-act="toggle" data-arg="${id}"${isUnavailable(s) ? ' disabled' : ''}>
+      return `<button class="light b${isOn ? ' on' : ''}${isUnavailable(s) ? ' unavailable' : ''}" data-act="toggle" data-arg="${id}" data-hold="${id}"${isUnavailable(s) ? ' disabled' : ''}>
         <span class="well">${ic(LIGHT_META[id]?.[1] ?? 'bulb')}</span><span><span class="name">${esc(H.lightName(get, id))}</span><span class="sub">${sub}</span></span></button>`;
     }).join('');
   },
@@ -269,6 +271,11 @@ function renderAll() {
   if (pending) return;
   pending = requestAnimationFrame(() => {
     pending = 0;
+    // A live sheet (cars, light details) re-renders with state, like a region.
+    if (liveSheet && sheet().open) {
+      const h = liveSheet();
+      if (h !== lastSheet) { lastSheet = h; sheet().innerHTML = h + CLOSE; }
+    }
     for (const [name, fn] of Object.entries(regions)) {
       // Home regions only render while Home is on screen; the sub-view only while one is.
       if (name !== 'tabs' && (name === 'subview') === (route === 'home')) continue;
@@ -303,14 +310,18 @@ function tick() {
 
 // ---- Actions ----
 const sheet = () => $('#sheet');
+const CLOSE = '<button class="btn line close b" data-act="sheet-close">Close</button>';
+let liveSheet = null;
+let lastSheet = '';
 function openSheet(html, onOpen) {
   const d = sheet();
-  d.innerHTML = `${html}<button class="btn line close b" data-act="sheet-close">Close</button>`;
+  liveSheet = null;
+  d.innerHTML = html + CLOSE;
   if (!d.open) { d.showModal(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(true, 'dashboard'))); }
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
-sheet().addEventListener('close', () => { stopLiveCam(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
+sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
 const ACTIONS = {
@@ -329,6 +340,8 @@ const ACTIONS = {
     quiet(call('climate', 'set_temperature', { entity_id: id, temperature: v }));
   },
   'cam-live': (id) => liveCamSheet(id),
+  car: (i) => openLive(() => carSheet(CARS[Number(i)])),
+  info: (id) => openLive(() => infoSheet(id)),
   'call-confirm': (arg) => confirmOr(arg, () => ACTIONS.call(arg)),
   toggle: (arg) => quiet(call('homeassistant', 'toggle', { entity_id: arg })),
   'good-night': () => confirmOr('good-night', () => quiet(call('scene', 'turn_on', { entity_id: E.goodNight }))),
@@ -500,40 +513,143 @@ function refreshCam() {
 }
 $('#camimg').addEventListener('error', (e) => e.target.classList.add('err'));
 $('#camimg').addEventListener('load', (e) => { e.target.classList.remove('err'); e.target.hidden = false; });
-// Live view: HA's MJPEG stream (camera_proxy_stream), which <img> plays natively and every camera
-// supports (HA falls back to fast stills for cameras without MJPEG). If the stream fails, poll snapshots.
-let liveImg = null;
-function streamUrl(id) {
-  const pic = get(id)?.attributes?.entity_picture;
-  return isLocalImage(pic, location.origin) && pic.includes('/api/camera_proxy/') ? pic.replace('/api/camera_proxy/', '/api/camera_proxy_stream/') : null;
+// ---- Live camera ----
+// The pop-up always streams the camera entity it was opened for. Best first: HA's HLS stream as
+// real video (camera/stream) where the tablet's WebView can play it; then HA's MJPEG stream
+// (camera_proxy_stream, which every camera supports); then snapshots of the same camera.
+let live = null;
+function camToken(id) {
+  const a = get(id)?.attributes ?? {};
+  if (a.access_token) return a.access_token;
+  const m = /[?&]token=([^&]+)/.exec(a.entity_picture ?? '');
+  return m ? decodeURIComponent(m[1]) : null;
 }
-function startLive(img, ids) {
-  liveImg = img;
-  const id = ids.find((i) => streamUrl(i));
-  const poll = () => { const u = ids.map(camUrl).find(Boolean); if (u) img.src = u; };
-  img.onerror = () => { img.onerror = null; console.warn('kiosk-home: live stream failed, showing snapshots'); poll(); liveTimer = setInterval(poll, 2000); };
-  if (id) img.src = streamUrl(id); else img.onerror();
+function startLive(box, id) {
+  stopLiveCam();
+  live = { box, timers: [] };
+  const mine = live;
+  const snapshots = () => {
+    if (live !== mine) return;
+    const img = document.createElement('img');
+    img.alt = 'Live view';
+    const poll = () => { const u = camUrl(id); if (u) img.src = u; };
+    poll(); mine.timers.push(setInterval(poll, 2000));
+    box.replaceChildren(img); mine.el = img;
+  };
+  const mjpeg = () => {
+    if (live !== mine) return;
+    const token = camToken(id);
+    if (!token) return snapshots();
+    const img = document.createElement('img');
+    img.alt = 'Live view';
+    img.onerror = () => { img.onerror = null; console.warn(`kiosk-home: MJPEG failed for ${id}, using snapshots`); snapshots(); };
+    img.src = `/api/camera_proxy_stream/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
+    box.replaceChildren(img); mine.el = img;
+  };
+  const video = document.createElement('video');
+  const canHls = (Number(get(id)?.attributes?.supported_features) & 2) && video.canPlayType('application/vnd.apple.mpegurl');
+  if (!canHls) return mjpeg();
+  conn.sendMessagePromise({ type: 'camera/stream', entity_id: id }).then((r) => {
+    if (live !== mine || !r?.url) return mjpeg();
+    Object.assign(video, { muted: true, autoplay: true, playsInline: true });
+    video.setAttribute('aria-label', 'Live view');
+    let playing = false;
+    video.addEventListener('playing', () => { playing = true; }, { once: true });
+    video.onerror = () => { console.warn(`kiosk-home: HLS failed for ${id}, using MJPEG`); mjpeg(); };
+    mine.timers.push(setTimeout(() => { if (!playing && live === mine) { console.warn(`kiosk-home: HLS slow for ${id}, using MJPEG`); mjpeg(); } }, 10000));
+    video.src = r.url;
+    box.replaceChildren(video); mine.el = video;
+  }, () => mjpeg());
 }
-const liveMarkup = (name) => `<img id="live" alt="${esc(name)} live view" style="display:block;width:100%;aspect-ratio:16/9;object-fit:contain;margin-top:12px;border-radius:6px;background:var(--well)">`;
+const liveBox = '<div class="livebox" id="live"></div>';
 function liveCamSheet(id) {
   const name = get(id)?.attributes?.friendly_name ?? 'Camera';
-  openSheet(`<h2>${esc(name)}</h2>${liveMarkup(name)}`, (d) => startLive(d.querySelector('#live'), [id]));
+  openSheet(`<h2>${esc(name)}</h2>${liveBox}`, (d) => startLive(d.querySelector('#live'), id));
 }
 function camSheet() {
-  openSheet(`<h2>Front Door</h2>${liveMarkup('Front door')}
-    <div class="acts"><button class="tile b" data-act="go" data-arg="#security">${ic('shield')}Open Security</button></div>`, (d) => startLive(d.querySelector('#live'), [E.cameraLive, E.camera]));
+  // The Home card shows the snapshot camera; its pop-up streams the live-view camera.
+  openSheet(`<h2>Front Door</h2>${liveBox}
+    <div class="acts"><button class="tile b" data-act="go" data-arg="#security">${ic('shield')}Open Security</button></div>`, (d) => startLive(d.querySelector('#live'), E.cameraLive));
 }
 // Closing the sheet must end the stream, or the tablet keeps downloading video in the background.
 function stopLiveCam() {
   clearInterval(liveTimer); liveTimer = 0;
-  if (liveImg) { liveImg.onerror = null; liveImg.removeAttribute('src'); liveImg = null; }
+  if (!live) return;
+  live.timers.forEach((t) => { clearInterval(t); clearTimeout(t); });
+  const el = live.el;
+  if (el) { el.onerror = null; if (el.tagName === 'VIDEO') el.pause(); el.removeAttribute('src'); if (el.tagName === 'VIDEO') el.load(); }
+  live = null;
+}
+
+// ---- Live sheets: cars and entity details ----
+function openLive(fn) {
+  openSheet(fn());
+  liveSheet = fn;
+  lastSheet = '';
+}
+
+/** Card badge: a Kia wordmark for the Sorento, a Tesla photo thumbnail for Bluey. */
+function carBadge(c) {
+  if (c.brand === 'tesla') return `<span class="well carthumb"><img src="${c.image}" alt=""></span>`;
+  return `<span class="well kia" aria-hidden="true"><svg viewBox="0 0 44 18"><text x="22" y="14" text-anchor="middle">KIA</text></svg></span>`;
+}
+
+function carSheet(c) {
+  const l = H.carLabel(get, c);
+  const st = (id) => get(id)?.state;
+  const val = (id) => { const s = get(id); const v = parseFloat(s?.state); return Number.isFinite(v) ? `${Math.round(v * 10) / 10}${s.attributes?.unit_of_measurement ? ` ${s.attributes.unit_of_measurement}` : ''}` : (s?.state ?? '—'); };
+  const chip = ([kind, id, name, icon]) => {
+    switch (kind) {
+      case 'toggle': return tile({ act: 'toggle', arg: id, icon, name, sub: st(id) === 'on' ? 'On' : 'Off', on: st(id) === 'on', off: isUnavailable(get(id)) });
+      case 'onroad': return tile({ act: 'toggle', arg: id, icon, name, sub: st(id) === 'on' ? 'Driving' : 'Parked', on: st(id) === 'on' });
+      case 'home': return tile({ act: 'noop', icon, name, sub: st(id) === 'on' ? 'At home' : 'Away' });
+      case 'charging': return tile({ act: 'noop', icon, name, sub: st(id) === 'on' ? 'Charging' : 'Idle', on: st(id) === 'on' });
+      case 'lock': { const svc = st(id) === 'locked' ? 'unlock' : 'lock'; const key = `lock.${svc}|${id}`; return tile({ act: 'call-confirm', arg: key, key, icon, name, sub: H.titleCase?.(st(id)) ?? st(id), alert: st(id) === 'unlocked' }); }
+      case 'boot': { const key = `cover.toggle|${id}`; return tile({ act: 'call-confirm', arg: key, key, icon, name, sub: st(id) ?? '—', alert: st(id) === 'open' }); }
+      default: return tile({ act: 'noop', icon, name, sub: val(id) });
+    }
+  };
+  const onroad = st(c.onroad) === 'on';
+  return `<h2>${esc(c.name)}</h2><p>${esc(l.place)} · ${onroad ? 'Driving' : 'Parked'} · ${l.charging ? 'Charging' : 'Not charging'}</p>
+    <img class="carphoto" src="${c.image}" alt="${esc(c.name)}">
+    <div class="kv"><span>Battery</span><span>${l.pct != null ? `${l.pct}%` : '—'}</span></div>
+    <span class="meter" style="--lvl:${l.pct ?? 0}%"></span>
+    <div class="acts">${c.chips.map(chip).join('')}</div>`;
+}
+
+/** Details for a held tile: state, last change, on/off and, for dimmable lights, brightness. */
+function infoSheet(id) {
+  const s = get(id);
+  const a = s?.attributes ?? {};
+  const name = H.lightName(get, id);
+  const on = s?.state === 'on';
+  const dimmable = id.startsWith('light.') && (a.supported_color_modes ?? []).some((m) => m !== 'onoff');
+  const bri = a.brightness != null ? Math.round(a.brightness / 2.55) : null;
+  const ago = s ? H.minutesText(Math.max(0, Math.round((Date.now() - Date.parse(s.last_changed)) / 60000))) : '';
+  const presets = dimmable ? `<div class="acts">${[10, 25, 50, 75, 100].map((p) => `<button class="tile b${on && bri === p ? ' on' : ''}" data-act="call" data-arg="light.turn_on|${id}|${JSON.stringify({ brightness_pct: p }).replace(/"/g, '&quot;')}">${p}%</button>`).join('')}</div>` : '';
+  return `<h2>${esc(name)}</h2><p>${isUnavailable(s) ? 'Unavailable' : on ? `On${bri != null ? ` · ${bri}%` : ''}` : 'Off'}${ago ? ` · changed ${ago} ago` : ''}</p>
+    <div class="acts"><button class="tile b${on ? ' on' : ''}" data-act="toggle" data-arg="${id}"${isUnavailable(s) ? ' disabled' : ''}>${ic(on ? 'bulb' : 'moon')}${on ? 'Turn off' : 'Turn on'}</button></div>
+    ${presets}<p class="sub-line" style="margin-top:12px">${esc(id)}</p>`;
 }
 
 // Sub-view actions get the same context as their render.
 for (const v of Object.values(VIEWS)) for (const [k, fn] of Object.entries(v.actions ?? {})) ACTIONS[k] = (arg) => fn(arg, viewCtx);
 
+// ---- Press and hold for details ([data-hold]) ----
+let holdTimer = 0;
+let held = false;
+document.addEventListener('pointerdown', (e) => {
+  const h = e.target.closest('[data-hold]');
+  held = false;
+  clearTimeout(holdTimer);
+  if (h) holdTimer = setTimeout(() => { held = true; ACTIONS.info(h.dataset.hold); }, 500);
+});
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) document.addEventListener(ev, () => clearTimeout(holdTimer), true);
+document.addEventListener('contextmenu', (e) => { if (e.target.closest('[data-hold]')) e.preventDefault(); });
+
 // ---- Click delegation ----
 document.addEventListener('click', (e) => {
+  if (held) { held = false; e.preventDefault(); return; }
   const t = e.target.closest('[data-act]');
   if (t && !t.disabled) { ACTIONS[t.dataset.act]?.(t.dataset.arg); return; }
   if (e.target.closest('#cam')) ACTIONS.cam();
