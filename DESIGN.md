@@ -158,7 +158,7 @@ A small dyer's palette: indigo ink and blued cotton for structure, three natural
 - **Turmeric** (`turmeric`, dark `night-turmeric`): the "on" pass. Lit lights, a charging car, the current tab, an armed confirm button, the self-powered meter and the 3px focus ring. Text on it is always **Turmeric Ink** (`turmeric-ink`), never white.
 
 ### Tertiary
-- **Madder** (`madder`, dark `night-madder`): the "needs attention" pass. Alert banner, alert tiles, count badges on tabs, the error toast, a low phone battery, the ticker's alert dot. Text on it is white. Where madder must be read as text on cloth (connection status, full-page errors) use **Madder Text** (`madder-text`, dark `night-madder-text`), a deeper or lighter shade that holds contrast.
+- **Madder** (`madder`, dark `night-madder`): the "needs attention" pass. Alert banner, alert tiles, the Security count badge, the error toast, a low phone battery. Madder never appears when all is well. Text on it is white. Where madder must be read as text on cloth (connection status, full-page errors) use **Madder Text** (`madder-text`, dark `night-madder-text`), a deeper or lighter shade that holds contrast.
 - **Dabu Green** (`dabu-green`, dark `night-dabu`): quiet "all is well" text only: someone is Home, alarm disarmed and OK, solar credit, a charging phone, the calm ticker dot. It is never a block fill.
 
 ### Neutral
@@ -171,7 +171,7 @@ A small dyer's palette: indigo ink and blued cotton for structure, three natural
 
 **The Overprint Rule.** In light mode the pass prints with `multiply` blending so the key line shows through it; in dark mode it prints `normal`. The overprint is the look, not a bug to clean up.
 
-**The Real Things Exception.** Literal object colours stay literal: the family's monogram colours (a deep indigo and the madder) and the bin-lid swatches (charcoal, yellow, green) are the actual colours of those things and are not system tokens.
+**The Real Things Exception.** Literal object colours stay literal: the family's monogram colours (a deep indigo and an aubergine, kept clear of the state colours) and the bin-lid swatches (charcoal, yellow, green) are the actual colours of those things and are not system tokens.
 
 ## Typography
 
@@ -213,7 +213,7 @@ None. The system is flat ink on cloth: no box shadows, no blur, no gradients on 
 
 Square-ish and hand-made. Blocks round to unequal corners (6, 5, 7, 5px clockwise from top left); icon wells and monograms to 5, 4, 6, 4px; the sheet to 7px; controls (tabs, buttons, segments, fields) to an even 5px; calendar date stamps to 4px; meters (battery, self-powered) to 2px. Outlines use the key-line weighting (2px top and left, 1.5px right and bottom) on blocks, date stamps, segments, fields and the sheet; internal rules are a single 1.5px key line.
 
-The **buti** is the system's one ornament: a 22 by 12px printed flower repeat (madder petals, indigo centre; turmeric and madder in dark mode) run as a 12px border strip. It edges the bottom of the tab bar and heads the clock block, and nowhere else.
+The **buti** is the system's one ornament: an 18 by 16px six-petal printed flower repeat in key-line ink (indigo on cloth; pale indigo in dark mode), never in a state colour, run as a 16px border strip. It edges the bottom of the tab bar and heads the clock block, and nowhere else.
 
 **The Uneven Corner Rule.** Block and well corners are deliberately unequal. Do not "fix" them to a uniform radius.
 
@@ -233,7 +233,7 @@ The everyday control: a block with a carved icon well on the left, a 700-weight 
 A solid indigo square (40px, 34 to 30px in dense rows) with a 24px line icon knocked out in cloth colour. Icons are a single in-house sprite at a 2.1 stroke with round caps and joins. Monograms for people reuse the well shape with a white initial on the person's colour.
 
 ### Navigation (tab bar)
-A full-width block: brand wordmark ("SuPar" 700 with "Home" in Faded Indigo 500), then text-and-icon tabs (48px, 600, Faded Indigo). The current tab is a turmeric fill with Turmeric Ink text, not an underline. Madder count badges (20px, 700, white) sit inside a tab when something there needs attention. The connection status sits right-aligned in Madder Text. The buti strip runs along the bar's lower edge.
+A full-width block: brand wordmark ("SuPar" 700 with "Home" in Faded Indigo 500), then text-and-icon tabs (48px, 600, Faded Indigo). The current tab is a turmeric fill with Turmeric Ink text, not an underline. Count badges (20px, 700) sit inside a tab: ink-on-cloth for a neutral count (Lights), madder with white text only when the count is a problem (Security). The connection status sits right-aligned in Madder Text. The buti strip runs along the bar's lower edge.
 
 ### Status Banner
 A 58px block across the work grid. Calm: no pass, ink text. Alert: madder pass with action buttons; the primary action is a white button with madder text, secondary actions are white-outlined, and a two-tap confirm turns the button turmeric ("armed") before it acts.

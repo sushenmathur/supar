@@ -59,7 +59,8 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - Front-door snapshot, refreshed every 10 s and paused while the screensaver is up or the page is hidden. Tapping it opens the live view.
 - **Tab bar**
   - Links to the existing Rooms, Lights, Climate, Security and Music views.
-  - The Lights and Security badges are counted the same way as the navbar's.
+  - **More** opens Phones, Settings, Dev tools and Restart Home Assistant (second tap to restart; a non-admin kiosk user can't restart, and the page says so).
+  - The Lights and Security badges are counted the same way as the navbar's. Lights is an ink badge; Security turns madder because an open door needs attention.
 
 Differences from the Lovelace view, on purpose:
 

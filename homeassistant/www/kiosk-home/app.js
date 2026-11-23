@@ -1,5 +1,5 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=1';
+import { VERSION, E, PEOPLE, CARS, NAV, MORE, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=1';
 import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=1';
 import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=1';
 import * as H from './home.js?v=1';
@@ -65,7 +65,8 @@ const regions = {
     const lights = H.lightsOn(get);
     const sec = H.securityOpen(get);
     return `<div class="brand">SuPar <span>Home</span></div>` + NAV.map(([name, icon, href]) => {
-      const badge = name === 'Lights' && lights ? `<span class="count num">${lights}</span>` : name === 'Security' && sec ? `<span class="count num">${sec}</span>` : '';
+      const badge = name === 'Lights' && lights ? `<span class="count num">${lights}</span>` : name === 'Security' && sec ? `<span class="count alert num">${sec}</span>` : '';
+      if (href === '#more') return `<button class="tab" data-act="more">${ic(icon)}${name}</button>`;
       return href
         ? `<a class="tab" href="${href}">${ic(icon)}${name}${badge}</a>`
         : `<span class="tab cur" aria-current="page">${ic(icon)}${name}</span>`;
@@ -301,6 +302,7 @@ const ACTIONS = {
   'alarm-arm-away': () => alarmCall('alarm_arm_away'),
   'alarm-disarm': () => alarmCall('alarm_disarm'),
   announce: announceSheet,
+  more: moreSheet,
   'lost-phone': lostPhoneSheet,
   wifi: () => openSheet(`<h2>Guest WiFi</h2><p>Scan with a phone camera to join.</p><img src="${WIFI_QR}" alt="WiFi QR code" style="display:block;width:280px;height:280px;margin:16px auto 0;background:#fff;border-radius:6px">`),
   robbie: robbieSheet,
@@ -378,6 +380,19 @@ function lostPhoneSheet() {
         }
       };
     });
+  });
+}
+
+function moreSheet() {
+  const draw = () => `<h2>More</h2>
+    <div class="acts">${MORE.map(([name, icon, href]) => `<button class="tile b" data-act="go" data-arg="${href}">${ic(icon)}${name}</button>`).join('')}
+      <button class="tile b${armed.has('restart') ? ' alert' : ''}" data-sheet="restart">${ic('alert')}${armed.has('restart') ? 'Tap again to restart' : 'Restart Home Assistant'}</button></div>`;
+  openSheet(draw(), function wire(d) {
+    d.querySelector('[data-sheet="restart"]').onclick = () => {
+      if (armed.has('restart')) { clearTimeout(armed.get('restart')); armed.delete('restart'); quiet(call('homeassistant', 'restart')); closeSheet(); return; }
+      armed.set('restart', setTimeout(() => { armed.delete('restart'); if (d.open) { d.innerHTML = draw() + '<button class="btn line close b" data-act="sheet-close">Close</button>'; wire(d); } }, CONFIRM_WINDOW_MS));
+      d.innerHTML = draw() + '<button class="btn line close b" data-act="sheet-close">Close</button>'; wire(d);
+    };
   });
 }
 

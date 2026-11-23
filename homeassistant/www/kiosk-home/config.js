@@ -56,7 +56,7 @@ export const E = {
 
 export const PEOPLE = [
   { id: 'person.sushenmathur', battery: 'sensor.sushen_iphone_battery_level', charge: 'sensor.sushen_iphone_battery_state', colour: '#3a4aa6' },
-  { id: 'person.paro', battery: 'sensor.paro_phone_battery', charge: 'sensor.paro_iphone_battery_state', colour: '#b4362b' },
+  { id: 'person.paro', battery: 'sensor.paro_phone_battery', charge: 'sensor.paro_iphone_battery_state', colour: '#6b4a8e' },
 ];
 
 export const CARS = [
@@ -123,7 +123,11 @@ export const WIFI_QR = '/api/image/serve/50750ef2d78e15cc901576e1c9fa2bae/512x51
 export const NAV = [
   ['Home', 'home', null], ['Rooms', 'rooms', '/dashboard-hub/living-room'], ['Lights', 'bulb', '/dashboard-hub/lights'],
   ['Climate', 'thermo', '/dashboard-hub/homeclimate'], ['Security', 'shield', '/dashboard-hub/security'], ['Music', 'music', '/dashboard-hub/music'],
+  ['More', 'more', '#more'],
 ];
+
+// The navbar's More menu.
+export const MORE = [['Phones', 'phone', '/ic3db-icloud3'], ['Settings', 'more', '/config'], ['Dev tools', 'key', '/developer-tools/yaml']];
 
 export const CAMERA_REFRESH_MS = 10_000;
 export const CONFIRM_WINDOW_MS = 3_000;
