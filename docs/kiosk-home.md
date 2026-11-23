@@ -75,6 +75,21 @@ Differences from the Lovelace view, on purpose:
 2. If `/config/www` didn't exist before, restart Home Assistant once.
 3. Check it in a browser where you're signed in to HA: `http://<your-ha>/local/kiosk-home/index.html`.
 
+### Single-file option (File editor upload)
+
+The HA File editor uploads files, not folders. For that case there's a one-file build of the same page, `homeassistant/www/kiosk-home.html`, with scripts, styles and fonts inlined (about 120 KB).
+
+1. In the File editor, open the `www` folder (create it if it isn't there) and upload `kiosk-home.html`.
+2. Use the path `/local/kiosk-home.html` in Kiosk Satellite instead of `/local/kiosk-home/index.html`.
+
+To update it, re-upload the file over the old one. To rebuild it after changing the page, run:
+
+```bash
+node tools/kiosk-home/build-single.mjs
+```
+
+Commit the result. The same 23 browser checks pass against the single file.
+
 ## Kiosk Satellite setup
 
 1. **Settings › Home Assistant › Custom Pages** → turn on **Share Home Assistant connection** (already on if kiosk-test works).
@@ -96,7 +111,7 @@ Then copy the folder again. Kiosk Satellite always loads fresh. A normal browser
 ## Debugging and rollback
 
 - The console logs `kiosk-home loaded v<n>` once per load, and a summary line (`N entities via kiosk-satellite`). It also logs short error codes when a service call fails. It never logs attributes or URLs.
-- **Rollback:** delete `/config/www/kiosk-home/` and remove the custom page entry in Kiosk Satellite.
+- **Rollback:** delete `/config/www/kiosk-home/` (or `/config/www/kiosk-home.html`) and remove the custom page entry in Kiosk Satellite.
 
 ## Checked before handing over
 
