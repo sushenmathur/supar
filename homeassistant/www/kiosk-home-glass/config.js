@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home-glass
-export const VERSION = '18';
+export const VERSION = '19';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -123,9 +123,9 @@ export const ROBBIE_ROOMS = [
   ['button.robbie_kitchen_clean', 'Kitchen', 'kitchen'], ['button.robbie_media_clean', 'Media Room', 'tv'], ['button.robbie_media_kitchen2', 'Media & Kitchen', 'sofa'],
   ['button.robbie_coffee_station_clean', 'Coffee Station', 'coffee'], ['button.robbie_tiled_area_clean', 'Mop Tiled Area', 'mop'], ['button.robbie_hallways', 'Hallways', 'hallway'],
 ];
-// Picture on Robbie's pop-up. Empty uses the built-in drawing of a Roborock Qrevo; to use a photo instead,
-// copy it to /config/www/ and set e.g. '/local/robbie.png' (same origin, so no outside requests).
-export const ROBBIE_IMAGE = '';
+// Picture on Robbie's pop-up: /config/www/images/robbie.png, served by HA at /local/ (same origin).
+// If it can't be loaded, the pop-up falls back to a built-in drawing of a Roborock Qrevo. '' uses the drawing.
+export const ROBBIE_IMAGE = '/local/images/robbie.png';
 
 // Guest WiFi QR, the same image the dashboard's WiFi popup shows.
 // Music Assistant's Home Assistant panel (same origin, so no host or IP in the page).

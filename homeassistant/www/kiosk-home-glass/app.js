@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=18';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=18';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=18';
-import * as H from './home.js?v=18';
-import { injectIcons, ic, weatherArt } from './icons.js?v=18';
-import { VIEWS, viewEntityIds } from './views.js?v=18';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=18';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=19';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=19';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=19';
+import * as H from './home.js?v=19';
+import { injectIcons, ic, weatherArt } from './icons.js?v=19';
+import { VIEWS, viewEntityIds } from './views.js?v=19';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=19';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -559,6 +559,8 @@ function robbieSheet() {
     <div class="acts">${ROBBIE_ROOMS.map(([id, name, icon]) => `<button class="tile b" data-press="${id}">${ic(icon ?? 'robot')}${esc(name)}</button>`).join('')}</div>`, (d) => {
     d.querySelectorAll('[data-svc]').forEach((b) => { const [dom, svc] = b.dataset.svc.split('.'); b.onclick = () => quiet(call(dom, svc, { entity_id: E.robbie })); });
     d.querySelectorAll('[data-press]').forEach((b) => { b.onclick = () => quiet(call('button', 'press', { entity_id: b.dataset.press }).then(closeSheet)); });
+    // A missing or unreadable photo falls back to the drawing.
+    d.querySelector('img.rbimg')?.addEventListener('error', (e) => { e.target.outerHTML = QREVO_SVG; }, { once: true });
   });
 }
 
@@ -616,7 +618,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=18';
+    : './vendor/hls.light.min.mjs?v=19';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

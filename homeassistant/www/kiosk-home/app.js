@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=16';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=16';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=16';
-import * as H from './home.js?v=16';
-import { injectIcons, ic, weatherArt } from './icons.js?v=16';
-import { VIEWS, viewEntityIds } from './views.js?v=16';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=16';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=17';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=17';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=17';
+import * as H from './home.js?v=17';
+import { injectIcons, ic, weatherArt } from './icons.js?v=17';
+import { VIEWS, viewEntityIds } from './views.js?v=17';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=17';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -540,6 +540,8 @@ function robbieSheet() {
     <div class="acts">${ROBBIE_ROOMS.map(([id, name, icon]) => `<button class="tile b" data-press="${id}">${ic(icon ?? 'robot')}${esc(name)}</button>`).join('')}</div>`, (d) => {
     d.querySelectorAll('[data-svc]').forEach((b) => { const [dom, svc] = b.dataset.svc.split('.'); b.onclick = () => quiet(call(dom, svc, { entity_id: E.robbie })); });
     d.querySelectorAll('[data-press]').forEach((b) => { b.onclick = () => quiet(call('button', 'press', { entity_id: b.dataset.press }).then(closeSheet)); });
+    // A missing or unreadable photo falls back to the drawing.
+    d.querySelector('img.rbimg')?.addEventListener('error', (e) => { e.target.outerHTML = QREVO_SVG; }, { once: true });
   });
 }
 
@@ -597,7 +599,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=16';
+    : './vendor/hls.light.min.mjs?v=17';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
