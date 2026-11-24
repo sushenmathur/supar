@@ -44,7 +44,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
 - **Quick actions**
   - Good Night (second tap to confirm), Festive.
   - Announce: pick speakers, type a message, or start or end quiet hour.
-  - Lost Phone: a combination-lock dial beside a keypad (the design in `dashboards/lost-phone-dial.html` on the `claude/serene-davinci-hbi1n3` branch, drawn in block print colours), with the phone choice above the keys. Each digit turns the dial and fills one of four segments. ✓ calls `script.lost_phone` and reads its response: the dial turns green when the alert is sent, and shakes red for a wrong passcode. A hardware keyboard works too (digits, Backspace, Enter). The glass copy keeps the plain keypad.
+  - Lost Phone: a combination-lock dial beside a keypad (the design in `dashboards/lost-phone-dial.html` on the `claude/serene-davinci-hbi1n3` branch, drawn in block print colours), with the phone choice above the keys. Each digit turns the dial and fills one of four segments. ✓ calls `script.lost_phone` and reads its response: the dial turns green when the alert is sent, and shakes red for a wrong passcode. A hardware keyboard works too (digits, Backspace, Enter). The glass copy has the same dial in its own colours (warm stone dial, amber pointer).
   - WiFi QR.
   - Robbie: start or pause, dock, stop, and the six room-clean buttons.
 - **Rooms**
