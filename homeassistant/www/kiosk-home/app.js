@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=10';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=10';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=10';
-import * as H from './home.js?v=10';
-import { injectIcons, ic, weatherArt } from './icons.js?v=10';
-import { VIEWS, viewEntityIds } from './views.js?v=10';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=10';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=11';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=11';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=11';
+import * as H from './home.js?v=11';
+import { injectIcons, ic, weatherArt } from './icons.js?v=11';
+import { VIEWS, viewEntityIds } from './views.js?v=11';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=11';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -97,7 +97,8 @@ const regions = {
       const band = H.batteryBand(batt);
       const pic = s?.attributes?.entity_picture;
       const face = isLocalImage(pic, location.origin) ? `<img class="avatar" src="${esc(pic)}" alt="">` : esc(first[0] ?? '?');
-      return `<div class="person b"><span class="mono" style="background:${p.colour}">${face}</span>
+      const hasPic = face.startsWith('<img');
+      return `<div class="person b"><span class="mono${hasPic ? ' pic' : ''}" style="${hasPic ? '' : `background:${p.colour}`}">${face}</span>
         <span><span class="name">${esc(first)}</span><span class="where${place === 'Home' ? '' : ' away'}">${esc(place)}</span></span>
         <span class="batt num${band === 'low' ? ' low' : ''}${charging ? ' chg' : ''}" title="${charging ? 'Charging' : ''}">${Number.isFinite(batt) ? `${Math.round(batt)}%` : '—'}<i style="--lvl:${Number.isFinite(batt) ? Math.round(batt) : 0}%"></i></span></div>`;
     }).join('');
@@ -525,7 +526,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=10';
+    : './vendor/hls.light.min.mjs?v=11';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

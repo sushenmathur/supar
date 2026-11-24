@@ -366,7 +366,9 @@ html.still *, html.still *::before, html.still *::after { animation-play-state: 
 .embed { width: 100%; height: 100%; border-width: 2px 1.5px 1.5px 2px; border-style: solid; border-color: var(--key); border-radius: 6px; background: var(--cloth); padding: 0; }
 
 /* Avatars, car badges, car photo, live camera box */
-.mono .avatar { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
+/* A profile picture fills a borderless circle (HA pictures are usually round); the coloured square is only for initials. */
+.mono.pic { border-radius: 50%; background: none; width: 44px; height: 44px; }
+.mono .avatar { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; transform: scale(1.06); }
 .mono { overflow: hidden; }
 button.car { text-align: left; }
 .carthumb { overflow: hidden; background: var(--cloth); }
