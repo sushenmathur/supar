@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home
-export const VERSION = '17';
+export const VERSION = '18';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -54,9 +54,10 @@ export const E = {
   bedroomTv: 'switch.bedroom_tv',
 };
 
+// charge: the phone's charging status, first entity preferred, the next used if it's missing or unavailable.
 export const PEOPLE = [
-  { id: 'person.sushenmathur', battery: 'sensor.sushen_iphone_battery_level', charge: 'sensor.sushen_iphone_battery_state', colour: '#3a4aa6' },
-  { id: 'person.paro', battery: 'sensor.paro_phone_battery', charge: 'sensor.paro_iphone_battery_state', colour: '#6b4a8e' },
+  { id: 'person.sushenmathur', battery: 'sensor.sushen_iphone_battery_level', charge: ['sensor.sushen_phone_battery_status', 'sensor.sushen_iphone_battery_state'], colour: '#3a4aa6' },
+  { id: 'person.paro', battery: 'sensor.paro_phone_battery', charge: ['sensor.paro_phone_battery_status', 'sensor.paro_iphone_battery_state'], colour: '#6b4a8e' },
 ];
 
 // Cars: card badge (Kia wordmark / Tesla photo thumbnail), the pop-up's photo and its controls (from master.yaml's chips).

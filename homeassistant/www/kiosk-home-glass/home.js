@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=19';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=20';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -101,6 +101,15 @@ export function weatherIcon(state, night) {
 
 export function personPlace(state) {
   return { home: 'Home', not_home: 'Away', 'Sushen - Work': 'Office', 'Paro - Work': 'Work', Gym: 'Gym' }[state] ?? (state || '—');
+}
+
+/** True when the phone is charging: reads the first of `ids` that has a usable state (not missing, unavailable or unknown). */
+export function isCharging(get, ids) {
+  for (const id of [].concat(ids)) {
+    const v = String(get(id)?.state ?? '').trim().toLowerCase();
+    if (v && v !== 'unavailable' && v !== 'unknown') return v === 'charging';
+  }
+  return false;
 }
 
 /** Battery colour band used across the dashboard: low <20, mid <50, ok otherwise. */

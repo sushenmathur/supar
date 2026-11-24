@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=17';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=17';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=17';
-import * as H from './home.js?v=17';
-import { injectIcons, ic, weatherArt } from './icons.js?v=17';
-import { VIEWS, viewEntityIds } from './views.js?v=17';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=17';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=18';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=18';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=18';
+import * as H from './home.js?v=18';
+import { injectIcons, ic, weatherArt } from './icons.js?v=18';
+import { VIEWS, viewEntityIds } from './views.js?v=18';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=18';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -93,14 +93,14 @@ const regions = {
       const first = (s?.attributes?.friendly_name ?? p.id.split('.')[1]).split(' ')[0];
       const place = H.personPlace(s?.state);
       const batt = parseFloat(get(p.battery)?.state);
-      const charging = String(get(p.charge)?.state ?? '').toLowerCase() === 'charging';
+      const charging = H.isCharging(get, p.charge);
       const band = H.batteryBand(batt);
       const pic = s?.attributes?.entity_picture;
       const face = isLocalImage(pic, location.origin) ? `<img class="avatar" src="${esc(pic)}" alt="">` : esc(first[0] ?? '?');
       const hasPic = face.startsWith('<img');
       return `<div class="person b"><span class="mono${hasPic ? ' pic' : ''}" style="${hasPic ? '' : `background:${p.colour}`}">${face}</span>
         <span><span class="name">${esc(first)}</span><span class="where${place === 'Home' ? '' : ' away'}">${esc(place)}</span></span>
-        <span class="batt num${band === 'low' ? ' low' : ''}${charging ? ' chg' : ''}" title="${charging ? 'Charging' : ''}">${Number.isFinite(batt) ? `${Math.round(batt)}%` : '—'}<i style="--lvl:${Number.isFinite(batt) ? Math.round(batt) : 0}%"></i></span></div>`;
+        <span class="batt num${band === 'low' ? ' low' : ''}${charging ? ' chg' : ''}" title="${charging ? 'Charging' : ''}">${Number.isFinite(batt) ? `${Math.round(batt)}%` : '—'}<i style="--lvl:${Number.isFinite(batt) ? Math.round(batt) : 0}%">${charging ? '<b class="fillup"></b>' : ''}</i></span></div>`;
     }).join('');
   },
 
@@ -599,7 +599,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=17';
+    : './vendor/hls.light.min.mjs?v=18';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -886,7 +886,7 @@ async function subscribeCalendar() {
 
 function entityIds(allStates) {
   const ids = new Set([...Object.values(E), ...LIGHT_POOL, ...SECURITY_CONTACTS, ...BINS.map((b) => b.id)]);
-  PEOPLE.forEach((p) => [p.id, p.battery, p.charge].forEach((i) => ids.add(i)));
+  PEOPLE.forEach((p) => [p.id, p.battery, ...[].concat(p.charge)].forEach((i) => ids.add(i)));
   CARS.forEach((c) => [c.tracker, c.battery, c.chargingPower, c.chargingFlag].filter(Boolean).forEach((i) => ids.add(i)));
   mediaIds = allStates.map((s) => s.entity_id).filter((id) => id.startsWith('media_player.'));
   mediaIds.forEach((i) => ids.add(i));

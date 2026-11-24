@@ -142,3 +142,16 @@ test('every master.yaml sub-view has a route', () => {
   assert.deepEqual(Object.keys(VIEWS).sort(), ['energy-dashboard', 'garage', 'homeclimate', 'kidsroom', 'laundry', 'lights', 'living-room', 'music', 'outdoor', 'security']);
   assert.ok(viewEntityIds().includes('lock.front_door_lock'));
 });
+
+test('charging reads the phone status sensor, then the iPhone backup when it is missing or unavailable', () => {
+  const ids = ['sensor.sushen_phone_battery_status', 'sensor.sushen_iphone_battery_state'];
+  const w = (a, b) => world({ ...(a !== undefined ? { [ids[0]]: [a] } : {}), ...(b !== undefined ? { [ids[1]]: [b] } : {}) });
+  assert.equal(H.isCharging(w('Charging', 'Not Charging'), ids), true);
+  assert.equal(H.isCharging(w('Not Charging', 'Charging'), ids), false, 'primary wins when it has a state');
+  assert.equal(H.isCharging(w('unavailable', 'Charging'), ids), true, 'backup when primary is unavailable');
+  assert.equal(H.isCharging(w('unknown', 'charging'), ids), true);
+  assert.equal(H.isCharging(w(undefined, 'Charging'), ids), true, 'backup when primary is missing');
+  assert.equal(H.isCharging(w('unavailable', 'unavailable'), ids), false);
+  assert.equal(H.isCharging(w('Full', undefined), ids), false);
+  assert.equal(H.isCharging(world({ 'sensor.x': ['Charging'] }), 'sensor.x'), true, 'a single id still works');
+});

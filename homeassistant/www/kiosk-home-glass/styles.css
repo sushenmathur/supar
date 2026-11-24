@@ -701,3 +701,11 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 .camtile .camname { display: grid; line-height: 1.15; min-width: 0; }
 .camtile .camname .upd { font-size: 12px; font-weight: 500; opacity: .9; white-space: nowrap; }
 .camtile .cap > small { flex: none; white-space: nowrap; }
+
+/* Charging: the empty part of the battery fills with pale green, fades and starts again (transform/opacity only).
+   The solid green still shows the real level. */
+.batt.chg i { overflow: hidden; }
+.batt .fillup { position: absolute; top: 0; bottom: 0; left: var(--lvl, 0%); right: 0; border-radius: 0 999px 999px 0; background: var(--dabu); opacity: 0; transform-origin: left; transform: scaleX(0); }
+@media (prefers-reduced-motion: no-preference) { .batt .fillup { animation: fillup 2.2s ease-in infinite; } }
+@media (prefers-reduced-motion: reduce) { .batt .fillup { opacity: .3; transform: none; } }
+@keyframes fillup { 0% { transform: scaleX(0); opacity: .55; } 80% { transform: scaleX(1); opacity: .55; } 100% { transform: scaleX(1); opacity: 0; } }

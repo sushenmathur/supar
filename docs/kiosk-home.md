@@ -31,7 +31,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - Close door needs a second tap.
 - **Day column**
   - Greeting, date, clock, weather and the India/Austin clocks.
-  - Sushen and Paro with place, battery and charging.
+  - Sushen and Paro with place, battery and charging. While a phone charges, the battery turns green and its empty part fills with pale green, fades and starts again; the solid green stays at the real level. Charging comes from `sensor.<name>_phone_battery_status`, or from `sensor.<name>_iphone_battery_state` when that is missing, `unavailable` or `unknown` (set in `PEOPLE` in `config.js`). A state of "charging", in any capitalisation, counts.
   - The family calendar's next three events, live through `calendar/event/subscribe`.
   - Sorento (Kia wordmark) and Bluey (Tesla T mark) with place, battery and charging.
   - Tapping a car opens its pop-up, which updates live while open:
