@@ -1,0 +1,44 @@
+/*@fonts Plus+Jakarta+Sans:wght@400;500;600;700;800*/
+/* Option 1 – Warm Stone. Light first, calm and soft.
+   Palette from ui-ux-pro-max "Home Decoration & Interior Design" (stone #78716C, warm white #FAF5F2,
+   gold #D97706, red #DC2626). Type: Plus Jakarta Sans (the skill's pick for smart-home controls).
+   A device that is on gets a soft amber tint and a gold icon, not a full-colour fill. */
+:root {
+  --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 18px; --r-s: 12px;
+  --ground: #F4F0EB; --cloth: #FFFFFF; --ink: #1C1917; --ink-2: #57534E; --line: #E9E4DC; --key: #E9E4DC;
+  --shadow: 0 1px 2px rgba(28, 25, 23, .05), 0 8px 22px rgba(28, 25, 23, .06);
+  --well: #F3EEE7; --well-ink: #44403C; --soft: #F8F4EF; --track: #EAE5DD;
+  --on-bg: #FDF1DE; --on-ink: #1C1917; --on-sub: #8A4B05; --on-well: #D97706; --on-well-ink: #FFFFFF; --on-border: #F6DDB3;
+  --info-bg: #FFFFFF; --info-ink: #1C1917; --info-bar: #B45309; --info-well-ink: #FFFFFF;
+  --alert: #DC2626; --alert-ink: #FFFFFF;
+  --accent: #1C1917; --accent-ink: #FFFFFF;
+  --good: #15803D; --good-bg: #DCFCE7; --dabu: #15803D;
+  --turmeric: #D97706; --turmeric-ink: #FFFFFF; --turmeric-ink-2: rgba(255, 255, 255, .85);
+  --madder: #DC2626; --madder-text: #B91C1C; --weather-ic: #D97706; --pass-blend: normal; --sel: rgba(217, 119, 6, .25);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #141210; --cloth: #1E1B18; --ink: #F5F0EA; --ink-2: #B8B0A6; --line: #2E2A26; --key: #2E2A26; --shadow: none;
+  --well: #2A2622; --well-ink: #D6CFC6; --soft: #24201D; --track: #36312C;
+  --on-bg: #3A2A12; --on-ink: #FBEBD3; --on-sub: #F3B867; --on-well: #F59E0B; --on-well-ink: #1C1206; --on-border: #5A3F15;
+  --info-bg: #1E1B18; --info-ink: #F5F0EA; --info-bar: #F59E0B; --info-well-ink: #1C1206;
+  --accent: #F5F0EA; --accent-ink: #141210; --good: #4ADE80; --good-bg: #14301E; --dabu: #4ADE80;
+  --madder-text: #FCA5A5; --weather-ic: #F59E0B;
+} }
+:root[data-theme="dark"] {
+  --ground: #141210; --cloth: #1E1B18; --ink: #F5F0EA; --ink-2: #B8B0A6; --line: #2E2A26; --key: #2E2A26; --shadow: none;
+  --well: #2A2622; --well-ink: #D6CFC6; --soft: #24201D; --track: #36312C;
+  --on-bg: #3A2A12; --on-ink: #FBEBD3; --on-sub: #F3B867; --on-well: #F59E0B; --on-well-ink: #1C1206; --on-border: #5A3F15;
+  --info-bg: #1E1B18; --info-ink: #F5F0EA; --info-bar: #F59E0B; --info-well-ink: #1C1206;
+  --accent: #F5F0EA; --accent-ink: #141210; --good: #4ADE80; --good-bg: #14301E; --dabu: #4ADE80;
+  --madder-text: #FCA5A5; --weather-ic: #F59E0B;
+}
+/*@base*/
+/* Flourishes */
+.clock { font-weight: 700; letter-spacing: -0.045em; }
+.time { background: linear-gradient(165deg, #FFF4E4 0%, #FFFFFF 55%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .time { background: linear-gradient(165deg, #2A2116 0%, #1E1B18 60%); } }
+:root[data-theme="dark"] .time { background: linear-gradient(165deg, #2A2116 0%, #1E1B18 60%); }
+.name { font-weight: 700; letter-spacing: -0.01em; }
+.sub { font-weight: 500; }
+.bar { box-shadow: none; }

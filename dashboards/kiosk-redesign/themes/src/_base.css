@@ -1,0 +1,80 @@
+/* ===== Shared modernisation layer (included in every option) =====
+   Loads after the page's own styles. Each option sets the tokens below; this layer maps them onto the
+   page's existing classes. It changes looks only: no markup or behaviour changes.
+   New tokens: --font, --font-display, --r (card radius), --r-s (small radius), --shadow, --line,
+   --on-bg / --on-ink / --on-sub / --on-well / --on-well-ink (a device that is on),
+   --info-bg / --info-ink / --info-bar (info banner), --alert / --alert-ink (needs attention),
+   --accent / --accent-ink (selected tab, today, current buttons, switches). */
+
+body { font-family: var(--font); }
+.clock, .wx b, .zones b, .stats b, .flow b, .big, .vhead h1 { font-family: var(--font-display, var(--font)); }
+
+/* Cards: one clean surface. The offset colour block and its key line go. */
+.b { background: var(--cloth); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+.b::after, .b::before { display: none !important; }
+.b.on { background: var(--on-bg); color: var(--on-ink); border-color: var(--on-border, transparent); }
+.b.on .sub { color: var(--on-sub); }
+.b.alert { background: var(--alert); color: var(--alert-ink); border-color: transparent; }
+.b.alert .sub { color: var(--alert-ink); opacity: .9; }
+
+/* Icon wells */
+.well, .mono { border-radius: var(--r-s); }
+.well { background: var(--well); color: var(--well-ink); }
+.b.on .well { background: var(--on-well); color: var(--on-well-ink); }
+.b.alert .well { background: rgba(255, 255, 255, .22); color: var(--alert-ink); }
+.mono { border-radius: 50%; }
+
+/* Info banner: calm card with an accent bar, so "info" never looks like a device that is on. */
+.banner.on { background: var(--info-bg); color: var(--info-ink); border-color: transparent; box-shadow: inset 5px 0 0 var(--info-bar), var(--shadow); }
+.banner.on .sub { color: var(--info-ink); opacity: .78; }
+.banner.on .well { background: var(--info-bar); color: var(--info-well-ink, #fff); }
+.banner.on .btn.line { border-color: currentColor; color: inherit; }
+.banner.calm .well { background: var(--good-bg, var(--well)); color: var(--dabu); }
+.btn { border-radius: var(--r-s); }
+.btn.solid { color: var(--alert); }
+
+/* The printed border strip on the clock card goes; the card gets its top padding back. */
+.time .buti, .buti { display: none; }
+.time { padding-top: 16px; }
+.wx { border-top: 1px solid var(--line); }
+
+/* Tab bar */
+.bar { border-radius: var(--r); }
+.tab { border-radius: var(--r-s); }
+.tab.cur { background: var(--tab-cur-bg, var(--accent)); color: var(--tab-cur-ink, var(--accent-ink)); }
+.count { border-radius: 999px; }
+
+/* Bars and meters: rounded pills */
+.batt i, .selfp i, .meter { border: 0; height: 8px; border-radius: 999px; background: var(--track); }
+.batt i::after, .selfp i::after, .meter::after { left: 0; top: 0; bottom: 0; border-radius: 999px; }
+.batt i::after { width: var(--lvl, 0%); }
+.selfp i::after { background: var(--good, var(--dabu)); max-width: 100%; }
+.batt.chg i { border: 0; }
+
+/* Calendar date stamps */
+.ev .d { border: 1px solid var(--line); border-radius: var(--r-s); background: var(--soft); }
+.ev .d.today { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.ev .d.today small { color: var(--accent-ink); opacity: .85; }
+
+/* Buttons and inputs that used the key line */
+.abtn, .seg button, .sheet input, .sheet select { border: 1px solid var(--line); border-radius: var(--r-s); }
+.abtn.cur, .seg button.cur { background: var(--accent); color: var(--accent-ink); }
+.sheet { border: 1px solid var(--line); border-radius: calc(var(--r) + 4px); box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
+.stats div:nth-child(odd) { border-right: 1px solid var(--line); }
+.stats div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+.evrow { border-top: 1px solid var(--line); }
+.cam img, .camtile img { border-radius: calc(var(--r) - 1px); }
+.switch-btn.on i { background: var(--accent); }
+.share::after { background: var(--accent); }
+
+/* Small fixes: car summaries and light names wrap instead of being cut off. */
+.row6 .name { font-size: 14px; letter-spacing: -0.015em; }
+.abtn { white-space: nowrap; font-size: 14.5px; gap: 5px; padding: 0 8px; }
+.abtn .ic { width: 20px; height: 20px; }
+.car .sub { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.15; }
+
+/* Motion: no offset-block "print" animation; keep a gentle press. */
+@media (prefers-reduced-motion: no-preference) {
+  button.b { transition: transform .12s ease, background-color .2s ease, box-shadow .2s ease; }
+  button.b:active { transform: scale(.98); }
+}

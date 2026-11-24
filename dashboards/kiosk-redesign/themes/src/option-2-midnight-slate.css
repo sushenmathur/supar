@@ -1,0 +1,53 @@
+/*@fonts Outfit:wght@300;400;500;600;700|Work+Sans:wght@400;500;600;700*/
+/* Option 2 – Midnight Slate. Dark first, for an always-on screen.
+   Palette from ui-ux-pro-max "Smart Home/IoT Dashboard" (#0F172A, card #1B2336, muted #94A3B8,
+   status green #22C55E, red). Type: Outfit for numbers and headings, Work Sans for text ("Geometric Modern").
+   Lights and devices that are on glow warm amber; info alerts are sky blue; urgent ones red. */
+:root {
+  --font: "Work Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Outfit", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 20px; --r-s: 14px;
+  --ground: #EEF2F7; --cloth: #FFFFFF; --ink: #0F172A; --ink-2: #475569; --line: #E2E8F0; --key: #E2E8F0;
+  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 24px rgba(15, 23, 42, .06);
+  --well: #F1F5F9; --well-ink: #334155; --soft: #F8FAFC; --track: #E2E8F0;
+  --on-bg: radial-gradient(130% 150% at 0% 0%, rgba(251, 191, 36, .30), rgba(251, 191, 36, .07) 62%), #FFFFFF;
+  --on-ink: #0F172A; --on-sub: #92400E; --on-well: #F59E0B; --on-well-ink: #1A1203; --on-border: rgba(245, 158, 11, .45);
+  --info-bg: #FFFFFF; --info-ink: #0F172A; --info-bar: #0284C7; --info-well-ink: #FFFFFF;
+  --alert: #DC2626; --alert-ink: #FFFFFF;
+  --accent: #0F172A; --accent-ink: #FFFFFF;
+  --good: #16A34A; --good-bg: #DCFCE7; --dabu: #15803D;
+  --turmeric: #F59E0B; --turmeric-ink: #1A1203; --turmeric-ink-2: rgba(26, 18, 3, .8);
+  --madder: #DC2626; --madder-text: #B91C1C; --weather-ic: #F59E0B; --pass-blend: normal; --sel: rgba(56, 189, 248, .3);
+  --glow: 0 0 0 1px rgba(245, 158, 11, .35), 0 14px 30px -14px rgba(245, 158, 11, .55);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #0B1120; --cloth: #1B2336; --ink: #F8FAFC; --ink-2: #94A3B8; --line: rgba(148, 163, 184, .14); --key: rgba(148, 163, 184, .14);
+  --shadow: 0 10px 30px rgba(0, 0, 0, .22);
+  --well: #272F42; --well-ink: #CBD5E1; --soft: #222B40; --track: #334155;
+  --on-bg: radial-gradient(130% 150% at 0% 0%, rgba(251, 191, 36, .32), rgba(251, 191, 36, .06) 62%), #1B2336;
+  --on-ink: #FFF7E6; --on-sub: #FCD34D; --on-well: #FBBF24; --on-well-ink: #1A1203; --on-border: rgba(251, 191, 36, .45);
+  --info-bg: #1B2336; --info-ink: #F8FAFC; --info-bar: #38BDF8; --info-well-ink: #082F49;
+  --accent: #F8FAFC; --accent-ink: #0F172A; --good: #22C55E; --good-bg: rgba(34, 197, 94, .15); --dabu: #4ADE80;
+  --madder-text: #FCA5A5; --weather-ic: #FBBF24;
+  --glow: 0 0 0 1px rgba(251, 191, 36, .4), 0 16px 36px -14px rgba(251, 191, 36, .55);
+} }
+:root[data-theme="dark"] {
+  --ground: #0B1120; --cloth: #1B2336; --ink: #F8FAFC; --ink-2: #94A3B8; --line: rgba(148, 163, 184, .14); --key: rgba(148, 163, 184, .14);
+  --shadow: 0 10px 30px rgba(0, 0, 0, .22);
+  --well: #272F42; --well-ink: #CBD5E1; --soft: #222B40; --track: #334155;
+  --on-bg: radial-gradient(130% 150% at 0% 0%, rgba(251, 191, 36, .32), rgba(251, 191, 36, .06) 62%), #1B2336;
+  --on-ink: #FFF7E6; --on-sub: #FCD34D; --on-well: #FBBF24; --on-well-ink: #1A1203; --on-border: rgba(251, 191, 36, .45);
+  --info-bg: #1B2336; --info-ink: #F8FAFC; --info-bar: #38BDF8; --info-well-ink: #082F49;
+  --accent: #F8FAFC; --accent-ink: #0F172A; --good: #22C55E; --good-bg: rgba(34, 197, 94, .15); --dabu: #4ADE80;
+  --madder-text: #FCA5A5; --weather-ic: #FBBF24;
+  --glow: 0 0 0 1px rgba(251, 191, 36, .4), 0 16px 36px -14px rgba(251, 191, 36, .55);
+}
+/*@base*/
+/* Flourishes */
+.b.on:not(.banner) { box-shadow: var(--glow); }
+.b.on .well { box-shadow: 0 0 18px rgba(251, 191, 36, .45); }
+.clock { font-weight: 300; letter-spacing: -0.05em; font-size: 96px; }
+.clock small { font-family: var(--font-display); font-weight: 500; }
+.name { font-family: var(--font-display); font-weight: 600; }
+body { background-image: radial-gradient(900px 500px at 0% 0%, rgba(56, 189, 248, .07), transparent 60%), radial-gradient(800px 500px at 100% 100%, rgba(251, 191, 36, .06), transparent 60%); }
+.banner.alert { box-shadow: 0 0 0 1px rgba(239, 68, 68, .5), 0 14px 30px -12px rgba(239, 68, 68, .6); }

@@ -1,0 +1,50 @@
+/* Option 3 – Indigo Studio. The current block print identity, modernised.
+   Keeps indigo, turmeric and madder and the self-hosted Hind, with the ui-ux-pro-max ambient
+   deep indigo (#4338CA) as the active colour. A device that is on is a solid indigo card;
+   turmeric is kept for info alerts and the selected tab; madder only for urgent alerts. */
+:root {
+  --font: "Hind", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 16px; --r-s: 10px;
+  --ground: #ECEEF8; --cloth: #FFFFFF; --ink: #1E1B4B; --ink-2: #4B4F7A; --line: #DCDFF0; --key: #DCDFF0;
+  --shadow: 0 1px 2px rgba(30, 27, 75, .06), 0 6px 16px rgba(30, 27, 75, .07);
+  --well: #EEF0FB; --well-ink: #3730A3; --soft: #F4F5FC; --track: #DCDFF0;
+  --on-bg: #4338CA; --on-ink: #FFFFFF; --on-sub: rgba(255, 255, 255, .84); --on-well: rgba(255, 255, 255, .18); --on-well-ink: #FFFFFF;
+  --info-bg: #FFF6DE; --info-ink: #2A1C00; --info-bar: #F0AE2E; --info-well-ink: #2A1C00;
+  --alert: #B4362B; --alert-ink: #FFFFFF;
+  --accent: #4338CA; --accent-ink: #FFFFFF;
+  --tab-cur-bg: #F0AE2E; --tab-cur-ink: #2A1C00;
+  --good: #2F6A3E; --good-bg: #DDEFE2; --dabu: #2F6A3E;
+  --turmeric: #F0AE2E; --turmeric-ink: #2A1C00; --turmeric-ink-2: rgba(42, 28, 0, .78);
+  --madder: #B4362B; --madder-text: #9E2C22; --weather-ic: #B07208; --pass-blend: normal;
+  --bar-bg: #1E1B4B; --bar-ink: #FFFFFF; --bar-ink-2: rgba(255, 255, 255, .72);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #0E1030; --cloth: #181B45; --ink: #EEF0FF; --ink-2: #B4B8E6; --line: rgba(180, 184, 230, .16); --key: rgba(180, 184, 230, .16);
+  --shadow: none; --well: #23275C; --well-ink: #C7CBFF; --soft: #1F2352; --track: #2C3170;
+  --on-bg: #5856D6; --on-ink: #FFFFFF; --on-sub: rgba(255, 255, 255, .86); --on-well: rgba(255, 255, 255, .2);
+  --info-bg: #2A2414; --info-ink: #FCEFD0; --info-bar: #F2B53F;
+  --alert: #C0402E; --accent: #818CF8; --accent-ink: #0E1030;
+  --good: #93D0A2; --good-bg: #1C3326; --dabu: #93D0A2; --madder-text: #FF9A85; --weather-ic: #F2B53F;
+  --bar-bg: #181B45;
+} }
+:root[data-theme="dark"] {
+  --ground: #0E1030; --cloth: #181B45; --ink: #EEF0FF; --ink-2: #B4B8E6; --line: rgba(180, 184, 230, .16); --key: rgba(180, 184, 230, .16);
+  --shadow: none; --well: #23275C; --well-ink: #C7CBFF; --soft: #1F2352; --track: #2C3170;
+  --on-bg: #5856D6; --on-ink: #FFFFFF; --on-sub: rgba(255, 255, 255, .86); --on-well: rgba(255, 255, 255, .2);
+  --info-bg: #2A2414; --info-ink: #FCEFD0; --info-bar: #F2B53F;
+  --alert: #C0402E; --accent: #818CF8; --accent-ink: #0E1030;
+  --good: #93D0A2; --good-bg: #1C3326; --dabu: #93D0A2; --madder-text: #FF9A85; --weather-ic: #F2B53F;
+  --bar-bg: #181B45;
+}
+/*@base*/
+/* Flourishes: an indigo tab bar with the turmeric tab kept from today's design. */
+.bar { background: var(--bar-bg); color: var(--bar-ink); border-color: transparent; }
+.bar .brand { color: var(--bar-ink); }
+.bar .brand span, .bar .tab { color: var(--bar-ink-2); }
+.bar .tab.cur { color: var(--tab-cur-ink); }
+.bar .count { background: rgba(255, 255, 255, .16); color: #fff; }
+.bar .count.alert { background: var(--madder); }
+.clock { font-weight: 700; letter-spacing: -0.04em; }
+.b.on .ok { color: #fff; }
+.ev .d.today { background: var(--turmeric); color: var(--turmeric-ink); }
+.ev .d.today small { color: var(--turmeric-ink); }
