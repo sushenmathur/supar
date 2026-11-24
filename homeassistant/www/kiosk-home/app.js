@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=26';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=26';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=26';
-import * as H from './home.js?v=26';
-import { injectIcons, ic, weatherArt } from './icons.js?v=26';
-import { VIEWS, viewEntityIds } from './views.js?v=26';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=26';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=27';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=27';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=27';
+import * as H from './home.js?v=27';
+import { injectIcons, ic, weatherArt } from './icons.js?v=27';
+import { VIEWS, viewEntityIds } from './views.js?v=27';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=27';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -369,7 +369,12 @@ const ACTIONS = {
     const run = () => quiet(call('input_boolean', 'toggle', { entity_id: E.frontDoor }));
     if (unlock) confirmOr('front-toggle', run); else run();
   },
-  tv: () => quiet(call('script', 'turn_on', { entity_id: 'script.media_tv_power' })),
+  // TV power: while it's on, turn it off through the LG webOS integration; while it's off, run
+  // script.media_tv_power, which wakes it (webOS can't switch itself on).
+  tv: () => {
+    const on = !['off', 'unavailable', 'unknown', undefined].includes(get(E.tv)?.state);
+    quiet(on ? call('media_player', 'turn_off', { entity_id: E.tv }) : call('script', 'turn_on', { entity_id: 'script.media_tv_power' }));
+  },
   'tv-remote': () => { openLive(tvRemoteSheet); sheet().classList.add('tvsheet'); },
   'tv-button': (button) => quiet(call('webostv', 'button', { entity_id: E.tv, button })),
   'tv-source': (source) => quiet(call('media_player', 'select_source', { entity_id: E.tv, source })),
@@ -695,7 +700,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=26';
+    : './vendor/hls.light.min.mjs?v=27';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

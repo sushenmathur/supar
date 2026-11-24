@@ -234,6 +234,10 @@ wss.on('connection', (ws) => {
           setTimeout(() => change('alarm_control_panel.home_alarm', alarmTo[msg.service]), 100);
           return ok({ context: { id: 'c' } });
         }
+        // script.media_tv_power wakes the TV (webOS can't switch itself on).
+        if (msg.domain === 'script' && msg.service === 'turn_on' && [].concat(msg.service_data?.entity_id).includes('script.media_tv_power')) {
+          setTimeout(() => change('media_player.tv', 'on'), 100); return ok({ context: { id: 'c' } });
+        }
         if (msg.domain === 'script' && msg.service === 'alarm_keypad') {
           if (process.env.MOCK_NO_ALARM_SCRIPT) return send({ id: msg.id, type: 'result', success: false, error: { code: 'not_found', message: 'Action script.alarm_keypad not found' } });
           // homeassistant/dashboard/alarm-keypad-script.yaml with the secret 1234

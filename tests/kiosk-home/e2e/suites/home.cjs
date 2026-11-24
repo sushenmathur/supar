@@ -31,7 +31,7 @@ const KS = (sharing) => `window.kioskSatellite={platform:'kiosksatellite',ia:[],
   check('arm away opens the code dial', await p.locator('#sheet #lpdial').count() === 1 && await p.locator('#sheet [data-chip="alarm_arm_away"].on').count() === 1);
   n = (await calls()).length;
   await enter('9999'); await sleep(300);
-  check('wrong alarm code refused', /Wrong code/.test(await p.locator('#lpmsg').textContent()) && /Disarmed/.test(await p.locator('#alarm').textContent()));
+  check('wrong alarm code shows Access denied', /Access denied/.test(await p.locator('#lpmsg').textContent()) && /Disarmed/.test(await p.locator('#alarm').textContent()));
   await sleep(1000); await enter('1234'); await sleep(400);
   check('arm away', (await calls()).at(-1) === 'alarm_control_panel.alarm_arm_away' && /Armed away/.test(await p.locator('#alarm').textContent()));
   await sleep(1900);

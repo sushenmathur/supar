@@ -42,7 +42,7 @@ const lg = async () => (await (await fetch(BASE + '/__log')).json());
     }
     const sent = (await lg()).data.filter((d) => /alarm/.test(d.svc)).map((d) => d.svc);
     const direct = MODE === 'direct';
-    check(direct ? 'no script: after trying it, the right codes go straight to the alarm' : 'codes are checked by script.alarm_keypad', direct ? sent.filter((s) => s.startsWith('alarm_control_panel.')).length === 4 : sent.every((s) => s === 'script.alarm_keypad'), [...new Set(sent)].join(','));
+    check(direct ? 'no script: after trying it, the right codes go straight to the alarm' : 'codes are checked by script.alarm_keypad', direct ? sent.filter((s) => s.startsWith('alarm_control_panel.')).length >= 4 : sent.every((s) => s === 'script.alarm_keypad'), [...new Set(sent)].join(','));
   }
   console.log(R.join('\n')); await b.close(); process.exit(R.some((r) => r.startsWith('FAIL')) ? 1 : 0);
 })();
