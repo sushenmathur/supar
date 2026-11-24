@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=17';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=17';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=17';
-import * as H from './home.js?v=17';
-import { injectIcons, ic, weatherArt } from './icons.js?v=17';
-import { VIEWS, viewEntityIds } from './views.js?v=17';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=17';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=18';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=18';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=18';
+import * as H from './home.js?v=18';
+import { injectIcons, ic, weatherArt } from './icons.js?v=18';
+import { VIEWS, viewEntityIds } from './views.js?v=18';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=18';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -532,16 +532,31 @@ function moreSheet() {
   });
 }
 
+// A drawing of a Roborock Qrevo (round body, LiDAR turret, dark front bumper) for Robbie's pop-up.
+const QREVO_SVG = `<svg class="rbimg" viewBox="0 0 160 112" role="img" aria-label="Robbie, a Roborock Qrevo">
+  <ellipse cx="80" cy="98" rx="66" ry="9" fill="rgba(0,0,0,.14)"/>
+  <path d="M16 60v16c0 12.2 28.7 22 64 22s64-9.8 64-22V60" fill="#d5dae4"/>
+  <path d="M18 74c4 11 30 19 62 19s58-8 62-19" fill="none" stroke="#2c303b" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="80" cy="60" rx="64" ry="23" fill="#f6f7fa" stroke="#c3c9d5" stroke-width="1.5"/>
+  <ellipse cx="80" cy="60" rx="52" ry="17" fill="none" stroke="#e3e7ee" stroke-width="1.5"/>
+  <path d="M63 54v-11h34v11c0 3.3-7.6 6-17 6s-17-2.7-17-6z" fill="#2c303b"/>
+  <ellipse cx="80" cy="43" rx="17" ry="6" fill="#454b5b"/>
+  <path d="M66 49.5c4 1.6 9 2.4 14 2.4s10-.8 14-2.4" fill="none" stroke="#7d8597" stroke-width="1.5"/>
+  <ellipse cx="80" cy="69" rx="7" ry="2.6" fill="#c3c9d5"/>
+  <circle cx="80" cy="69" r="1.3" fill="#2fbfa0"/>
+</svg>`;
+
 function robbieSheet() {
   const r = H.robbie(get);
   const cleaning = get(E.robbie)?.state === 'cleaning';
-  openSheet(`<h2>Robbie</h2><p>${esc(r.label)}</p>
+  const pic = ROBBIE_IMAGE ? `<img class="rbimg" src="${esc(ROBBIE_IMAGE)}" alt="Robbie, a Roborock Qrevo">` : QREVO_SVG;
+  openSheet(`<div class="rbhead">${pic}<div><h2>Robbie</h2><p>${esc(r.label)}</p><small>Roborock Qrevo</small></div></div>
     <div class="acts">
       <button class="tile b" data-svc="vacuum.${cleaning ? 'pause' : 'start'}">${ic(cleaning ? 'pause' : 'play')}${cleaning ? 'Pause' : 'Start'}</button>
       <button class="tile b" data-svc="vacuum.return_to_base">${ic('home')}Dock</button>
       <button class="tile b" data-svc="vacuum.stop">${ic('stop')}Stop</button>
     </div>
-    <div class="acts">${ROBBIE_ROOMS.map(([id, name]) => `<button class="tile b" data-press="${id}">${ic('robot')}${esc(name)}</button>`).join('')}</div>`, (d) => {
+    <div class="acts">${ROBBIE_ROOMS.map(([id, name, icon]) => `<button class="tile b" data-press="${id}">${ic(icon ?? 'robot')}${esc(name)}</button>`).join('')}</div>`, (d) => {
     d.querySelectorAll('[data-svc]').forEach((b) => { const [dom, svc] = b.dataset.svc.split('.'); b.onclick = () => quiet(call(dom, svc, { entity_id: E.robbie })); });
     d.querySelectorAll('[data-press]').forEach((b) => { b.onclick = () => quiet(call('button', 'press', { entity_id: b.dataset.press }).then(closeSheet)); });
   });
@@ -601,7 +616,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=17';
+    : './vendor/hls.light.min.mjs?v=18';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

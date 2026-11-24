@@ -46,7 +46,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - Announce: pick speakers, type a message, or start or end quiet hour.
   - Lost Phone: a combination-lock dial beside a keypad (the design in `dashboards/lost-phone-dial.html` on the `claude/serene-davinci-hbi1n3` branch, drawn in block print colours), with the phone choice above the keys. Each digit turns the dial and fills one of four segments. ✓ calls `script.lost_phone` and reads its response: the dial turns green when the alert is sent, and shakes red for a wrong passcode. A hardware keyboard works too (digits, Backspace, Enter). The glass copy has the same dial in its own colours (warm stone dial, amber pointer).
   - WiFi QR.
-  - Robbie: start or pause, dock, stop, and the six room-clean buttons.
+  - Robbie: a picture of the Roborock Qrevo, start or pause, dock, stop, and the six room-clean buttons, each with an icon for its area (kitchen, TV, sofa, coffee cup, mop, hallway). The picture is a built-in drawing; to use a photo, copy it to `/config/www/` and set `ROBBIE_IMAGE` in `config.js` (for example `/local/robbie.png`).
 - **Rooms**
   - The six tiles with the same labels. Tapping one opens that room's view on this page.
   - An open garage prints in madder here too.
@@ -77,7 +77,7 @@ The tab bar and room tiles open the other `master.yaml` views inside the same pa
 |---|---|---|
 | `#lights` | Lights | "N of 18 lights on", Evening, Night (two taps), All off (two taps); three room panels with a master switch, every light as a toggle, and a brightness picker (10–100%) on dimmable lights that are on |
 | `#homeclimate` | Climate | Average temperature badge, AC off-timer (room, duration, Start, Cancel, running timers); four rooms with room temperature, target −/+ and HVAC modes |
-| `#security` | Security | Alarm arm/disarm, garage Open (two taps) / Stop / Close (two taps), front door lock (unlock takes two taps), all seven door sensors, seven camera snapshots (tap for live), patio and backyard motion |
+| `#security` | Security | Alarm arm/disarm, garage Open (two taps) / Stop / Close (two taps), front door lock (unlock takes two taps), all seven door sensors, seven camera snapshots, each with the time Home Assistant last updated it (tap for live), patio and backyard motion |
 | `#living-room` | Living Room | The floor plan with tappable light buttons (and Aircon, which opens Climate), Robbie controls and the five clean buttons, motion badges |
 | `#garage` | Garage | Door open/stop/close, garage light, keep-open, garage camera, sensor chips; Bluey and Kia with location, driving/parked, battery, charging, and their controls (lock and boot take two taps) |
 | `#kidsroom` | Kids Rooms | Samar and Shanaya: sensor chips (night light, tall lamp and occupancy toggle), live camera, aircon target and cool/heat/off |

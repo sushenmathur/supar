@@ -39,8 +39,12 @@ const doorTile = (c, id, name, icon = 'door') => {
   return c.tile({ act: 'noop', icon, name, sub: c.isUnavailable(s) ? 'Unavailable' : s.state === 'on' ? 'Open' : 'Closed', alert: s?.state === 'on', off: c.isUnavailable(s) });
 };
 const camImg = (c, id, name, live = true) => {
-  const pic = c.get(id)?.attributes?.entity_picture;
-  return `<button class="camtile b" data-act="cam-live" data-arg="${id}">${pic ? `<img data-cam="${id}" src="${c.esc(pic)}" alt="${c.esc(name)} camera">` : ''}<span class="cap"><span>${c.esc(name)}</span><small>${off(c, id) ? 'Unavailable' : live ? 'Tap for live' : ''}</small></span></button>`;
+  const s = c.get(id);
+  const pic = s?.attributes?.entity_picture;
+  // When Home Assistant last updated the camera, as on the Home camera card.
+  const upd = s?.last_updated ? `Updated ${c.fmtTime(new Date(s.last_updated), c.tz())}` : '';
+  const hint = off(c, id) ? 'Unavailable' : live ? 'Tap for live' : '';
+  return `<button class="camtile b" data-act="cam-live" data-arg="${id}">${pic ? `<img data-cam="${id}" src="${c.esc(pic)}" alt="${c.esc(name)} camera">` : ''}<span class="cap"><span class="camname">${c.esc(name)}${upd && !off(c, id) ? `<small class="upd">${upd}</small>` : ''}</span><small>${hint}</small></span></button>`;
 };
 const meter = (v) => `<span class="meter" style="--lvl:${Math.max(0, Math.min(100, v ?? 0))}%"></span>`;
 const twoTap = (c, key, text) => c.label(key, text);
