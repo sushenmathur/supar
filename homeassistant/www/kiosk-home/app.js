@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=13';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=13';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=13';
-import * as H from './home.js?v=13';
-import { injectIcons, ic, weatherArt } from './icons.js?v=13';
-import { VIEWS, viewEntityIds } from './views.js?v=13';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=13';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=14';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=14';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=14';
+import * as H from './home.js?v=14';
+import { injectIcons, ic, weatherArt } from './icons.js?v=14';
+import { VIEWS, viewEntityIds } from './views.js?v=14';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=14';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -322,7 +322,7 @@ function openSheet(html, onOpen) {
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
-sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam'); sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
+sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam', 'lpsheet'); sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
 const ACTIONS = {
@@ -412,35 +412,91 @@ function announceSheet() {
   });
 }
 
+// Lost Phone: a combination-lock dial beside a keypad (from dashboards/lost-phone-dial.html on the design branch),
+// drawn in block print colours. Four digits, then ✓ calls script.lost_phone, which checks the passcode in HA.
+const LP_LEN = 4;
+function lpDial() {
+  let g = '';
+  for (let i = 0; i < 120; i++) {
+    const long = i % 12 === 0, len = long ? 14 : i % 3 === 0 ? 9 : 5;
+    g += `<line x1="180" y1="34" x2="180" y2="${34 + len}" class="lptick${long ? ' l' : ''}" transform="rotate(${i * 3} 180 180)"/>`;
+  }
+  for (let d = 0; d < 10; d++) {
+    const a = d * 36, x = 180 + 108 * Math.sin(a * Math.PI / 180), y = 180 - 108 * Math.cos(a * Math.PI / 180);
+    g += `<text class="lpdg" data-d="${d}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" transform="rotate(${a} ${x.toFixed(1)} ${y.toFixed(1)})">${d}</text>`;
+  }
+  return g;
+}
+function lpArcs(n) {
+  let s = '';
+  const p = (a) => [180 + 168 * Math.cos(a * Math.PI / 180), 180 + 168 * Math.sin(a * Math.PI / 180)].map((v) => v.toFixed(1)).join(' ');
+  for (let i = 0; i < LP_LEN; i++) {
+    const a0 = -90 + i * (360 / LP_LEN) + 8, a1 = -90 + (i + 1) * (360 / LP_LEN) - 8;
+    s += `<path class="lpseg${i < n ? ' f' : ''}" d="M${p(a0)} A168 168 0 0 1 ${p(a1)}"/>`;
+  }
+  return s;
+}
 function lostPhoneSheet() {
   let phone = 'Sushen';
   let code = '';
-  const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'clear', 0, 'go'];
-  openSheet(`<h2>Lost Phone</h2><p id="lpmsg">Enter passcode</p>
-    <div class="acts" id="lpwho">${['Sushen', 'Paro'].map((p) => `<button class="tile b${p === phone ? ' on' : ''}" data-phone="${p}">${ic('phone')}${p}</button>`).join('')}</div>
-    <div class="acts" style="grid-template-columns:repeat(3,1fr)">${keys.map((k) => `<button class="tile b" data-key="${k}" style="justify-content:center;font-size:22px;font-weight:700">${k === 'clear' ? 'Clear' : k === 'go' ? 'Send' : k}</button>`).join('')}</div>`, (d) => {
-    const msg = d.querySelector('#lpmsg');
-    const show = () => { msg.textContent = code ? '•'.repeat(code.length) : 'Enter passcode'; };
-    d.querySelectorAll('[data-phone]').forEach((b) => { b.onclick = () => { phone = b.dataset.phone; d.querySelectorAll('[data-phone]').forEach((x) => x.classList.toggle('on', x === b)); }; });
-    d.querySelectorAll('[data-key]').forEach((b) => {
-      b.onclick = async () => {
-        const k = b.dataset.key;
-        if (k === 'clear') { code = ''; show(); return; }
-        if (k !== 'go') { if (code.length < 4) code += k; show(); return; }
-        if (code.length < 4) return;
-        msg.textContent = 'Checking…';
-        try {
-          const res = await conn.sendMessagePromise({ type: 'call_service', domain: 'script', service: 'lost_phone', service_data: { passcode: code, phone }, return_response: true });
-          const ok = res?.response?.ok;
-          msg.textContent = ok === true ? `Alert sent to ${phone}` : ok === false ? 'Wrong passcode' : 'Not confirmed: update the script';
-          code = '';
-          if (ok === true) setTimeout(closeSheet, 1500);
-        } catch (err) {
-          msg.textContent = /passcode|denied/i.test(err?.message ?? '') ? 'Wrong passcode' : `Error: ${String(err?.message ?? errorCode(err)).slice(0, 40)}`;
-          code = '';
-        }
-      };
+  let busy = false;
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'x', '0', 'ok'];
+  openSheet(`<h2>Lost Phone</h2>
+    <div class="lp">
+      <div class="lpleft">
+        <div class="lpdial" id="lpdial"><div class="lpptr"></div>
+          <svg viewBox="0 0 360 360" aria-hidden="true"><defs><radialGradient id="lpface" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#2b3a86"/><stop offset="1" stop-color="#121a45"/></radialGradient></defs>
+            <g id="lparcs">${lpArcs(0)}</g><circle cx="180" cy="180" r="150" fill="url(#lpface)"/><g id="lpwheel">${lpDial()}</g></svg>
+          <div class="lphub num" id="lphub">–</div></div>
+        <p class="lpmsg" id="lpmsg" role="status" aria-live="polite">Enter passcode</p>
+      </div>
+      <div class="lpright">
+        <div class="lpwho">${['Sushen', 'Paro'].map((p) => `<button class="tile b${p === phone ? ' on' : ''}" data-phone="${p}" aria-pressed="${p === phone}">${ic('phone')}<span>${p}</span></button>`).join('')}</div>
+        <div class="lppad">${keys.map((k) => `<button class="lpkey${k === 'ok' ? ' ok' : k === 'x' ? ' cl' : ''}" data-key="${k}" aria-label="${k === 'ok' ? 'Send alert' : k === 'x' ? 'Clear' : k}">${k === 'x' ? '✕' : k === 'ok' ? '✓' : k}</button>`).join('')}</div>
+      </div>
+    </div>`, (d) => {
+    d.classList.add('lpsheet');
+    const $d = (s) => d.querySelector(s);
+    const dial = $d('#lpdial'), wheel = $d('#lpwheel'), hub = $d('#lphub'), msg = $d('#lpmsg');
+    const say = (t, cls = '') => { msg.textContent = t; msg.className = `lpmsg ${cls}`; };
+    const arcs = () => { $d('#lparcs').innerHTML = lpArcs(code.length); };
+    const turn = (n) => {
+      wheel.style.transform = `rotate(${-n * 36}deg)`;
+      d.querySelectorAll('.lpdg').forEach((e) => e.classList.toggle('cur', e.dataset.d === String(n)));
+      hub.textContent = n;
+    };
+    const reset = () => { code = ''; arcs(); hub.textContent = '–'; d.querySelectorAll('.lpdg.cur').forEach((e) => e.classList.remove('cur')); dial.className = 'lpdial'; };
+    const press = async (k) => {
+      if (busy) return;
+      dial.classList.remove('bad');
+      if (/^\d$/.test(k)) { if (code.length < LP_LEN) { code += k; turn(+k); arcs(); say('Enter passcode'); } return; }
+      if (k === 'x') { reset(); say('Enter passcode'); return; }
+      if (code.length < LP_LEN) { say(`Enter all ${LP_LEN} digits`); return; }
+      busy = true; say('Checking…');
+      let ok;
+      try {
+        const res = await conn.sendMessagePromise({ type: 'call_service', domain: 'script', service: 'lost_phone', service_data: { passcode: code, phone }, return_response: true });
+        ok = res?.response?.ok;
+        if (ok === undefined) { reset(); say('Not confirmed: update the script', 'bad'); busy = false; return; }
+      } catch (err) {
+        if (!/passcode|denied/i.test(err?.message ?? '')) { reset(); say(`Error: ${String(err?.message ?? errorCode(err)).slice(0, 40)}`, 'bad'); busy = false; return; }
+        ok = false;
+      }
+      if (ok === true) {
+        dial.classList.add('good'); say(`Alert sent to ${phone}`, 'good');
+        setTimeout(() => { busy = false; closeSheet(); }, 1800);
+      } else {
+        dial.classList.add('bad'); say('Access denied: wrong passcode', 'bad');
+        setTimeout(() => { reset(); dial.classList.add('bad'); setTimeout(() => dial.classList.remove('bad'), 500); busy = false; }, 900);
+      }
+    };
+    d.querySelectorAll('[data-phone]').forEach((b) => {
+      b.onclick = () => { phone = b.dataset.phone; d.querySelectorAll('[data-phone]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); }); };
     });
+    d.querySelectorAll('[data-key]').forEach((b) => { b.onclick = () => press(b.dataset.key); });
+    d.onkeydown = (e) => {
+      if (/^\d$/.test(e.key)) { e.preventDefault(); press(e.key); } else if (e.key === 'Backspace') press('x'); else if (e.key === 'Enter' && !e.target.closest?.('button')) press('ok');
+    };
   });
 }
 
@@ -526,7 +582,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=13';
+    : './vendor/hls.light.min.mjs?v=14';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

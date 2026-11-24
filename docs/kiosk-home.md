@@ -44,7 +44,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
 - **Quick actions**
   - Good Night (second tap to confirm), Festive.
   - Announce: pick speakers, type a message, or start or end quiet hour.
-  - Lost Phone: the 4-digit keypad and phone choice. It calls `script.lost_phone` and reads its response.
+  - Lost Phone: a combination-lock dial beside a keypad (the design in `dashboards/lost-phone-dial.html` on the `claude/serene-davinci-hbi1n3` branch, drawn in block print colours), with the phone choice above the keys. Each digit turns the dial and fills one of four segments. ✓ calls `script.lost_phone` and reads its response: the dial turns green when the alert is sent, and shakes red for a wrong passcode. A hardware keyboard works too (digits, Backspace, Enter). The glass copy keeps the plain keypad.
   - WiFi QR.
   - Robbie: start or pause, dock, stop, and the six room-clean buttons.
 - **Rooms**
@@ -214,7 +214,7 @@ Then copy the folder again. Kiosk Satellite always loads fresh. A normal browser
 - [ ] **Garage:** opening it raises the banner. Close door needs two taps and closes it.
 - [ ] **Alarm:** arm home, then disarm (a code prompt appears only if your alarm needs one).
 - [ ] **Announce:** a test message plays on the chosen speaker.
-- [ ] **Lost Phone:** the right passcode rings the phone; a wrong one says "Wrong passcode".
+- [ ] **Lost Phone:** the right passcode rings the phone; a wrong one turns the dial red and says "Access denied: wrong passcode".
 - [ ] **Bins:** the tile shows the right next collection. If it doesn't, tell me what the sensor states look like.
 - [ ] **Theme:** switching KS between light and dark restyles the page without a reload.
 - [ ] **Room tiles and tabs:** they open the right Lovelace views.
