@@ -3,15 +3,20 @@
 // for installs where only single files can be uploaded (e.g. the HA File editor add-on).
 // Scripts are bundled with esbuild, the stylesheet and Hind fonts are inlined as data URIs.
 //
-//   node tools/kiosk-home/build-single.mjs        (needs network once for `npx esbuild`)
+//   node tools/kiosk-home/build-single.mjs                          → kiosk-home.html
+//   node tools/kiosk-home/build-single.mjs --name kiosk-home-glass  → kiosk-home-glass.html
+// (needs network once for `npx esbuild`)
 import { readFileSync, writeFileSync, mkdtempSync, readdirSync, mkdirSync, copyFileSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 
 const repo = resolve(new URL('../../', import.meta.url).pathname);
-const src = join(repo, 'homeassistant/www/kiosk-home');
-const out = join(repo, 'homeassistant/www/kiosk-home.html');
+const i = process.argv.indexOf('--name');
+const name = i > 0 ? process.argv[i + 1] : 'kiosk-home';
+if (!/^kiosk-home[\w-]*$/.test(name)) throw new Error(`unexpected --name ${name}`);
+const src = join(repo, 'homeassistant/www', name);
+const out = join(repo, `homeassistant/www/${name}.html`);
 
 // Copy the modules to a temp dir with the ?v= cache-busting queries removed, so esbuild can resolve them.
 const tmp = mkdtempSync(join(tmpdir(), 'kiosk-home-'));
@@ -34,6 +39,6 @@ if (/src="app\.js|href="styles\.css/.test(html)) throw new Error('index.html str
 // hls.js rides along as inert base64 text; the page decodes and imports it only when a camera pop-up opens.
 const hls = readFileSync(join(src, 'vendor/hls.light.min.mjs')).toString('base64');
 html = html.replace('</body>', () => `<script type="text/plain" id="hls-src">${hls}</script>\n</body>`);
-html = html.replace('<head>', '<head>\n<!-- Built from homeassistant/www/kiosk-home/ by tools/kiosk-home/build-single.mjs. Do not edit; rebuild. -->');
+html = html.replace('<head>', `<head>\n<!-- Built from homeassistant/www/${name}/ by tools/kiosk-home/build-single.mjs. Do not edit; rebuild. -->`);
 writeFileSync(out, html);
 console.log(`wrote ${out} (${Math.round(html.length / 1024)} KB)`);

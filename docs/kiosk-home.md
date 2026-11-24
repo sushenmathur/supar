@@ -1,6 +1,6 @@
 # SuPar Home: block print kiosk page (`kiosk-home`)
 
-A live version of your Home dashboard, built as a hand-made page for the kitchen tablet. It runs in Kiosk Satellite's **Custom Pages** and uses the **Warm Stone Glass** design (`dashboards/kiosk-redesign/DESIGN.md`): frosted cards over a warm backdrop, Plus Jakarta Sans, amber for devices that are on, red for alerts, with a matching dark mode. It replaced the earlier block print look (option 2 in `dashboards/home-2026/`). It shows everything on today's `hubhome` view, wired to the same entities with the same rules, and talks to Home Assistant over its websocket API. Nothing in your Lovelace config changes.
+A live version of your Home dashboard, built as a hand-made page for the kitchen tablet. It runs in Kiosk Satellite's **Custom Pages** and uses the block print design (option 2 in `dashboards/home-2026/`). It shows everything on today's `hubhome` view, wired to the same entities with the same rules, and talks to Home Assistant over its websocket API. Nothing in your Lovelace config changes.
 
 It's a test page that sits beside your dashboard, and it can be removed in one step (see **Rollback**).
 
@@ -119,11 +119,32 @@ Differences from the Lovelace view, on purpose:
 - **Kept light on the tablet:**
   - Everything moving is transform/opacity only, so it runs on the GPU.
   - Animations pause under the screensaver or when the page is hidden, and are off with reduced motion.
-  - Frosted glass (`backdrop-filter`) is the costliest effect. A blurred card is redrawn every frame something behind or inside it moves, which took Home to 19 fps. On Home only the clock, calendar and alarm cards are blurred; the other cards get a denser fill. The sub-views have nothing animating and keep full glass. If the tablet still lags, set `--glass-blur` lower or remove the blur (see `prefers-reduced-transparency` in `styles.css`).
   - Measured with Playwright on a 4× throttled CPU, with one live state change a second:
     - every view holds 61 fps
     - Lights and Security do no layout or style work while idle
     - Home does one layout per real update, plus about 3 style recalculations a second for the running animations
+
+## Glass version (`kiosk-home-glass`)
+
+A second copy of the page in the **Warm Stone Glass** design (`dashboards/kiosk-redesign/DESIGN.md`): frosted cards over a warm backdrop, Plus Jakarta Sans, amber for devices that are on, an amber stripe for info banners and red for alerts, with a matching dark mode. Install it next to `kiosk-home`, so you can switch between them in Kiosk Satellite:
+
+| | Block print | Glass |
+|---|---|---|
+| Folder | `www/kiosk-home/` | `www/kiosk-home-glass/` |
+| Single file | `www/kiosk-home.html` | `www/kiosk-home-glass.html` |
+| Kiosk Satellite URL | `/local/kiosk-home.html` | `/local/kiosk-home-glass.html` |
+| Build the single file | `node tools/kiosk-home/build-single.mjs` | `node tools/kiosk-home/build-single.mjs --name kiosk-home-glass` |
+| Bump the version | `--dir homeassistant/www/kiosk-home` | `--dir homeassistant/www/kiosk-home-glass` |
+
+It does everything the block print page does, and also:
+- **Hallway door at night.** It raises a banner alert, as the patio and laundry doors do, and can be snoozed.
+- **Long tile names scroll.** Names too long for their tile, such as "Bedroom Downlights", scroll gently instead of being cut off. Only names that don't fit move, and they stop with reduced motion or under the screensaver.
+- **One date stamp per day.** The family calendar shows each day's stamp once, so two events on the same day sit under one stamp.
+- **Clearer buttons and spacing.** Arm home and Arm away have a solid fill and edge, and the alarm, garage and front door cards are spaced further apart.
+- **Kids Rooms.** One compact row of sensor chips, and both cameras the same, larger size.
+- **Performance.** Frosted glass (`backdrop-filter`) is the costliest effect: a blurred card is redrawn every frame something behind or inside it moves. On Home only the clock, calendar and alarm cards are blurred; the rest get a denser fill. With that, Home holds 61 fps on a 4× throttled CPU, and the sub-views keep full glass. If the tablet still lags, lower `--glass-blur` or remove the blur (see `prefers-reduced-transparency` in its `styles.css`).
+
+Changes to one copy aren't made to the other automatically: if a fix belongs in both, apply it to both folders and rebuild both files.
 
 ## Deploy
 

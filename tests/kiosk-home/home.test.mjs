@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as H from '../../homeassistant/www/kiosk-home/home.js';
 import { applyEntityDiff } from '../../homeassistant/www/kiosk-home/state.js';
+import './glass.test.mjs'; // the glass page's own checks run with these
 
 const NOW = Date.parse('2026-11-23T08:00:00Z');
 const ago = (min) => new Date(NOW - min * 60000).toISOString();
