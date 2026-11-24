@@ -1,6 +1,6 @@
 // Sub-views ported from master.yaml (security, lights, homeclimate, living-room, garage, kidsroom,
 // outdoor, laundry, music). Each view: { ids, render(c), actions? }. `c` is the context from app.js.
-import { energyHud } from './energyhud.js?v=23';
+import { energyHud } from './energyhud.js?v=26';
 
 // ---- Shared helpers ----
 const st = (c, id) => c.get(id)?.state;
@@ -138,6 +138,13 @@ export function acTimerText(timers, now = Date.now()) {
   return { text: `${best.room} · ${mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins}m`}`, active: true };
 }
 
+/** An aircon's running mode as a haze colour and a word, or null while it's off or unavailable. */
+export function acMode(state) {
+  const m = { cool: ['cool', 'Cooling'], heat: ['heat', 'Heating'], heat_cool: ['heatcool', 'Heat/cool'], auto: ['heatcool', 'Auto'],
+    fan_only: ['fan', 'Fan only'], dry: ['dry', 'Drying'] }[state];
+  return m ? { cls: m[0], label: m[1] } : null;
+}
+
 const homeclimate = {
   ids: [...new Set([...CLIMATE_ROOMS.flatMap((r) => [r[1], r[2]]), ...AVG_SOURCES, ...AC_TIMERS.map((t) => t[1]),
     'input_select.ac_timer_target', 'input_select.ac_timer_preset', 'script.ac_off_timer_start', 'script.ac_off_timer_cancel'])],
@@ -147,10 +154,17 @@ const homeclimate = {
     const timer = acTimerText(AC_TIMERS.map(([r, id]) => [r, c.get(id)]));
     const right = chip(c, { icon: 'thermo', text: avg == null ? 'No data' : `Average ${avg}°`, alert: band === 'hot' })
       + chip(c, { icon: 'timer', text: timer.text, on: timer.active, act: 'ac-timer' });
-    const rooms = CLIMATE_ROOMS.map(([name, sensor, climate]) => panel(c, {
-      title: name, icon: 'thermo',
-      body: `<div class="big num" style="font-size:52px">${num(c, sensor) ?? '—'}<small style="font-size:22px">°</small></div><span class="sub">Room temperature</span>${climateBlock(c, climate)}`,
-    })).join('');
+    // A running aircon's panel gets a soft haze in its mode's colour (blue cool, red heat, amber heat/cool,
+    // teal fan only, violet dry) and the mode under its name, so it's clear at a glance which are on.
+    const rooms = CLIMATE_ROOMS.map(([name, sensor, climate]) => {
+      const mode = acMode(c.get(climate)?.state);
+      const target = c.get(climate)?.attributes?.temperature;
+      return panel(c, {
+        title: name, icon: 'thermo', cls: mode ? `ac ac-${mode.cls}` : '',
+        sub: mode ? `<span class="acmode">${mode.label}${target != null ? ` · ${target}°` : ''}</span>` : '',
+        body: `${mode ? '<span class="haze" aria-hidden="true"></span>' : ''}<div class="big num" style="font-size:52px">${num(c, sensor) ?? '—'}<small style="font-size:22px">°</small></div><span class="sub">Room temperature</span>${climateBlock(c, climate)}`,
+      });
+    }).join('');
     return head(c, { icon: 'thermo', title: 'Climate', right: `<div class="seg">${right}</div>` }) + cols('repeat(4, minmax(0, 1fr))', rooms);
   },
   actions: {

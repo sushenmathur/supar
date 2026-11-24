@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "description": "End-to-end and visual tests for the kiosk pages. npm install here once (ws for the fake Home Assistant); Playwright with Chromium must be available.",
+  "type": "commonjs",
+  "dependencies": {
+    "ws": "8.18.0"
+  }
+}

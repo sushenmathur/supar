@@ -1,6 +1,6 @@
 // Connects to Home Assistant: through Kiosk Satellite's shared connection when inside KS,
 // otherwise with the Home Assistant session this browser already has.
-import { createConnection, getAuth, ERR_INVALID_AUTH } from './vendor/haws.mjs?v=23';
+import { createConnection, getAuth, ERR_INVALID_AUTH } from './vendor/haws.mjs?v=26';
 
 export const MESSAGES = {
   ksAuth: 'Turn on Share Home Assistant connection in Settings › Home Assistant › Custom Pages, and make sure this page is added as a custom page.',

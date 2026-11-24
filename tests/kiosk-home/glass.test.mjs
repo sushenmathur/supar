@@ -26,3 +26,9 @@ test('glass page: charging uses the status sensor, then the iPhone backup', () =
   assert.equal(G.isCharging(world({ [ids[0]]: 'unavailable', [ids[1]]: 'Charging' }), ids), true);
   assert.equal(G.isCharging(world({ [ids[0]]: 'Not Charging', [ids[1]]: 'Charging' }), ids), false);
 });
+
+test('glass page: climate haze modes match kiosk-home', async () => {
+  const a = await import('../../homeassistant/www/kiosk-home/views.js');
+  const b = await import('../../homeassistant/www/kiosk-home-glass/views.js');
+  for (const s of ['cool', 'heat', 'heat_cool', 'auto', 'fan_only', 'dry', 'off']) assert.deepEqual(b.acMode(s), a.acMode(s));
+});

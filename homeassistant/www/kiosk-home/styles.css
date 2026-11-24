@@ -591,3 +591,31 @@ button.car { text-align: left; }
 .panel.kid .seg .chip > span { overflow: hidden; text-overflow: ellipsis; }
 .panel.kid .seg .chip .ic { width: 18px; height: 18px; flex: none; }
 .panel.kid .camtile { min-height: 0; height: 100%; }
+
+/* ---- Climate: a running aircon's panel gets a soft haze in its mode's colour ---- */
+.panel.ac { position: relative; isolation: isolate; }
+.panel.ac .haze { position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(130% 70% at 50% 0%, var(--haze) 0%, transparent 72%), radial-gradient(90% 50% at 50% 100%, var(--haze-2, transparent) 0%, transparent 75%); }
+@media (prefers-reduced-motion: no-preference) { .panel.ac .haze { animation: haze 6s ease-in-out infinite; } }
+@keyframes haze { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+.panel.ac-cool { --haze: rgba(59, 130, 246, .26); --haze-2: rgba(59, 130, 246, .10); --mode: #1d5fd1; }
+.panel.ac-heat { --haze: rgba(239, 68, 68, .24); --haze-2: rgba(239, 68, 68, .09); --mode: #c0392b; }
+.panel.ac-heatcool { --haze: rgba(245, 158, 11, .28); --haze-2: rgba(245, 158, 11, .10); --mode: #b86e00; }
+.panel.ac-fan { --haze: rgba(20, 184, 166, .26); --haze-2: rgba(20, 184, 166, .10); --mode: #0f8577; }
+.panel.ac-dry { --haze: rgba(139, 92, 246, .24); --haze-2: rgba(139, 92, 246, .09); --mode: #6d3fd6; }
+.panel.ac .acmode { color: var(--mode); font-weight: 700; }
+.panel.ac .acmode::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: currentColor; margin-right: 6px; vertical-align: 1px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .panel.ac-cool { --haze: rgba(96, 165, 250, .30); --mode: #93c5fd; } :root:not([data-theme="light"]) .panel.ac-heat { --haze: rgba(248, 113, 113, .28); --mode: #fca5a5; }
+  :root:not([data-theme="light"]) .panel.ac-heatcool { --haze: rgba(251, 191, 36, .28); --mode: #fcd34d; } :root:not([data-theme="light"]) .panel.ac-fan { --haze: rgba(45, 212, 191, .28); --mode: #5eead4; }
+  :root:not([data-theme="light"]) .panel.ac-dry { --haze: rgba(167, 139, 250, .30); --mode: #c4b5fd; } }
+:root[data-theme="dark"] .panel.ac-cool { --haze: rgba(96, 165, 250, .30); --mode: #93c5fd; } :root[data-theme="dark"] .panel.ac-heat { --haze: rgba(248, 113, 113, .28); --mode: #fca5a5; }
+:root[data-theme="dark"] .panel.ac-heatcool { --haze: rgba(251, 191, 36, .28); --mode: #fcd34d; } :root[data-theme="dark"] .panel.ac-fan { --haze: rgba(45, 212, 191, .28); --mode: #5eead4; }
+:root[data-theme="dark"] .panel.ac-dry { --haze: rgba(167, 139, 250, .30); --mode: #c4b5fd; }
+
+/* Car logos (images in /config/www/images/): shown on a white chip once loaded; the built-in mark until then. */
+.well.logo img { display: none; width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+.well.logo.haslogo { background: #fff; color: #111; border-color: transparent; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08); }
+.well.logo.haslogo::before, .well.logo.haslogo::after { display: none; }
+.well.logo.haslogo img { display: block; }
+.well.logo.haslogo svg { display: none; }

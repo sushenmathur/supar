@@ -161,3 +161,14 @@ test('kiosk-home: hallway door shows as a grey note', () => {
   assert.equal(b.title, 'Hallway door open');
   assert.equal(b.level, 'note');
 });
+
+test('climate haze: each running aircon mode has its own colour and word; off has none', async () => {
+  const { acMode } = await import('../../homeassistant/www/kiosk-home/views.js');
+  assert.deepEqual(acMode('cool'), { cls: 'cool', label: 'Cooling' });
+  assert.deepEqual(acMode('heat'), { cls: 'heat', label: 'Heating' });
+  assert.deepEqual(acMode('heat_cool'), { cls: 'heatcool', label: 'Heat/cool' });
+  assert.deepEqual(acMode('auto'), { cls: 'heatcool', label: 'Auto' });
+  assert.deepEqual(acMode('fan_only'), { cls: 'fan', label: 'Fan only' });
+  assert.deepEqual(acMode('dry'), { cls: 'dry', label: 'Drying' });
+  for (const s of ['off', 'unavailable', 'unknown', undefined]) assert.equal(acMode(s), null);
+});

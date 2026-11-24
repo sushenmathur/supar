@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=23';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=23';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=23';
-import * as H from './home.js?v=23';
-import { injectIcons, ic, weatherArt } from './icons.js?v=23';
-import { VIEWS, viewEntityIds } from './views.js?v=23';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=23';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=26';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=26';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=26';
+import * as H from './home.js?v=26';
+import { injectIcons, ic, weatherArt } from './icons.js?v=26';
+import { VIEWS, viewEntityIds } from './views.js?v=26';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=26';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -514,6 +514,17 @@ function lostPhoneSheet() {
 
 // Home alarm: the same dial and keypad for the alarm code. Disarmed: choose Arm home or Arm away; armed: Disarm.
 const ALARM_WORDS = { alarm_arm_home: ['Arm home', 'home', 'Armed home'], alarm_arm_away: ['Arm away', 'away', 'Armed away'], alarm_disarm: ['Disarm', 'lock', 'Disarmed'] };
+// Success means the alarm actually changed, not that the call was accepted: some integrations (Alarmo, for one)
+// quietly ignore a wrong code and still answer the call as successful. Arming counts once the alarm is arming
+// (exit delay) or armed in the chosen mode; disarming once it's disarmed.
+function alarmChanged(svc, ms = 8000) {
+  const want = svc === 'alarm_disarm' ? ['disarmed'] : ['arming', svc === 'alarm_arm_home' ? 'armed_home' : 'armed_away'];
+  const t0 = Date.now();
+  return new Promise((resolve) => {
+    const tick = () => { if (want.includes(get(E.alarm)?.state)) resolve(true); else if (Date.now() - t0 > ms) resolve(false); else setTimeout(tick, 200); };
+    tick();
+  });
+}
 function alarmCall(service) {
   const s = get(E.alarm);
   const arming = service !== 'alarm_disarm';
@@ -521,31 +532,32 @@ function alarmCall(service) {
   const fmt = s?.attributes?.code_format;
   dialSheet({
     title: 'Home Alarm', prompt: 'Enter alarm code', chips, chip: service, minLen: 4, maxLen: 8, okLabel: arming ? 'Arm' : 'Disarm', cls: 'alarmsheet',
-    // The code must be checked by Home Assistant, never by the page (anything in the page can be read without
-    // signing in). An alarm with its own code (code_format) checks it itself. Otherwise script.alarm_keypad
-    // (homeassistant/dashboard/alarm-keypad-script.yaml) checks it against a secret before arming or disarming;
-    // without that script the keypad refuses rather than accept any code.
+    // The code is checked by Home Assistant, never by the page (anything in the page can be read without signing
+    // in). script.alarm_keypad (homeassistant/dashboard/alarm-keypad-script.yaml) is the authority: it compares the
+    // code with alarm_keypad_code in secrets.yaml and only then arms or disarms, passing the code on to the alarm.
+    // Only if that script isn't installed does the page send the code to the alarm itself (when it has a code).
+    // Either way, success means the alarm actually changed state.
     submit: async (code, svc) => {
-      if (fmt) {
-        try {
-          await conn.sendMessagePromise({ type: 'call_service', domain: 'alarm_control_panel', service: svc, service_data: { entity_id: E.alarm, code } });
-          return { ok: true, msg: ALARM_WORDS[svc][2] };
-        } catch (err) {
-          if (/code/i.test(err?.message ?? '') || err?.code === 'invalid_code') return { ok: false, msg: 'Wrong code' };
-          throw err;
-        }
-      }
+      const DENIED = { ok: false, msg: 'Access denied: wrong passcode' };
       try {
         const res = await conn.sendMessagePromise({ type: 'call_service', domain: 'script', service: 'alarm_keypad', service_data: { request: svc.replace('alarm_', ''), code }, return_response: true });
         const ok = res?.response?.ok;
-        if (ok === true) return { ok: true, msg: ALARM_WORDS[svc][2] };
-        if (ok === false) return { ok: false, msg: 'Wrong code' };
-        return { ok: undefined, msg: 'Not confirmed: update script.alarm_keypad' };
+        if (ok === false) return DENIED;
+        if (ok !== true) return { ok: undefined, msg: 'Not confirmed: update script.alarm_keypad' };
+        return (await alarmChanged(svc)) ? { ok: true, msg: ALARM_WORDS[svc][2] } : { ok: undefined, msg: "The alarm didn't change: check its own code matches" };
       } catch (err) {
-        if (/not found|not_found|unknown/i.test(`${err?.code ?? ''} ${err?.message ?? ''}`)) return { ok: undefined, msg: 'Code check not set up: add script.alarm_keypad' };
-        if (/code|denied/i.test(err?.message ?? '')) return { ok: false, msg: 'Wrong code' };
+        const missing = /not found|not_found|unknown/i.test(`${err?.code ?? ''} ${err?.message ?? ''}`);
+        if (!missing) { if (/code|denied/i.test(err?.message ?? '')) return DENIED; throw err; }
+      }
+      // No script: fall back to the alarm's own code, if it has one.
+      if (!fmt) return { ok: undefined, msg: 'Code check not set up: add script.alarm_keypad' };
+      try {
+        await conn.sendMessagePromise({ type: 'call_service', domain: 'alarm_control_panel', service: svc, service_data: { entity_id: E.alarm, code } });
+      } catch (err) {
+        if (/code/i.test(err?.message ?? '') || err?.code === 'invalid_code') return DENIED;
         throw err;
       }
+      return (await alarmChanged(svc)) ? { ok: true, msg: ALARM_WORDS[svc][2] } : DENIED;
     },
   });
 }
@@ -683,7 +695,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=23';
+    : './vendor/hls.light.min.mjs?v=26';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -878,9 +890,13 @@ function openLive(fn) {
 }
 
 /** Card badge: a Kia wordmark for the Sorento, a Tesla photo thumbnail for Bluey. */
+/** Car card badge: the car's logo image (c.logo, from /config/www/images/) once it loads; until then, or if it's
+ *  missing, a built-in Kia wordmark or Tesla T. */
 function carBadge(c) {
-  if (c.brand === 'tesla') return `<span class="well tesla" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 5.6c2.9-1.5 5.9-2.3 9-2.3s6.1.8 9 2.3l-.7 1.3c-1.8-.9-3.7-1.4-5.7-1.6L12 9.2 9.4 5.3c-2 .2-3.9.7-5.7 1.6z"/><path d="M9.9 6.9 12 10.4l2.1-3.5c.8.1 1.6.2 2.3.4L12 21 7.6 7.3c.7-.2 1.5-.3 2.3-.4z"/></svg></span>`;
-  return `<span class="well kia" aria-hidden="true"><svg viewBox="0 0 44 18"><text x="22" y="14" text-anchor="middle">KIA</text></svg></span>`;
+  const mark = c.brand === 'tesla' ? '<svg viewBox="0 0 24 24"><path d="M3 5.6c2.9-1.5 5.9-2.3 9-2.3s6.1.8 9 2.3l-.7 1.3c-1.8-.9-3.7-1.4-5.7-1.6L12 9.2 9.4 5.3c-2 .2-3.9.7-5.7 1.6z"/><path d="M9.9 6.9 12 10.4l2.1-3.5c.8.1 1.6.2 2.3.4L12 21 7.6 7.3c.7-.2 1.5-.3 2.3-.4z"/></svg>'
+    : '<svg viewBox="0 0 44 18"><text x="22" y="14" text-anchor="middle">KIA</text></svg>';
+  const logo = c.logo ? `<img src="${esc(c.logo)}" alt="" onload="this.parentNode.classList.add('haslogo')">` : '';
+  return `<span class="well logo ${c.brand}" aria-hidden="true">${logo}${mark}</span>`;
 }
 
 function carSheet(c) {

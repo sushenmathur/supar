@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home
-export const VERSION = '23';
+export const VERSION = '26';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -61,13 +61,14 @@ export const PEOPLE = [
   { id: 'person.paro', battery: 'sensor.paro_phone_battery', charge: ['sensor.paro_phone_battery_status', 'sensor.paro_iphone_battery_state'], colour: '#6b4a8e' },
 ];
 
-// Cars: card badge (Kia wordmark / Tesla photo thumbnail), the pop-up's photo and its controls (from master.yaml's chips).
+// Cars: card badge (the logo image in /config/www/images/, else a built-in Kia wordmark / Tesla T), the pop-up's
+// photo and its controls (from master.yaml's chips).
 export const CARS = [
-  { name: 'Sorento', brand: 'kia', tracker: 'device_tracker.kia_gps_location', battery: 'input_number.kia_battery_estimate', chargingPower: 'sensor.kia_charger_power',
+  { name: 'Sorento', brand: 'kia', logo: '/local/images/kialogo.png', tracker: 'device_tracker.kia_gps_location', battery: 'input_number.kia_battery_estimate', chargingPower: 'sensor.kia_charger_power',
     onroad: 'input_boolean.kia_onroad', image: '/api/image/serve/b0801eee9b5f2d6fcf7972d71f0d7711/512x512',
     chips: [['value', 'sensor.kia_charger_power', 'Charge power', 'plug'], ['value', 'sensor.kia_last_charge_added', 'Last charge', 'bolt'],
       ['toggle', 'switch.kia_charger', 'Charger', 'plug'], ['onroad', 'input_boolean.kia_onroad', 'On road', 'car'], ['home', 'binary_sensor.kia_at_home', 'Location', 'home']] },
-  { name: 'Bluey', brand: 'tesla', tracker: 'device_tracker.tesla', battery: 'sensor.sonic_battery', chargingFlag: 'binary_sensor.sonic_charging',
+  { name: 'Bluey', brand: 'tesla', logo: '/local/images/teslalogo.png', tracker: 'device_tracker.tesla', battery: 'sensor.sonic_battery', chargingFlag: 'binary_sensor.sonic_charging',
     onroad: 'input_boolean.tesla_onroad', image: '/api/image/serve/cdd510be49f2493bc87fd540c01cea69/512x512',
     chips: [['value', 'sensor.sonic_range_rated', 'Range', 'gauge'], ['value', 'sensor.bluey_charge_energy_added', 'Last charge', 'bolt'],
       ['lock', 'lock.bluey_lock', 'Lock', 'lock'], ['boot', 'cover.bluey_trunk', 'Boot', 'car'], ['charging', 'binary_sensor.sonic_charging', 'Charger', 'plug']] },

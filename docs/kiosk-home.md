@@ -20,7 +20,7 @@ All page files live in `homeassistant/www/kiosk-home/` and get copied to `/confi
 | `energyhud.js` | The Home Energy HUD for `#energy-dashboard`. Its photos are `/local/images/energy-dashboard-bg1.png` (day) and `energy-dashboard-bg-night.png` (when `sensor.dashboard_night_mode` is on), already on Home Assistant; its fonts, Rajdhani and JetBrains Mono (SIL OFL), are in `fonts/` so nothing loads from Google Fonts |
 | `vendor/haws.mjs` | home-assistant-js-websocket 9.8.1 (same build as kiosk-test) |
 
-Tests live in `tests/kiosk-home/` and run with `node --test tests/kiosk-home`.
+Tests live in `tests/kiosk-home/`: unit tests (`node --test tests/kiosk-home`), end-to-end tests against a fake Home Assistant on both pages and both builds (`node tests/kiosk-home/e2e/run.mjs`), and visual regression against approved screenshots (`node tests/kiosk-home/visual/run.mjs`). See `tests/kiosk-home/README.md`.
 
 ## What it shows and does
 
@@ -35,7 +35,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - Greeting, date, clock, weather and the India/Austin clocks.
   - Sushen and Paro with place, battery and charging. While a phone charges, the battery turns green and its empty part fills with pale green, fades and starts again; the solid green stays at the real level. Charging comes from `sensor.<name>_phone_battery_status`, or from `sensor.<name>_iphone_battery_state` when that is missing, `unavailable` or `unknown` (set in `PEOPLE` in `config.js`). A state of "charging", in any capitalisation, counts.
   - The family calendar's next three events, live through `calendar/event/subscribe`.
-  - Sorento (Kia wordmark) and Bluey (Tesla T mark) with place, battery and charging.
+  - Sorento and Bluey with place, battery and charging. Their badges use `/config/www/images/kialogo.png` and `teslalogo.png` (set as `logo` in `CARS` in `config.js`) on a white chip; until an image loads, or if it's missing, a built-in Kia wordmark or Tesla T shows instead.
   - Tapping a car opens its pop-up, which updates live while open:
     - photo, place, driving or parked, battery and charging
     - Sorento: charge power, last charge, charger switch, on-road toggle, location
@@ -62,7 +62,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - The same sums: today, sold, bill to date, estimate, the grid/home/solar flow (each line is a track with a pill sliding the way power moves: yellow from solar or out to the grid, purple from the grid; the icons sit in tinted wells, purple for grid, blue for home, amber for solar), Tesla and Kia charging (a car that's charging shows a pulsing ⚡ and its row turns green), and self-powered %.
 - **Utilities and security**
   - Next bins (each bin's own icon in its colour: general waste a red bin, recycling a yellow recycle symbol, garden organics a green leaf), washer and dryer.
-  - Home Alarm with **Arm home / Arm away / Disarm**. Each opens the same dial and keypad as Lost Phone for the alarm code (4 to 8 digits): while disarmed you can switch between Arm home and Arm away on the dial; while armed it offers Disarm. A wrong code shakes the dial red; a right one turns it green and closes. **The code is always checked by Home Assistant, never by the page** (the page can be read without signing in): if the alarm has its own code (`code_format`) the page sends the code to the alarm; otherwise it calls `script.alarm_keypad` (`homeassistant/dashboard/alarm-keypad-script.yaml`), which compares it with `alarm_keypad_code` in `secrets.yaml` and only then arms or disarms. Without that script the keypad refuses ("Code check not set up") rather than accept any code.
+  - Home Alarm with **Arm home / Arm away / Disarm**. Each opens the same dial and keypad as Lost Phone for the alarm code (4 to 8 digits): while disarmed you can switch between Arm home and Arm away on the dial; while armed it offers Disarm. A wrong code shakes the dial red; a right one turns it green and closes. **The code is always checked by Home Assistant, never by the page** (the page can be read without signing in). Every arm and disarm goes through `script.alarm_keypad` (`homeassistant/dashboard/alarm-keypad-script.yaml`): it compares the code with `alarm_keypad_code` in `secrets.yaml` and, only if it matches, arms or disarms the alarm, passing the code on (so an alarm with its own code should use the same one). A code that doesn't match shows **"Access denied: wrong passcode"** and the alarm doesn't change. Success is shown only once the alarm has really changed state, because some alarm integrations (Alarmo, for one) ignore a wrong code without reporting an error. Without the script, the page sends the code to the alarm itself if the alarm has a code, and otherwise refuses ("Code check not set up").
   - Garage door: while it's open, a tap opens the same close confirmation with the camera; while it's closed, a second tap opens it.
   - Front door: second tap to unlock.
   - Front-door snapshot, refreshed every 10 s and paused while the screensaver is up or the page is hidden. Tapping it opens the live view.
@@ -78,7 +78,7 @@ The tab bar and room tiles open the other `master.yaml` views inside the same pa
 | Route | From | What it has |
 |---|---|---|
 | `#lights` | Lights | "N of 18 lights on", Evening, Night (two taps), All off (two taps); three room panels with a master switch, every light as a toggle, and a brightness picker (10–100%) on dimmable lights that are on |
-| `#homeclimate` | Climate | Average temperature badge, AC off-timer (room, duration, Start, Cancel, running timers); four rooms with room temperature, target −/+ and HVAC modes |
+| `#homeclimate` | Climate | Average temperature badge, AC off-timer (room, duration, Start, Cancel, running timers); four rooms with room temperature, target −/+ and HVAC modes. A running aircon's panel has a soft haze in its mode's colour (blue cool, red heat, amber heat/cool or auto, teal fan only, violet dry) and its mode and target under the room name |
 | `#security` | Security | Alarm arm/disarm, garage Open (two taps) / Stop / Close (asks first, with the garage camera), front door lock (unlock takes two taps), all seven door sensors, seven camera snapshots, each with the time Home Assistant last updated it (tap for live), patio and backyard motion |
 | `#living-room` | Living Room | The floor plan with tappable light buttons (and Aircon, which opens Climate), Robbie controls and the five clean buttons, motion badges |
 | `#garage` | Garage | Door open/stop/close, garage light, keep-open, garage camera, sensor chips; Bluey and Kia with location, driving/parked, battery, charging, and their controls (lock and boot take two taps) |
