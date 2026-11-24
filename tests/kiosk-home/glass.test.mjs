@@ -18,7 +18,7 @@ test('hallway door: a grey note on the banner whenever it is open, day or night,
   // Snoozing doesn't hide it, and a real alert comes first.
   const both = world({ 'binary_sensor.hallwaydoorsensor_contact': 'on', 'input_boolean.alert_banner_snooze': 'on', 'binary_sensor.side_door_contact': 'on' });
   const b = G.banner(both);
-  assert.equal(b.title, 'Side door open'); assert.equal(b.level, 'urgent'); assert.match(b.sub, /Also: Hallway door/);
+  assert.equal(b.title, 'Side door open'); assert.equal(b.level, 'urgent'); assert.deepEqual(b.chips.map((c) => [c.level, c.text]), [['note', 'Hallway door']]);
 });
 
 test('glass page: charging uses the status sensor, then the iPhone backup', () => {

@@ -932,3 +932,35 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 .mrow { border: 1px solid var(--line); border-radius: var(--r-s); background: var(--cloth); box-shadow: var(--shadow); }
 .mini, .mpill, .mctl .rk:not(.big), .mvol .rk { border: 1px solid var(--line); }
 .mrow.sel { outline-color: var(--on-well); }
+
+/* ---- Alert banner: one entry per priority. Red (high), amber (medium), grey (low); lower priorities are chips.
+   Too long to fit: it scrolls like a ticker (bannerTicker in app.js). ---- */
+.banner .grow { display: block; width: 0; }  /* width 0: the banner never grows to fit its text; flex: 1 fills the space */
+.banner .track { display: inline-flex; width: max-content; align-items: center; gap: 12px; white-space: nowrap; }
+.banner .track > *, .banner .copy > * { flex: none; }
+.banner .track .sub { display: inline; overflow: visible; }
+.banner .grow.tick { -webkit-mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 28px), transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .banner .grow.tick .track { animation: btick var(--tkd, 14s) linear infinite; will-change: transform; }
+}
+@keyframes btick { to { transform: translateX(var(--tk, 0)); } }
+.banner .gap { width: 28px; flex: none; }
+.banner .copy { display: inline-flex; align-items: center; gap: 12px; }
+.banner .sep { width: 1px; height: 26px; flex: none; background: currentColor; opacity: .3; }
+.banner .chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 8px; border-radius: 999px; font-size: 14px; font-weight: 700; }
+.banner .chip .ic { width: 18px; height: 18px; }
+.banner .chip.warn { background: var(--turmeric); color: var(--turmeric-ink); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .8); }
+.banner .chip.note { background: #7d849a; color: #fff; box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .55); }
+.banner.warn .chip.note { box-shadow: 0 0 0 1.5px rgba(0, 0, 0, .12); }
+.banner.warn { --pass: var(--turmeric); color: var(--turmeric-ink); }
+.banner.warn .sub { color: var(--turmeric-ink-2); }
+.banner.warn .well { background: rgba(255, 255, 255, .92); color: #8a4b05; }
+.banner.warn .btn.solid { color: #8a4b05; }
+.banner.warn .btn.line, .banner.note .btn.line, .banner.calm .btn.line { border-color: currentColor; color: inherit; }
+/* Glass: amber banner like the red one, from the "on" tokens. */
+.banner.warn { background: var(--on-well); color: var(--on-well-ink); border-color: transparent; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 12px 30px -10px rgba(217, 119, 6, .5); }
+.banner.warn .sub { color: var(--on-well-ink); opacity: .9; }
+.banner.warn .well { background: rgba(255, 255, 255, .22); color: var(--on-well-ink); }
+.banner.warn .btn.solid { background: #fff; color: #B45309; }
+.banner .chip.warn { background: var(--on-well); color: var(--on-well-ink); }
+.banner .chip.note { background: #A8A29E; }

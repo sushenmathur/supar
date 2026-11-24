@@ -41,6 +41,7 @@ leaks between them, and prints one line per suite. Options: `--page kiosk-home`,
 | `six` | Hallway note, bin icons, garage confirmation from every entry point, aircon text, flow pill, alarm dial |
 | `cars` | Car badges use the logo images from `/config/www/images/`, and fall back to the built-in marks when they're missing |
 | `tv` | TV remote on long press: every button's service, sources, power, disabled when off; car charging bolt |
+| `banner` | The alert banner: priorities and colours (red, amber, grey), grouping, chips, night-only doors, the ticker |
 | `media` | The Media pop-up: each player listed once and in order, the hero's controls and volume slider, row buttons, power (TV, bedroom TV switch, others), the TV remote, artwork only through Home Assistant, the progress clock |
 | `alarm` | A wrong passcode shows "Access denied" and leaves the alarm alone, for arm home, arm away and disarm, in six set-ups: the script with an alarm without a code, with one that rejects wrong codes, with one that ignores them silently (like Alarmo); no script with an alarm code; no script and no code; and the script passing while the alarm's own code differs |
 | `glass` | Glass-only layout: ticker, calendar stamps, spacing, Kids Rooms |
@@ -65,4 +66,4 @@ node tests/kiosk-home/visual/run.mjs --update
 
 Options: `--page kiosk-home`, `--shot home-light,alarm`. Shots: home (light and dark), lights, climate (light and dark,
 with four aircon modes running), security, kids rooms, energy HUD, Lost Phone, alarm keypad, garage close
-confirmation, TV remote, Robbie, Media pop-up (light and dark).
+confirmation, TV remote, Robbie, Media pop-up (light and dark), amber banner, grey banner (dark).

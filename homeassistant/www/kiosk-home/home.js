@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=28';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=29';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -10,34 +10,40 @@ const BAD_DOCK = (v) => Boolean(v) && !['ok', 'unavailable', 'unknown'].includes
 
 // ---- Alert banner ----
 
-/** The banner's alert list, sorted by priority (1 = most urgent); ties keep insertion order. */
+/** The banner's alert list, sorted by priority, ties in insertion order. Priority: 1 high (red), 2 medium (amber),
+ *  3 low (grey). `door` is the door's name for grouping ("Garage and side doors open"). Patio, laundry and the front
+ *  door (security door closed) only count at night; Snooze hides them and the Robbie and camera battery alerts. */
 export function alerts(get) {
   const list = [];
   const push = (a) => list.push(a);
   const snoozed = on(get, E.snooze);
+  const night = st(get, E.sun) === 'below_horizon';
   const front = on(get, E.frontContact);
   const screen = on(get, E.screenContact);
   if (on(get, E.garageContact)) {
     const kept = on(get, E.keepGarage);
-    push({ p: kept ? 3 : 1, id: E.garageContact, msg: kept ? 'Garage door kept open' : 'Garage door open', icon: 'garage' });
+    push({ p: kept ? 2 : 1, id: E.garageContact, door: 'Garage', kept, msg: kept ? 'Garage door kept open' : 'Garage door open', icon: 'garage' });
   }
   if (on(get, E.sideContact)) {
     const kept = on(get, E.keepSide);
-    push({ p: kept ? 3 : 1, id: E.sideContact, msg: kept ? 'Side door kept open' : 'Side door open', icon: 'door' });
+    push({ p: kept ? 2 : 1, id: E.sideContact, door: 'Side', kept, msg: kept ? 'Side door kept open' : 'Side door open', icon: 'door' });
   }
-  if (screen) push({ p: 1, id: E.screenContact, msg: front ? 'Front and security doors open' : 'Security door open', icon: 'shield' });
+  // Front and security doors both open: high. The security door on its own: high. The front door on its own: low.
+  if (screen) {
+    if (front) push({ p: 1, id: E.frontContact, door: 'Front', msg: 'Front door open', icon: 'door' });
+    push({ p: 1, id: E.screenContact, door: 'Security', msg: 'Security door open', icon: 'shield' });
+  }
   if (!snoozed) {
-    const night = st(get, E.sun) === 'below_horizon';
-    if (night && front && !screen) push({ p: 2, id: E.frontContact, msg: 'Front door open', icon: 'door' });
-    if (night && on(get, E.patioContact)) push({ p: 3, id: E.patioContact, msg: 'Patio door open', icon: 'door' });
-    if (night && on(get, E.laundryContact)) push({ p: 3, id: E.laundryContact, msg: 'Laundry door open', icon: 'door' });
-    if (BAD_DOCK(st(get, E.robbieDock))) push({ p: 3, id: E.robbieDock, msg: 'Roborock water tank empty', icon: 'robot' });
+    if (night && front && !screen) push({ p: 3, id: E.frontContact, door: 'Front', msg: 'Front door open', icon: 'door' });
+    if (night && on(get, E.patioContact)) push({ p: 2, id: E.patioContact, door: 'Patio', msg: 'Patio door open', icon: 'door' });
+    if (night && on(get, E.laundryContact)) push({ p: 2, id: E.laundryContact, door: 'Laundry', msg: 'Laundry door open', icon: 'door' });
+    if (BAD_DOCK(st(get, E.robbieDock))) push({ p: 2, id: E.robbieDock, msg: 'Roborock water tank empty', icon: 'robot' });
     const bat = numOf(get, E.sideBattery);
-    if (!Number.isNaN(bat) && bat < 20) push({ p: 3, id: E.sideBattery, msg: 'Side camera battery low', icon: 'alert' });
+    if (!Number.isNaN(bat) && bat < 20) push({ p: 2, id: E.sideBattery, msg: 'Side camera battery low', icon: 'alert' });
   }
-  if (on(get, E.quietHour)) push({ p: 4, quiet: true, id: E.quietHour, msg: 'Quiet hour on', icon: 'bellOff' });
-  // The hallway door shows whenever it's open, day or night, as a grey note: worth knowing, not a warning.
-  if (on(get, E.hallwayContact)) push({ p: 5, note: true, id: E.hallwayContact, msg: 'Hallway door open', icon: 'door' });
+  if (on(get, E.quietHour)) push({ p: 3, quiet: true, id: E.quietHour, msg: 'Quiet hour on', icon: 'bellOff' });
+  // The hallway door shows whenever it's open, day or night: worth knowing, not a warning.
+  if (on(get, E.hallwayContact)) push({ p: 3, id: E.hallwayContact, door: 'Hallway', msg: 'Hallway door open', icon: 'door' });
   return list.map((a, i) => ({ ...a, i })).sort((a, b) => a.p - b.p || a.i - b.i);
 }
 
@@ -45,19 +51,37 @@ export function minutesText(mins) {
   return mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${mins % 60} min`;
 }
 
-/** Title, sub-line and level for the banner, matching the dashboard's wording. */
+/** One priority's alerts as text: "Garage and side doors", "Garage door kept open", "Roborock water tank empty".
+ *  With `open`, open doors say so ("Garage and side doors open"). */
+export function groupText(group, open = false) {
+  const doors = group.filter((a) => a.door);
+  const parts = [];
+  if (doors.length === 1 && doors[0].kept) parts.push(doors[0].msg);
+  else if (doors.length) {
+    const names = doors.map((a, i) => (i ? a.door.toLowerCase() : a.door) + (a.kept ? ' (kept open)' : ''));
+    const joined = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names.at(-1)}` : names[0];
+    parts.push(`${joined} ${names.length > 1 ? 'doors' : 'door'}${open ? ' open' : ''}`);
+  }
+  for (const a of group) if (!a.door) parts.push(a.msg);
+  return parts.join(' · ');
+}
+
+const LEVEL = { 1: 'urgent', 2: 'warn', 3: 'note' };
+
+/** The banner: one entry per priority. The highest priority is the title, in its colour (red, amber, grey); each
+ *  lower priority is a chip in its own colour. */
 export function banner(get, now = Date.now()) {
   const list = alerts(get);
-  if (!list.length) return { level: 'calm', title: 'All clear', sub: 'Doors closed · no alerts', icon: 'check', list };
-  const top = list[0];
-  const mins = Math.max(0, Math.round((now - changedAt(get, top.id)) / 60000));
+  if (!list.length) return { level: 'calm', title: 'All clear', sub: 'Doors closed · no alerts', icon: 'check', chips: [], list };
+  const groups = [1, 2, 3].map((p) => list.filter((a) => a.p === p)).filter((g) => g.length);
+  const icon = (g) => (g.length > 1 ? 'alert' : g[0].icon);
+  const top = groups[0];
+  // How long since the newest alert in the top group.
+  const mins = Math.max(0, Math.round((now - Math.max(...top.map((a) => changedAt(get, a.id)))) / 60000));
   const dur = minutesText(mins);
-  const more = list.slice(1).filter((a) => !a.quiet).map((a) => a.msg.replace(/ open$/, '')).join(' · ');
-  const sub = top.quiet
-    ? `${dur} · Automated announcements suppressed${more ? ` · Also: ${more}` : ''}`
-    : more ? `${dur} · Also: ${more}` : `For ${dur}`;
-  const level = top.p === 1 ? 'urgent' : top.p === 2 || top.p === 4 ? 'warn' : top.note ? 'note' : 'info';
-  return { level, title: top.msg, sub, icon: top.icon, list };
+  const sub = top.every((a) => a.quiet) ? `${dur} · Automated announcements suppressed` : `For ${dur}`;
+  const chips = groups.slice(1).map((g) => ({ level: LEVEL[g[0].p], text: groupText(g), icon: icon(g) }));
+  return { level: LEVEL[top[0].p], title: groupText(top, true), sub, icon: icon(top), chips, list };
 }
 
 /** Which banner buttons show. */

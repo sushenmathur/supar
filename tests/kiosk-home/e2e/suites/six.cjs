@@ -17,7 +17,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   if (SHOT) await p.locator('#banner').screenshot({ path: SHOT + '-banner.png' });
   await set('binary_sensor.side_door_contact', 'on'); await sleep(500);
   bn = await p.evaluate(() => ({ cls: document.querySelector('#banner').className, t: document.querySelector('#banner').innerText.replace(/\s+/g, ' ') }));
-  check('with a real alert, the hallway door is listed after it', /alert/.test(bn.cls) && /Side door open/.test(bn.t) && /Also: Hallway door/.test(bn.t), bn.t);
+  check('with a real alert, the hallway door is a grey chip after it', /alert/.test(bn.cls) && /Side door open/.test(bn.t) && await p.locator('#banner .chip.note', { hasText: 'Hallway door' }).count() >= 1, bn.t);
   await set('binary_sensor.side_door_contact', 'off'); await set('binary_sensor.hallwaydoorsensor_contact', 'off'); await sleep(500);
   check('all clear once it closes', /All clear/.test(await p.locator('#banner').innerText()));
   // 2. Bins

@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, MEDIA_PLAYERS, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=28';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=28';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=28';
-import * as H from './home.js?v=28';
-import { injectIcons, ic, weatherArt } from './icons.js?v=28';
-import { VIEWS, viewEntityIds } from './views.js?v=28';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=28';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, MEDIA_PLAYERS, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=29';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=29';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=29';
+import * as H from './home.js?v=29';
+import { injectIcons, ic, weatherArt } from './icons.js?v=29';
+import { VIEWS, viewEntityIds } from './views.js?v=29';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=29';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -131,14 +131,15 @@ const regions = {
     const b = H.banner(get);
     const btn = H.bannerButtons(get);
     const el = $('#banner');
-    el.classList.toggle('alert', b.level === 'urgent' || b.level === 'warn');
-    el.classList.toggle('on', b.level === 'info');
+    // Colour by the highest priority: red (urgent), amber (warn), grey (note).
+    el.classList.toggle('alert', b.level === 'urgent');
+    el.classList.toggle('warn', b.level === 'warn');
     el.classList.toggle('calm', b.level === 'calm');
     el.classList.toggle('note', b.level === 'note');
     const ctl = (show, act, text, cls = 'line', key) => (show ? `<button class="btn ${key && armed.has(key) ? 'armed' : cls}" data-act="${act}">${esc(key ? label(key, text) : text)}</button>` : '');
     const keepOn = (id) => (get(id)?.state === 'on' ? 'solid' : 'line');
     return `<span class="well">${ic(b.icon)}</span>
-      <span class="grow"><b>${esc(b.title)}</b><span class="sub">${esc(b.sub)}</span></span>
+      <span class="grow"><span class="track"><b>${esc(b.title)}</b><span class="sub">${esc(b.sub)}</span>${b.chips.length ? '<span class="sep"></span>' : ''}${b.chips.map((c) => `<span class="chip ${c.level}">${ic(c.icon)}${esc(c.text)}</span>`).join('')}</span></span>
       ${ctl(btn.close, 'close-garage', 'Close door', 'solid', 'close-garage')}
       ${ctl(btn.keepGarage, 'keep-garage', 'Keep garage open', keepOn(E.keepGarage))}
       ${ctl(btn.keepSide, 'keep-side', 'Keep side open', keepOn(E.keepSide))}
@@ -289,10 +290,25 @@ function renderAll() {
       if (last.get(name) === html) continue;
       last.set(name, html);
       const el = document.getElementById(name);
-      if (el) el.innerHTML = fillPhase(html);
+      if (el) { el.innerHTML = fillPhase(html); if (name === 'banner') bannerTicker(el); }
     }
   });
 }
+
+// The banner scrolls like a ticker when its alerts don't fit: a copy follows the text round, transform only
+// (paused with everything else under html.still). Short text stays still.
+function bannerTicker(el) {
+  const g = el.querySelector('.grow'), t = g?.querySelector('.track');
+  if (!t) return;
+  g.classList.remove('tick');
+  if (t.scrollWidth <= g.clientWidth + 1) return;
+  t.innerHTML += `<span class="gap" aria-hidden="true"></span><span class="copy" aria-hidden="true">${t.innerHTML}</span>`;
+  const shift = t.querySelector('.copy').offsetLeft;
+  t.style.setProperty('--tk', `${-shift}px`);
+  t.style.setProperty('--tkd', `${Math.max(8, shift / 45).toFixed(1)}s`);
+  g.classList.add('tick');
+}
+addEventListener('resize', () => { const el = $('#banner'); if (el) { last.delete('banner'); renderAll(); } });
 
 // ---- Clock (once a second, outside the state render) ----
 function tick() {
@@ -781,7 +797,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=28';
+    : './vendor/hls.light.min.mjs?v=29';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

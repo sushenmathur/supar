@@ -13,7 +13,7 @@ function world(spec) {
   return (id) => m.get(id);
 }
 
-test('alerts sort by priority and keep insertion order for ties', () => {
+test('alerts sort by priority: high, medium, low', () => {
   const get = world({
     'binary_sensor.garage_door_sensor_contact': ['on', {}, 12],
     'binary_sensor.side_door_contact': ['on', {}, 3],
@@ -22,19 +22,42 @@ test('alerts sort by priority and keep insertion order for ties', () => {
     'sun.sun': ['below_horizon'],
     'binary_sensor.front_door_contact': ['on'],
   });
-  const list = H.alerts(get).map((a) => a.msg);
-  assert.deepEqual(list, ['Garage door open', 'Front door open', 'Side door kept open', 'Quiet hour on']);
+  assert.deepEqual(H.alerts(get).map((a) => [a.p, a.msg]), [[1, 'Garage door open'], [2, 'Side door kept open'], [3, 'Front door open'], [3, 'Quiet hour on']]);
 });
 
-test('banner wording matches the dashboard', () => {
-  const get = world({ 'binary_sensor.garage_door_sensor_contact': ['on', {}, 12], 'binary_sensor.side_door_contact': ['on', {}, 3] });
+test('alert priorities follow the rules', () => {
+  const night = { 'sun.sun': ['below_horizon'] };
+  const p = (spec) => H.alerts(world(spec)).map((a) => [a.p, a.door ?? a.msg]);
+  assert.deepEqual(p({ 'binary_sensor.garage_door_sensor_contact': ['on'] }), [[1, 'Garage']]);
+  assert.deepEqual(p({ 'binary_sensor.garage_door_sensor_contact': ['on'], 'input_boolean.keep_garage_door_open': ['on'] }), [[2, 'Garage']]);
+  assert.deepEqual(p({ 'binary_sensor.side_door_contact': ['on'] }), [[1, 'Side']]);
+  assert.deepEqual(p({ ...night, 'binary_sensor.patio_door_contact': ['on'], 'binary_sensor.laundrydoorsensor_contact': ['on'] }), [[2, 'Patio'], [2, 'Laundry']]);
+  assert.deepEqual(p({ 'binary_sensor.patio_door_contact': ['on'], 'binary_sensor.front_door_contact': ['on'] }), [], 'patio and front door only at night');
+  assert.deepEqual(p({ 'binary_sensor.hallwaydoorsensor_contact': ['on'] }), [[3, 'Hallway']]);
+  assert.deepEqual(p({ 'binary_sensor.front_door_contact': ['on'], 'binary_sensor.crimsafe_door_contact': ['on'] }), [[1, 'Front'], [1, 'Security']], 'front and security: high, day or night');
+  assert.deepEqual(p({ ...night, 'binary_sensor.front_door_contact': ['on'] }), [[3, 'Front']]);
+  assert.deepEqual(p({ 'binary_sensor.crimsafe_door_contact': ['on'] }), [[1, 'Security']]);
+  assert.deepEqual(p({ 'sensor.robbie_dock_dock_error': ['water_box_empty'] }), [[2, 'Roborock water tank empty']]);
+});
+
+test('banner groups one entry per priority, coloured by the highest', () => {
+  const get = world({ 'binary_sensor.garage_door_sensor_contact': ['on', {}, 12], 'binary_sensor.side_door_contact': ['on', {}, 3],
+    'sun.sun': ['below_horizon'], 'binary_sensor.patio_door_contact': ['on'], 'binary_sensor.hallwaydoorsensor_contact': ['on'] });
   const b = H.banner(get, NOW);
-  assert.equal(b.title, 'Garage door open');
-  assert.equal(b.sub, '12 min · Also: Side door');
   assert.equal(b.level, 'urgent');
+  assert.equal(b.title, 'Garage and side doors open');
+  assert.equal(b.sub, 'For 3 min', 'time since the newest alert in the group');
+  assert.deepEqual(b.chips.map((c) => [c.level, c.text]), [['warn', 'Patio door'], ['note', 'Hallway door']]);
+  assert.equal(b.icon, 'alert');
+  const three = H.banner(world({ 'binary_sensor.garage_door_sensor_contact': ['on'], 'binary_sensor.front_door_contact': ['on'], 'binary_sensor.crimsafe_door_contact': ['on'] }), NOW);
+  assert.equal(three.title, 'Garage, front and security doors open');
+  const kept = H.banner(world({ 'binary_sensor.garage_door_sensor_contact': ['on', {}, 20], 'input_boolean.keep_garage_door_open': ['on'] }), NOW);
+  assert.equal(kept.level, 'warn'); assert.equal(kept.title, 'Garage door kept open'); assert.equal(kept.sub, 'For 20 min'); assert.equal(kept.icon, 'garage');
+  const low = H.banner(world({ 'sun.sun': ['below_horizon'], 'binary_sensor.front_door_contact': ['on'] }), NOW);
+  assert.equal(low.level, 'note'); assert.equal(low.title, 'Front door open');
   const quiet = H.banner(world({ 'input_boolean.quiet_hour': ['on', {}, 75] }), NOW);
   assert.equal(quiet.sub, '1 h 15 min · Automated announcements suppressed');
-  assert.equal(quiet.level, 'warn');
+  assert.equal(quiet.level, 'note');
   assert.equal(H.banner(world({}), NOW).level, 'calm');
 });
 

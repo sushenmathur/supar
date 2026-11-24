@@ -27,10 +27,15 @@ Tests live in `tests/kiosk-home/`: unit tests (`node --test tests/kiosk-home`), 
 Parity with `hubhome` (behaviour map taken from `master.yaml`):
 
 - **Alert banner**
-  - Same alerts, priorities and wording, with the same buttons: Close door, Keep garage open, Keep side open, Snooze 30 min and End quiet hour.
+  - **Three priorities, one entry each.** Every alert has a priority, and the banner shows one entry per priority: the highest is the title in its colour, each lower one a chip in its own colour. Doors in the same priority are grouped ("Garage and side doors open"). The whole banner takes the colour of the highest priority: red if even one high alert is active.
+    - **High (red):** garage door open; side door open; front and security doors both open; the security door open on its own.
+    - **Medium (amber):** garage or side door open with Keep … open on; patio and laundry doors (night only); Robbie's water tank empty; side camera battery low.
+    - **Low (grey):** hallway door (any time); front door open with the security door closed (night only); quiet hour.
+    - Snooze 30 min hides the night-only doors, Robbie and the camera battery, as before.
+  - **Ticker:** when the alerts don't fit beside the buttons, the text scrolls slowly round. One door stays still. It stops with reduced motion and under the screensaver.
+  - Buttons as before: Close door, Keep garage open, Keep side open, Snooze 30 min and End quiet hour.
   - When there's nothing to report it shows a calm "All clear" strip instead of disappearing, so the layout doesn't jump.
   - **Close door** opens a confirmation first: the live garage camera (`camera.garage_live_view`) with a warning to check nothing and no one is in the way. The door closes only when you tap **Close garage door**; **Cancel** leaves it open.
-  - The hallway door shows whenever it's open, day or night, as a grey note (not a warning, and not snoozable). With another alert it's listed after it ("Also: Hallway door").
 - **Day column**
   - Greeting, date, clock, weather and the India/Austin clocks.
   - Sushen and Paro with place, battery and charging. While a phone charges, the battery turns green and its empty part fills with pale green, fades and starts again; the solid green stays at the real level. Charging comes from `sensor.<name>_phone_battery_status`, or from `sensor.<name>_iphone_battery_state` when that is missing, `unavailable` or `unknown` (set in `PEOPLE` in `config.js`). A state of "charging", in any capitalisation, counts.
@@ -142,7 +147,6 @@ A second copy of the page in the **Warm Stone Glass** design (`dashboards/kiosk-
 | Bump the version | `--dir homeassistant/www/kiosk-home` | `--dir homeassistant/www/kiosk-home-glass` |
 
 It does everything the block print page does, and also:
-- **Hallway door at night.** It raises a banner alert, as the patio and laundry doors do, and can be snoozed.
 - **Long tile names scroll.** Names too long for their tile, such as "Bedroom Downlights", scroll gently instead of being cut off. Only names that don't fit move, and they stop with reduced motion or under the screensaver.
 - **One date stamp per day.** The family calendar shows each day's stamp once, so two events on the same day sit under one stamp.
 - **Clearer buttons and spacing.** Arm home and Arm away have a solid fill and edge, and the alarm, garage and front door cards are spaced further apart.
