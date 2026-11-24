@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=11';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=11';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=11';
-import * as H from './home.js?v=11';
-import { injectIcons, ic, weatherArt } from './icons.js?v=11';
-import { VIEWS, viewEntityIds } from './views.js?v=11';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=11';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=12';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=12';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=12';
+import * as H from './home.js?v=12';
+import { injectIcons, ic, weatherArt } from './icons.js?v=12';
+import { VIEWS, viewEntityIds } from './views.js?v=12';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=12';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -526,7 +526,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=11';
+    : './vendor/hls.light.min.mjs?v=12';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -536,59 +536,130 @@ function camToken(id) {
   const m = /[?&]token=([^&]+)/.exec(a.entity_picture ?? '');
   return m ? decodeURIComponent(m[1]) : null;
 }
-function startLive(box, id) {
+const errText = (e) => (typeof e === 'number' ? `connection error ${e}` : [e?.code, e?.message].filter(Boolean).join(': ') || String(e));
+
+/**
+ * Plays a camera the way HA's own camera dialog does: ask which live formats it supports
+ * (camera/capabilities), try WebRTC if offered, then HLS (hls.js), and only then fall back to
+ * MJPEG / snapshots, showing HA's reason on screen so a failure can be diagnosed.
+ */
+async function startLive(box, id) {
   stopLiveCam();
-  live = { box, timers: [] };
+  live = { box, timers: [], cleanups: [] };
   const mine = live;
-  const status = (text) => { if (live === mine) box.dataset.status = text; };
-  const show = (el) => { if (live === mine) { box.replaceChildren(el); mine.el = el; } };
+  const alive = () => live === mine;
+  const status = (text) => { if (alive()) box.dataset.status = text; };
+  const show = (el) => { if (alive()) { box.replaceChildren(el); mine.el = el; } };
+  const reasons = [];
+
   const snapshots = () => {
-    if (live !== mine) return;
+    if (!alive()) return;
     const img = document.createElement('img');
     img.alt = 'Latest snapshot';
     const poll = () => { const u = camUrl(id); if (u) img.src = u; };
     poll(); mine.timers.push(setInterval(poll, 2000));
-    show(img); status('Snapshot (live view unavailable)');
+    show(img);
   };
-  const mjpeg = (why) => {
-    if (live !== mine) return;
-    if (why) console.warn(`kiosk-home: ${why} for ${id}, trying MJPEG`);
+  const fallback = () => {
+    if (!alive()) return;
+    const why = reasons.join(' · ') || 'no live format';
+    console.warn(`kiosk-home: no live view for ${id}: ${why}`);
+    status(`No live view (${why}). Showing the latest image.`);
     const token = camToken(id);
     if (!token) return snapshots();
     const img = document.createElement('img');
-    img.alt = 'Live view';
+    img.alt = 'Latest image';
     img.onerror = () => { img.onerror = null; snapshots(); };
-    img.onload = () => status('');
     img.src = `/api/camera_proxy_stream/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
-    show(img); status('Image stream');
+    show(img);
   };
-  status('Starting live view…');
-  conn.sendMessagePromise({ type: 'camera/stream', entity_id: id }).then(async (r) => {
-    if (live !== mine) return;
-    if (!r?.url) return mjpeg('no HLS URL');
-    const video = document.createElement('video');
-    Object.assign(video, { muted: true, autoplay: true, playsInline: true });
-    video.setAttribute('aria-label', 'Live view');
-    video.addEventListener('playing', () => { mine.playing = true; status(''); });
+  // Resolves true once video plays, false on error or after `ms`.
+  const waitPlaying = (video, ms) => new Promise((resolve) => {
+    const t = setTimeout(() => resolve(false), ms);
+    mine.timers.push(t);
+    video.addEventListener('playing', () => { clearTimeout(t); resolve(true); }, { once: true });
+    mine.fail = () => { clearTimeout(t); resolve(false); };
+  });
+  const newVideo = () => {
+    const v = document.createElement('video');
+    Object.assign(v, { muted: true, autoplay: true, playsInline: true });
+    v.setAttribute('aria-label', 'Live view');
+    return v;
+  };
+
+  async function tryWebRtc() {
+    status('Starting live view (WebRTC)…');
+    let cfg = {};
+    try { cfg = await conn.sendMessagePromise({ type: 'camera/webrtc/get_client_config', entity_id: id }); } catch (e) { reasons.push(`WebRTC config: ${errText(e)}`); return false; }
+    if (!alive()) return true;
+    const pc = new RTCPeerConnection(cfg.configuration ?? {});
+    mine.cleanups.push(() => pc.close());
+    pc.addTransceiver('video', { direction: 'recvonly' });
+    pc.addTransceiver('audio', { direction: 'recvonly' });
+    if (cfg.dataChannel) pc.createDataChannel(cfg.dataChannel);
+    const video = newVideo();
+    const stream = new MediaStream();
+    pc.ontrack = (e) => { stream.addTrack(e.track); video.srcObject = stream; };
+    let sessionId = null;
+    const queued = [];
+    const sendCandidate = (c) => quiet(conn.sendMessagePromise({ type: 'camera/webrtc/candidate', entity_id: id, session_id: sessionId, candidate: c }));
+    pc.onicecandidate = (e) => { if (!e.candidate) return; const c = e.candidate.toJSON(); if (sessionId) sendCandidate(c); else queued.push(c); };
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    const playing = waitPlaying(video, 20000);
+    try {
+      const unsub = await conn.subscribeMessage((m) => {
+        if (m.type === 'session') { sessionId = m.session_id; queued.splice(0).forEach(sendCandidate); }
+        else if (m.type === 'answer') quiet(pc.setRemoteDescription({ type: 'answer', sdp: m.answer }));
+        else if (m.type === 'candidate') quiet(pc.addIceCandidate(m.candidate));
+        else if (m.type === 'error') { reasons.push(`WebRTC: ${m.code}: ${m.message}`); mine.fail?.(); }
+      }, { type: 'camera/webrtc/offer', entity_id: id, offer: offer.sdp });
+      mine.cleanups.push(() => quiet(Promise.resolve(unsub())));
+    } catch (e) { reasons.push(`WebRTC offer: ${errText(e)}`); return false; }
+    show(video);
+    if (await playing) { status(''); return true; }
+    if (!reasons.some((r) => r.startsWith('WebRTC'))) reasons.push('WebRTC: no video within 20 s');
+    pc.close();
+    return false;
+  }
+
+  async function tryHls() {
+    status('Starting live view…');
+    let url;
+    try { url = (await conn.sendMessagePromise({ type: 'camera/stream', entity_id: id }))?.url; } catch (e) { reasons.push(`HLS: ${errText(e)}`); return false; }
+    if (!alive()) return true;
+    if (!url) { reasons.push('HLS: no stream URL'); return false; }
+    const video = newVideo();
     // Arlo cameras can take 10 to 20 seconds to start streaming.
-    mine.timers.push(setTimeout(() => { if (!mine.playing) mjpeg('HLS did not start'); }, 25000));
+    const playing = waitPlaying(video, 25000);
     let Hls = null;
-    try { Hls = await loadHls(); } catch { /* fall through to native */ }
-    if (live !== mine) return;
+    try { Hls = await loadHls(); } catch (e) { reasons.push(`HLS player: ${errText(e)}`); }
+    if (!alive()) return true;
     if (Hls?.isSupported()) {
       const hls = new Hls({ lowLatencyMode: true, backBufferLength: 30, maxBufferLength: 10 });
       mine.hls = hls;
-      hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal) { hls.destroy(); mine.hls = null; mjpeg(`HLS error ${data.details}`); } });
-      hls.loadSource(r.url);
+      hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) { reasons.push(`HLS: ${d.details}`); hls.destroy(); mine.hls = null; mine.fail?.(); } });
+      hls.loadSource(url);
       hls.attachMedia(video);
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.onerror = () => mjpeg('native HLS failed');
-      video.src = r.url;
-    } else {
-      return mjpeg('no HLS support');
-    }
+      video.onerror = () => { reasons.push('HLS: native playback failed'); mine.fail?.(); };
+      video.src = url;
+    } else { reasons.push('HLS: not supported on this device'); return false; }
     show(video);
-  }, (err) => mjpeg(`camera/stream refused (${errorCode(err)})`));
+    if (await playing) { status(''); return true; }
+    if (!reasons.some((r) => r.startsWith('HLS'))) reasons.push('HLS: no video within 25 s');
+    return false;
+  }
+
+  let types = ['hls'];
+  try { types = (await conn.sendMessagePromise({ type: 'camera/capabilities', entity_id: id }))?.frontend_stream_types ?? types; }
+  catch (e) { reasons.push(`capabilities: ${errText(e)}`); }
+  if (!alive()) return;
+  if (types.includes('web_rtc') && await tryWebRtc()) return;
+  if (!alive()) return;
+  if (types.includes('hls') && await tryHls()) return;
+  if (!types.includes('hls') && !types.includes('web_rtc')) reasons.push(`camera offers ${types.join(', ') || 'no'} live formats`);
+  fallback();
 }
 const liveBox = '<div class="livebox" id="live"></div>';
 function liveCamSheet(id) {
@@ -606,6 +677,7 @@ function stopLiveCam() {
   if (!live) return;
   live.timers.forEach((t) => { clearInterval(t); clearTimeout(t); });
   live.hls?.destroy();
+  live.cleanups?.forEach((f) => { try { f(); } catch { /* already closed */ } });
   const el = live.el;
   if (el) { el.onerror = null; if (el.tagName === 'VIDEO') el.pause(); el.removeAttribute('src'); if (el.tagName === 'VIDEO') el.load(); }
   live = null;
