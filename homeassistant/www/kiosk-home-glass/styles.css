@@ -7,6 +7,9 @@
 @font-face { font-family: "Hind"; font-weight: 600; font-display: swap; src: url("fonts/hind-600-latin.woff2") format("woff2"); }
 @font-face { font-family: "Hind"; font-weight: 700; font-display: swap; src: url("fonts/hind-700-latin.woff2") format("woff2"); }
 @font-face { font-family: "Plus Jakarta Sans"; font-weight: 400 800; font-display: swap; src: url("fonts/plus-jakarta-sans-latin.woff2") format("woff2"); }
+@font-face { font-family: "Rajdhani"; font-weight: 600; font-display: swap; src: url("fonts/rajdhani-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Rajdhani"; font-weight: 700; font-display: swap; src: url("fonts/rajdhani-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 700; font-display: swap; src: url("fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2"); }
 
 :root {
   --ground: #e9eef7;
@@ -709,3 +712,28 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 @media (prefers-reduced-motion: no-preference) { .batt .fillup { animation: fillup 2.2s ease-in infinite; } }
 @media (prefers-reduced-motion: reduce) { .batt .fillup { opacity: .3; transform: none; } }
 @keyframes fillup { 0% { transform: scaleX(0); opacity: .55; } 80% { transform: scaleX(1); opacity: .55; } 100% { transform: scaleX(1); opacity: 0; } }
+
+/* ---- Energy HUD (#energy-dashboard): the Home Energy view, drawn in the page ---- */
+.subview > .hud:only-child { grid-row: 1 / -1; }
+.hud { position: relative; height: 100%; min-height: 0; overflow: hidden; border-radius: 14px; background: #04091A; isolation: isolate; }
+.hud-bg { position: absolute; inset: -40px; background: #04091A center / cover no-repeat; filter: blur(28px) brightness(.45) saturate(1.2); z-index: -1; }
+.hud-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hud-svg .hud-ui { font-family: Rajdhani, "Hind", system-ui, sans-serif; }
+.hud-svg .hud-mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.hud-svg .hot { cursor: pointer; outline: none; }
+.hud-svg .hot:focus-visible > rect:first-child { stroke: #fff; stroke-width: 3; stroke-opacity: .9; }
+.hud-svg .hud-spin { transform-box: fill-box; transform-origin: center; }
+.hud-svg .hud-flow { stroke-dasharray: 2 14; stroke-linecap: round; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Stepped, not smooth: SVG dash and rotation animations repaint on the main thread, so the dots march at 16
+     steps a second and the rings turn at 4, which looks the same on a wall display for a fraction of the work. */
+  .hud-svg .hud-flow { animation: hudDash 1s steps(16) infinite; }
+  .hud-svg .hud-spin { animation: hudSpin 24s steps(96) infinite; }
+}
+@keyframes hudDash { to { stroke-dashoffset: -16; } }
+@keyframes hudSpin { to { transform: rotate(360deg); } }
+.hud-home { position: absolute; right: 20px; bottom: 20px; height: 56px; padding: 0 22px 0 16px; border-radius: 28px; display: flex; align-items: center; gap: 10px;
+  background: rgba(6, 14, 34, .62); border: 1px solid rgba(179, 136, 255, .65); box-shadow: 0 0 18px rgba(179, 136, 255, .35), 0 8px 24px rgba(0, 0, 0, .45);
+  color: #E6F1FF; font: 700 17px Rajdhani, "Hind", sans-serif; letter-spacing: 3px; }
+.hud-home .ic { width: 24px; height: 24px; color: #B388FF; }
+.hud-anim { pointer-events: none; will-change: transform; }

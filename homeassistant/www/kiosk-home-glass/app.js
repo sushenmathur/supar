@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=20';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=20';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=20';
-import * as H from './home.js?v=20';
-import { injectIcons, ic, weatherArt } from './icons.js?v=20';
-import { VIEWS, viewEntityIds } from './views.js?v=20';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=20';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=21';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=21';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=21';
+import * as H from './home.js?v=21';
+import { injectIcons, ic, weatherArt } from './icons.js?v=21';
+import { VIEWS, viewEntityIds } from './views.js?v=21';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=21';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -267,7 +267,7 @@ function onRoute() {
 }
 regions.subview = () => (VIEWS[route] ? VIEWS[route].render(viewCtx) : '');
 const viewCtx = { get, esc, ic, armed, label, H, E, tz: () => tz, fmtTime, isUnavailable, tile, call, quiet,
-  openSheet: (...a) => openSheet(...a), mediaIds: () => mediaIds, musicPanel: MUSIC_PANEL, energyPanel: ENERGY_PANEL, isLocalImage: (u) => isLocalImage(u, location.origin) };
+  openSheet: (...a) => openSheet(...a), mediaIds: () => mediaIds, musicPanel: MUSIC_PANEL, isLocalImage: (u) => isLocalImage(u, location.origin) };
 
 // Region output is only written when it changes, so taps and focus survive unrelated updates.
 const last = new Map();
@@ -319,6 +319,8 @@ function tick() {
     if (clk.textContent) { clk.classList.remove('stamp'); void clk.offsetWidth; clk.classList.add('stamp'); }
     clk.textContent = hm;
   }
+  // The energy HUD shows the time too: redraw it when the minute changes while it's on screen.
+  if (hm !== tick.hm) { tick.hm = hm; if (route === 'energy-dashboard') { last.delete('subview'); renderAll(); } }
   // Only touch the DOM when text changes: every write costs a restyle, more so while animations run.
   const put = (sel, v) => { const el = $(sel); if (el.textContent !== v) el.textContent = v; };
   put('#ampm', ap.toUpperCase());
@@ -618,7 +620,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=20';
+    : './vendor/hls.light.min.mjs?v=21';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -857,8 +859,8 @@ document.addEventListener('pointerdown', (e) => {
   clearTimeout(holdTimer);
   if (h) holdTimer = setTimeout(() => { held = true; ACTIONS.info(h.dataset.hold); }, 500);
 });
-// Cards that act as links (the Energy card) open with Enter or Space, like a button.
-document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('[role="link"][data-act]')) { e.preventDefault(); e.target.click(); } });
+// Cards and HUD panels that act as links or buttons open with Enter or Space, like a button.
+document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('[role="link"][data-act], [role="button"][data-act]:not(button)')) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });  // SVG has no .click()
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) document.addEventListener(ev, () => clearTimeout(holdTimer), true);
 document.addEventListener('contextmenu', (e) => { if (e.target.closest('[data-hold]')) e.preventDefault(); });
 

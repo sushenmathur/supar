@@ -17,6 +17,7 @@ All page files live in `homeassistant/www/kiosk-home/` and get copied to `/confi
 | `state.js` | State-diff and small helpers |
 | `connection.js` | KS shared connection, or the browser's HA session (same as kiosk-test) |
 | `icons.js`, `styles.css`, `fonts/` | Icons, block print styling and self-hosted Hind |
+| `energyhud.js` | The Home Energy HUD for `#energy-dashboard`. Its photos are `/local/images/energy-dashboard-bg1.png` (day) and `energy-dashboard-bg-night.png` (when `sensor.dashboard_night_mode` is on), already on Home Assistant; its fonts, Rajdhani and JetBrains Mono (SIL OFL), are in `fonts/` so nothing loads from Google Fonts |
 | `vendor/haws.mjs` | home-assistant-js-websocket 9.8.1 (same build as kiosk-test) |
 
 Tests live in `tests/kiosk-home/` and run with `node --test tests/kiosk-home`.
@@ -84,7 +85,7 @@ The tab bar and room tiles open the other `master.yaml` views inside the same pa
 | `#outdoor` | Outdoor | Backyard & Patio, Front (front door, downlight, outdoor lights, driveway, outdoor plug), Side & Laundry |
 | `#laundry` | Laundry | Drying advice, water leak and laundry door badges; washer and dryer status, last run, last start, energy and cost, notify toggles, dryer power |
 | `#music` | Music | The Music Assistant panel (`/d5369777_music_assistant`, set as `MUSIC_PANEL` in `config.js`) embedded under the tab bar, plus an Open full screen button |
-| `#energy-dashboard` | Energy | Home Assistant's Energy dashboard (`/energy-new/energy`, set as `ENERGY_PANEL` in `config.js`) embedded under the tab bar, plus an Open full screen button. Opened by tapping the Energy card on Home (or Enter on it); it has no tab of its own |
+| `#energy-dashboard` | Energy | The Home Energy HUD, drawn in the page (`energyhud.js`, a port of the button-card "Home Energy" view): the house photo with glass cards for grid, today, billing, solar, home, Tesla and Kia, live flows and the weather and tariff. Taps open the page's own details pop-up; the Home card and the HOME button go back to Home. Opened by tapping the Energy card on Home (or Enter on it); it has no tab of its own |
 
 Differences from the Lovelace sub-views, on purpose or because the source isn't in the repo:
 
@@ -120,6 +121,7 @@ Differences from the Lovelace view, on purpose:
 - **Kept light on the tablet:**
   - Everything moving is transform/opacity only, so it runs on the GPU.
   - Animations pause under the screensaver or when the page is hidden, and are off with reduced motion.
+  - The energy HUD keeps its moving parts (flow dots, ring dashes) on a separate transparent layer and steps them at 16 and 4 updates a second, so the photo, frosted glass and text aren't repainted each frame. It only runs while the view is open.
   - Measured with Playwright on a 4× throttled CPU, with one live state change a second:
     - every view holds 61 fps
     - Lights and Security do no layout or style work while idle

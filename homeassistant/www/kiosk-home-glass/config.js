@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home-glass
-export const VERSION = '20';
+export const VERSION = '21';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -131,9 +131,6 @@ export const ROBBIE_IMAGE = '/local/images/robbie.png';
 // Guest WiFi QR, the same image the dashboard's WiFi popup shows.
 // Music Assistant's Home Assistant panel (same origin, so no host or IP in the page).
 export const MUSIC_PANEL = '/d5369777_music_assistant';
-
-// Home Assistant's Energy dashboard, shown inside the page on the #energy-dashboard view (same origin, so no host in the page).
-export const ENERGY_PANEL = '/energy-new/energy';
 
 export const WIFI_QR = '/api/image/serve/50750ef2d78e15cc901576e1c9fa2bae/512x512';
 

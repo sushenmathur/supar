@@ -1,5 +1,6 @@
 // Sub-views ported from master.yaml (security, lights, homeclimate, living-room, garage, kidsroom,
 // outdoor, laundry, music). Each view: { ids, render(c), actions? }. `c` is the context from app.js.
+import { energyHud } from './energyhud.js?v=21';
 
 // ---- Shared helpers ----
 const st = (c, id) => c.get(id)?.state;
@@ -364,14 +365,5 @@ const music = {
   },
 };
 
-// Energy: Home Assistant's own Energy dashboard inside the page, like Music. Opened by tapping the Energy card.
-const energy = {
-  ids: [],
-  render(c) {
-    return head(c, { icon: 'bolt', title: 'Energy', right: `<a class="btn line b" href="${c.energyPanel}" style="display:flex;align-items:center;text-decoration:none;color:inherit">Open full screen</a>` })
-      + `<div class="vbody"><iframe class="embed b" src="${c.energyPanel}" title="Home Assistant energy dashboard"></iframe></div>`;
-  },
-};
-
-export const VIEWS = { lights, homeclimate, security, 'living-room': livingRoom, garage, kidsroom, outdoor, laundry, music, 'energy-dashboard': energy };
+export const VIEWS = { lights, homeclimate, security, 'living-room': livingRoom, garage, kidsroom, outdoor, laundry, music, 'energy-dashboard': energyHud };
 export const viewEntityIds = () => [...new Set(Object.values(VIEWS).flatMap((v) => v.ids))];
