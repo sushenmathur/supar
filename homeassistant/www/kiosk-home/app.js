@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=9';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=9';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=9';
-import * as H from './home.js?v=9';
-import { injectIcons, ic, weatherArt } from './icons.js?v=9';
-import { VIEWS, viewEntityIds } from './views.js?v=9';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=9';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=10';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=10';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=10';
+import * as H from './home.js?v=10';
+import { injectIcons, ic, weatherArt } from './icons.js?v=10';
+import { VIEWS, viewEntityIds } from './views.js?v=10';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=10';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -321,7 +321,7 @@ function openSheet(html, onOpen) {
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
-sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
+sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
 const ACTIONS = {
@@ -514,10 +514,21 @@ function refreshCam() {
 $('#camimg').addEventListener('error', (e) => e.target.classList.add('err'));
 $('#camimg').addEventListener('load', (e) => { e.target.classList.remove('err'); e.target.hidden = false; });
 // ---- Live camera ----
-// The pop-up always streams the camera entity it was opened for. Best first: HA's HLS stream as
-// real video (camera/stream) where the tablet's WebView can play it; then HA's MJPEG stream
-// (camera_proxy_stream, which every camera supports); then snapshots of the same camera.
+// The pop-up always streams the camera entity it was opened for, the same way Home Assistant's own
+// camera dialog does: ask HA for an HLS stream (camera/stream) and play it with hls.js (or natively).
+// Arlo cameras only give a still image any other way, so MJPEG and snapshots are last resorts.
+// hls.js (~370 KB) is loaded the first time a camera pop-up opens, never at page start.
 let live = null;
+let hlsLib = null;
+async function loadHls() {
+  if (hlsLib) return hlsLib;
+  const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
+  const url = inline
+    ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
+    : './vendor/hls.light.min.mjs?v=10';
+  hlsLib = (await import(url)).default;
+  return hlsLib;
+}
 function camToken(id) {
   const a = get(id)?.attributes ?? {};
   if (a.access_token) return a.access_token;
@@ -528,38 +539,55 @@ function startLive(box, id) {
   stopLiveCam();
   live = { box, timers: [] };
   const mine = live;
+  const status = (text) => { if (live === mine) box.dataset.status = text; };
+  const show = (el) => { if (live === mine) { box.replaceChildren(el); mine.el = el; } };
   const snapshots = () => {
     if (live !== mine) return;
     const img = document.createElement('img');
-    img.alt = 'Live view';
+    img.alt = 'Latest snapshot';
     const poll = () => { const u = camUrl(id); if (u) img.src = u; };
     poll(); mine.timers.push(setInterval(poll, 2000));
-    box.replaceChildren(img); mine.el = img;
+    show(img); status('Snapshot (live view unavailable)');
   };
-  const mjpeg = () => {
+  const mjpeg = (why) => {
     if (live !== mine) return;
+    if (why) console.warn(`kiosk-home: ${why} for ${id}, trying MJPEG`);
     const token = camToken(id);
     if (!token) return snapshots();
     const img = document.createElement('img');
     img.alt = 'Live view';
-    img.onerror = () => { img.onerror = null; console.warn(`kiosk-home: MJPEG failed for ${id}, using snapshots`); snapshots(); };
+    img.onerror = () => { img.onerror = null; snapshots(); };
+    img.onload = () => status('');
     img.src = `/api/camera_proxy_stream/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
-    box.replaceChildren(img); mine.el = img;
+    show(img); status('Image stream');
   };
-  const video = document.createElement('video');
-  const canHls = (Number(get(id)?.attributes?.supported_features) & 2) && video.canPlayType('application/vnd.apple.mpegurl');
-  if (!canHls) return mjpeg();
-  conn.sendMessagePromise({ type: 'camera/stream', entity_id: id }).then((r) => {
-    if (live !== mine || !r?.url) return mjpeg();
+  status('Starting live view…');
+  conn.sendMessagePromise({ type: 'camera/stream', entity_id: id }).then(async (r) => {
+    if (live !== mine) return;
+    if (!r?.url) return mjpeg('no HLS URL');
+    const video = document.createElement('video');
     Object.assign(video, { muted: true, autoplay: true, playsInline: true });
     video.setAttribute('aria-label', 'Live view');
-    let playing = false;
-    video.addEventListener('playing', () => { playing = true; }, { once: true });
-    video.onerror = () => { console.warn(`kiosk-home: HLS failed for ${id}, using MJPEG`); mjpeg(); };
-    mine.timers.push(setTimeout(() => { if (!playing && live === mine) { console.warn(`kiosk-home: HLS slow for ${id}, using MJPEG`); mjpeg(); } }, 10000));
-    video.src = r.url;
-    box.replaceChildren(video); mine.el = video;
-  }, () => mjpeg());
+    video.addEventListener('playing', () => { mine.playing = true; status(''); });
+    // Arlo cameras can take 10 to 20 seconds to start streaming.
+    mine.timers.push(setTimeout(() => { if (!mine.playing) mjpeg('HLS did not start'); }, 25000));
+    let Hls = null;
+    try { Hls = await loadHls(); } catch { /* fall through to native */ }
+    if (live !== mine) return;
+    if (Hls?.isSupported()) {
+      const hls = new Hls({ lowLatencyMode: true, backBufferLength: 30, maxBufferLength: 10 });
+      mine.hls = hls;
+      hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal) { hls.destroy(); mine.hls = null; mjpeg(`HLS error ${data.details}`); } });
+      hls.loadSource(r.url);
+      hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.onerror = () => mjpeg('native HLS failed');
+      video.src = r.url;
+    } else {
+      return mjpeg('no HLS support');
+    }
+    show(video);
+  }, (err) => mjpeg(`camera/stream refused (${errorCode(err)})`));
 }
 const liveBox = '<div class="livebox" id="live"></div>';
 function liveCamSheet(id) {
@@ -576,6 +604,7 @@ function stopLiveCam() {
   clearInterval(liveTimer); liveTimer = 0;
   if (!live) return;
   live.timers.forEach((t) => { clearInterval(t); clearTimeout(t); });
+  live.hls?.destroy();
   const el = live.el;
   if (el) { el.onerror = null; if (el.tagName === 'VIDEO') el.pause(); el.removeAttribute('src'); if (el.tagName === 'VIDEO') el.load(); }
   live = null;
@@ -590,7 +619,7 @@ function openLive(fn) {
 
 /** Card badge: a Kia wordmark for the Sorento, a Tesla photo thumbnail for Bluey. */
 function carBadge(c) {
-  if (c.brand === 'tesla') return `<span class="well carthumb"><img src="${c.image}" alt=""></span>`;
+  if (c.brand === 'tesla') return `<span class="well tesla" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 5.6c2.9-1.5 5.9-2.3 9-2.3s6.1.8 9 2.3l-.7 1.3c-1.8-.9-3.7-1.4-5.7-1.6L12 9.2 9.4 5.3c-2 .2-3.9.7-5.7 1.6z"/><path d="M9.9 6.9 12 10.4l2.1-3.5c.8.1 1.6.2 2.3.4L12 21 7.6 7.3c.7-.2 1.5-.3 2.3-.4z"/></svg></span>`;
   return `<span class="well kia" aria-hidden="true"><svg viewBox="0 0 44 18"><text x="22" y="14" text-anchor="middle">KIA</text></svg></span>`;
 }
 

@@ -20,7 +20,7 @@ for (const name of readdirSync(src).filter((n) => n.endsWith('.js'))) {
   writeFileSync(join(tmp, name), readFileSync(join(src, name), 'utf8').replace(/(\.m?js)\?v=[\w.-]+/g, '$1'));
 }
 copyFileSync(join(src, 'vendor/haws.mjs'), join(tmp, 'vendor/haws.mjs'));
-execFileSync('npx', ['--yes', 'esbuild@0.24.2', join(tmp, 'app.js'), '--bundle', '--format=esm', '--minify', '--legal-comments=none', `--outfile=${join(tmp, 'bundle.js')}`], { stdio: 'inherit' });
+execFileSync('npx', ['--yes', 'esbuild@0.24.2', join(tmp, 'app.js'), '--bundle', '--format=esm', '--minify', '--legal-comments=none', '--external:./vendor/hls.light.min.mjs', `--outfile=${join(tmp, 'bundle.js')}`], { stdio: 'inherit' });
 const js = readFileSync(join(tmp, 'bundle.js'), 'utf8').replace(/<\/script/gi, '<\\/script');
 rmSync(tmp, { recursive: true, force: true });
 
@@ -31,6 +31,9 @@ let html = readFileSync(join(src, 'index.html'), 'utf8');
 html = html.replace(/<link rel="stylesheet" href="styles\.css\?v=[\w.-]+">/, () => `<style>\n${css}\n</style>`);
 html = html.replace(/<script type="module" src="app\.js\?v=[\w.-]+"[\s\S]*?><\/script>/, () => `<script type="module">\n${js}\n</script>`);
 if (/src="app\.js|href="styles\.css/.test(html)) throw new Error('index.html structure changed; update build-single.mjs');
+// hls.js rides along as inert base64 text; the page decodes and imports it only when a camera pop-up opens.
+const hls = readFileSync(join(src, 'vendor/hls.light.min.mjs')).toString('base64');
+html = html.replace('</body>', () => `<script type="text/plain" id="hls-src">${hls}</script>\n</body>`);
 html = html.replace('<head>', '<head>\n<!-- Built from homeassistant/www/kiosk-home/ by tools/kiosk-home/build-single.mjs. Do not edit; rebuild. -->');
 writeFileSync(out, html);
 console.log(`wrote ${out} (${Math.round(html.length / 1024)} KB)`);

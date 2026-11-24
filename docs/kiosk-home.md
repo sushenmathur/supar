@@ -33,7 +33,7 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - Greeting, date, clock, weather and the India/Austin clocks.
   - Sushen and Paro with place, battery and charging.
   - The family calendar's next three events, live through `calendar/event/subscribe`.
-  - Sorento (Kia wordmark) and Bluey (Tesla photo thumbnail) with place, battery and charging.
+  - Sorento (Kia wordmark) and Bluey (Tesla T mark) with place, battery and charging.
   - Tapping a car opens its pop-up, which updates live while open:
     - photo, place, driving or parked, battery and charging
     - Sorento: charge power, last charge, charger switch, on-road toggle, location
@@ -89,12 +89,12 @@ Differences from the Lovelace sub-views, on purpose or because the source isn't 
 
 - **No history graphs** on Climate: the page shows the current room temperature instead of the 12-hour line.
 - **Music** shows the Music Assistant panel itself rather than the dashboard's third-party music card. It uses a same-origin path, so no IP address is stored in the page.
-- **Live camera view** always streams the camera entity the pop-up is for. The Home card shows `camera.front_door_snapshot_2`, but its pop-up streams `camera.front_door_live_view_2`. The stream used, best first:
-  1. Home Assistant's HLS stream as real video, where the tablet can play it.
-  2. The MJPEG stream (`/api/camera_proxy_stream/…`, using the camera's own access token).
-  3. Snapshots of the same camera every 2 seconds.
+- **Live camera view** always streams the camera entity the pop-up is for. The Home card shows `camera.front_door_snapshot_2`, but its pop-up streams `camera.front_door_live_view_2`. It works the way Home Assistant's own camera dialog does:
+  1. It asks Home Assistant for the camera's HLS stream (`camera/stream`) and plays it with hls.js. Arlo cameras can take 10–20 seconds to start; the pop-up shows "Starting live view…" until video plays.
+  2. If that fails, it falls back to the MJPEG stream. For Arlo cameras this only shows the last captured image.
+  3. After that, it falls back to snapshots.
 
-  The stream closes when the pop-up does.
+  hls.js 1.7.4 (Apache-2.0) is in `vendor/`. It's only loaded when a camera pop-up opens; in the single-file build it's embedded as inert base64 text, so it adds about 490 KB to the file but nothing at page start. Closing the pop-up stops the stream and clears the player.
 - **Garage door and washer/dryer cards** are third-party too. The page uses the same entities from their config, with plain controls.
 - Two things in `master.yaml` look like typos and are copied as they are: Outdoor reads `binary_sensor.patio_door` (the navbar uses `binary_sensor.patio_door_contact`), and the dryer's notify toggle points at `automation.washing_machine_finished_announcement`.
 
