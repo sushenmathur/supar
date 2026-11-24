@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=30';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=30';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=30';
-import * as H from './home.js?v=30';
-import { injectIcons, ic, weatherArt } from './icons.js?v=30';
-import { VIEWS, viewEntityIds } from './views.js?v=30';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=30';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=31';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=31';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=31';
+import * as H from './home.js?v=31';
+import { injectIcons, ic, weatherArt } from './icons.js?v=31';
+import { VIEWS, viewEntityIds } from './views.js?v=31';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=31';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -74,6 +74,7 @@ const regions = {
     return `<a class="brand" href="#home">SuPar <span>Home</span></a>` + NAV.map(([name, icon, r]) => {
       const badge = name === 'Lights' && lights ? `<span class="count num">${lights}</span>` : name === 'Security' && sec ? `<span class="count alert num">${sec}</span>` : '';
       const here = r === cur ? ' cur" aria-current="page' : '';
+      if (r === 'music' && ksMusic.nowPlaying + ksMusic.library) return `<button class="tab" data-act="ks-music">${ic(icon)}${name}</button>`;
       if (r === 'more' || r === 'rooms') return `<button class="tab${here}" data-act="${r}">${ic(icon)}${name}${badge}</button>`;
       return `<a class="tab${here}" href="#${r}">${ic(icon)}${name}${badge}</a>`;
     }).join('') + `<span class="grow"></span><span class="conn" id="conn"></span>`;
@@ -405,6 +406,15 @@ const ACTIONS = {
     quiet(on ? call('media_player', 'turn_off', { entity_id: E.tv }) : call('script', 'turn_on', { entity_id: 'script.media_tv_power' }));
   },
   'tv-remote': () => { sheet().classList.remove('mediasheet'); openLive(tvRemoteSheet); sheet().classList.add('tvsheet'); },
+  // The Music tab in Kiosk Satellite: its Now Playing view while a track is loaded, else its Music Library.
+  // Falls back to the Music Assistant view if the kiosk doesn't respond.
+  'ks-music': () => {
+    const loaded = ['playing', 'paused'].includes(ksMedia?.state);
+    const fallback = () => { location.hash = '#music'; };
+    if (ksMusic.nowPlaying && (loaded || !ksMusic.library)) quiet(call('switch', 'turn_on', { entity_id: ksMusic.nowPlaying }).catch(fallback));
+    else if (ksMusic.library) quiet(call('button', 'press', { entity_id: ksMusic.library }).catch(fallback));
+    else fallback();
+  },
   media: () => { openLive(mediaSheet); sheet().classList.add('mediasheet'); },
   'media-sel': (id) => { mediaSel = id; renderAll(); },
   'media-power': (id) => {
@@ -808,7 +818,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=30';
+    : './vendor/hls.light.min.mjs?v=31';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -1109,6 +1119,26 @@ async function subscribeCalendar() {
   }
 }
 
+// The kiosk's own music entities (KS_MUSIC), found by name when not set: this kiosk's, if there are several.
+const ksMusic = { nowPlaying: '', library: '' };
+let ksMedia = null;
+async function findKsMusic(allStates) {
+  if (!inKioskSatellite()) return;
+  const all = allStates.map((x) => x.entity_id);
+  let name = '';
+  try { name = String((await ks.getDeviceInfo?.())?.name ?? ''); } catch { /* not offered */ }
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const pick = (set, re) => {
+    if (set) return all.includes(set) ? set : '';
+    const found = all.filter((id) => re.test(id));
+    return found.length === 1 ? found[0] : (slug && found.find((id) => id.includes(`_${slug}_`) || id.includes(`.ks_${slug}_`))) || '';
+  };
+  ksMusic.nowPlaying = pick(KS_MUSIC.nowPlaying, /^switch\..*_now_playing$/);
+  ksMusic.library = pick(KS_MUSIC.library, /^button\..*_show_music_library$/);
+  console.info(`kiosk-home: Music tab uses ${ksMusic.nowPlaying || ksMusic.library ? 'Kiosk Satellite\'s player' : 'Music Assistant'}`);
+  last.delete('tabs'); renderAll();
+}
+
 function entityIds(allStates) {
   const ids = new Set([...Object.values(E), ...LIGHT_POOL, ...SECURITY_CONTACTS, ...BINS.map((b) => b.id)]);
   PEOPLE.forEach((p) => [p.id, p.battery, ...[].concat(p.charge)].forEach((i) => ids.add(i)));
@@ -1135,6 +1165,7 @@ async function boot() {
   const [cfg, all] = await Promise.all([conn.sendMessagePromise({ type: 'get_config' }).catch(() => null), conn.sendMessagePromise({ type: 'get_states' })]);
   if (cfg?.time_zone) tz = cfg.time_zone;
   const ids = entityIds(all);
+  quiet(findKsMusic(all));
   const wanted = new Set(ids);
   for (const s of all) if (wanted.has(s.entity_id)) states.set(s.entity_id, s);
   console.info(`kiosk-home: ${ids.length} entities via ${via}, time zone ${tz}`);
@@ -1163,7 +1194,7 @@ async function boot() {
   const still = () => document.documentElement.classList.toggle('still', camPaused.size > 0);
   document.addEventListener('visibilitychange', () => { if (document.hidden) camPaused.add('hidden'); else { camPaused.delete('hidden'); refreshCam(); } still(); });
   if (inKioskSatellite()) {
-    const onKs = (s) => { if (s?.screensaver?.active) camPaused.add('saver'); else { camPaused.delete('saver'); refreshCam(); } still(); };
+    const onKs = (s) => { ksMedia = s?.mediaPlayer ?? null; if (s?.screensaver?.active) camPaused.add('saver'); else { camPaused.delete('saver'); refreshCam(); } still(); };
     addEventListener('kiosksatellite:kiosk-state', (e) => onKs(e.detail));
     quiet(Promise.resolve(ks.getKioskState?.()).then(onKs));
   }

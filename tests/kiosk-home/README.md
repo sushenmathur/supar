@@ -43,13 +43,14 @@ leaks between them, and prints one line per suite. Options: `--page kiosk-home`,
 | `tv` | TV remote on long press: every button's service, sources, power, disabled when off; car charging bolt |
 | `banner` | The alert banner: priorities and colours (red, amber, grey), grouping, chips, night-only doors, the ticker |
 | `theme` | Dark at sunset and light at sunrise, live; the dark-by-sun page matches the tablet's dark mode pixel for pixel |
+| `music` | The Music tab in Kiosk Satellite: Music Library when nothing is loaded, Now Playing while playing or paused, this kiosk's entities among several; Music Assistant without them or outside Kiosk Satellite |
 | `media` | The Media pop-up: each player listed once and in order, the hero's controls and volume slider, row buttons, power (TV, bedroom TV switch, others), the TV remote, artwork only through Home Assistant, the progress clock |
 | `alarm` | A wrong passcode shows "Access denied" and leaves the alarm alone, for arm home, arm away and disarm, in six set-ups: the script with an alarm without a code, with one that rejects wrong codes, with one that ignores them silently (like Alarmo); no script with an alarm code; no script and no code; and the script passing while the alarm's own code differs |
 | `glass` | Glass-only layout: ticker, calendar stamps, spacing, Kids Rooms |
 | `single` | The single-file build: Kiosk Satellite on/off, sign-in message, core actions |
 | `perf.cjs` | Not in the runner: `NAME=kiosk-home node e2e/suites/perf.cjs home` measures frames and layout work on a 4× throttled CPU |
 
-The fake Home Assistant has switches for scenarios: `MOCK_TV`, `MOCK_LONG`, `MOCK_ALARM_CODE`, `MOCK_ALARM_SILENT`, `MOCK_ALARM_MISMATCH`, `MOCK_NO_ALARM_SCRIPT`, `MOCK_NO_LOGOS`, `MOCK_MEDIA`,
+The fake Home Assistant has switches for scenarios: `MOCK_TV`, `MOCK_LONG`, `MOCK_ALARM_CODE`, `MOCK_ALARM_SILENT`, `MOCK_ALARM_MISMATCH`, `MOCK_NO_ALARM_SCRIPT`, `MOCK_NO_LOGOS`, `MOCK_MEDIA`, `MOCK_KS_MUSIC`,
 `SCENE=calm`, and `MOCK_NOW` (a fixed clock). Tests change states through `GET /__state?id=&s=` and read the service calls
 from `GET /__log`.
 

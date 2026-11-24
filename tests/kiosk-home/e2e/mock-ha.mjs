@@ -127,6 +127,11 @@ if (process.env.MOCK_MEDIA) {
   set('media_player.bedroom_apple_tv', 'idle', { friendly_name: 'Bedroom Apple TV' });
 }
 
+// MOCK_KS_MUSIC: two Kiosk Satellite tablets' ESPHome entities (Now Playing switch, Show Music Library button).
+if (process.env.MOCK_KS_MUSIC) {
+  for (const k of ['kitchen_tablet', 'bedroom_tablet']) { set(`switch.ks_${k}_now_playing`, 'off'); set(`button.ks_${k}_show_music_library`, 'unknown'); }
+}
+
 // Live-view camera with no entity_picture (only an access token), as Arlo live entities can be.
 S['camera.front_door_live_view_2'] = { s: 'idle', a: { access_token: 'livetoken', supported_features: 2, friendly_name: 'Front Door live view' }, lc: now() };
 S['person.sushenmathur'].a.entity_picture = '/api/image/serve/sushenface/512x512';
