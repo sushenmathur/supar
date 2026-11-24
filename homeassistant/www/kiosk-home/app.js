@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=21';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=21';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=21';
-import * as H from './home.js?v=21';
-import { injectIcons, ic, weatherArt } from './icons.js?v=21';
-import { VIEWS, viewEntityIds } from './views.js?v=21';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=21';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=22';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=22';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=22';
+import * as H from './home.js?v=22';
+import { injectIcons, ic, weatherArt } from './icons.js?v=22';
+import { VIEWS, viewEntityIds } from './views.js?v=22';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=22';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -520,13 +520,30 @@ function alarmCall(service) {
   const chips = (arming ? ['alarm_arm_home', 'alarm_arm_away'] : ['alarm_disarm']).map((k) => [k, ALARM_WORDS[k][0], ALARM_WORDS[k][1]]);
   const fmt = s?.attributes?.code_format;
   dialSheet({
-    title: 'Home Alarm', prompt: 'Enter alarm code', chips, chip: service, minLen: 4, maxLen: fmt === 'text' ? 8 : 8, okLabel: arming ? 'Arm' : 'Disarm', cls: 'alarmsheet',
+    title: 'Home Alarm', prompt: 'Enter alarm code', chips, chip: service, minLen: 4, maxLen: 8, okLabel: arming ? 'Arm' : 'Disarm', cls: 'alarmsheet',
+    // The code must be checked by Home Assistant, never by the page (anything in the page can be read without
+    // signing in). An alarm with its own code (code_format) checks it itself. Otherwise script.alarm_keypad
+    // (homeassistant/dashboard/alarm-keypad-script.yaml) checks it against a secret before arming or disarming;
+    // without that script the keypad refuses rather than accept any code.
     submit: async (code, svc) => {
+      if (fmt) {
+        try {
+          await conn.sendMessagePromise({ type: 'call_service', domain: 'alarm_control_panel', service: svc, service_data: { entity_id: E.alarm, code } });
+          return { ok: true, msg: ALARM_WORDS[svc][2] };
+        } catch (err) {
+          if (/code/i.test(err?.message ?? '') || err?.code === 'invalid_code') return { ok: false, msg: 'Wrong code' };
+          throw err;
+        }
+      }
       try {
-        await conn.sendMessagePromise({ type: 'call_service', domain: 'alarm_control_panel', service: svc, service_data: { entity_id: E.alarm, code } });
-        return { ok: true, msg: ALARM_WORDS[svc][2] };
+        const res = await conn.sendMessagePromise({ type: 'call_service', domain: 'script', service: 'alarm_keypad', service_data: { request: svc.replace('alarm_', ''), code }, return_response: true });
+        const ok = res?.response?.ok;
+        if (ok === true) return { ok: true, msg: ALARM_WORDS[svc][2] };
+        if (ok === false) return { ok: false, msg: 'Wrong code' };
+        return { ok: undefined, msg: 'Not confirmed: update script.alarm_keypad' };
       } catch (err) {
-        if (/code/i.test(err?.message ?? '') || err?.code === 'invalid_code') return { ok: false, msg: 'Wrong code' };
+        if (/not found|not_found|unknown/i.test(`${err?.code ?? ''} ${err?.message ?? ''}`)) return { ok: undefined, msg: 'Code check not set up: add script.alarm_keypad' };
+        if (/code|denied/i.test(err?.message ?? '')) return { ok: false, msg: 'Wrong code' };
         throw err;
       }
     },
@@ -666,7 +683,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=21';
+    : './vendor/hls.light.min.mjs?v=22';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

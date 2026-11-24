@@ -1,0 +1,60 @@
+# Alarm keypad check for the kiosk page (www/kiosk-home and www/kiosk-home-glass).
+#
+# alarm_control_panel.home_alarm has no code of its own, so Home Assistant arms and disarms it whatever code
+# is entered. The kiosk's alarm dial calls this script instead: it compares the code with a secret, and only
+# then arms or disarms the alarm. It answers the dial with { ok: true } or { ok: false }.
+#
+# Install:
+#   1. In /config/secrets.yaml add your code, for example:   alarm_keypad_code: "1234"   (keep the quotes)
+#   2. Add the script below to /config/scripts.yaml (or Settings > Automations & scenes > Scripts > Add >
+#      Edit in YAML, using everything from `alias:` down, with the script ID alarm_keypad).
+#   3. Reload scripts (Developer tools > YAML > Scripts).
+#
+# The code stays in Home Assistant; the kiosk page never sees it. If the alarm later gets its own code
+# (code_format), the page sends the code straight to the alarm instead, and this script isn't used.
+alarm_keypad:
+  alias: Alarm keypad
+  description: Arm or disarm the home alarm from the kiosk keypad, after checking the code
+  icon: mdi:shield-key
+  fields:
+    request:
+      name: Request
+      required: true
+      selector:
+        select:
+          options:
+            - arm_home
+            - arm_away
+            - disarm
+    code:
+      name: Code
+      required: true
+      selector:
+        text:
+          type: password
+  sequence:
+    - variables:
+        alarm_code: !secret alarm_keypad_code
+    - if:
+        - condition: template
+          value_template: >-
+            {{ (code | default('') | string) != (alarm_code | string)
+               or request not in ['arm_home', 'arm_away', 'disarm'] }}
+      then:
+        # Tell the keypad the code was wrong.
+        - variables:
+            result:
+              ok: false
+              reason: Incorrect code
+        - stop: Incorrect code
+          response_variable: result
+    - action: "alarm_control_panel.alarm_{{ request }}"
+      target:
+        entity_id: alarm_control_panel.home_alarm
+    # Tell the keypad it worked.
+    - variables:
+        result:
+          ok: true
+    - stop: Done
+      response_variable: result
+  mode: single
