@@ -1,6 +1,6 @@
 # SuPar Home: block print kiosk page (`kiosk-home`)
 
-A live version of your Home dashboard, built as a hand-made page for the kitchen tablet. It runs in Kiosk Satellite's **Custom Pages** and uses the block print design (option 2 in `dashboards/home-2026/`). It shows everything on today's `hubhome` view, wired to the same entities with the same rules, and talks to Home Assistant over its websocket API. Nothing in your Lovelace config changes.
+A live version of your Home dashboard, built as a hand-made page for the kitchen tablet. It runs in Kiosk Satellite's **Custom Pages** and uses the **Warm Stone Glass** design (`dashboards/kiosk-redesign/DESIGN.md`): frosted cards over a warm backdrop, Plus Jakarta Sans, amber for devices that are on, red for alerts, with a matching dark mode. It replaced the earlier block print look (option 2 in `dashboards/home-2026/`). It shows everything on today's `hubhome` view, wired to the same entities with the same rules, and talks to Home Assistant over its websocket API. Nothing in your Lovelace config changes.
 
 It's a test page that sits beside your dashboard, and it can be removed in one step (see **Rollback**).
 
@@ -119,6 +119,7 @@ Differences from the Lovelace view, on purpose:
 - **Kept light on the tablet:**
   - Everything moving is transform/opacity only, so it runs on the GPU.
   - Animations pause under the screensaver or when the page is hidden, and are off with reduced motion.
+  - Frosted glass (`backdrop-filter`) is the costliest effect. A blurred card is redrawn every frame something behind or inside it moves, which took Home to 19 fps. On Home only the clock, calendar and alarm cards are blurred; the other cards get a denser fill. The sub-views have nothing animating and keep full glass. If the tablet still lags, set `--glass-blur` lower or remove the blur (see `prefers-reduced-transparency` in `styles.css`).
   - Measured with Playwright on a 4× throttled CPU, with one live state change a second:
     - every view holds 61 fps
     - Lights and Security do no layout or style work while idle

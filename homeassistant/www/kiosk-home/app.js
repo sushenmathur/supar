@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=13';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=13';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=13';
-import * as H from './home.js?v=13';
-import { injectIcons, ic, weatherArt } from './icons.js?v=13';
-import { VIEWS, viewEntityIds } from './views.js?v=13';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=13';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=14';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=14';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=14';
+import * as H from './home.js?v=14';
+import { injectIcons, ic, weatherArt } from './icons.js?v=14';
+import { VIEWS, viewEntityIds } from './views.js?v=14';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=14';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -526,7 +526,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=13';
+    : './vendor/hls.light.min.mjs?v=14';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

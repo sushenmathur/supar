@@ -206,6 +206,9 @@ components:
     height: "48px"
 ---
 
+> **Superseded.** The kiosk page now uses Warm Stone Glass, specified in `dashboards/kiosk-redesign/DESIGN.md`. This file records the earlier block print system, kept for reference.
+
+
 # Design System: SuPar Home
 
 ## Overview
