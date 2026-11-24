@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=19';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=19';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=19';
-import * as H from './home.js?v=19';
-import { injectIcons, ic, weatherArt } from './icons.js?v=19';
-import { VIEWS, viewEntityIds } from './views.js?v=19';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=19';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=20';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=20';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=20';
+import * as H from './home.js?v=20';
+import { injectIcons, ic, weatherArt } from './icons.js?v=20';
+import { VIEWS, viewEntityIds } from './views.js?v=20';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=20';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -174,7 +174,7 @@ const regions = {
     const acOn = ac && !['off', 'unavailable', 'unknown'].includes(ac.state);
     const target = ac?.attributes?.temperature;
     const acSub = acOn ? `${H.conditionText(ac.attributes.hvac_action) || ac.state.replace(/_/g, ' ')}${target != null ? ` · ${target}°` : ''}` : `Off${ac?.attributes?.current_temperature != null ? ` · room ${ac.attributes.current_temperature}°` : ''}`;
-    return tile({ act: 'tv', icon: 'tv', name: 'TV', sub: tvSub, on: tvOn, off: isUnavailable(tv) })
+    return tile({ act: 'tv', icon: 'tv', name: 'TV', sub: tvSub, on: tvOn, off: isUnavailable(tv), hold: 'act:tv-remote' })
       + tile({ act: 'aircon', icon: 'snow', name: 'Aircon', sub: acSub.charAt(0).toUpperCase() + acSub.slice(1), on: acOn, off: isUnavailable(ac) });
   },
 
@@ -207,8 +207,7 @@ const regions = {
         <span class="flowline ${e.solar.active ? 'to-left exp' : 'idle'}"><i style="${phase(13200)}"></i></span>
         <div class="node"><span class="well">${ic(e.solar.active ? 'sun' : 'moon')}</span><b>${e.solar.value}</b><span class="sub">Solar</span></div>
       </div>
-      <div><div class="evrow num">Tesla <span class="sub">${e.tesla.charging ? 'Charging' : 'Not charging'}</span><em>${e.tesla.value}</em></div>
-        <div class="evrow num">Kia <span class="sub">${e.kia.charging ? 'Charging' : 'Not charging'}</span><em>${e.kia.value}</em></div></div>
+      <div>${[['Tesla', e.tesla], ['Kia', e.kia]].map(([n, v]) => `<div class="evrow num${v.charging ? ' chg' : ''}">${v.charging ? `<span class="evbolt" style="animation-delay:__PH1400__">${ic('bolt')}</span>` : ''}${n} <span class="sub">${v.charging ? 'Charging' : 'Not charging'}</span><em>${v.value}</em></div>`).join('')}</div>
       <div class="selfp num">Self-powered<i style="--lvl:${e.self}%"></i><b>${e.self}%</b></div>`;
   },
 
@@ -324,7 +323,7 @@ function openSheet(html, onOpen) {
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
-sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam', 'lpsheet'); sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
+sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam', 'lpsheet', 'tvsheet'); sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
 const ACTIONS = {
@@ -361,6 +360,9 @@ const ACTIONS = {
     if (unlock) confirmOr('front-toggle', run); else run();
   },
   tv: () => quiet(call('script', 'turn_on', { entity_id: 'script.media_tv_power' })),
+  'tv-remote': () => { openLive(tvRemoteSheet); sheet().classList.add('tvsheet'); },
+  'tv-button': (button) => quiet(call('webostv', 'button', { entity_id: E.tv, button })),
+  'tv-source': (source) => quiet(call('media_player', 'select_source', { entity_id: E.tv, source })),
   'alarm-arm-home': () => alarmCall('alarm_arm_home'),
   'alarm-arm-away': () => alarmCall('alarm_arm_away'),
   'alarm-disarm': () => alarmCall('alarm_disarm'),
@@ -502,6 +504,40 @@ function lostPhoneSheet() {
   });
 }
 
+// TV remote, from the Media TV pop-up (lg-remote-control): arrows and OK, back/home/menu, colour buttons,
+// power, volume, channels, playback and sources. Live: it redraws as the TV's state changes.
+function tvRemoteSheet() {
+  const tv = get(E.tv);
+  const a = tv?.attributes ?? {};
+  const on = tv && !['off', 'unavailable', 'unknown'].includes(tv.state);
+  const off = on ? '' : ' disabled';
+  const btn = (k, icon, labelText, cls = '') => `<button class="rk ${cls}" data-act="tv-button" data-arg="${k}" aria-label="${labelText}"${off}>${icon ? ic(icon) : esc(labelText)}</button>`;
+  const svc = (s, icon, labelText, data = '', cls = '') => `<button class="rk ${cls}" data-act="call" data-arg="media_player.${s}|${E.tv}|${data.replace(/"/g, '&quot;')}" aria-label="${labelText}"${off}>${ic(icon)}</button>`;
+  const vol = a.volume_level != null ? Math.round(a.volume_level * 100) : null;
+  const status = isUnavailable(tv) ? 'Unavailable' : on ? [a.app_name ?? a.source, a.media_title].filter(Boolean).join(' · ') || 'On' : 'Off';
+  const list = (a.source_list ?? []).filter((x) => !TV_SOURCES.some(([n]) => n === x));
+  return `<div class="tvhead"><h2>Media TV</h2><p>${esc(status)}${vol != null && on ? ` · volume ${vol}%${a.is_volume_muted ? ' (muted)' : ''}` : ''}</p></div>
+    <div class="tvr">
+      <div class="tvl">
+        <div class="dpad">${btn('UP', 'up', 'Up', 'u')}${btn('LEFT', 'left', 'Left', 'l')}${btn('ENTER', '', 'OK', 'ok')}${btn('RIGHT', 'chevron', 'Right', 'r')}${btn('DOWN', 'down', 'Down', 'd')}</div>
+        <div class="rrow">${btn('BACK', 'back', 'Back')}${btn('HOME', 'home', 'Home')}${btn('MENU', 'more', 'Menu')}</div>
+        <div class="rrow colours">${['RED', 'GREEN', 'YELLOW', 'BLUE'].map((c) => `<button class="rk cb ${c.toLowerCase()}" data-act="tv-button" data-arg="${c}" aria-label="${c.toLowerCase()}"${off}></button>`).join('')}</div>
+      </div>
+      <div class="tvrt">
+        <div class="rrow">
+          <button class="rk pw${on ? ' on' : ''}" data-act="tv" aria-label="Power">${ic('power')}</button>
+          ${svc('volume_mute', 'mute', a.is_volume_muted ? 'Unmute' : 'Mute', JSON.stringify({ is_volume_muted: !a.is_volume_muted }), a.is_volume_muted ? 'on' : '')}
+          ${svc('volume_down', 'volDown', 'Volume down')}${svc('volume_up', 'volUp', 'Volume up')}
+        </div>
+        <div class="rrow">${btn('CHANNELDOWN', 'minus', 'Channel down')}<span class="rlbl">CH</span>${btn('CHANNELUP', 'plus', 'Channel up')}
+          ${svc('media_previous_track', 'prev', 'Previous')}${svc('media_play_pause', tv?.state === 'playing' ? 'pause' : 'play', 'Play or pause')}${svc('media_next_track', 'next', 'Next')}</div>
+        <div class="srcs">${TV_SOURCES.map(([src, name, colour]) => `<button class="tile b src${a.source === src ? ' on' : ''}" data-act="tv-source" data-arg="${esc(src)}"${off}><i style="background:${colour}"></i>${esc(name)}</button>`).join('')}</div>
+        ${list.length ? `<select id="tvsrc" aria-label="All sources"${off}><option value="">All sources…</option>${list.map((x) => `<option${a.source === x ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select>` : ''}
+      </div>
+    </div>`;
+}
+document.addEventListener('change', (e) => { if (e.target.id === 'tvsrc' && e.target.value) ACTIONS['tv-source'](e.target.value); });
+
 function moreSheet() {
   const draw = () => `<h2>More</h2>
     <div class="acts">${MORE.map(([name, icon, href]) => `<button class="tile b" data-act="go" data-arg="${href}">${ic(icon)}${name}</button>`).join('')}
@@ -601,7 +637,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=19';
+    : './vendor/hls.light.min.mjs?v=20';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -838,7 +874,8 @@ document.addEventListener('pointerdown', (e) => {
   const h = e.target.closest('[data-hold]');
   held = false;
   clearTimeout(holdTimer);
-  if (h) holdTimer = setTimeout(() => { held = true; ACTIONS.info(h.dataset.hold); }, 500);
+  // data-hold="<entity>" opens its details; data-hold="act:<action>" runs that action (the TV remote).
+  if (h) holdTimer = setTimeout(() => { held = true; const v = h.dataset.hold; if (v.startsWith('act:')) ACTIONS[v.slice(4)]?.(); else ACTIONS.info(v); }, 500);
 });
 // Cards and HUD panels that act as links or buttons open with Enter or Space, like a button.
 document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('[role="link"][data-act], [role="button"][data-act]:not(button)')) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });  // SVG has no .click()

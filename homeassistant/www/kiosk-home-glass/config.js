@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home-glass
-export const VERSION = '21';
+export const VERSION = '22';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -127,6 +127,10 @@ export const ROBBIE_ROOMS = [
 // Picture on Robbie's pop-up: /config/www/images/robbie.png, served by HA at /local/ (same origin).
 // If it can't be loaded, the pop-up falls back to a built-in drawing of a Roborock Qrevo. '' uses the drawing.
 export const ROBBIE_IMAGE = '/local/images/robbie.png';
+
+// TV remote (press and hold the TV tile): quick sources from the Media TV pop-up (lg-remote-control).
+// [source name as the TV lists it, label, badge colour]. Power uses script.media_tv_power, like a tap.
+export const TV_SOURCES = [['Netflix', 'Netflix', '#E50914'], ['Prime Video', 'Prime Video', '#00A8E1'], ['Stremio', 'Stremio', '#7B5BF5'], ['YouTube', 'YouTube', '#FF0000']];
 
 // Guest WiFi QR, the same image the dashboard's WiFi popup shows.
 // Music Assistant's Home Assistant panel (same origin, so no host or IP in the page).

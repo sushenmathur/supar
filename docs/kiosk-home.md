@@ -52,13 +52,13 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - The six tiles with the same labels. Tapping one opens that room's view on this page.
   - An open garage prints in madder here too.
 - **TV and Aircon**
-  - TV runs `script.media_tv_power`.
+  - TV: a tap runs `script.media_tv_power`. **Press and hold** for the remote (from the Media TV pop-up's lg-remote-control card): arrows and OK, Back, Home, Menu, the red/green/yellow/blue buttons (`webostv.button`), power (`script.media_tv_power`), mute and volume, channel up/down, previous/play-pause/next, the quick sources Netflix, Prime Video, Stremio and YouTube (`TV_SOURCES` in `config.js`), and a list of every other source the TV reports (`media_player.select_source`). While the TV is off, only power works.
   - Aircon opens a sheet with its HVAC modes and cooler/warmer controls.
 - **Lights**
   - The six dynamic slots with the dashboard's replacement rule: favourites that are off give way to lights that are on elsewhere.
   - The count covers all 18 lights in the house, as the navbar badge does.
 - **Energy**
-  - The same sums: today, sold, bill to date, estimate, the grid/home/solar flow, Tesla and Kia charging, and self-powered %.
+  - The same sums: today, sold, bill to date, estimate, the grid/home/solar flow, Tesla and Kia charging (a car that's charging shows a pulsing ⚡ and its row turns green), and self-powered %.
 - **Utilities and security**
   - Next bins, washer and dryer.
   - Home Alarm with **Arm home / Arm away / Disarm**. It asks for a code only if the entity has a `code_format`.

@@ -737,3 +737,38 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
   color: #E6F1FF; font: 700 17px Rajdhani, "Hind", sans-serif; letter-spacing: 3px; }
 .hud-home .ic { width: 24px; height: 24px; color: #B388FF; }
 .hud-anim { pointer-events: none; will-change: transform; }
+
+/* ---- TV remote (press and hold the TV tile) ---- */
+.sheet.tvsheet { width: min(820px, calc(100vw - 32px)); }
+.tvhead p { margin-top: 2px; }
+.tvr { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; margin-top: 14px; align-items: start; }
+.tvl, .tvrt { display: grid; gap: 14px; }
+.rk { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; text-align: center; font-weight: 700; font-size: 17px; color: var(--ink);
+  background: var(--cloth); border: 1.5px solid var(--key); transition: transform .1s, background-color .15s; }
+.rk .ic { width: 24px; height: 24px; }
+.rk:active:not(:disabled) { transform: scale(.92); background: var(--turmeric); color: var(--turmeric-ink, #2a1c00); }
+.rk:disabled { opacity: .4; }
+.rk.on { background: var(--turmeric); color: var(--turmeric-ink, #2a1c00); border-color: transparent; }
+.rk.pw { color: var(--madder-text, #b4362b); }
+.rk.pw.on { background: var(--dabu); color: #fff; }
+.dpad { position: relative; width: 240px; height: 240px; margin: 0 auto; border-radius: 50%; border: 1.5px solid var(--key); background: var(--well, rgba(0,0,0,.04));
+  display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); place-items: center; }
+.dpad .rk { width: 64px; height: 64px; background: var(--cloth); }
+.dpad .u { grid-area: 1 / 2; } .dpad .l { grid-area: 2 / 1; } .dpad .ok { grid-area: 2 / 2; width: 84px; height: 84px; font-size: 20px; }
+.dpad .r { grid-area: 2 / 3; } .dpad .d { grid-area: 3 / 2; }
+.rrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rlbl { font-weight: 700; color: var(--ink-2); font-size: 14px; letter-spacing: .06em; }
+.colours .cb { width: 56px; height: 28px; border-radius: 14px; border: 0; }
+.cb.red { background: #d93a2f; } .cb.green { background: #2e9b4f; } .cb.yellow { background: #e9b824; } .cb.blue { background: #2f6fd6; }
+.srcs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.srcs .src { min-height: 52px; justify-content: flex-start; gap: 10px; font-weight: 700; padding: 0 14px; }
+.srcs .src i { width: 12px; height: 12px; border-radius: 50%; flex: none; position: relative; z-index: 3; }
+.tvrt select { width: 100%; min-height: 48px; padding: 0 12px; font: inherit; color: var(--ink); background: var(--cloth); border: 1.5px solid var(--key); border-radius: 8px; }
+
+/* ---- Energy card: a pulsing bolt on a car that's charging ---- */
+.evrow.chg { color: var(--dabu); }
+.evrow.chg .sub { color: var(--dabu); }
+.evbolt { display: inline-grid; place-items: center; width: 16px; height: 16px; align-self: center; margin-right: -2px; color: var(--dabu); }
+.evbolt .ic { width: 15px; height: 15px; fill: currentColor; }
+@media (prefers-reduced-motion: no-preference) { .evbolt { animation: evpulse 1.4s ease-in-out infinite; } }
+@keyframes evpulse { 0%, 100% { transform: scale(.8); opacity: .5; } 50% { transform: scale(1.2); opacity: 1; } }
