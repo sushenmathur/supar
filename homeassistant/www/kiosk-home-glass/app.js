@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=28';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=28';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=28';
-import * as H from './home.js?v=28';
-import { injectIcons, ic, weatherArt } from './icons.js?v=28';
-import { VIEWS, viewEntityIds } from './views.js?v=28';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=28';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, MEDIA_PLAYERS, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=29';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=29';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=29';
+import * as H from './home.js?v=29';
+import { injectIcons, ic, weatherArt } from './icons.js?v=29';
+import { VIEWS, viewEntityIds } from './views.js?v=29';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=29';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -168,7 +168,8 @@ const regions = {
     const r = H.rooms(get, mediaIds);
     const t = (path, icon, name, x) => tile({ act: 'go', arg: `#${path}`, icon, name, sub: x.label, on: x.on && !x.alert, alert: x.alert });
     return t('living-room', 'sofa', 'Living', r.living) + t('kidsroom', 'kids', 'Kids', r.kids) + t('garage', 'garage', 'Garage', r.garage)
-      + t('outdoor', 'tree', 'Outdoor', r.outdoor) + t('laundry', 'washer', 'Laundry', r.laundry) + t('media', 'tv', 'Media', r.media);
+      + t('outdoor', 'tree', 'Outdoor', r.outdoor) + t('laundry', 'washer', 'Laundry', r.laundry)
+      + tile({ act: 'media', icon: 'tv', name: 'Media', sub: r.media.label, on: r.media.on });
   },
 
   media() {
@@ -296,9 +297,9 @@ function renderAll() {
   pending = requestAnimationFrame(() => {
     pending = 0;
     // A live sheet (cars, light details) re-renders with state, like a region.
-    if (liveSheet && sheet().open) {
+    if (liveSheet && sheet().open && !sliding) {
       const h = liveSheet();
-      if (h !== lastSheet) { lastSheet = h; sheet().innerHTML = h + CLOSE; }
+      if (h !== lastSheet) { lastSheet = h; sheet().innerHTML = h + CLOSE; mediaClock(); }
     }
     for (const [name, fn] of Object.entries(regions)) {
       // Home regions only render while Home is on screen; the sub-view only while one is.
@@ -332,6 +333,7 @@ function tick() {
   put('#hello', `${H.greeting(hour)}, ${now.toLocaleDateString('en-AU', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long' })}`);
   put('#india', fmtTime(now, 'Asia/Kolkata'));
   put('#austin', fmtTime(now, 'America/Chicago'));
+  mediaClock();
 }
 
 // ---- Actions ----
@@ -347,7 +349,7 @@ function openSheet(html, onOpen) {
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
-sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam', 'lpsheet', 'tvsheet'); sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
+sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam', 'lpsheet', 'tvsheet', 'mediasheet'); mediaSel = null; sliding = false; sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
 const ACTIONS = {
@@ -394,7 +396,17 @@ const ACTIONS = {
     const on = !['off', 'unavailable', 'unknown', undefined].includes(get(E.tv)?.state);
     quiet(on ? call('media_player', 'turn_off', { entity_id: E.tv }) : call('script', 'turn_on', { entity_id: 'script.media_tv_power' }));
   },
-  'tv-remote': () => { openLive(tvRemoteSheet); sheet().classList.add('tvsheet'); },
+  'tv-remote': () => { sheet().classList.remove('mediasheet'); openLive(tvRemoteSheet); sheet().classList.add('tvsheet'); },
+  media: () => { openLive(mediaSheet); sheet().classList.add('mediasheet'); },
+  'media-sel': (id) => { mediaSel = id; renderAll(); },
+  'media-power': (id) => {
+    const p = H.mediaPlayers(get).find((x) => x.id === id);
+    if (!p) return;
+    if (p.remote) return ACTIONS.tv();
+    // A device with its own power switch (the bedroom TV) is switched there.
+    if (p.power) return quiet(call('switch', p.powerOn ? 'turn_off' : 'turn_on', { entity_id: p.power }));
+    quiet(call('media_player', p.isOn ? 'turn_off' : 'turn_on', { entity_id: id }));
+  },
   'tv-button': (button) => quiet(call('webostv', 'button', { entity_id: E.tv, button })),
   'tv-source': (source) => quiet(call('media_player', 'select_source', { entity_id: E.tv, source })),
   'alarm-arm-home': () => alarmCall('alarm_arm_home'),
@@ -586,6 +598,75 @@ function alarmCall(service) {
   });
 }
 
+// ---- Media pop-up ----
+// Left: the selected player, large (artwork, what's on, progress, controls, volume). Right: every player in
+// MEDIA_PLAYERS, playing first; tap one to select it. Live: it redraws as the players change; the progress
+// clock runs from tick() (mediaClock) so the sheet's HTML only changes when a player does.
+let mediaSel = null;
+let sliding = false;
+function mediaSheet() {
+  const players = H.mediaPlayers(get);
+  const p = players.find((x) => x.id === mediaSel) ?? players.find((x) => x.playing) ?? players[0];
+  mediaSel = p.id;  // stays selected while it's open, even if it stops playing
+  const sv = (svc, icon, labelText, bit, cls = '', data = '') => `<button class="rk ${cls}" data-act="call" data-arg="media_player.${svc}|${p.id}|${data.replace(/"/g, '&quot;')}" aria-label="${labelText}"${p.isOn && p.can(bit) ? '' : ' disabled'}>${ic(icon)}</button>`;
+  const art = (x, cls) => `<span class="${cls}">${ic(x.icon)}${x.isOn && isLocalImage(x.pic, location.origin) ? `<img src="${esc(x.pic)}" alt="" onerror="this.remove()">` : ''}</span>`;
+  const t = p.dur > 0 && p.pos != null && p.isOn;
+  const pause = p.playing && p.can(H.MF.PAUSE);
+  const hero = `<div class="mhero">
+      <div class="mart${p.playing ? ' playing' : ''}">${art(p, 'mpic')}<span class="msrc">${esc([p.name, p.isOn ? p.app : ''].filter(Boolean).join(' · '))}</span>${p.playing ? '<span class="meq" aria-hidden="true"><i></i><i></i><i></i></span>' : ''}</div>
+      <div class="mttl"><b>${esc((p.isOn && (p.title || p.app)) || p.name)}</b><span>${esc(p.isOn ? (p.title ? p.by || p.app : p.sub) : p.sub)}</span></div>
+      ${t ? `<div class="mprog num" data-mclock data-pos="${p.pos}" data-at="${esc(p.at ?? '')}" data-dur="${p.dur}" data-run="${p.playing ? 1 : ''}"><span class="m0">${H.clockTime(p.pos)}</span><span class="mbar"><i></i></span><span>${H.clockTime(p.dur)}</span></div>` : ''}
+      <div class="mctl">
+        <button class="rk pw${p.isOn ? ' on' : ''}" data-act="media-power" data-arg="${p.id}" aria-label="Power"${p.unavailable ? ' disabled' : ''}>${ic('power')}</button>
+        ${sv('media_previous_track', 'prev', 'Previous', H.MF.PREVIOUS)}
+        ${sv(pause ? 'media_pause' : 'media_play', pause ? 'pause' : 'play', pause ? 'Pause' : 'Play', pause ? H.MF.PAUSE : H.MF.PLAY, 'big')}
+        ${sv('media_next_track', 'next', 'Next', H.MF.NEXT)}
+        ${sv('volume_mute', 'mute', p.muted ? 'Unmute' : 'Mute', H.MF.VOLUME_MUTE, p.muted ? 'on' : '', JSON.stringify({ is_volume_muted: !p.muted }))}
+      </div>
+      <div class="mvol">${sv('volume_down', 'volDown', 'Volume down', H.MF.VOLUME_STEP | H.MF.VOLUME_SET)}
+        <input type="range" min="0" max="100" step="1" value="${p.vol ?? 0}" data-mvol="${p.id}" aria-label="Volume"${p.isOn && p.vol != null && p.can(H.MF.VOLUME_SET) ? '' : ' disabled'} style="--v:${p.vol ?? 0}%">
+        ${sv('volume_up', 'volUp', 'Volume up', H.MF.VOLUME_STEP | H.MF.VOLUME_SET)}<span class="mpct num">${p.vol != null && p.isOn ? `${p.vol}%` : '—'}</span></div>
+    </div>`;
+  const row = (x) => {
+    const mini = (act, arg, icon, labelText, cls = '', dis = false) => `<button class="mini ${cls}" data-act="${act}" data-arg="${esc(arg)}" aria-label="${labelText}"${dis ? ' disabled' : ''}>${ic(icon)}</button>`;
+    const btn = x.remote ? `<button class="mpill" data-act="tv-remote" aria-label="TV remote">${ic('remote')}Remote</button>`
+      : x.playing && x.can(H.MF.PAUSE) ? mini('call', `media_player.media_pause|${x.id}|`, 'pause', `Pause ${x.name}`, 'on')
+        : x.state === 'paused' ? mini('call', `media_player.media_play|${x.id}|`, 'play', `Play ${x.name}`)
+          : x.power && x.powerOn === false ? `<button class="mpill" data-act="media-power" data-arg="${x.id}">${ic('power')}Turn on</button>`
+            : mini('media-power', x.id, 'power', `Power ${x.name}`, x.isOn ? 'pw' : '', x.unavailable);
+    return `<div class="mrow${x.id === p.id ? ' sel' : ''}${x.isOn ? '' : ' off'}" role="button" tabindex="0" data-act="media-sel" data-arg="${x.id}" aria-pressed="${x.id === p.id}">
+      ${art(x, `mthumb${x.isOn && isLocalImage(x.pic, location.origin) ? ' pic' : ''}`)}<span class="who"><b>${esc(x.name)}</b><span class="${x.playing ? 'playing' : ''}">${esc(x.sub)}</span></span><span class="macts">${btn}</span></div>`;
+  };
+  return `<div class="mhead"><h2>Media</h2><span>${esc(H.mediaSummary(players))}</span></div>
+    <div class="mgrid">${hero}<div class="mlist">${players.map(row).join('')}</div></div>`;
+}
+/** Moves the media pop-up's progress clock on, once a second. */
+function mediaClock() {
+  const el = sheet().open && sheet().querySelector('[data-mclock]');
+  if (!el) return;
+  const d = el.dataset;
+  const sec = H.mediaElapsed({ pos: Number(d.pos), at: d.at, dur: Number(d.dur), playing: Boolean(d.run) });
+  if (sec == null) return;
+  const t = H.clockTime(sec);
+  const m0 = el.querySelector('.m0');
+  if (m0.textContent !== t) m0.textContent = t;
+  el.querySelector('.mbar i').style.transform = `scaleX(${(sec / Number(d.dur)).toFixed(4)})`;
+}
+// The volume slider: the label follows the finger; the volume is set on release. While it's held the sheet
+// doesn't redraw, so a state update can't snatch it.
+sheet().addEventListener('pointerdown', (e) => { if (e.target.matches?.('[data-mvol]')) sliding = true; });
+document.addEventListener('pointerup', () => { if (sliding) { sliding = false; renderAll(); } }, true);
+sheet().addEventListener('input', (e) => {
+  const r = e.target.closest?.('[data-mvol]'); if (!r) return;
+  r.style.setProperty('--v', `${r.value}%`);
+  const pct = r.parentNode.querySelector('.mpct'); if (pct) pct.textContent = `${r.value}%`;
+});
+sheet().addEventListener('change', (e) => {
+  const r = e.target.closest?.('[data-mvol]'); if (!r) return;
+  sliding = false;
+  quiet(call('media_player', 'volume_set', { entity_id: r.dataset.mvol, volume_level: Number(r.value) / 100 }));
+});
+
 // TV remote, from the Media TV pop-up (lg-remote-control): arrows and OK, back/home/menu, colour buttons,
 // power, volume, channels, playback and sources. Live: it redraws as the TV's state changes.
 function tvRemoteSheet() {
@@ -719,7 +800,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=28';
+    : './vendor/hls.light.min.mjs?v=29';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -1027,6 +1108,7 @@ function entityIds(allStates) {
   mediaIds = allStates.map((s) => s.entity_id).filter((id) => id.startsWith('media_player.'));
   mediaIds.forEach((i) => ids.add(i));
   ids.add('switch.bedroom_tv');
+  MEDIA_PLAYERS.forEach((m) => [...m.ids, m.power].filter(Boolean).forEach((i) => ids.add(i)));
   viewEntityIds().forEach((i) => ids.add(i));
   return [...ids];
 }

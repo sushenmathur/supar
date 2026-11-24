@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=27';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=28';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -173,6 +173,69 @@ export function mediaLabel(get, allIds = null) {
     if (on(get, sw) && st(get, player) !== 'playing') parts.push(`${name} on`);
   }
   return { label: parts.join(' · ') || 'All off', on: playing.length > 0 || Object.keys(MEDIA.switches).some((sw) => on(get, sw)) };
+}
+
+// ---- Media pop-up ----
+
+// Home Assistant's media player feature bits.
+export const MF = { PAUSE: 1, SEEK: 2, VOLUME_SET: 4, VOLUME_MUTE: 8, PREVIOUS: 16, NEXT: 32, TURN_ON: 128, TURN_OFF: 256, VOLUME_STEP: 1024, PLAY: 16384 };
+const MEDIA_RANK = { playing: 0, buffering: 1, paused: 1, on: 2, idle: 2, standby: 3, off: 4 };
+const MEDIA_WORD = { playing: 'Playing', buffering: 'Loading', paused: 'Paused', on: 'On', idle: 'Idle', standby: 'Standby', off: 'Off' };
+
+/** The Media pop-up's players: playing first, then paused, on or idle, then off, then unavailable (dimmed),
+ *  keeping MEDIA_PLAYERS order within each. Each entry uses the first of its ids that is available. */
+export function mediaPlayers(get) {
+  const gone = (s) => !s || ['unavailable', 'unknown'].includes(s.state);
+  return MEDIA_PLAYERS.map((p, i) => {
+    const id = p.ids.find((x) => !gone(get(x))) ?? p.ids.find((x) => get(x)) ?? p.ids[0];
+    const s = get(id);
+    const a = s?.attributes ?? {};
+    const unavailable = gone(s);
+    const powerOn = p.power ? on(get, p.power) : null;
+    const state = unavailable ? 'unavailable' : powerOn === false ? 'off' : s.state;
+    const isOn = !unavailable && !['off', 'standby'].includes(state);
+    const title = a.media_title ?? '';
+    const by = a.media_artist ?? a.media_series_title ?? a.media_album_name ?? '';
+    const app = a.app_name ?? a.source ?? '';
+    const what = [title, by].filter(Boolean).join(' · ') || app;
+    const sub = unavailable ? 'Unavailable'
+      : powerOn === false ? `Off · ${p.powerName ?? 'Power'} power off`
+        : [MEDIA_WORD[state] ?? 'On', isOn ? what : ''].filter(Boolean).join(' · ');
+    const f = a.supported_features;
+    return {
+      ...p, id, i, state, unavailable, isOn, powerOn, sub, title, by, app,
+      playing: state === 'playing',
+      rank: unavailable ? 5 : MEDIA_RANK[state] ?? 2,
+      can: (bit) => f == null || (f & bit) !== 0,
+      vol: a.volume_level != null ? Math.round(a.volume_level * 100) : null,
+      muted: Boolean(a.is_volume_muted),
+      pic: a.entity_picture ?? '',
+      pos: a.media_position, at: a.media_position_updated_at, dur: a.media_duration,
+    };
+  }).sort((x, y) => x.rank - y.rank || x.i - y.i);
+}
+
+/** The pop-up heading's summary: "2 playing · Kitchen speaker paused · TV on", "All off". */
+export function mediaSummary(players) {
+  const n = players.filter((p) => p.playing).length;
+  const parts = [];
+  if (n) parts.push(`${n} playing`);
+  const others = players.filter((p) => p.isOn && !p.playing).map((p) => `${p.name} ${p.state === 'paused' ? 'paused' : 'on'}`);
+  return [...parts, ...others.slice(0, 2)].join(' · ') || 'All off';
+}
+
+/** Elapsed time of a player at `now`, in seconds, from its last reported position; null without a duration. */
+export function mediaElapsed({ pos, at, dur, playing }, now = Date.now()) {
+  if (!(dur > 0) || pos == null) return null;
+  const run = playing && at ? (now - new Date(at).getTime()) / 1000 : 0;
+  return Math.max(0, Math.min(dur, pos + Math.max(0, run)));
+}
+
+/** 2:41, 1:02:05. */
+export function clockTime(sec) {
+  const s = Math.max(0, Math.floor(sec));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = String(s % 60).padStart(2, '0');
+  return h ? `${h}:${String(m).padStart(2, '0')}:${r}` : `${m}:${r}`;
 }
 
 // ---- Lights ----

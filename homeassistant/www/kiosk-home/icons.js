@@ -34,6 +34,7 @@ export const ICONS = {
   garage: '<path d="M3 9.5 12 4l9 5.5V20H3z"/><path d="M7 20v-8h10v8M7 14.5h10M7 17h10"/>',
   tree: '<path d="M12 21v-5"/><path d="M12 3c-3.5 0-6 3-6 6.5 0 3 2.5 5.5 6 5.5s6-2.5 6-5.5C18 6 15.5 3 12 3z"/>',
   washer: '<rect x="4" y="2.5" width="16" height="19" rx="2"/><circle cx="12" cy="13" r="4.5"/><path d="M7.5 6h1M11 6h1"/>',
+  speaker: '<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><circle cx="12" cy="14" r="3.5"/><path d="M12 7h.01"/>',
   tv: '<rect x="2.5" y="4.5" width="19" height="13" rx="2"/><path d="M8 21h8"/>',
   snow: '<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7"/><path d="m9 4 3 2 3-2M9 20l3-2 3 2"/>',
   pendant: '<path d="M12 2v6"/><path d="M6 14a6 6 0 0 1 12 0z"/><path d="M10.5 17a1.5 1.5 0 0 0 3 0"/>',

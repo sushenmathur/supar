@@ -42,6 +42,8 @@ const SHOTS = [
   ['garage-close', 'light', '', async (p) => { await p.locator('#banner [data-act="close-garage"]').click(); await p.waitForFunction(() => (document.querySelector('#live')?.dataset.status ?? '') !== '' || document.querySelector('#live')?.dataset.live, null, { timeout: 15000 }); }],
   ['tv-remote', 'light', '', async (p) => { const b = await p.locator('#media [data-act="tv"]').boundingBox(); await p.mouse.move(b.x + 20, b.y + 20); await p.mouse.down(); await p.waitForTimeout(650); await p.mouse.up(); }, { MOCK_TV: '1' }],
   ['robbie', 'light', '', async (p) => { await p.locator('#actions [data-act="robbie"]').click(); }],
+  ['media', 'light', '', async (p) => { await p.locator('#rooms [data-act="media"]').click(); await p.waitForFunction(() => [...document.querySelectorAll('#sheet img')].every((i) => i.complete)); }, { MOCK_MEDIA: '1' }],
+  ['media-dark', 'dark', '', async (p) => { await p.locator('#rooms [data-act="media"]').click(); await p.waitForFunction(() => [...document.querySelectorAll('#sheet img')].every((i) => i.complete)); }, { MOCK_MEDIA: '1' }],
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

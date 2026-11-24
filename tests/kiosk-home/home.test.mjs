@@ -172,3 +172,40 @@ test('climate haze: each running aircon mode has its own colour and word; off ha
   assert.deepEqual(acMode('dry'), { cls: 'dry', label: 'Drying' });
   for (const s of ['off', 'unavailable', 'unknown', undefined]) assert.equal(acMode(s), null);
 });
+
+test('media pop-up: each player listed once, playing first, unavailable last', () => {
+  const get = world({
+    'media_player.tv': ['off'], 'media_player.media_apple_tv': ['paused', { media_title: 'The Creek', media_series_title: 'Bluey' }],
+    'media_player.spotify': ['playing', { media_title: 'Here Comes the Sun', media_artist: 'The Beatles' }],
+    'media_player.kitchen_speaker': ['unavailable'], 'media_player.bedroom_google_tv': ['idle', { app_name: 'YouTube' }],
+    'media_player.hubs_bedroom_apple_tv': ['unavailable'], 'media_player.bedroom_apple_tv': ['idle'], 'switch.bedroom_tv': ['on'],
+  });
+  const ps = H.mediaPlayers(get);
+  assert.deepEqual(ps.map((p) => p.name), ['Spotify', 'Media Apple TV', 'Bedroom Google TV', 'Bedroom Apple TV', 'TV', 'Kitchen speaker']);
+  assert.equal(ps.filter((p) => p.name === 'Bedroom Apple TV').length, 1);
+  assert.equal(ps.find((p) => p.name === 'Bedroom Apple TV').id, 'media_player.bedroom_apple_tv', 'falls back to the available bedroom entity');
+  assert.equal(ps[0].sub, 'Playing · Here Comes the Sun · The Beatles');
+  assert.equal(ps[1].sub, 'Paused · The Creek · Bluey');
+  assert.equal(ps[2].sub, 'Idle · YouTube');
+  assert.equal(ps.at(-1).sub, 'Unavailable');
+  assert.equal(H.mediaSummary(ps), '1 playing · Media Apple TV paused · Bedroom Google TV on');
+});
+
+test('media pop-up: a device powered off at its switch reads as off; feature bits gate controls', () => {
+  const get = world({ 'media_player.hubs_bedroom_apple_tv': ['idle', { supported_features: H.MF.PAUSE | H.MF.PLAY }], 'switch.bedroom_tv': ['off'] });
+  const p = H.mediaPlayers(get).find((x) => x.name === 'Bedroom Apple TV');
+  assert.equal(p.id, 'media_player.hubs_bedroom_apple_tv');
+  assert.equal(p.isOn, false); assert.equal(p.powerOn, false);
+  assert.equal(p.sub, 'Off · Bedroom TV power off');
+  assert.equal(p.can(H.MF.PAUSE), true); assert.equal(p.can(H.MF.NEXT), false);
+  assert.equal(H.mediaSummary(H.mediaPlayers(world({}))), 'All off');
+});
+
+test('media pop-up: progress clock', () => {
+  const at = new Date(NOW).toISOString();
+  assert.equal(H.mediaElapsed({ pos: 100, at, dur: 300, playing: true }, NOW + 30000), 130);
+  assert.equal(H.mediaElapsed({ pos: 100, at, dur: 300, playing: false }, NOW + 30000), 100);
+  assert.equal(H.mediaElapsed({ pos: 290, at, dur: 300, playing: true }, NOW + 60000), 300, 'stops at the end');
+  assert.equal(H.mediaElapsed({ pos: 10, at, dur: undefined, playing: true }, NOW), null);
+  assert.equal(H.clockTime(161), '2:41'); assert.equal(H.clockTime(3725), '1:02:05'); assert.equal(H.clockTime(5), '0:05');
+});

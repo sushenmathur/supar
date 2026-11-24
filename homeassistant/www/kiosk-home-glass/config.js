@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home-glass
-export const VERSION = '28';
+export const VERSION = '29';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -114,6 +114,18 @@ export const MEDIA = {
   names: { 'media_player.hubs_bedroom_apple_tv': 'Bedroom Apple TV', 'media_player.media_apple_tv': 'Media Apple TV', 'media_player.tv': 'TV' },
   switches: { 'switch.bedroom_tv': { name: 'Bedroom TV', player: 'media_player.hubs_bedroom_apple_tv' } },
 };
+
+// The Media pop-up's players, in the order they're listed when none is playing (the Media tile's list in
+// master.yaml). ids: the first one Home Assistant has (and isn't unavailable) is used, so the bedroom Apple TV
+// is listed once. remote: its power and long press use the TV remote. power: a switch that powers the device.
+export const MEDIA_PLAYERS = [
+  { ids: ['media_player.tv'], name: 'TV', icon: 'tv', remote: true },
+  { ids: ['media_player.media_apple_tv'], name: 'Media Apple TV', icon: 'tv' },
+  { ids: ['media_player.spotify'], name: 'Spotify', icon: 'music' },
+  { ids: ['media_player.kitchen_speaker'], name: 'Kitchen speaker', icon: 'speaker' },
+  { ids: ['media_player.bedroom_google_tv'], name: 'Bedroom Google TV', icon: 'tv' },
+  { ids: ['media_player.hubs_bedroom_apple_tv', 'media_player.bedroom_apple_tv'], name: 'Bedroom Apple TV', icon: 'tv', power: 'switch.bedroom_tv', powerName: 'Bedroom TV' },
+];
 
 export const BINS = [
   { id: 'sensor.general_waste', label: 'General', lid: 'r' },

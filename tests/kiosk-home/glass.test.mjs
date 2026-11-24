@@ -32,3 +32,11 @@ test('glass page: climate haze modes match kiosk-home', async () => {
   const b = await import('../../homeassistant/www/kiosk-home-glass/views.js');
   for (const s of ['cool', 'heat', 'heat_cool', 'auto', 'fan_only', 'dry', 'off']) assert.deepEqual(b.acMode(s), a.acMode(s));
 });
+
+test('glass page: media pop-up players match kiosk-home', async () => {
+  const K = await import('../../homeassistant/www/kiosk-home/home.js');
+  const m = new Map([['media_player.spotify', { state: 'playing', attributes: { media_title: 'Song' } }], ['switch.bedroom_tv', { state: 'off' }]]);
+  const get = (id) => m.get(id);
+  const pick = (ps) => ps.map((p) => [p.id, p.sub, p.rank]);
+  assert.deepEqual(pick(G.mediaPlayers(get)), pick(K.mediaPlayers(get)));
+});

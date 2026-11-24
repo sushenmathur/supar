@@ -113,6 +113,19 @@ set('switch.dryer_power', 'off'); set('input_number.dm_last_duration', '48'); se
 S['weather.north_lakes_weather'].a.humidity = 64;
 set('media_player.home_speakers', 'paused', { friendly_name: 'Home speakers', media_title: 'Morning playlist', volume_level: 0.4 });
 S['media_player.kitchen_speaker'].a.volume_level = 0.55; S['media_player.kitchen_speaker'].a.media_artist = 'Band';
+// MOCK_MEDIA: the Media pop-up's players (config.js MEDIA_PLAYERS), two playing with artwork. Both bedroom Apple TV
+// entities exist, as on the real Home Assistant; the pop-up lists one.
+if (process.env.MOCK_MEDIA) {
+  const pic = (id) => `/api/media_player_proxy/${id}?token=t&cache=1`;
+  set('media_player.media_apple_tv', 'playing', { friendly_name: 'Media Apple TV', app_name: 'Disney+', media_title: 'The Creek', media_series_title: 'Bluey', media_duration: 422, media_position: 161,
+    media_position_updated_at: new Date(NOW_MS()).toISOString(), volume_level: 0.45, is_volume_muted: false, supported_features: 22463, entity_picture: pic('media_player.media_apple_tv') });
+  set('media_player.spotify', 'playing', { friendly_name: 'Spotify', media_title: 'Here Comes the Sun', media_artist: 'The Beatles', media_duration: 185, media_position: 40,
+    media_position_updated_at: new Date(NOW_MS()).toISOString(), volume_level: 0.6, supported_features: 22463, entity_picture: pic('media_player.spotify') });
+  S['media_player.kitchen_speaker'] = { s: 'paused', a: { friendly_name: 'Kitchen speaker', media_title: 'Morning playlist', volume_level: 0.55, supported_features: 22463 }, lc: ago(5) };
+  set('media_player.bedroom_google_tv', 'idle', { friendly_name: 'Bedroom Google TV', supported_features: 22463 });
+  set('media_player.hubs_bedroom_apple_tv', 'idle', { friendly_name: 'Hubs Bedroom Apple TV' });
+  set('media_player.bedroom_apple_tv', 'idle', { friendly_name: 'Bedroom Apple TV' });
+}
 
 // Live-view camera with no entity_picture (only an access token), as Arlo live entities can be.
 S['camera.front_door_live_view_2'] = { s: 'idle', a: { access_token: 'livetoken', supported_features: 2, friendly_name: 'Front Door live view' }, lc: now() };
@@ -155,6 +168,10 @@ const server = http.createServer((req, res) => {
   if (url.pathname === '/energy-new/energy') { res.writeHead(200, { 'content-type': 'text/html' }); return res.end('<!doctype html><title>Energy</title><body style="font:20px sans-serif;padding:24px"><h1 id=en>Energy dashboard</h1><p>Home Assistant energy-new/energy view</p></body>'); }
   const face = /\/api\/image\/serve\/(sushenface|paroface)\//.exec(url.pathname);
   if (face) { res.writeHead(200, { 'content-type': 'image/png' }); return res.end(readFileSync(join(FIX, face[1] === 'sushenface' ? 'avatar-1.png' : 'avatar-2.png'))); }
+  if (url.pathname.startsWith('/api/media_player_proxy/')) {
+    log.art = (log.art ?? 0) + 1;
+    res.writeHead(200, { 'content-type': 'image/png' }); return res.end(readFileSync(join(FIX, url.pathname.includes('spotify') ? 'art-2.png' : 'art-1.png')));
+  }
   if (url.pathname.startsWith('/api/camera_proxy/') || url.pathname.startsWith('/api/image/serve/')) {
     if (url.pathname.includes('snapshot')) log.camera++;
     res.writeHead(200, { 'content-type': 'image/png', 'cache-control': 'no-store' }); return res.end(png);
@@ -258,6 +275,13 @@ wss.on('connection', (ws) => {
           if (msg.service === 'close_cover') { change(id, 'closed'); change('binary_sensor.garage_door_sensor_contact', 'off'); change('input_select.garage_door_state', 'Closed'); }
           for (const one of [].concat(id ?? [])) { if (msg.service === 'turn_off' && S[one]) change(one, 'off'); if (msg.service === 'turn_on' && S[one] && /^(light|switch)\./.test(one)) change(one, 'on', msg.service_data.brightness_pct ? { brightness: Math.round(msg.service_data.brightness_pct * 2.55) } : undefined); }
           if (msg.service === 'set_hvac_mode') change(id, msg.service_data.hvac_mode);
+          if (msg.domain === 'media_player' && S[id]) {
+            if (msg.service === 'media_pause') change(id, 'paused');
+            if (msg.service === 'media_play') change(id, 'playing');
+            if (msg.service === 'turn_on' && id !== 'media_player.tv') change(id, 'idle');
+            if (msg.service === 'volume_set') change(id, undefined, { volume_level: msg.service_data.volume_level });
+            if (msg.service === 'volume_mute') change(id, undefined, { is_volume_muted: msg.service_data.is_volume_muted });
+          }
           if (msg.service === 'open_cover') { change(id, 'open'); }
           if (msg.service === 'turn_on' && id?.startsWith('input_boolean')) change(id, 'on');
           if (msg.service === 'alarm_arm_away') change(id, 'armed_away');
