@@ -1,0 +1,114 @@
+/*@fonts Plus+Jakarta+Sans:wght@400;500;600;700;800*/
+/* Option 1b – Warm Stone Glass: Warm Stone with a liquid glass treatment.
+   Based on Option 1 – Light first, calm and soft.
+   Palette from ui-ux-pro-max "Home Decoration & Interior Design" (stone #78716C, warm white #FAF5F2,
+   gold #D97706, red #DC2626). Type: Plus Jakarta Sans (the skill's pick for smart-home controls).
+   A device that is on gets a soft amber tint and a gold icon, not a full-colour fill. */
+:root {
+  --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 18px; --r-s: 12px;
+  --ground: #F4F0EB; --cloth: #FFFFFF; --ink: #1C1917; --ink-2: #57534E; --line: #E9E4DC; --key: #E9E4DC;
+  --shadow: 0 1px 2px rgba(28, 25, 23, .05), 0 8px 22px rgba(28, 25, 23, .06);
+  --well: #F3EEE7; --well-ink: #44403C; --soft: #F8F4EF; --track: #EAE5DD;
+  --on-bg: #FDF1DE; --on-ink: #1C1917; --on-sub: #8A4B05; --on-well: #D97706; --on-well-ink: #FFFFFF; --on-border: #F6DDB3;
+  --info-bg: #FFFFFF; --info-ink: #1C1917; --info-bar: #B45309; --info-well-ink: #FFFFFF;
+  --alert: #DC2626; --alert-ink: #FFFFFF;
+  --accent: #1C1917; --accent-ink: #FFFFFF;
+  --good: #15803D; --good-bg: #DCFCE7; --dabu: #15803D;
+  --turmeric: #D97706; --turmeric-ink: #FFFFFF; --turmeric-ink-2: rgba(255, 255, 255, .85);
+  --madder: #DC2626; --madder-text: #B91C1C; --weather-ic: #D97706; --pass-blend: normal; --sel: rgba(217, 119, 6, .25);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #141210; --cloth: #1E1B18; --ink: #F5F0EA; --ink-2: #B8B0A6; --line: #2E2A26; --key: #2E2A26; --shadow: none;
+  --well: #2A2622; --well-ink: #D6CFC6; --soft: #24201D; --track: #36312C;
+  --on-bg: #3A2A12; --on-ink: #FBEBD3; --on-sub: #F3B867; --on-well: #F59E0B; --on-well-ink: #1C1206; --on-border: #5A3F15;
+  --info-bg: #1E1B18; --info-ink: #F5F0EA; --info-bar: #F59E0B; --info-well-ink: #1C1206;
+  --accent: #F5F0EA; --accent-ink: #141210; --good: #4ADE80; --good-bg: #14301E; --dabu: #4ADE80;
+  --madder-text: #FCA5A5; --weather-ic: #F59E0B;
+} }
+:root[data-theme="dark"] {
+  --ground: #141210; --cloth: #1E1B18; --ink: #F5F0EA; --ink-2: #B8B0A6; --line: #2E2A26; --key: #2E2A26; --shadow: none;
+  --well: #2A2622; --well-ink: #D6CFC6; --soft: #24201D; --track: #36312C;
+  --on-bg: #3A2A12; --on-ink: #FBEBD3; --on-sub: #F3B867; --on-well: #F59E0B; --on-well-ink: #1C1206; --on-border: #5A3F15;
+  --info-bg: #1E1B18; --info-ink: #F5F0EA; --info-bar: #F59E0B; --info-well-ink: #1C1206;
+  --accent: #F5F0EA; --accent-ink: #141210; --good: #4ADE80; --good-bg: #14301E; --dabu: #4ADE80;
+  --madder-text: #FCA5A5; --weather-ic: #F59E0B;
+}
+/*@base*/
+/* Flourishes */
+.clock { font-weight: 700; letter-spacing: -0.045em; }
+.time { background: linear-gradient(165deg, #FFF4E4 0%, #FFFFFF 55%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .time { background: linear-gradient(165deg, #2A2116 0%, #1E1B18 60%); } }
+:root[data-theme="dark"] .time { background: linear-gradient(165deg, #2A2116 0%, #1E1B18 60%); }
+.name { font-weight: 700; letter-spacing: -0.01em; }
+.sub { font-weight: 500; }
+.bar { box-shadow: none; }
+
+/* ===== Liquid glass layer =====
+   Frosted, see-through cards over a warm blurred backdrop: backdrop blur + saturation, a bright top edge
+   (specular highlight), a soft inner glow and a gentle drop shadow. Devices that are on become amber glass. */
+:root {
+  --cloth: rgba(255, 255, 255, .52); --line: rgba(255, 255, 255, .75); --key: rgba(255, 255, 255, .75);
+  --well: rgba(255, 255, 255, .62); --soft: rgba(255, 255, 255, .5); --track: rgba(28, 25, 23, .1);
+  --on-bg: linear-gradient(150deg, rgba(255, 214, 153, .62), rgba(253, 236, 207, .45)); --on-border: rgba(255, 236, 204, .9);
+  --info-bg: rgba(255, 255, 255, .58);
+  --glass-blur: blur(22px) saturate(170%);
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, .95), inset 0 -1px 0 rgba(255, 255, 255, .25), inset 0 0 22px rgba(255, 255, 255, .35);
+  --shadow: 0 10px 30px -8px rgba(120, 72, 20, .18), 0 2px 6px rgba(120, 72, 20, .06);
+  --backdrop:
+    radial-gradient(620px 460px at 8% 6%, rgba(255, 183, 120, .75), transparent 70%),
+    radial-gradient(560px 420px at 58% 28%, rgba(255, 220, 160, .7), transparent 70%),
+    radial-gradient(600px 460px at 96% 12%, rgba(244, 166, 140, .55), transparent 70%),
+    radial-gradient(640px 480px at 30% 100%, rgba(214, 196, 170, .7), transparent 70%),
+    radial-gradient(560px 440px at 92% 96%, rgba(255, 196, 120, .55), transparent 70%),
+    linear-gradient(160deg, #F6EDE2, #EFE4D6);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --cloth: rgba(46, 38, 30, .46); --line: rgba(255, 236, 214, .14); --key: rgba(255, 236, 214, .14);
+  --well: rgba(255, 240, 220, .1); --soft: rgba(255, 240, 220, .06); --track: rgba(255, 240, 220, .14);
+  --on-bg: linear-gradient(150deg, rgba(245, 158, 11, .34), rgba(120, 72, 20, .3)); --on-border: rgba(251, 191, 36, .4);
+  --info-bg: rgba(46, 38, 30, .5);
+  --glass-edge: inset 0 1px 0 rgba(255, 240, 220, .22), inset 0 0 22px rgba(255, 240, 220, .05);
+  --shadow: 0 12px 32px -10px rgba(0, 0, 0, .55);
+  --backdrop:
+    radial-gradient(620px 460px at 8% 6%, rgba(217, 119, 6, .35), transparent 70%),
+    radial-gradient(560px 420px at 60% 30%, rgba(180, 83, 9, .22), transparent 70%),
+    radial-gradient(600px 460px at 96% 12%, rgba(190, 90, 70, .25), transparent 70%),
+    radial-gradient(640px 480px at 30% 100%, rgba(120, 90, 60, .3), transparent 70%),
+    radial-gradient(560px 440px at 92% 96%, rgba(245, 158, 11, .2), transparent 70%),
+    linear-gradient(160deg, #17120E, #120E0B);
+} }
+:root[data-theme="dark"] {
+  --cloth: rgba(46, 38, 30, .46); --line: rgba(255, 236, 214, .14); --key: rgba(255, 236, 214, .14);
+  --well: rgba(255, 240, 220, .1); --soft: rgba(255, 240, 220, .06); --track: rgba(255, 240, 220, .14);
+  --on-bg: linear-gradient(150deg, rgba(245, 158, 11, .34), rgba(120, 72, 20, .3)); --on-border: rgba(251, 191, 36, .4);
+  --info-bg: rgba(46, 38, 30, .5);
+  --glass-edge: inset 0 1px 0 rgba(255, 240, 220, .22), inset 0 0 22px rgba(255, 240, 220, .05);
+  --shadow: 0 12px 32px -10px rgba(0, 0, 0, .55);
+  --backdrop:
+    radial-gradient(620px 460px at 8% 6%, rgba(217, 119, 6, .35), transparent 70%),
+    radial-gradient(560px 420px at 60% 30%, rgba(180, 83, 9, .22), transparent 70%),
+    radial-gradient(600px 460px at 96% 12%, rgba(190, 90, 70, .25), transparent 70%),
+    radial-gradient(640px 480px at 30% 100%, rgba(120, 90, 60, .3), transparent 70%),
+    radial-gradient(560px 440px at 92% 96%, rgba(245, 158, 11, .2), transparent 70%),
+    linear-gradient(160deg, #17120E, #120E0B);
+}
+html, body { background: var(--backdrop) fixed; }
+body { background-image: var(--backdrop); background-repeat: no-repeat; background-size: cover; }
+.b, .abtn, .ev .d { -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
+.b { box-shadow: var(--glass-edge), var(--shadow); }
+.b.on:not(.banner) { box-shadow: inset 0 1px 0 rgba(255, 248, 235, .9), inset 0 0 24px rgba(255, 220, 160, .35), 0 12px 30px -10px rgba(217, 119, 6, .35); }
+.banner.on { box-shadow: inset 5px 0 0 var(--info-bar), var(--glass-edge), var(--shadow); }
+.b.alert { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 12px 30px -10px rgba(220, 38, 38, .5); }
+.well { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8); }
+.b.on .well { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 4px 12px -2px rgba(217, 119, 6, .5); }
+.time { background: linear-gradient(165deg, rgba(255, 236, 210, .55), rgba(255, 255, 255, .38) 60%); }
+.abtn { background: rgba(255, 255, 255, .4); }
+.cam { box-shadow: var(--glass-edge), var(--shadow); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .time { background: linear-gradient(165deg, rgba(120, 72, 20, .35), rgba(46, 38, 30, .4) 60%); }
+  :root:not([data-theme="light"]) .abtn { background: rgba(255, 240, 220, .06); }
+  :root:not([data-theme="light"]) .well { box-shadow: inset 0 1px 0 rgba(255, 240, 220, .14); } }
+:root[data-theme="dark"] .time { background: linear-gradient(165deg, rgba(120, 72, 20, .35), rgba(46, 38, 30, .4) 60%); }
+:root[data-theme="dark"] .abtn { background: rgba(255, 240, 220, .06); }
+/* Glass is the most expensive effect on a tablet GPU: drop the blur if the screen asks for less transparency. */
+@media (prefers-reduced-transparency: reduce) { .b, .abtn, .ev .d { backdrop-filter: none; -webkit-backdrop-filter: none; } :root { --cloth: rgba(255, 255, 255, .9); } }

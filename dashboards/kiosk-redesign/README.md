@@ -7,6 +7,7 @@ changes, so the mock-ups show your real layout and real logic.
 | Option | Direction | "On" | Info alert | Urgent | Type | Palette source (ui-ux-pro-max) |
 |---|---|---|---|---|---|---|
 | 1 Warm Stone | Light first, calm | Soft amber tint + gold icon | White card, amber bar | Red | Plus Jakarta Sans | Home Decoration & Interior |
+| 1b Warm Stone Glass | Warm Stone with liquid glass: frosted see-through cards over a warm blurred backdrop | Amber-tinted glass | Glass card, amber bar | Red | Plus Jakarta Sans | Home Decoration & Interior |
 | 2 Midnight Slate | Dark first, ambient | Warm amber glow | Sky-blue bar | Red | Outfit + Work Sans | Smart Home/IoT Dashboard |
 | 3 Indigo Studio | Evolution of today | Solid indigo card | Turmeric tint | Madder | Hind (current) | Ambient deep indigo + your turmeric/madder |
 
