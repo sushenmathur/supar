@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home-glass
-export const VERSION = '22';
+export const VERSION = '23';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -33,6 +33,7 @@ export const E = {
   aircon: 'climate.living_room',
   calendar: 'calendar.supar_family',
   camera: 'camera.front_door_snapshot_2',
+  garageCamera: 'camera.garage_live_view',
   cameraLive: 'camera.front_door_live_view_2',
   washer: 'sensor.washer_current_status',
   washerEnd: 'sensor.washer_remaining_time',

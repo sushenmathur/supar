@@ -25,6 +25,9 @@ export const ICONS = {
   down: '<path d="m6 9 6 6 6-6"/>',
   left: '<path d="m15 6-6 6 6 6"/>',
   remote: '<rect x="7" y="2.5" width="10" height="19" rx="3"/><circle cx="12" cy="8" r="2"/><path d="M10 13.5h.01M14 13.5h.01M10 17h.01M14 17h.01"/>',
+  // Lucide "recycle" (ISC licence).
+  recycle: '<path d="M7 19H4.8a1.8 1.8 0 0 1-1.6-.9 1.8 1.8 0 0 1 0-1.8L7.2 9.5"/><path d="M11 19h8.2a1.8 1.8 0 0 0 1.6-.9 1.8 1.8 0 0 0 0-1.8l-1.2-2.1"/><path d="m14 16-3 3 3 3"/><path d="M8.3 13.6 7.2 9.5l-4.1 1.1"/><path d="m9.3 5.8 1.1-1.9A1.8 1.8 0 0 1 12 3a1.8 1.8 0 0 1 1.5.9l3.9 6.8"/><path d="m13.4 9.6 4.1 1.1 1.1-4.1"/>',
+  leaf: '<path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15z"/><path d="M5 19 13 11"/>',
   robot: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3"/>',
   sofa: '<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 13a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2z"/><path d="M5 18v2M19 18v2"/>',
   kids: '<circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 20v-4a4 4 0 0 1 8 0v4M13 20v-3a3 3 0 0 1 6 0v3"/>',

@@ -29,7 +29,8 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
 - **Alert banner**
   - Same alerts, priorities and wording, with the same buttons: Close door, Keep garage open, Keep side open, Snooze 30 min and End quiet hour.
   - When there's nothing to report it shows a calm "All clear" strip instead of disappearing, so the layout doesn't jump.
-  - Close door needs a second tap.
+  - **Close door** opens a confirmation first: the live garage camera (`camera.garage_live_view`) with a warning to check nothing and no one is in the way. The door closes only when you tap **Close garage door**; **Cancel** leaves it open.
+  - The hallway door shows whenever it's open, day or night, as a grey note (not a warning, and not snoozable). With another alert it's listed after it ("Also: Hallway door").
 - **Day column**
   - Greeting, date, clock, weather and the India/Austin clocks.
   - Sushen and Paro with place, battery and charging. While a phone charges, the battery turns green and its empty part fills with pale green, fades and starts again; the solid green stays at the real level. Charging comes from `sensor.<name>_phone_battery_status`, or from `sensor.<name>_iphone_battery_state` when that is missing, `unavailable` or `unknown` (set in `PEOPLE` in `config.js`). A state of "charging", in any capitalisation, counts.
@@ -53,16 +54,16 @@ Parity with `hubhome` (behaviour map taken from `master.yaml`):
   - An open garage prints in madder here too.
 - **TV and Aircon**
   - TV: a tap runs `script.media_tv_power`. **Press and hold** for the remote (from the Media TV pop-up's lg-remote-control card): arrows and OK, Back, Home, Menu, the red/green/yellow/blue buttons (`webostv.button`), power (`script.media_tv_power`), mute and volume, channel up/down, previous/play-pause/next, the quick sources Netflix, Prime Video, Stremio and YouTube (`TV_SOURCES` in `config.js`), and a list of every other source the TV reports (`media_player.select_source`). While the TV is off, only power works.
-  - Aircon opens a sheet with its HVAC modes and cooler/warmer controls.
+  - **Living Aircon** shows the room temperature ("Room 29°"), plus the mode and target while it runs. A tap opens a sheet with its HVAC modes and cooler/warmer controls.
 - **Lights**
   - The six dynamic slots with the dashboard's replacement rule: favourites that are off give way to lights that are on elsewhere.
   - The count covers all 18 lights in the house, as the navbar badge does.
 - **Energy**
-  - The same sums: today, sold, bill to date, estimate, the grid/home/solar flow, Tesla and Kia charging (a car that's charging shows a pulsing ⚡ and its row turns green), and self-powered %.
+  - The same sums: today, sold, bill to date, estimate, the grid/home/solar flow (each line is a track with a pill sliding the way power moves: yellow from solar or out to the grid, purple from the grid; the icons sit in tinted wells, purple for grid, blue for home, amber for solar), Tesla and Kia charging (a car that's charging shows a pulsing ⚡ and its row turns green), and self-powered %.
 - **Utilities and security**
-  - Next bins, washer and dryer.
-  - Home Alarm with **Arm home / Arm away / Disarm**. It asks for a code only if the entity has a `code_format`.
-  - Garage door: second tap to toggle.
+  - Next bins (each bin's own icon in its colour: general waste a red bin, recycling a yellow recycle symbol, garden organics a green leaf), washer and dryer.
+  - Home Alarm with **Arm home / Arm away / Disarm**. Each opens the same dial and keypad as Lost Phone for the alarm code (4 to 8 digits): while disarmed you can switch between Arm home and Arm away on the dial; while armed it offers Disarm. A wrong code shakes the dial red; a right one turns it green and closes.
+  - Garage door: while it's open, a tap opens the same close confirmation with the camera; while it's closed, a second tap opens it.
   - Front door: second tap to unlock.
   - Front-door snapshot, refreshed every 10 s and paused while the screensaver is up or the page is hidden. Tapping it opens the live view.
 - **Tab bar**
@@ -78,7 +79,7 @@ The tab bar and room tiles open the other `master.yaml` views inside the same pa
 |---|---|---|
 | `#lights` | Lights | "N of 18 lights on", Evening, Night (two taps), All off (two taps); three room panels with a master switch, every light as a toggle, and a brightness picker (10–100%) on dimmable lights that are on |
 | `#homeclimate` | Climate | Average temperature badge, AC off-timer (room, duration, Start, Cancel, running timers); four rooms with room temperature, target −/+ and HVAC modes |
-| `#security` | Security | Alarm arm/disarm, garage Open (two taps) / Stop / Close (two taps), front door lock (unlock takes two taps), all seven door sensors, seven camera snapshots, each with the time Home Assistant last updated it (tap for live), patio and backyard motion |
+| `#security` | Security | Alarm arm/disarm, garage Open (two taps) / Stop / Close (asks first, with the garage camera), front door lock (unlock takes two taps), all seven door sensors, seven camera snapshots, each with the time Home Assistant last updated it (tap for live), patio and backyard motion |
 | `#living-room` | Living Room | The floor plan with tappable light buttons (and Aircon, which opens Climate), Robbie controls and the five clean buttons, motion badges |
 | `#garage` | Garage | Door open/stop/close, garage light, keep-open, garage camera, sensor chips; Bluey and Kia with location, driving/parked, battery, charging, and their controls (lock and boot take two taps) |
 | `#kidsroom` | Kids Rooms | Samar and Shanaya: sensor chips (night light, tall lamp and occupancy toggle), live camera, aircon target and cool/heat/off |

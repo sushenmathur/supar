@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=20';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=21';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -36,6 +36,8 @@ export function alerts(get) {
     if (!Number.isNaN(bat) && bat < 20) push({ p: 3, id: E.sideBattery, msg: 'Side camera battery low', icon: 'alert' });
   }
   if (on(get, E.quietHour)) push({ p: 4, quiet: true, id: E.quietHour, msg: 'Quiet hour on', icon: 'bellOff' });
+  // The hallway door shows whenever it's open, day or night, as a grey note: worth knowing, not a warning.
+  if (on(get, E.hallwayContact)) push({ p: 5, note: true, id: E.hallwayContact, msg: 'Hallway door open', icon: 'door' });
   return list.map((a, i) => ({ ...a, i })).sort((a, b) => a.p - b.p || a.i - b.i);
 }
 
@@ -54,7 +56,7 @@ export function banner(get, now = Date.now()) {
   const sub = top.quiet
     ? `${dur} · Automated announcements suppressed${more ? ` · Also: ${more}` : ''}`
     : more ? `${dur} · Also: ${more}` : `For ${dur}`;
-  const level = top.p === 1 ? 'urgent' : top.p === 2 || top.p === 4 ? 'warn' : 'info';
+  const level = top.p === 1 ? 'urgent' : top.p === 2 || top.p === 4 ? 'warn' : top.note ? 'note' : 'info';
   return { level, title: top.msg, sub, icon: top.icon, list };
 }
 

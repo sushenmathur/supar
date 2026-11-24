@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=22';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, BINS } from './config.js?v=23';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -31,12 +31,13 @@ export function alerts(get) {
     if (night && front && !screen) push({ p: 2, id: E.frontContact, msg: 'Front door open', icon: 'door' });
     if (night && on(get, E.patioContact)) push({ p: 3, id: E.patioContact, msg: 'Patio door open', icon: 'door' });
     if (night && on(get, E.laundryContact)) push({ p: 3, id: E.laundryContact, msg: 'Laundry door open', icon: 'door' });
-    if (night && on(get, E.hallwayContact)) push({ p: 3, id: E.hallwayContact, msg: 'Hallway door open', icon: 'door' });
     if (BAD_DOCK(st(get, E.robbieDock))) push({ p: 3, id: E.robbieDock, msg: 'Roborock water tank empty', icon: 'robot' });
     const bat = numOf(get, E.sideBattery);
     if (!Number.isNaN(bat) && bat < 20) push({ p: 3, id: E.sideBattery, msg: 'Side camera battery low', icon: 'alert' });
   }
   if (on(get, E.quietHour)) push({ p: 4, quiet: true, id: E.quietHour, msg: 'Quiet hour on', icon: 'bellOff' });
+  // The hallway door shows whenever it's open, day or night, as a grey note: worth knowing, not a warning.
+  if (on(get, E.hallwayContact)) push({ p: 5, note: true, id: E.hallwayContact, msg: 'Hallway door open', icon: 'door' });
   return list.map((a, i) => ({ ...a, i })).sort((a, b) => a.p - b.p || a.i - b.i);
 }
 
@@ -55,14 +56,14 @@ export function banner(get, now = Date.now()) {
   const sub = top.quiet
     ? `${dur} · Automated announcements suppressed${more ? ` · Also: ${more}` : ''}`
     : more ? `${dur} · Also: ${more}` : `For ${dur}`;
-  const level = top.p === 1 ? 'urgent' : top.p === 2 || top.p === 4 ? 'warn' : 'info';
+  const level = top.p === 1 ? 'urgent' : top.p === 2 || top.p === 4 ? 'warn' : top.note ? 'note' : 'info';
   return { level, title: top.msg, sub, icon: top.icon, list };
 }
 
 /** Which banner buttons show. */
 export function bannerButtons(get) {
   const night = st(get, E.sun) === 'below_horizon';
-  const snoozable = night && [E.frontContact, E.patioContact, E.laundryContact, E.hallwayContact].some((id) => on(get, id))
+  const snoozable = night && [E.frontContact, E.patioContact, E.laundryContact].some((id) => on(get, id))
     || BAD_DOCK(st(get, E.robbieDock))
     || numOf(get, E.sideBattery) < 20;
   return {

@@ -1,6 +1,6 @@
 // Sub-views ported from master.yaml (security, lights, homeclimate, living-room, garage, kidsroom,
 // outdoor, laundry, music). Each view: { ids, render(c), actions? }. `c` is the context from app.js.
-import { energyHud } from './energyhud.js?v=22';
+import { energyHud } from './energyhud.js?v=23';
 
 // ---- Shared helpers ----
 const st = (c, id) => c.get(id)?.state;
@@ -193,7 +193,7 @@ const security = {
     const right = `<div class="seg">${SEC_BADGES.map(([id, name]) => chip(c, { icon: 'eye', text: `${name}: ${on(c, id) ? 'Detected' : off(c, id) ? 'Unavailable' : 'Clear'}`, on: on(c, id) })).join('')}</div>`;
     const cover = st(c, 'cover.garage_door_v2');
     const garage = panel(c, { title: 'Garage door', icon: 'garage', sub: cap(cover), cls: cover === 'open' || cover === 'opening' ? 'alert' : '',
-      body: `<div class="seg"><button data-act="call-confirm" data-arg="cover.open_cover|cover.garage_door_v2">${twoTap(c, 'cover.open_cover|cover.garage_door_v2', 'Open')}</button><button data-act="call" data-arg="cover.stop_cover|cover.garage_door_v2">Stop</button><button data-act="call-confirm" data-arg="cover.close_cover|cover.garage_door_v2">${twoTap(c, 'cover.close_cover|cover.garage_door_v2', 'Close')}</button></div>` });
+      body: `<div class="seg"><button data-act="call-confirm" data-arg="cover.open_cover|cover.garage_door_v2">${twoTap(c, 'cover.open_cover|cover.garage_door_v2', 'Open')}</button><button data-act="call" data-arg="cover.stop_cover|cover.garage_door_v2">Stop</button><button data-act="close-garage">Close</button></div>` });
     const lk = st(c, 'lock.front_door_lock');
     const lock = panel(c, { title: 'Front door lock', icon: 'lock', sub: cap(lk), cls: lk === 'unlocked' || lk === 'open' ? 'alert' : '',
       body: `<div class="seg"><button data-act="call" data-arg="lock.lock|lock.front_door_lock">Lock</button><button data-act="call-confirm" data-arg="lock.unlock|lock.front_door_lock">${twoTap(c, 'lock.unlock|lock.front_door_lock', 'Unlock')}</button></div>` });
@@ -256,7 +256,7 @@ const garage = {
       ${chip(c, { icon: 'thermo', text: valueText(c, 'sensor.garagemotionsensor_device_temperature') })}</div>`;
     const door = panel(c, { title: 'Garage door', icon: 'garage', sub: `${cap(cover)} · cars: ${[on(c, 'binary_sensor.tesla_at_home') && 'Bluey', on(c, 'binary_sensor.kia_at_home') && 'Kia'].filter(Boolean).join(' & ') || 'none'}`,
       cls: cover === 'open' || cover === 'opening' ? 'alert' : '',
-      body: `<div class="seg"><button data-act="call-confirm" data-arg="cover.open_cover|cover.garage_door_v2">${twoTap(c, 'cover.open_cover|cover.garage_door_v2', 'Open')}</button><button data-act="call" data-arg="cover.stop_cover|cover.garage_door_v2">Stop</button><button data-act="call-confirm" data-arg="cover.close_cover|cover.garage_door_v2">${twoTap(c, 'cover.close_cover|cover.garage_door_v2', 'Close')}</button></div>`
+      body: `<div class="seg"><button data-act="call-confirm" data-arg="cover.open_cover|cover.garage_door_v2">${twoTap(c, 'cover.open_cover|cover.garage_door_v2', 'Open')}</button><button data-act="call" data-arg="cover.stop_cover|cover.garage_door_v2">Stop</button><button data-act="close-garage">Close</button></div>`
         + grid(2, toggleTile(c, 'light.garage_light', 'Light', 'downlight') + toggleTile(c, 'input_boolean.keep_garage_door_open', 'Keep open', 'garage'))
         + camImg(c, 'camera.garage_live_view', 'Garage') });
     const bluey = vehicle(c, { title: 'Bluey', image: '/api/image/serve/cdd510be49f2493bc87fd540c01cea69/512x512', battery: 'sensor.sonic_battery', tracker: 'device_tracker.tesla',

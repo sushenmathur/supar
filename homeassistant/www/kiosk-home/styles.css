@@ -521,3 +521,65 @@ button.car { text-align: left; }
 .evbolt .ic { width: 15px; height: 15px; fill: currentColor; }
 @media (prefers-reduced-motion: no-preference) { .evbolt { animation: evpulse 1.4s ease-in-out infinite; } }
 @keyframes evpulse { 0%, 100% { transform: scale(.8); opacity: .5; } 50% { transform: scale(1.2); opacity: 1; } }
+
+/* ---- Banner note (grey): open but not a warning, e.g. the hallway door ---- */
+.banner.note { --pass: transparent; background: #e3e7f0; color: var(--ink); }
+.banner.note .well { background: #7d849a; color: #fff; }
+.banner.note .sub { color: var(--ink-2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .banner.note { background: #222b58; } :root:not([data-theme="light"]) .banner.note .well { background: #5d6587; } }
+:root[data-theme="dark"] .banner.note { background: #222b58; }
+:root[data-theme="dark"] .banner.note .well { background: #5d6587; }
+
+/* ---- Bins: each bin's own icon in its colour ---- */
+.binicons { display: inline-flex; gap: 3px; vertical-align: -4px; margin-left: 5px; }
+.binico { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; }
+.binico .ic { width: 16px; height: 16px; stroke-width: 2.2; }
+.binico.r { color: #d32f2f; background: rgba(211, 47, 47, .14); }
+.binico.y { color: #c99700; background: rgba(233, 184, 36, .2); }
+.binico.g { color: #2e8b45; background: rgba(46, 155, 79, .16); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .binico.r { color: #ff8a80; } :root:not([data-theme="light"]) .binico.y { color: #ffd54f; } :root:not([data-theme="light"]) .binico.g { color: #81c995; } }
+:root[data-theme="dark"] .binico.r { color: #ff8a80; } :root[data-theme="dark"] .binico.y { color: #ffd54f; } :root[data-theme="dark"] .binico.g { color: #81c995; }
+
+/* ---- Garage close confirmation ---- */
+.gwarn { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0 12px; padding: 10px 12px; border-radius: 10px; background: rgba(233, 184, 36, .18); color: var(--ink); font-weight: 600; }
+.gwarn .ic { width: 22px; height: 22px; flex: none; color: #c97a00; }
+
+/* ---- Dial keypad: a single option (Disarm) spans the row ---- */
+.lpwho.one { grid-template-columns: 1fr; }
+
+/* ---- Energy card flows: a track with a pill that slides the way power moves, and tinted icon wells ---- */
+:root { --flow-track: rgba(27, 37, 89, .12); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --flow-track: rgba(226, 231, 250, .16); } }
+:root[data-theme="dark"] { --flow-track: rgba(226, 231, 250, .16); }
+/* Each node's column is just its icon; the value and label centre under it and may spill sideways, so the
+   lines get the space between the icons (the card is narrow). */
+.flow { grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr) 44px; column-gap: 4px; padding: 0 10px; }
+.flow .node { min-width: 0; width: 44px; }
+.flow .node > * { justify-self: center; white-space: nowrap; }
+.flowline, .flowline.exp, .flowline.imp { width: auto; height: 6px; margin-top: 19px; border-radius: 3px; background: var(--flow-track); overflow: hidden; position: relative; }
+.flowline i, .flowline.exp i, .flowline.imp i { position: absolute; top: 0; bottom: 0; left: 0; right: auto; width: 38%; height: auto; border-radius: 3px; background: var(--flow-c, var(--ink)); transform: translateX(80%); animation: none; }
+.flowline.exp { --flow-c: var(--flow-exp); }
+.flowline.imp { --flow-c: var(--flow-imp); }
+.flowline.idle i { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .flowline.to-right i { animation: flowpill-r 2.2s ease-in-out infinite; }
+  .flowline.to-left i { animation: flowpill-l 2.2s ease-in-out infinite; }
+}
+@keyframes flowpill-r { from { transform: translateX(-100%); } to { transform: translateX(263%); } }
+@keyframes flowpill-l { from { transform: translateX(263%); } to { transform: translateX(-100%); } }
+.flow .node .well { border-radius: 14px; border: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), 0 4px 12px -4px var(--node-glow, transparent); }
+.flow .node .well::before, .flow .node .well::after { display: none; }
+.flow .n-grid .well { background: linear-gradient(150deg, #f1ebff, #dccffd); color: #7c3aed; --node-glow: rgba(124, 58, 237, .35); }
+.flow .n-home .well { background: linear-gradient(150deg, #e8f1ff, #cfe0ff); color: #2f6fd6; --node-glow: rgba(47, 111, 214, .35); }
+.flow .n-solar .well { background: linear-gradient(150deg, #fff6dc, #ffe3a6); color: #d98a00; --node-glow: rgba(217, 138, 0, .35); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .flow .n-grid .well { background: linear-gradient(150deg, rgba(167, 139, 250, .32), rgba(124, 58, 237, .22)); color: #c4b5fd; }
+  :root:not([data-theme="light"]) .flow .n-home .well { background: linear-gradient(150deg, rgba(96, 165, 250, .32), rgba(47, 111, 214, .22)); color: #93c5fd; }
+  :root:not([data-theme="light"]) .flow .n-solar .well { background: linear-gradient(150deg, rgba(251, 191, 36, .32), rgba(217, 138, 0, .22)); color: #fcd34d; }
+}
+:root[data-theme="dark"] .flow .n-grid .well { background: linear-gradient(150deg, rgba(167, 139, 250, .32), rgba(124, 58, 237, .22)); color: #c4b5fd; }
+:root[data-theme="dark"] .flow .n-home .well { background: linear-gradient(150deg, rgba(96, 165, 250, .32), rgba(47, 111, 214, .22)); color: #93c5fd; }
+:root[data-theme="dark"] .flow .n-solar .well { background: linear-gradient(150deg, rgba(251, 191, 36, .32), rgba(217, 138, 0, .22)); color: #fcd34d; }
+
+/* Labels in sheet tiles sit above the tile's colour layer (state colours are printed over the key line). */
+.sheet .acts .tile > span { position: relative; z-index: 3; }

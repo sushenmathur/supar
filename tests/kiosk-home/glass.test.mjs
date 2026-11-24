@@ -6,19 +6,19 @@ import * as G from '../../homeassistant/www/kiosk-home-glass/home.js';
 
 const world = (spec) => (id) => (id in spec ? { entity_id: id, state: spec[id], attributes: {}, last_changed: new Date().toISOString() } : undefined);
 
-test('hallway door raises a night alert, like patio and laundry', () => {
-  const night = world({ 'sun.sun': 'below_horizon', 'binary_sensor.hallwaydoorsensor_contact': 'on' });
-  assert.deepEqual(G.alerts(night).map((a) => a.msg), ['Hallway door open']);
-  assert.equal(G.bannerButtons(night).snooze, true);
-  const day = world({ 'sun.sun': 'above_horizon', 'binary_sensor.hallwaydoorsensor_contact': 'on' });
-  assert.deepEqual(G.alerts(day), []);
-  const snoozed = world({ 'sun.sun': 'below_horizon', 'binary_sensor.hallwaydoorsensor_contact': 'on', 'input_boolean.alert_banner_snooze': 'on' });
-  assert.deepEqual(G.alerts(snoozed), []);
-});
-
-test('banner says all clear only when the hallway door is closed too', () => {
-  assert.equal(G.banner(world({ 'sun.sun': 'below_horizon', 'binary_sensor.hallwaydoorsensor_contact': 'off' })).title, 'All clear');
-  assert.equal(G.banner(world({ 'sun.sun': 'below_horizon', 'binary_sensor.hallwaydoorsensor_contact': 'on' })).title, 'Hallway door open');
+test('hallway door: a grey note on the banner whenever it is open, day or night, not snoozable', () => {
+  for (const sun of ['above_horizon', 'below_horizon']) {
+    const w = world({ 'sun.sun': sun, 'binary_sensor.hallwaydoorsensor_contact': 'on' });
+    assert.deepEqual(G.alerts(w).map((a) => a.msg), ['Hallway door open']);
+    const b = G.banner(w);
+    assert.equal(b.title, 'Hallway door open'); assert.equal(b.level, 'note');
+    assert.equal(G.bannerButtons(w).snooze, false);
+  }
+  assert.equal(G.banner(world({ 'binary_sensor.hallwaydoorsensor_contact': 'off' })).title, 'All clear');
+  // Snoozing doesn't hide it, and a real alert comes first.
+  const both = world({ 'binary_sensor.hallwaydoorsensor_contact': 'on', 'input_boolean.alert_banner_snooze': 'on', 'binary_sensor.side_door_contact': 'on' });
+  const b = G.banner(both);
+  assert.equal(b.title, 'Side door open'); assert.equal(b.level, 'urgent'); assert.match(b.sub, /Also: Hallway door/);
 });
 
 test('glass page: charging uses the status sensor, then the iPhone backup', () => {

@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=20';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=20';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=20';
-import * as H from './home.js?v=20';
-import { injectIcons, ic, weatherArt } from './icons.js?v=20';
-import { VIEWS, viewEntityIds } from './views.js?v=20';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=20';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=21';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=21';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=21';
+import * as H from './home.js?v=21';
+import { injectIcons, ic, weatherArt } from './icons.js?v=21';
+import { VIEWS, viewEntityIds } from './views.js?v=21';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=21';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -134,6 +134,7 @@ const regions = {
     el.classList.toggle('alert', b.level === 'urgent' || b.level === 'warn');
     el.classList.toggle('on', b.level === 'info');
     el.classList.toggle('calm', b.level === 'calm');
+    el.classList.toggle('note', b.level === 'note');
     const ctl = (show, act, text, cls = 'line', key) => (show ? `<button class="btn ${key && armed.has(key) ? 'armed' : cls}" data-act="${act}">${esc(key ? label(key, text) : text)}</button>` : '');
     const keepOn = (id) => (get(id)?.state === 'on' ? 'solid' : 'line');
     return `<span class="well">${ic(b.icon)}</span>
@@ -173,9 +174,11 @@ const regions = {
     const ac = get(E.aircon);
     const acOn = ac && !['off', 'unavailable', 'unknown'].includes(ac.state);
     const target = ac?.attributes?.temperature;
-    const acSub = acOn ? `${H.conditionText(ac.attributes.hvac_action) || ac.state.replace(/_/g, ' ')}${target != null ? ` · ${target}°` : ''}` : `Off${ac?.attributes?.current_temperature != null ? ` · room ${ac.attributes.current_temperature}°` : ''}`;
+    // Room temperature first; while running, the mode and target after it.
+    const room = ac?.attributes?.current_temperature;
+    const acSub = `${room != null ? `Room ${room}°` : 'Room —'}${acOn ? ` · ${H.conditionText(ac.attributes.hvac_action) || ac.state.replace(/_/g, ' ')}${target != null ? ` ${target}°` : ''}` : ''}`;
     return tile({ act: 'tv', icon: 'tv', name: 'TV', sub: tvSub, on: tvOn, off: isUnavailable(tv), hold: 'act:tv-remote' })
-      + tile({ act: 'aircon', icon: 'snow', name: 'Aircon', sub: acSub.charAt(0).toUpperCase() + acSub.slice(1), on: acOn, off: isUnavailable(ac) });
+      + tile({ act: 'aircon', icon: 'snow', name: 'Living Aircon', sub: acSub, on: acOn, off: isUnavailable(ac) });
   },
 
   lights() {
@@ -201,11 +204,11 @@ const regions = {
         <div><b>${e.estimate}</b><span class="sub">Estimated bill</span></div>
       </div>
       <div class="flow num">
-        <div class="node"><span class="well">${ic('tower')}</span><b>${e.grid.value}</b><span class="sub">${e.grid.label}</span></div>
-        <span class="flowline ${e.grid.dir === 'in' ? 'to-right imp' : e.grid.dir === 'out' ? 'to-left exp' : 'idle'}"><i style="${phase(13200)}"></i></span>
-        <div class="node"><span class="well">${ic('home')}</span><b>${e.home}</b><span class="sub">Home</span></div>
-        <span class="flowline ${e.solar.active ? 'to-left exp' : 'idle'}"><i style="${phase(13200)}"></i></span>
-        <div class="node"><span class="well">${ic(e.solar.active ? 'sun' : 'moon')}</span><b>${e.solar.value}</b><span class="sub">Solar</span></div>
+        <div class="node n-grid"><span class="well">${ic('tower')}</span><b>${e.grid.value}</b><span class="sub">${e.grid.label}</span></div>
+        <span class="flowline ${e.grid.dir === 'in' ? 'to-right imp' : e.grid.dir === 'out' ? 'to-left exp' : 'idle'}"><i style="${phase(2200)}"></i></span>
+        <div class="node n-home"><span class="well">${ic('home')}</span><b>${e.home}</b><span class="sub">Home</span></div>
+        <span class="flowline ${e.solar.active ? 'to-left exp' : 'idle'}"><i style="${phase(2200)}"></i></span>
+        <div class="node n-solar"><span class="well">${ic(e.solar.active ? 'sun' : 'moon')}</span><b>${e.solar.value}</b><span class="sub">Solar</span></div>
       </div>
       <div>${[['Tesla', e.tesla], ['Kia', e.kia]].map(([n, v]) => `<div class="evrow num${v.charging ? ' chg' : ''}">${v.charging ? `<span class="evbolt" style="animation-delay:__PH1400__">${ic('bolt')}</span>` : ''}${n} <span class="sub">${v.charging ? 'Charging' : 'Not charging'}</span><em>${v.value}</em></div>`).join('')}</div>
       <div class="selfp num">Self-powered<i style="--lvl:${e.self}%"></i><b>${e.self}%</b></div>`;
@@ -215,7 +218,9 @@ const regions = {
     const bins = H.nextBins(get);
     const w = H.machine(get, E.washer, E.washerEnd);
     const d = H.machine(get, E.dryer, E.dryerEnd);
-    const lids = bins ? `<span class="binlids">${bins.bins.map((b) => `<i class="${b.lid}" title="${b.label}"></i>`).join('')}</span>` : '';
+    // Bin icons in the bin's colour: general (red bin), recycling (yellow recycle), garden organics (green leaf).
+    const BIN_ICON = { r: 'bin', y: 'recycle', g: 'leaf' };
+    const lids = bins ? `<span class="binicons">${bins.bins.map((b) => `<span class="binico ${b.lid}" title="${esc(b.label)}">${ic(BIN_ICON[b.lid] ?? 'bin')}</span>`).join('')}</span>` : '';
     return `<div class="tile b"><span class="well">${ic('bin')}</span><span><span class="name">Bins</span><span class="sub">${bins ? esc(bins.when) : '—'}${lids}</span></span></div>`
       + tile({ act: 'go', arg: '#laundry', icon: 'washer', name: 'Washer', sub: w.short ?? w.label, on: w.on, cls: w.on ? 'spin' : '' })
       + tile({ act: 'go', arg: '#laundry', icon: 'dryer', name: 'Dryer', sub: d.short ?? d.label, on: d.on, cls: d.on ? 'spin' : '' });
@@ -347,12 +352,17 @@ const ACTIONS = {
   'call-confirm': (arg) => confirmOr(arg, () => ACTIONS.call(arg)),
   toggle: (arg) => quiet(call('homeassistant', 'toggle', { entity_id: arg })),
   'good-night': () => confirmOr('good-night', () => quiet(call('scene', 'turn_on', { entity_id: E.goodNight }))),
-  'close-garage': () => confirmOr('close-garage', () => quiet(call('cover', 'close_cover', { entity_id: E.garageCover }))),
+  'close-garage': () => garageCloseSheet(),
   'keep-garage': () => quiet(call('input_boolean', 'toggle', { entity_id: E.keepGarage })),
   'keep-side': () => quiet(call('input_boolean', 'toggle', { entity_id: E.keepSide })),
   snooze: () => quiet(call('input_boolean', 'toggle', { entity_id: E.snooze })),
   'end-quiet': () => quiet(call('input_boolean', 'turn_off', { entity_id: E.quietHour })),
-  'garage-toggle': () => confirmOr('garage-toggle', () => quiet(call('cover', 'toggle', { entity_id: E.garageCover }))),
+  // Closing always asks first, with the garage camera; opening keeps the two-tap confirm.
+  'garage-toggle': () => {
+    const cover = get(E.garageCover);
+    const open = ['open', 'opening'].includes(cover?.state) || get(E.garageContact)?.state === 'on';
+    if (open) garageCloseSheet(); else confirmOr('garage-toggle', () => quiet(call('cover', 'open_cover', { entity_id: E.garageCover })));
+  },
   'front-toggle': () => {
     // Unlocking asks for a second tap; locking doesn't.
     const unlock = get(E.frontDoor)?.state === 'off';
@@ -375,21 +385,6 @@ const ACTIONS = {
   cam: camSheet,
 };
 
-function alarmCall(service) {
-  const s = get(E.alarm);
-  const needsCode = s?.attributes?.code_format && (service === 'alarm_disarm' || s.attributes.code_arm_required !== false);
-  if (!needsCode) return quiet(call('alarm_control_panel', service, { entity_id: E.alarm }));
-  const words = { alarm_arm_home: 'Arm home', alarm_arm_away: 'Arm away', alarm_disarm: 'Disarm' };
-  openSheet(`<h2>${words[service]}</h2><p>Enter the alarm code.</p>
-    <input id="code" type="password" inputmode="numeric" autocomplete="off" aria-label="Alarm code">
-    <div class="acts"><button class="tile b on" data-sheet="code-go">${ic('shield')}${words[service]}</button></div>`, (d) => {
-    d.querySelector('#code').focus();
-    d.querySelector('[data-sheet="code-go"]').onclick = () => {
-      const code = d.querySelector('#code').value;
-      quiet(call('alarm_control_panel', service, { entity_id: E.alarm, code }).then(closeSheet));
-    };
-  });
-}
 
 function announceSheet() {
   const qh = get(E.quietHour)?.state === 'on';
@@ -416,9 +411,9 @@ function announceSheet() {
   });
 }
 
-// Lost Phone: a combination-lock dial beside a keypad (from dashboards/lost-phone-dial.html on the design branch),
-// drawn in block print colours. Four digits, then ✓ calls script.lost_phone, which checks the passcode in HA.
-const LP_LEN = 4;
+// A combination-lock dial beside a keypad (from dashboards/lost-phone-dial.html on the design branch), shared by
+// Lost Phone and the alarm. Each digit turns the dial and fills a segment; ✓ calls submit(code, chip), which
+// resolves to { ok: true | false | undefined, msg }: true turns the dial green and closes, false shakes it red.
 function lpDial() {
   let g = '';
   for (let i = 0; i < 120; i++) {
@@ -431,39 +426,42 @@ function lpDial() {
   }
   return g;
 }
-function lpArcs(n) {
+function lpArcs(n, total) {
   let s = '';
   const p = (a) => [180 + 168 * Math.cos(a * Math.PI / 180), 180 + 168 * Math.sin(a * Math.PI / 180)].map((v) => v.toFixed(1)).join(' ');
-  for (let i = 0; i < LP_LEN; i++) {
-    const a0 = -90 + i * (360 / LP_LEN) + 8, a1 = -90 + (i + 1) * (360 / LP_LEN) - 8;
+  const gap = total > 6 ? 4 : 8;
+  for (let i = 0; i < total; i++) {
+    const a0 = -90 + i * (360 / total) + gap, a1 = -90 + (i + 1) * (360 / total) - gap;
     s += `<path class="lpseg${i < n ? ' f' : ''}" d="M${p(a0)} A168 168 0 0 1 ${p(a1)}"/>`;
   }
   return s;
 }
-function lostPhoneSheet() {
-  let phone = 'Sushen';
+function dialSheet({ title, prompt = 'Enter passcode', chips = [], chip, minLen = 4, maxLen = 4, okLabel = 'Send', cls = '', submit }) {
   let code = '';
   let busy = false;
+  let pick = chip ?? chips[0]?.[0];
+  const segs = () => Math.max(minLen, Math.min(maxLen, code.length));
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'x', '0', 'ok'];
-  openSheet(`<h2>Lost Phone</h2>
+  openSheet(`<h2>${esc(title)}</h2>
     <div class="lp">
       <div class="lpleft">
         <div class="lpdial" id="lpdial"><div class="lpptr"></div>
           <svg viewBox="0 0 360 360" aria-hidden="true"><defs><radialGradient id="lpface" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#2b3a86"/><stop offset="1" stop-color="#121a45"/></radialGradient></defs>
-            <g id="lparcs">${lpArcs(0)}</g><circle cx="180" cy="180" r="150" fill="url(#lpface)"/><g id="lpwheel">${lpDial()}</g></svg>
+            <g id="lparcs">${lpArcs(0, minLen)}</g><circle cx="180" cy="180" r="150" fill="url(#lpface)"/><g id="lpwheel">${lpDial()}</g></svg>
           <div class="lphub num" id="lphub">–</div></div>
-        <p class="lpmsg" id="lpmsg" role="status" aria-live="polite">Enter passcode</p>
+        <p class="lpmsg" id="lpmsg" role="status" aria-live="polite">${esc(prompt)}</p>
       </div>
       <div class="lpright">
-        <div class="lpwho">${['Sushen', 'Paro'].map((p) => `<button class="tile b${p === phone ? ' on' : ''}" data-phone="${p}" aria-pressed="${p === phone}">${ic('phone')}<span>${p}</span></button>`).join('')}</div>
-        <div class="lppad">${keys.map((k) => `<button class="lpkey${k === 'ok' ? ' ok' : k === 'x' ? ' cl' : ''}" data-key="${k}" aria-label="${k === 'ok' ? 'Send alert' : k === 'x' ? 'Clear' : k}">${k === 'x' ? '✕' : k === 'ok' ? '✓' : k}</button>`).join('')}</div>
+        ${chips.length ? `<div class="lpwho${chips.length === 1 ? ' one' : ''}">${chips.map(([v, text, icon]) => `<button class="tile b${v === pick ? ' on' : ''}" data-chip="${esc(v)}" aria-pressed="${v === pick}">${ic(icon)}<span>${esc(text)}</span></button>`).join('')}</div>` : ''}
+        <div class="lppad">${keys.map((k) => `<button class="lpkey${k === 'ok' ? ' ok' : k === 'x' ? ' cl' : ''}" data-key="${k}" aria-label="${k === 'ok' ? esc(okLabel) : k === 'x' ? 'Clear' : k}">${k === 'x' ? '✕' : k === 'ok' ? '✓' : k}</button>`).join('')}</div>
       </div>
     </div>`, (d) => {
     d.classList.add('lpsheet');
+    if (cls) d.classList.add(cls);
     const $d = (s) => d.querySelector(s);
     const dial = $d('#lpdial'), wheel = $d('#lpwheel'), hub = $d('#lphub'), msg = $d('#lpmsg');
-    const say = (t, cls = '') => { msg.textContent = t; msg.className = `lpmsg ${cls}`; };
-    const arcs = () => { $d('#lparcs').innerHTML = lpArcs(code.length); };
+    const say = (t, c = '') => { msg.textContent = t; msg.className = `lpmsg ${c}`; };
+    const arcs = () => { $d('#lparcs').innerHTML = lpArcs(code.length, segs()); };
     const turn = (n) => {
       wheel.style.transform = `rotate(${-n * 36}deg)`;
       d.querySelectorAll('.lpdg').forEach((e) => e.classList.toggle('cur', e.dataset.d === String(n)));
@@ -473,34 +471,65 @@ function lostPhoneSheet() {
     const press = async (k) => {
       if (busy) return;
       dial.classList.remove('bad');
-      if (/^\d$/.test(k)) { if (code.length < LP_LEN) { code += k; turn(+k); arcs(); say('Enter passcode'); } return; }
-      if (k === 'x') { reset(); say('Enter passcode'); return; }
-      if (code.length < LP_LEN) { say(`Enter all ${LP_LEN} digits`); return; }
+      if (/^\d$/.test(k)) { if (code.length < maxLen) { code += k; turn(+k); arcs(); say(prompt); } return; }
+      if (k === 'x') { reset(); say(prompt); return; }
+      if (code.length < minLen) { say(minLen === maxLen ? `Enter all ${minLen} digits` : `Enter at least ${minLen} digits`); return; }
       busy = true; say('Checking…');
-      let ok;
-      try {
-        const res = await conn.sendMessagePromise({ type: 'call_service', domain: 'script', service: 'lost_phone', service_data: { passcode: code, phone }, return_response: true });
-        ok = res?.response?.ok;
-        if (ok === undefined) { reset(); say('Not confirmed: update the script', 'bad'); busy = false; return; }
-      } catch (err) {
-        if (!/passcode|denied/i.test(err?.message ?? '')) { reset(); say(`Error: ${String(err?.message ?? errorCode(err)).slice(0, 40)}`, 'bad'); busy = false; return; }
-        ok = false;
-      }
-      if (ok === true) {
-        dial.classList.add('good'); say(`Alert sent to ${phone}`, 'good');
+      const r = await submit(code, pick).catch((err) => ({ ok: undefined, msg: `Error: ${String(err?.message ?? errorCode(err)).slice(0, 40)}` }));
+      if (r.ok === true) {
+        dial.classList.add('good'); say(r.msg, 'good');
         setTimeout(() => { busy = false; closeSheet(); }, 1800);
-      } else {
-        dial.classList.add('bad'); say('Access denied: wrong passcode', 'bad');
+      } else if (r.ok === false) {
+        dial.classList.add('bad'); say(r.msg, 'bad');
         setTimeout(() => { reset(); dial.classList.add('bad'); setTimeout(() => dial.classList.remove('bad'), 500); busy = false; }, 900);
-      }
+      } else { reset(); say(r.msg, 'bad'); busy = false; }
     };
-    d.querySelectorAll('[data-phone]').forEach((b) => {
-      b.onclick = () => { phone = b.dataset.phone; d.querySelectorAll('[data-phone]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); }); };
+    d.querySelectorAll('[data-chip]').forEach((b) => {
+      b.onclick = () => { pick = b.dataset.chip; d.querySelectorAll('[data-chip]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); }); };
     });
     d.querySelectorAll('[data-key]').forEach((b) => { b.onclick = () => press(b.dataset.key); });
     d.onkeydown = (e) => {
       if (/^\d$/.test(e.key)) { e.preventDefault(); press(e.key); } else if (e.key === 'Backspace') press('x'); else if (e.key === 'Enter' && !e.target.closest?.('button')) press('ok');
     };
+  });
+}
+
+// Lost Phone: four digits, then ✓ calls script.lost_phone, which checks the passcode in Home Assistant.
+function lostPhoneSheet() {
+  dialSheet({
+    title: 'Lost Phone', chips: [['Sushen', 'Sushen', 'phone'], ['Paro', 'Paro', 'phone']], okLabel: 'Send alert',
+    submit: async (code, phone) => {
+      try {
+        const res = await conn.sendMessagePromise({ type: 'call_service', domain: 'script', service: 'lost_phone', service_data: { passcode: code, phone }, return_response: true });
+        const ok = res?.response?.ok;
+        if (ok === undefined) return { ok: undefined, msg: 'Not confirmed: update the script' };
+        return ok ? { ok: true, msg: `Alert sent to ${phone}` } : { ok: false, msg: 'Access denied: wrong passcode' };
+      } catch (err) {
+        if (/passcode|denied/i.test(err?.message ?? '')) return { ok: false, msg: 'Access denied: wrong passcode' };
+        throw err;
+      }
+    },
+  });
+}
+
+// Home alarm: the same dial and keypad for the alarm code. Disarmed: choose Arm home or Arm away; armed: Disarm.
+const ALARM_WORDS = { alarm_arm_home: ['Arm home', 'home', 'Armed home'], alarm_arm_away: ['Arm away', 'away', 'Armed away'], alarm_disarm: ['Disarm', 'lock', 'Disarmed'] };
+function alarmCall(service) {
+  const s = get(E.alarm);
+  const arming = service !== 'alarm_disarm';
+  const chips = (arming ? ['alarm_arm_home', 'alarm_arm_away'] : ['alarm_disarm']).map((k) => [k, ALARM_WORDS[k][0], ALARM_WORDS[k][1]]);
+  const fmt = s?.attributes?.code_format;
+  dialSheet({
+    title: 'Home Alarm', prompt: 'Enter alarm code', chips, chip: service, minLen: 4, maxLen: fmt === 'text' ? 8 : 8, okLabel: arming ? 'Arm' : 'Disarm', cls: 'alarmsheet',
+    submit: async (code, svc) => {
+      try {
+        await conn.sendMessagePromise({ type: 'call_service', domain: 'alarm_control_panel', service: svc, service_data: { entity_id: E.alarm, code } });
+        return { ok: true, msg: ALARM_WORDS[svc][2] };
+      } catch (err) {
+        if (/code/i.test(err?.message ?? '') || err?.code === 'invalid_code') return { ok: false, msg: 'Wrong code' };
+        throw err;
+      }
+    },
   });
 }
 
@@ -637,7 +666,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=20';
+    : './vendor/hls.light.min.mjs?v=21';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -792,6 +821,17 @@ async function startLive(box, id) {
   fallback();
 }
 const liveBox = '<div class="livebox" id="live"></div>';
+// Close the garage door: show the garage camera and a warning, and close only on an explicit confirm.
+function garageCloseSheet() {
+  openSheet(`<h2>Close the garage door?</h2>
+    <p class="gwarn" role="alert">${ic('alert')}<span>Check the camera: make sure nothing and no one is in the way of the door before closing it.</span></p>
+    ${liveBox}
+    <div class="acts"><button class="tile b alert" data-sheet="garage-go">${ic('garage')}<span>Close garage door</span></button></div>`, (d) => {
+    d.querySelector('.close').textContent = 'Cancel';
+    startLive(d.querySelector('#live'), E.garageCamera);
+    d.querySelector('[data-sheet="garage-go"]').onclick = () => { quiet(call('cover', 'close_cover', { entity_id: E.garageCover })); closeSheet(); };
+  });
+}
 function liveCamSheet(id) {
   const name = get(id)?.attributes?.friendly_name ?? 'Camera';
   openSheet(`<h2>${esc(name)}</h2>${liveBox}`, (d) => startLive(d.querySelector('#live'), id));

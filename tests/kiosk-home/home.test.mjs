@@ -155,3 +155,9 @@ test('charging reads the phone status sensor, then the iPhone backup when it is 
   assert.equal(H.isCharging(w('Full', undefined), ids), false);
   assert.equal(H.isCharging(world({ 'sensor.x': ['Charging'] }), 'sensor.x'), true, 'a single id still works');
 });
+
+test('kiosk-home: hallway door shows as a grey note', () => {
+  const b = H.banner(world({ 'binary_sensor.hallwaydoorsensor_contact': ['on'], 'sun.sun': ['above_horizon'] }), NOW);
+  assert.equal(b.title, 'Hallway door open');
+  assert.equal(b.level, 'note');
+});
