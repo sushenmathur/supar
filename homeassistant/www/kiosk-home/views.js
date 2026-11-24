@@ -1,6 +1,6 @@
 // Sub-views ported from master.yaml (security, lights, homeclimate, living-room, garage, kidsroom,
 // outdoor, laundry, music). Each view: { ids, render(c), actions? }. `c` is the context from app.js.
-import { energyHud } from './energyhud.js?v=22';
+import { energyHud } from './energyhud.js?v=23';
 
 // ---- Shared helpers ----
 const st = (c, id) => c.get(id)?.state;
@@ -278,7 +278,7 @@ const garage = {
 
 // ---- Kids rooms ----
 function kidPanel(c, { title, icon, chips, camera, climate }) {
-  return panel(c, { title, icon, cls: 'fill', body: `<div class="seg">${chips}</div>${camImg(c, camera, title)}${climateBlock(c, climate, ['cool', 'heat', 'off'])}` });
+  return panel(c, { title, icon, cls: 'fill kid', body: `<div class="seg">${chips}</div>${camImg(c, camera, title)}${climateBlock(c, climate, ['cool', 'heat', 'off'])}` });
 }
 const kidsroom = {
   ids: ['sensor.aarlo_temperature_samar_cam', 'binary_sensor.samar_room_occupancy_new', 'light.aarlo_samar_cam', 'light.tall_lamp', 'media_player.aarlo_samar_cam',
@@ -289,8 +289,8 @@ const kidsroom = {
       chips: chip(c, { icon: 'thermo', text: valueText(c, 'sensor.aarlo_temperature_samar_cam') })
         + chip(c, { icon: 'eye', text: on(c, 'binary_sensor.samar_room_occupancy_new') ? 'In room' : 'Empty', on: on(c, 'binary_sensor.samar_room_occupancy_new') })
         + chip(c, { icon: 'moon', text: 'Night light', on: on(c, 'light.aarlo_samar_cam'), act: 'toggle', arg: 'light.aarlo_samar_cam' })
-        + chip(c, { icon: 'lamp', text: `Tall lamp ${on(c, 'light.tall_lamp') ? 'on' : 'off'}`, on: on(c, 'light.tall_lamp'), act: 'toggle', arg: 'light.tall_lamp' })
-        + chip(c, { icon: 'music', text: `White noise: ${cap(st(c, 'media_player.aarlo_samar_cam'))}`, on: st(c, 'media_player.aarlo_samar_cam') === 'playing' }) });
+        + chip(c, { icon: 'lamp', text: `Lamp ${on(c, 'light.tall_lamp') ? 'on' : 'off'}`, on: on(c, 'light.tall_lamp'), act: 'toggle', arg: 'light.tall_lamp' })
+        + chip(c, { icon: 'music', text: `Noise ${st(c, 'media_player.aarlo_samar_cam') === 'playing' ? 'on' : 'off'}`, on: st(c, 'media_player.aarlo_samar_cam') === 'playing' }) });
     const shanaya = kidPanel(c, { title: 'Shanaya Room', icon: 'kids', camera: 'camera.shanaya_cam_live_view', climate: 'climate.shanaya_room',
       chips: chip(c, { icon: 'thermo', text: valueText(c, 'sensor.shanayaroomtemp_temperature') })
         + chip(c, { icon: 'eye', text: on(c, 'binary_sensor.shanaya_presence_sensor_presence') ? 'Present' : 'Empty', on: on(c, 'binary_sensor.shanaya_presence_sensor_presence') })

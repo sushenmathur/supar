@@ -82,7 +82,7 @@ The tab bar and room tiles open the other `master.yaml` views inside the same pa
 | `#security` | Security | Alarm arm/disarm, garage Open (two taps) / Stop / Close (asks first, with the garage camera), front door lock (unlock takes two taps), all seven door sensors, seven camera snapshots, each with the time Home Assistant last updated it (tap for live), patio and backyard motion |
 | `#living-room` | Living Room | The floor plan with tappable light buttons (and Aircon, which opens Climate), Robbie controls and the five clean buttons, motion badges |
 | `#garage` | Garage | Door open/stop/close, garage light, keep-open, garage camera, sensor chips; Bluey and Kia with location, driving/parked, battery, charging, and their controls (lock and boot take two taps) |
-| `#kidsroom` | Kids Rooms | Samar and Shanaya: sensor chips (night light, tall lamp and occupancy toggle), live camera, aircon target and cool/heat/off |
+| `#kidsroom` | Kids Rooms | Samar and Shanaya: one row of compact sensor chips (night light, tall lamp and occupancy toggle), live camera, aircon target and cool/heat/off |
 | `#outdoor` | Outdoor | Backyard & Patio, Front (front door, downlight, outdoor lights, driveway, outdoor plug), Side & Laundry |
 | `#laundry` | Laundry | Drying advice, water leak and laundry door badges; washer and dryer status, last run, last start, energy and cost, notify toggles, dryer power |
 | `#music` | Music | The Music Assistant panel (`/d5369777_music_assistant`, set as `MUSIC_PANEL` in `config.js`) embedded under the tab bar, plus an Open full screen button |
