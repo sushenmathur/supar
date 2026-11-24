@@ -84,6 +84,7 @@ The tab bar and room tiles open the other `master.yaml` views inside the same pa
 | `#outdoor` | Outdoor | Backyard & Patio, Front (front door, downlight, outdoor lights, driveway, outdoor plug), Side & Laundry |
 | `#laundry` | Laundry | Drying advice, water leak and laundry door badges; washer and dryer status, last run, last start, energy and cost, notify toggles, dryer power |
 | `#music` | Music | The Music Assistant panel (`/d5369777_music_assistant`, set as `MUSIC_PANEL` in `config.js`) embedded under the tab bar, plus an Open full screen button |
+| `#energy-dashboard` | Energy | Home Assistant's Energy dashboard (`/energy-new/energy`, set as `ENERGY_PANEL` in `config.js`) embedded under the tab bar, plus an Open full screen button. Opened by tapping the Energy card on Home (or Enter on it); it has no tab of its own |
 
 Differences from the Lovelace sub-views, on purpose or because the source isn't in the repo:
 
@@ -111,7 +112,7 @@ Differences from the Lovelace view, on purpose:
 - **Weather and time of day:** the clock card shows a printed weather picture. The page background takes on a faint dawn, dusk or night tint from `sun.sun`.
 - **Calendar:** today's date stamp is turmeric.
 - **Moving only when something is happening:**
-  - Energy flow lines march in the direction power is moving.
+  - Energy flow lines march in the direction power is moving: yellow while solar is going to the home or out to the grid, purple while power comes in from the grid, grey when idle.
   - Robbie, washer and dryer icons turn while they run.
   - An urgent alert's colour drifts slightly.
   - The clock stamps on the minute.

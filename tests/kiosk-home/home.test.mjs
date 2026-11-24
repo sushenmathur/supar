@@ -138,6 +138,7 @@ test('laundry drying advice follows the badge thresholds', () => {
 });
 
 test('every master.yaml sub-view has a route', () => {
-  assert.deepEqual(Object.keys(VIEWS).sort(), ['garage', 'homeclimate', 'kidsroom', 'laundry', 'lights', 'living-room', 'music', 'outdoor', 'security']);
+  // The master.yaml sub-views, plus the in-page Energy dashboard opened from the Energy card.
+  assert.deepEqual(Object.keys(VIEWS).sort(), ['energy-dashboard', 'garage', 'homeclimate', 'kidsroom', 'laundry', 'lights', 'living-room', 'music', 'outdoor', 'security']);
   assert.ok(viewEntityIds().includes('lock.front_door_lock'));
 });

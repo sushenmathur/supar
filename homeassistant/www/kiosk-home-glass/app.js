@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=16';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=16';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=16';
-import * as H from './home.js?v=16';
-import { injectIcons, ic, weatherArt } from './icons.js?v=16';
-import { VIEWS, viewEntityIds } from './views.js?v=16';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=16';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ENERGY_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=17';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=17';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=17';
+import * as H from './home.js?v=17';
+import { injectIcons, ic, weatherArt } from './icons.js?v=17';
+import { VIEWS, viewEntityIds } from './views.js?v=17';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=17';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -206,9 +206,9 @@ const regions = {
       </div>
       <div class="flow num">
         <div class="node"><span class="well">${ic('tower')}</span><b>${e.grid.value}</b><span class="sub">${e.grid.label}</span></div>
-        <span class="flowline ${e.grid.dir === 'in' ? 'to-right' : e.grid.dir === 'out' ? 'to-left' : 'idle'}"><i style="${phase(13200)}"></i></span>
+        <span class="flowline ${e.grid.dir === 'in' ? 'to-right imp' : e.grid.dir === 'out' ? 'to-left exp' : 'idle'}"><i style="${phase(13200)}"></i></span>
         <div class="node"><span class="well">${ic('home')}</span><b>${e.home}</b><span class="sub">Home</span></div>
-        <span class="flowline ${e.solar.active ? 'to-left' : 'idle'}"><i style="${phase(13200)}"></i></span>
+        <span class="flowline ${e.solar.active ? 'to-left exp' : 'idle'}"><i style="${phase(13200)}"></i></span>
         <div class="node"><span class="well">${ic(e.solar.active ? 'sun' : 'moon')}</span><b>${e.solar.value}</b><span class="sub">Solar</span></div>
       </div>
       <div><div class="evrow num">Tesla <span class="sub">${e.tesla.charging ? 'Charging' : 'Not charging'}</span><em>${e.tesla.value}</em></div>
@@ -267,7 +267,7 @@ function onRoute() {
 }
 regions.subview = () => (VIEWS[route] ? VIEWS[route].render(viewCtx) : '');
 const viewCtx = { get, esc, ic, armed, label, H, E, tz: () => tz, fmtTime, isUnavailable, tile, call, quiet,
-  openSheet: (...a) => openSheet(...a), mediaIds: () => mediaIds, musicPanel: MUSIC_PANEL, isLocalImage: (u) => isLocalImage(u, location.origin) };
+  openSheet: (...a) => openSheet(...a), mediaIds: () => mediaIds, musicPanel: MUSIC_PANEL, energyPanel: ENERGY_PANEL, isLocalImage: (u) => isLocalImage(u, location.origin) };
 
 // Region output is only written when it changes, so taps and focus survive unrelated updates.
 const last = new Map();
@@ -601,7 +601,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=16';
+    : './vendor/hls.light.min.mjs?v=17';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -840,6 +840,8 @@ document.addEventListener('pointerdown', (e) => {
   clearTimeout(holdTimer);
   if (h) holdTimer = setTimeout(() => { held = true; ACTIONS.info(h.dataset.hold); }, 500);
 });
+// Cards that act as links (the Energy card) open with Enter or Space, like a button.
+document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('[role="link"][data-act]')) { e.preventDefault(); e.target.click(); } });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) document.addEventListener(ev, () => clearTimeout(holdTimer), true);
 document.addEventListener('contextmenu', (e) => { if (e.target.closest('[data-hold]')) e.preventDefault(); });
 

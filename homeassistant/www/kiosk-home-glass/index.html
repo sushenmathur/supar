@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>SuPar Home</title>
-<link rel="stylesheet" href="styles.css?v=16">
-<script type="module" src="app.js?v=16"
+<link rel="stylesheet" href="styles.css?v=17">
+<script type="module" src="app.js?v=17"
   onerror="document.querySelector('#message p').textContent = 'This page\'s files did not load. Check that all of www/kiosk-home/ was copied, then reload.'"></script>
 </head>
 <body>
@@ -43,7 +43,7 @@
           <div class="lights b" id="lights"></div>
         </div>
         <div class="stack s2">
-          <section class="energy b" id="energy" aria-label="Energy"></section>
+          <section class="energy b" id="energy" aria-label="Energy: open the energy dashboard" role="link" tabindex="0" data-act="go" data-arg="#energy-dashboard"></section>
           <div class="util" id="util"></div>
         </div>
         <div class="stack s3">
