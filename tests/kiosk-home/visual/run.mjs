@@ -86,6 +86,8 @@ for (const name of pages) {
   for (const [shot, scheme, route, steps, mockEnv] of SHOTS) {
     if (onlyShots && !onlyShots.includes(shot)) continue;
     const mock = await startMock(mockEnv);
+    // The pages go dark by the sun, so a dark shot is taken after sunset.
+    if (scheme === 'dark') await set('sun.sun', 'below_horizon');
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, colorScheme: scheme, reducedMotion: 'reduce', deviceScaleFactor: 1 });
     const page = await ctx.newPage();
     await page.clock.setFixedTime(FIXED);

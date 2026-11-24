@@ -117,6 +117,7 @@ Differences from the Lovelace view, on purpose:
 
 ## Look and motion
 
+- **Dark mode by the sun:** the page turns dark at sunset and light at sunrise (`sun.sun`), live, whatever the tablet is set to. Set `THEME = 'system'` in `config.js` to follow the tablet's own light/dark setting instead.
 - **Weather and time of day:** the clock card shows a printed weather picture. The page background takes on a faint dawn, dusk or night tint from `sun.sun`.
 - **Calendar:** today's date stamp is turmeric.
 - **Moving only when something is happening:**
@@ -225,5 +226,5 @@ Then copy the folder again. Kiosk Satellite always loads fresh. A normal browser
 - [ ] **Announce:** a test message plays on the chosen speaker.
 - [ ] **Lost Phone:** the right passcode rings the phone; a wrong one turns the dial red and says "Access denied: wrong passcode".
 - [ ] **Bins:** the tile shows the right next collection. If it doesn't, tell me what the sensor states look like.
-- [ ] **Theme:** switching KS between light and dark restyles the page without a reload.
+- [ ] **Theme:** the page turns dark after sunset and light after sunrise, without a reload.
 - [ ] **Room tiles and tabs:** they open the right Lovelace views.

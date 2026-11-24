@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home
-export const VERSION = '29';
+export const VERSION = '30';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -118,6 +118,10 @@ export const MEDIA = {
 // The Media pop-up's players, in the order they're listed when none is playing (the Media tile's list in
 // master.yaml). ids: the first one Home Assistant has (and isn't unavailable) is used, so the bedroom Apple TV
 // is listed once. remote: its power and long press use the TV remote. power: a switch that powers the device.
+// Dark mode: 'sun' switches to dark after sunset and back at sunrise (sun.sun); 'system' follows the tablet's own
+// light/dark setting (Kiosk Satellite or Android).
+export const THEME = 'sun';
+
 export const MEDIA_PLAYERS = [
   { ids: ['media_player.tv'], name: 'TV', icon: 'tv', remote: true },
   { ids: ['media_player.media_apple_tv'], name: 'Media Apple TV', icon: 'tv' },

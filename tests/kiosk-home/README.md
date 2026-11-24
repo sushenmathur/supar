@@ -42,6 +42,7 @@ leaks between them, and prints one line per suite. Options: `--page kiosk-home`,
 | `cars` | Car badges use the logo images from `/config/www/images/`, and fall back to the built-in marks when they're missing |
 | `tv` | TV remote on long press: every button's service, sources, power, disabled when off; car charging bolt |
 | `banner` | The alert banner: priorities and colours (red, amber, grey), grouping, chips, night-only doors, the ticker |
+| `theme` | Dark at sunset and light at sunrise, live; the dark-by-sun page matches the tablet's dark mode pixel for pixel |
 | `media` | The Media pop-up: each player listed once and in order, the hero's controls and volume slider, row buttons, power (TV, bedroom TV switch, others), the TV remote, artwork only through Home Assistant, the progress clock |
 | `alarm` | A wrong passcode shows "Access denied" and leaves the alarm alone, for arm home, arm away and disarm, in six set-ups: the script with an alarm without a code, with one that rejects wrong codes, with one that ignores them silently (like Alarmo); no script with an alarm code; no script and no code; and the script passing while the alarm's own code differs |
 | `glass` | Glass-only layout: ticker, calendar stamps, spacing, Kids Rooms |
@@ -55,7 +56,7 @@ from `GET /__log`.
 ## Visual
 
 `visual/run.mjs` takes the same screenshots every run: a fixed clock (Tue 24 Nov 2026, 10:30 am), fixed data, animations
-off, 1280 × 800. It compares each with `visual/baseline/<page>/<shot>.jpg`; a shot fails when more than 0.2% of its pixels
+off, 1280 × 800; dark shots are taken after sunset. It compares each with `visual/baseline/<page>/<shot>.jpg`; a shot fails when more than 0.2% of its pixels
 differ noticeably, and the actual image and a red diff go to `visual/output/` (not committed).
 
 When a change to the look is intended, check the new screenshots and accept them:

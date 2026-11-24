@@ -1,6 +1,6 @@
 // Sub-views ported from master.yaml (security, lights, homeclimate, living-room, garage, kidsroom,
 // outdoor, laundry, music). Each view: { ids, render(c), actions? }. `c` is the context from app.js.
-import { energyHud } from './energyhud.js?v=29';
+import { energyHud } from './energyhud.js?v=30';
 
 // ---- Shared helpers ----
 const st = (c, id) => c.get(id)?.state;
@@ -228,7 +228,8 @@ const LR_BADGES = [['binary_sensor.corridormotionsensor_occupancy', 'Corridor'],
 const livingRoom = {
   ids: [...PLAN.map((p) => p[0]), 'climate.living_room', 'vacuum.robbie', ...ROBBIE_BTNS.map((b) => b[0]), ...LR_BADGES.map((b) => b[0])],
   render(c) {
-    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const t = document.documentElement.dataset.theme;  // set by the sun (app.js applyTheme), else the tablet's setting
+    const dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
     const img = dark ? '/api/image/serve/cbbd3b4658275dd38c08c3e87ddacc41/512x512' : '/api/image/serve/4f7585416645db017d4cdb7d40e9bb2a/512x512';
     const pins = PLAN.map(([id, name, x, y]) => `<button class="pin b${on(c, id) ? ' on' : ''}" style="left:${x}%;top:${y}%" data-act="toggle" data-arg="${id}" data-hold="${id}" aria-label="${name}">${c.ic('bulb')}<span>${name}</span></button>`).join('')
       + `<button class="pin b${['off', 'unavailable'].includes(st(c, 'climate.living_room')) ? '' : ' on'}" style="left:8%;top:22%" data-act="go" data-arg="#homeclimate" aria-label="Aircon">${c.ic('snow')}<span>Aircon</span></button>`;

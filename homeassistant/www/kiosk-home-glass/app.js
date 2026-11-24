@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, MEDIA_PLAYERS, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=30';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=30';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=30';
-import * as H from './home.js?v=30';
-import { injectIcons, ic, weatherArt } from './icons.js?v=30';
-import { VIEWS, viewEntityIds } from './views.js?v=30';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=30';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=31';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=31';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=31';
+import * as H from './home.js?v=31';
+import { injectIcons, ic, weatherArt } from './icons.js?v=31';
+import { VIEWS, viewEntityIds } from './views.js?v=31';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=31';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -297,6 +297,7 @@ function renderAll() {
   if (pending) return;
   pending = requestAnimationFrame(() => {
     pending = 0;
+    applyTheme();
     // A live sheet (cars, light details) re-renders with state, like a region.
     if (liveSheet && sheet().open && !sliding) {
       const h = liveSheet();
@@ -328,6 +329,16 @@ function bannerTicker(el) {
   g.classList.add('tick');
 }
 addEventListener('resize', () => { const el = $('#banner'); if (el) { last.delete('banner'); renderAll(); } });
+
+// Dark after sunset, light after sunrise (THEME 'sun'), whatever the tablet is set to. Until sun.sun is known,
+// and with THEME 'system', the tablet's own setting applies.
+function applyTheme() {
+  const sun = get(E.sun)?.state;
+  const want = THEME === 'sun' && (sun === 'below_horizon' || sun === 'above_horizon') ? (sun === 'below_horizon' ? 'dark' : 'light') : null;
+  const root = document.documentElement;
+  if (want && root.dataset.theme !== want) { root.dataset.theme = want; root.style.colorScheme = want; if (route !== 'home') last.delete('subview'); }
+  if (!want && root.dataset.theme) { delete root.dataset.theme; root.style.colorScheme = ''; }
+}
 
 // ---- Clock (once a second, outside the state render) ----
 function tick() {
@@ -816,7 +827,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=30';
+    : './vendor/hls.light.min.mjs?v=31';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

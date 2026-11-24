@@ -232,3 +232,28 @@ test('media pop-up: progress clock', () => {
   assert.equal(H.mediaElapsed({ pos: 10, at, dur: undefined, playing: true }, NOW), null);
   assert.equal(H.clockTime(161), '2:41'); assert.equal(H.clockTime(3725), '1:02:05'); assert.equal(H.clockTime(5), '0:05');
 });
+
+test('every dark style also applies when the page goes dark at sunset (data-theme="dark")', async () => {
+  const { readFileSync } = await import('node:fs');
+  for (const page of ['kiosk-home', 'kiosk-home-glass']) {
+    const s = readFileSync(new URL(`../../homeassistant/www/${page}/styles.css`, import.meta.url), 'utf8');
+    const norm = (x) => x.replace(/\s+/g, ' ').trim();
+    const whole = norm(s);
+    const missing = [];
+    for (const m of s.matchAll(/@media \(prefers-color-scheme: dark\) \{/g)) {
+      let i = m.index + m[0].length, depth = 1, start = i, d = 0;
+      for (; depth; i++) { if (s[i] === '{') depth++; else if (s[i] === '}') depth--; }
+      const body = s.slice(start, i - 1);
+      let from = 0;
+      for (let k = 0; k < body.length; k++) {
+        if (body[k] === '{') d++;
+        else if (body[k] === '}' && --d === 0) {
+          const rule = norm(body.slice(from, k + 1).replaceAll(':root:not([data-theme="light"])', ':root[data-theme="dark"]'));
+          if (!whole.includes(rule)) missing.push(rule.slice(0, 120));
+          from = k + 1;
+        }
+      }
+    }
+    assert.deepEqual(missing, [], `${page}: dark rules with no data-theme="dark" copy`);
+  }
+});
