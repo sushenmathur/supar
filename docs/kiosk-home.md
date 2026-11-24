@@ -93,6 +93,7 @@ Differences from the Lovelace sub-views, on purpose or because the source isn't 
   1. It asks the camera which live formats it supports (`camera/capabilities`).
   2. It plays WebRTC if offered (`camera/webrtc/offer` with ICE candidates), otherwise HLS (`camera/stream`, played with hls.js). Arlo cameras can take 10 to 20 seconds to start.
   3. If no live format works, it shows the latest image with Home Assistant's reason printed on it, for example `HLS: start_stream_failed: …`. That text, or the matching `kiosk-home: no live view …` console line in the KS remote admin, says why.
+  4. The pop-up resizes to the camera's own resolution, as large as the screen allows, so a square or wide camera fills the frame without black bars. This applies to every camera pop-up (Home, Security, Garage and Kids Rooms). A red **LIVE · HLS** or **LIVE · WebRTC** badge in the corner confirms you're watching live video, not the last recording.
 
   hls.js 1.7.4 (Apache-2.0) is in `vendor/`. It's loaded only when a camera pop-up opens; in the single-file build it's embedded as inert base64 text. Closing the pop-up closes the WebRTC connection or HLS player.
 - **Garage door and washer/dryer cards** are third-party too. The page uses the same entities from their config, with plain controls.

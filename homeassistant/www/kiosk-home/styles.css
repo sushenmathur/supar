@@ -384,3 +384,10 @@ button.car { text-align: left; }
 .well.tesla svg { width: 22px; height: 22px; fill: currentColor; }
 .livebox { position: relative; }
 .livebox[data-status]:not([data-status=""])::after { content: attr(data-status); position: absolute; left: 10px; right: 10px; bottom: 10px; padding: 6px 10px; line-height: 1.35; border-radius: 4px; background: rgba(10, 16, 40, .7); color: #fff; font-size: 13px; font-weight: 600; }
+
+/* Camera pop-up sized to the video: the sheet hugs the stream instead of a fixed 16:9 box. */
+.sheet.fitcam { max-width: calc(100vw - 32px); }
+.sheet.fitcam .livebox { margin-left: auto; margin-right: auto; max-width: 100%; }
+.sheet.fitcam .livebox img, .sheet.fitcam .livebox video { object-fit: cover; }
+/* LIVE badge once real video is playing (shows the transport, which helps diagnose). */
+.livebox[data-live]::before { content: "LIVE \00B7  " attr(data-live); position: absolute; left: 10px; top: 10px; z-index: 1; padding: 4px 10px; border-radius: 4px; background: var(--madder); color: #fff; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; }

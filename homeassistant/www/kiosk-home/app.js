@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=12';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=12';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=12';
-import * as H from './home.js?v=12';
-import { injectIcons, ic, weatherArt } from './icons.js?v=12';
-import { VIEWS, viewEntityIds } from './views.js?v=12';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=12';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, ROBBIE_ROOMS, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=13';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=13';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=13';
+import * as H from './home.js?v=13';
+import { injectIcons, ic, weatherArt } from './icons.js?v=13';
+import { VIEWS, viewEntityIds } from './views.js?v=13';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=13';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -322,7 +322,7 @@ function openSheet(html, onOpen) {
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
-sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
+sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam'); sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
 const ACTIONS = {
@@ -526,7 +526,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=12';
+    : './vendor/hls.light.min.mjs?v=13';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -551,11 +551,28 @@ async function startLive(box, id) {
   const status = (text) => { if (alive()) box.dataset.status = text; };
   const show = (el) => { if (alive()) { box.replaceChildren(el); mine.el = el; } };
   const reasons = [];
+  // Size the pop-up to the camera's real resolution, as large as the screen allows (no letterboxing).
+  const fit = (w, h) => {
+    if (!alive() || !w || !h) return;
+    const d = sheet();
+    const chrome = d.offsetHeight - box.offsetHeight; // title, buttons and padding
+    const pad = 52; // sheet padding (24 + 24) and key-line borders
+    const maxW = innerWidth - 32 - pad;
+    const maxH = innerHeight - 48 - chrome;
+    const k = Math.min(maxW / w, maxH / h);
+    const bw = Math.round(w * k);
+    box.style.aspectRatio = `${w} / ${h}`;
+    box.style.width = `${bw}px`;
+    d.style.width = `${Math.max(bw + pad, 360)}px`;
+    d.classList.add('fitcam');
+  };
+  const onLive = (via) => { if (alive()) { status(''); box.dataset.live = via; } };
 
   const snapshots = () => {
     if (!alive()) return;
     const img = document.createElement('img');
     img.alt = 'Latest snapshot';
+    img.addEventListener('load', () => fit(img.naturalWidth, img.naturalHeight), { once: true });
     const poll = () => { const u = camUrl(id); if (u) img.src = u; };
     poll(); mine.timers.push(setInterval(poll, 2000));
     show(img);
@@ -569,6 +586,7 @@ async function startLive(box, id) {
     if (!token) return snapshots();
     const img = document.createElement('img');
     img.alt = 'Latest image';
+    img.addEventListener('load', () => fit(img.naturalWidth, img.naturalHeight), { once: true });
     img.onerror = () => { img.onerror = null; snapshots(); };
     img.src = `/api/camera_proxy_stream/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`;
     show(img);
@@ -583,6 +601,7 @@ async function startLive(box, id) {
   const newVideo = () => {
     const v = document.createElement('video');
     Object.assign(v, { muted: true, autoplay: true, playsInline: true });
+    v.addEventListener('loadedmetadata', () => fit(v.videoWidth, v.videoHeight));
     v.setAttribute('aria-label', 'Live view');
     return v;
   };
@@ -617,7 +636,7 @@ async function startLive(box, id) {
       mine.cleanups.push(() => quiet(Promise.resolve(unsub())));
     } catch (e) { reasons.push(`WebRTC offer: ${errText(e)}`); return false; }
     show(video);
-    if (await playing) { status(''); return true; }
+    if (await playing) { onLive('WebRTC'); return true; }
     if (!reasons.some((r) => r.startsWith('WebRTC'))) reasons.push('WebRTC: no video within 20 s');
     pc.close();
     return false;
@@ -646,7 +665,7 @@ async function startLive(box, id) {
       video.src = url;
     } else { reasons.push('HLS: not supported on this device'); return false; }
     show(video);
-    if (await playing) { status(''); return true; }
+    if (await playing) { onLive('HLS'); return true; }
     if (!reasons.some((r) => r.startsWith('HLS'))) reasons.push('HLS: no video within 25 s');
     return false;
   }
