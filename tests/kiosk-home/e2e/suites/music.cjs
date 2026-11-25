@@ -21,14 +21,14 @@ const tokens = () => localStorage.setItem('hassTokens', JSON.stringify({ hassUrl
     check('in Kiosk Satellite the Music tab opens the kiosk player', await tab(p).evaluate((t) => t.tagName === 'BUTTON' && t.dataset.act === 'ks-music'));
     let n = (await log()).length; await tab(p).click(); await sleep(300);
     let c = (await log()).slice(n);
-    check('nothing loaded: opens the Music Library (this kiosk\'s)', c.length === 1 && c[0].svc === 'button.press' && c[0].data.entity_id === 'button.ks_kitchen_tablet_show_music_library', JSON.stringify(c));
+    check('opens the Music Library (button.kitchen_tab_show_music_library)', c.length === 1 && c[0].svc === 'button.press' && c[0].data.entity_id === 'button.kitchen_tab_show_music_library', JSON.stringify(c));
     check('stays on the page', (await p.evaluate(() => location.hash)) !== '#music');
     await p.evaluate(() => { window.kioskSatellite.st = { screensaver: { active: false }, mediaPlayer: { state: 'playing', title: 'Song' } }; dispatchEvent(new CustomEvent('kiosksatellite:kiosk-state', { detail: window.kioskSatellite.st })); });
     n = (await log()).length; await tab(p).click(); await sleep(300); c = (await log()).slice(n);
-    check('a track playing: opens Now Playing (this kiosk\'s)', c.length === 1 && c[0].svc === 'switch.turn_on' && c[0].data.entity_id === 'switch.ks_kitchen_tablet_now_playing', JSON.stringify(c));
+    check('a track playing: still the Music Library', c.length === 1 && c[0].svc === 'button.press' && c[0].data.entity_id === 'button.kitchen_tab_show_music_library', JSON.stringify(c));
     await p.evaluate(() => dispatchEvent(new CustomEvent('kiosksatellite:kiosk-state', { detail: { screensaver: { active: false }, mediaPlayer: { state: 'paused' } } })));
     n = (await log()).length; await tab(p).click(); await sleep(300); c = (await log()).slice(n);
-    check('paused counts as loaded', c[0]?.svc === 'switch.turn_on', JSON.stringify(c));
+    check('paused: still the Music Library', c[0]?.svc === 'button.press', JSON.stringify(c));
   }
   const out = await open(tokens);
   check('outside Kiosk Satellite: Music Assistant as before', await tab(out.p).evaluate((t) => t.tagName === 'A' && t.getAttribute('href') === '#music'));

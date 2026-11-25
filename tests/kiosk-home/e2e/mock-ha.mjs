@@ -129,7 +129,8 @@ if (process.env.MOCK_MEDIA) {
 
 // MOCK_KS_MUSIC: two Kiosk Satellite tablets' ESPHome entities (Now Playing switch, Show Music Library button).
 if (process.env.MOCK_KS_MUSIC) {
-  for (const k of ['kitchen_tablet', 'bedroom_tablet']) { set(`switch.ks_${k}_now_playing`, 'off'); set(`button.ks_${k}_show_music_library`, 'unknown'); }
+  for (const k of ['kitchen_tablet', 'bedroom_tablet']) set(`switch.ks_${k}_now_playing`, 'off');
+  set('button.kitchen_tab_show_music_library', 'unknown'); set('button.ks_bedroom_tablet_show_music_library', 'unknown');
 }
 
 // Live-view camera with no entity_picture (only an access token), as Arlo live entities can be.

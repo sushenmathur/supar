@@ -43,7 +43,7 @@ leaks between them, and prints one line per suite. Options: `--page kiosk-home`,
 | `tv` | TV remote on long press: every button's service, sources, power, disabled when off; car charging bolt |
 | `banner` | The alert banner: priorities and colours (red, amber, grey), grouping, chips, night-only doors, the ticker |
 | `theme` | Dark at sunset and light at sunrise, live; the dark-by-sun page matches the tablet's dark mode pixel for pixel |
-| `music` | The Music tab in Kiosk Satellite: Music Library when nothing is loaded, Now Playing while playing or paused, this kiosk's entities among several; Music Assistant without them or outside Kiosk Satellite |
+| `music` | The Music tab in Kiosk Satellite presses `button.kitchen_tab_show_music_library` (the Music Library); Music Assistant without it or outside Kiosk Satellite |
 | `media` | The Media pop-up: each player listed once and in order, the hero's controls and volume slider, row buttons, power (TV, bedroom TV switch, others), the TV remote, artwork only through Home Assistant, the progress clock |
 | `alarm` | A wrong passcode shows "Access denied" and leaves the alarm alone, for arm home, arm away and disarm, in six set-ups: the script with an alarm without a code, with one that rejects wrong codes, with one that ignores them silently (like Alarmo); no script with an alarm code; no script and no code; and the script passing while the alarm's own code differs |
 | `glass` | Glass-only layout: ticker, calendar stamps, spacing, Kids Rooms |

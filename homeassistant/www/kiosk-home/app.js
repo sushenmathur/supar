@@ -1,11 +1,11 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=31';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=31';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=31';
-import * as H from './home.js?v=31';
-import { injectIcons, ic, weatherArt } from './icons.js?v=31';
-import { VIEWS, viewEntityIds } from './views.js?v=31';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=31';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=32';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=32';
+import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=32';
+import * as H from './home.js?v=32';
+import { injectIcons, ic, weatherArt } from './icons.js?v=32';
+import { VIEWS, viewEntityIds } from './views.js?v=32';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=32';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -406,13 +406,12 @@ const ACTIONS = {
     quiet(on ? call('media_player', 'turn_off', { entity_id: E.tv }) : call('script', 'turn_on', { entity_id: 'script.media_tv_power' }));
   },
   'tv-remote': () => { sheet().classList.remove('mediasheet'); openLive(tvRemoteSheet); sheet().classList.add('tvsheet'); },
-  // The Music tab in Kiosk Satellite: its Now Playing view while a track is loaded, else its Music Library.
-  // Falls back to the Music Assistant view if the kiosk doesn't respond.
+  // The Music tab in Kiosk Satellite: the kiosk's Music Library (its Now Playing view only if there's no library
+  // button). Falls back to the Music Assistant view if the kiosk doesn't respond.
   'ks-music': () => {
-    const loaded = ['playing', 'paused'].includes(ksMedia?.state);
     const fallback = () => { location.hash = '#music'; };
-    if (ksMusic.nowPlaying && (loaded || !ksMusic.library)) quiet(call('switch', 'turn_on', { entity_id: ksMusic.nowPlaying }).catch(fallback));
-    else if (ksMusic.library) quiet(call('button', 'press', { entity_id: ksMusic.library }).catch(fallback));
+    if (ksMusic.library) quiet(call('button', 'press', { entity_id: ksMusic.library }).catch(fallback));
+    else if (ksMusic.nowPlaying) quiet(call('switch', 'turn_on', { entity_id: ksMusic.nowPlaying }).catch(fallback));
     else fallback();
   },
   media: () => { openLive(mediaSheet); sheet().classList.add('mediasheet'); },
@@ -818,7 +817,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=31';
+    : './vendor/hls.light.min.mjs?v=32';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

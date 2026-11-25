@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home
-export const VERSION = '31';
+export const VERSION = '32';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -152,12 +152,11 @@ export const TV_SOURCES = [['Netflix', 'Netflix', '#E50914'], ['Prime Video', 'P
 
 // Guest WiFi QR, the same image the dashboard's WiFi popup shows.
 // Music Assistant's Home Assistant panel (same origin, so no host or IP in the page).
-// Inside Kiosk Satellite the Music tab opens the kiosk's own player, through its ESPHome entities (Kiosk Satellite:
-// Settings > ESPHome, Expose kiosk entities): Now Playing while a track is loaded, the Music Library otherwise.
-// null: found by name (switch.*_now_playing, button.*_show_music_library), picking this kiosk's when there are
-// several. Set the entity ids here if that guesses wrong. Without them, or outside Kiosk Satellite, the tab shows
-// Music Assistant (MUSIC_PANEL) as before.
-export const KS_MUSIC = { nowPlaying: null, library: null };
+// Inside Kiosk Satellite the Music tab opens the kiosk's Music Library, by pressing its ESPHome button (Kiosk
+// Satellite: Settings > ESPHome, Expose kiosk entities). nowPlaying is only used if there is no library button;
+// null finds an entity by name (switch.*_now_playing, button.*_show_music_library). Without them, or outside
+// Kiosk Satellite, the tab shows Music Assistant (MUSIC_PANEL).
+export const KS_MUSIC = { nowPlaying: null, library: 'button.kitchen_tab_show_music_library' };
 export const MUSIC_PANEL = '/d5369777_music_assistant';
 
 export const WIFI_QR = '/api/image/serve/50750ef2d78e15cc901576e1c9fa2bae/512x512';
