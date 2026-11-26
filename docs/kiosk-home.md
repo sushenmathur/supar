@@ -133,6 +133,7 @@ Differences from the Lovelace view, on purpose:
 - **Kept light on the tablet:**
   - Everything moving is transform/opacity only, so it runs on the GPU.
   - Animations pause under the screensaver or when the page is hidden, and are off with reduced motion.
+  - Pop-ups use Kiosk Satellite's non-audio interaction hold. In 2026.11.32 and later, this holds the screensaver and dashboard timers while the pop-up is open. On older versions, it holds the screensaver and leaves dashboard rotation and return-to-home timers running.
   - The energy HUD keeps its moving parts (flow dots, ring dashes) on a separate transparent layer and steps them at 16 and 4 updates a second, so the photo, frosted glass and text aren't repainted each frame. It only runs while the view is open.
   - Measured with Playwright on a 4× throttled CPU, with one live state change a second:
     - every view holds 61 fps

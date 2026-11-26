@@ -4,7 +4,7 @@ const R = []; const check = (n, c, x = '') => R.push(`${c ? 'PASS' : 'FAIL'} ${n
 const calls = async () => (await (await fetch(BASE + '/__log')).json()).calls;
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const tokens = () => localStorage.setItem('hassTokens', JSON.stringify({ hassUrl: location.origin, clientId: location.origin + '/', access_token: 'x', refresh_token: 'r', expires: Date.now() + 3e6 }));
-const KS = (sharing) => `window.kioskSatellite={platform:'kiosksatellite',ia:[],setInteractionActive(a){this.ia.push(a);return Promise.resolve(true)},getKioskState(){return Promise.resolve({screensaver:{active:false}})},
+const KS = (sharing, version = '2026.11.32+375') => `window.kioskSatellite={platform:'kiosksatellite',version:${JSON.stringify(version)},ia:[],setInteractionActive(active,reason){this.ia.push([active,reason]);return Promise.resolve(true)},getKioskState(){return Promise.resolve({screensaver:{active:false}})},
  ha:{createSocket(){ if(!${sharing}) return Promise.reject(2); return new Promise((res)=>{const ws=new WebSocket(location.origin.replace(/^http/,'ws')+'/api/websocket');ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='auth_required')ws.send(JSON.stringify({type:'auth',access_token:'k'}));if(m.type==='auth_ok'){ws.onmessage=null;ws.haVersion=m.ha_version;res(ws)}}})}}};`;
 (async () => {
   const b = await chromium.launch();
@@ -81,9 +81,19 @@ const KS = (sharing) => `window.kioskSatellite={platform:'kiosksatellite',ia:[],
   check('camera refreshed', (await (await fetch(BASE + '/__log')).json()).camera >= 1);
   check('console clean', !logs.some(l => /error|secret|token=/.test(l)), logs.join(' | '));
 
-  const ks = await page(KS(true));
-  await ks.p.locator('[data-act="wifi"]').click(); await sleep(200); await ks.p.keyboard.press('Escape'); await sleep(200);
-  check('KS on: renders + interaction bracket', (await ks.p.locator('#lights button').count()) === 6 && JSON.stringify(await ks.p.evaluate(() => window.kioskSatellite.ia)) === '[true,false]');
+  for (const [version, reason] of [['2026.11.32+375', 'settings'], ['2026.11.31', 'media'], ['', 'media']]) {
+    const ks = await page(KS(true, version));
+    const before = (await calls()).length;
+    await ks.p.locator('[data-act="wifi"]').click();
+    await ks.p.locator('#sheet [data-act="sheet-close"]').click();
+    await ks.p.waitForFunction(() => window.kioskSatellite.ia.length >= 2);
+    const interaction = await ks.p.evaluate(() => window.kioskSatellite.ia);
+    check(`KS ${version || 'without a version'}: popup brackets with ${reason} and sends no HA service call`,
+      await ks.p.locator('#lights button').count() === 6 &&
+      JSON.stringify(interaction) === JSON.stringify([[true, reason], [false, reason]]) &&
+      (await calls()).length === before, JSON.stringify(interaction));
+    await ks.p.close();
+  }
   const off = await page(KS(false));
   check('KS off: sharing message', /Share Home Assistant connection/.test(await off.p.locator('#message').textContent()));
   const none = await page(() => {});

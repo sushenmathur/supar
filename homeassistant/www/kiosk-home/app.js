@@ -1,12 +1,12 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=34';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=34';
-import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=34';
-import * as H from './home.js?v=34';
-import { mountPerson, personMarkup } from './person.js?v=34';
-import { injectIcons, ic, weatherArt } from './icons.js?v=34';
-import { VIEWS, viewEntityIds } from './views.js?v=34';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=34';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=35';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=35';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=35';
+import * as H from './home.js?v=35';
+import { mountPerson, personMarkup } from './person.js?v=35';
+import { injectIcons, ic, weatherArt } from './icons.js?v=35';
+import { VIEWS, viewEntityIds } from './views.js?v=35';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=35';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -353,11 +353,16 @@ const CLOSE = '<button class="btn line close b" data-act="sheet-close">Close</bu
 let liveSheet = null;
 let lastSheet = '';
 let personSheet = null;
+// Kiosk Satellite 2026.11.32 added a non-audio hold for settings (#1603).
+// Older versions only exempt 'media' from audio ducking and audio focus.
+const [ksYear, ksMonth, ksRelease] = (ks?.version ?? '').split('.').map((part) => parseInt(part, 10));
+const popupInteractionReason = ksYear > 2026 ||
+  (ksYear === 2026 && (ksMonth > 11 || (ksMonth === 11 && ksRelease >= 32))) ? 'settings' : 'media';
 function openSheet(html, onOpen, { closeButton = true } = {}) {
   const d = sheet();
   liveSheet = null;
   d.innerHTML = html + (closeButton ? CLOSE : '');
-  if (!d.open) { d.showModal(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(true, 'dashboard'))); }
+  if (!d.open) { d.showModal(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(true, popupInteractionReason))); }
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
@@ -373,7 +378,7 @@ sheet().addEventListener('close', () => {
   mediaSel = null;
   sliding = false;
   d.style.width = '';
-  if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard')));
+  if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, popupInteractionReason)));
 });
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
@@ -834,7 +839,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=34';
+    : './vendor/hls.light.min.mjs?v=35';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
