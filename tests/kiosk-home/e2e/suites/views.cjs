@@ -5,7 +5,7 @@ const log = async () => (await (await fetch(BASE + '/__log')).json()).calls;
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 (async () => {
   const b = await chromium.launch();
-  const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
+  const p = await b.newPage({ viewport: { width: 1280, height: 800 }, hasTouch: true });
   const logs = []; p.on('console', m => logs.push(m.type() + ': ' + m.text())); p.on('pageerror', e => logs.push('pageerror: ' + e.message));
   await p.addInitScript(() => localStorage.setItem('hassTokens', JSON.stringify({ hassUrl: location.origin, clientId: location.origin + '/', access_token: 'x', refresh_token: 'r', expires: Date.now() + 3e6 })));
   await p.goto(PAGE); await sleep(1200);
@@ -32,6 +32,34 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   check('All off needs second tap', (await log()).length === n0 && /Tap again/.test(await p.locator('#subview .vhead').textContent()));
   await p.locator('#subview button', { hasText: 'Tap again' }).click(); await sleep(300);
   check('All off turns everything off', (await log()).at(-1) === 'homeassistant.turn_off' && /0<\/b> of 18/.test(await p.locator('#subview .vhead').innerHTML()));
+  // Floor plan pins must stay over their anchors while pressed, so the tap can land.
+  await go('living-room');
+  const pins = p.locator('.plan [data-act="toggle"]');
+  const ids = await pins.evaluateAll((buttons) => buttons.map((button) => button.dataset.arg));
+  check('floor plan shows all five light controls', ids.length === 5);
+  for (const id of ids) {
+    const selector = `.plan [data-arg="${id}"]`;
+    const pin = p.locator(selector);
+    const centre = ({ x, y, width, height }) => [x + width / 2, y + height / 2];
+    const [x, y] = centre(await pin.boundingBox());
+    const requestCount = (await log()).length;
+    await p.mouse.move(x, y);
+    await p.mouse.down();
+    const [pressedX, pressedY] = centre(await pin.boundingBox());
+    await p.mouse.up();
+    const lit = (on) => p.waitForFunction(
+      ({ selector, on }) => document.querySelector(selector)?.classList.contains('on') === on,
+      { selector, on }, { timeout: 1500 },
+    ).then(() => true, () => false);
+    const turnedOn = await lit(true);
+    await pin.tap();
+    const turnedOff = await lit(false);
+    const calls = (await (await fetch(BASE + '/__log')).json()).data.slice(requestCount);
+    check(`floor plan ${id} stays in place and toggles on and off with mouse and touch`,
+      Math.hypot(pressedX - x, pressedY - y) <= 2 && turnedOn && turnedOff && calls.length === 2 &&
+      calls.every(({ svc, data }) => svc === 'homeassistant.toggle' && data.entity_id === id),
+      `pressed shift: ${Math.hypot(pressedX - x, pressedY - y).toFixed(1)}px; on: ${turnedOn}; off: ${turnedOff}; calls: ${calls.length}`);
+  }
   // Climate
   await go('homeclimate');
   await p.locator('#subview [data-act="temp"][data-arg="climate.bed_ac|1"]').click(); await sleep(250);

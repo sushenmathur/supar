@@ -1,12 +1,12 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=34';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=34';
-import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=34';
-import * as H from './home.js?v=34';
-import { mountPerson, personMarkup } from './person.js?v=34';
-import { injectIcons, ic, weatherArt } from './icons.js?v=34';
-import { VIEWS, viewEntityIds } from './views.js?v=34';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=34';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=35';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=35';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=35';
+import * as H from './home.js?v=35';
+import { mountPerson, personMarkup } from './person.js?v=35';
+import { injectIcons, ic, weatherArt } from './icons.js?v=35';
+import { VIEWS, viewEntityIds } from './views.js?v=35';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=35';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -853,7 +853,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=34';
+    : './vendor/hls.light.min.mjs?v=35';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

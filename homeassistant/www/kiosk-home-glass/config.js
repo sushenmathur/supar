@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home-glass
-export const VERSION = '34';
+export const VERSION = '35';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
