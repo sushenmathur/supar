@@ -1042,3 +1042,26 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 .person-events li { display: grid; grid-template-columns: 8px 1fr auto; align-items: center; gap: 9px; min-height: 38px; padding: 5px 3px; border-bottom: 1px solid var(--person-line); }
 .person-events strong { color: var(--person-state); overflow-wrap: anywhere; }
 .person-events time { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Compact bin reminder. The day and enlarged lid icons share the bottom row. */
+.util .bin-tile {
+  display: grid; grid-template: 28px 16px 21px / minmax(0, 1fr); align-content: center;
+  gap: 2px; min-width: 0; min-height: 84px; padding: 6px 9px; text-align: left;
+}
+.util .bin-tile .well { grid-area: 1 / 1; width: 28px; height: 28px; }
+.util .bin-tile .name { grid-area: 2 / 1; }
+.util .bin-summary { grid-area: 3 / 1; display: flex; align-items: center; justify-content: space-between; gap: 3px; font-size: 12px; }
+.util .bin-tile .binicons { flex: none; gap: 2px; margin: 0 0 0 auto; }
+.util .bin-tile .binico { width: 21px; height: 21px; }
+.util .bin-tile .binico .ic { width: 19px; height: 19px; }
+.util .bin-reminder {
+  grid-area: 1 / 1; justify-self: end; align-self: center; width: calc(100% - 31px);
+  font-size: 9.5px; line-height: 1.05; font-weight: 800; text-align: right;
+}
+.util .bin-tile.done .bin-reminder { color: var(--dabu); }
+.util .bin-tile.alert .binico.r { background: #ffe8e5; color: #a82026; }
+.util .bin-tile.alert .binico.y { background: #fff0be; color: #715300; }
+.util .bin-tile.alert .binico.g { background: #e5f4e7; color: #20663a; }
+.util .bin-tile.three-bins .bin-summary { display: contents; }
+.util .three-bins .bin-day { grid-area: 2 / 1; justify-self: end; position: relative; z-index: 3; }
+.util .three-bins .binicons { grid-area: 3 / 1; position: relative; z-index: 3; }

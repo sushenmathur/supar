@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=37';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=38';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -347,12 +347,37 @@ export function robbie(get) {
   return { label: words[v] ?? titleCase(v ?? '—'), alert: v === 'error', on: v === 'cleaning' || v === 'returning' };
 }
 
+let binClockZone;
+let binClockFormatter;
+function binClockParts(now, timeZone) {
+  if (!binClockFormatter || binClockZone !== timeZone) {
+    binClockZone = timeZone;
+    binClockFormatter = new Intl.DateTimeFormat('en-AU', {
+      timeZone, weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', hourCycle: 'h23',
+    });
+  }
+  return Object.fromEntries(binClockFormatter.formatToParts(now).map(({ type, value }) => [type, value]));
+}
+
+// The reminder is keyed by the local Monday date, including on Tuesday morning.
+export function binReminderWeek(now, timeZone) {
+  const { weekday, year, month, day, hour } = binClockParts(now, timeZone);
+  if (!(weekday === 'Mon' && Number(hour) >= 16) && !(weekday === 'Tue' && Number(hour) < 8)) return '';
+  return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day) - (weekday === 'Tue' ? 1 : 0))).toISOString().slice(0, 10);
+}
+
 /**
  * Next bin collection. The wheelie-bin sensors aren't defined in this repo, so read whichever shape
  * they have: a number of days, a date, or a `days`/`days_to`/`date` attribute. Unknown shapes are skipped.
  */
-export function nextBins(get, today = new Date()) {
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+export function nextBins(get, today = new Date(), timeZone) {
+  const civilDay = (date) => {
+    const { year, month, day } = binClockParts(date, timeZone);
+    return Date.UTC(Number(year), Number(month) - 1, Number(day));
+  };
+  const dayMs = 86400000;
+  const start = civilDay(today);
   const daysUntil = (s) => {
     if (!s || ['unknown', 'unavailable'].includes(s.state)) return null;
     const a = s.attributes ?? {};
@@ -362,7 +387,10 @@ export function nextBins(get, today = new Date()) {
     }
     for (const v of [a.date, a.next_date, a.next_collection, s.state]) {
       const t = Date.parse(v);
-      if (Number.isFinite(t)) { const d = new Date(t); return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - start) / 86400000); }
+      if (Number.isFinite(t)) {
+        const date = /^\d{4}-\d{2}-\d{2}$/.test(v) ? t : civilDay(new Date(t));
+        return (date - start) / dayMs;
+      }
     }
     if (/today/i.test(s.state)) return 0;
     if (/tomorrow/i.test(s.state)) return 1;
@@ -371,8 +399,9 @@ export function nextBins(get, today = new Date()) {
   const due = BINS.map((b) => ({ ...b, days: daysUntil(get(b.id)) })).filter((b) => b.days !== null && b.days >= 0);
   if (!due.length) return null;
   const min = Math.min(...due.map((b) => b.days));
-  const when = min === 0 ? 'Today' : min === 1 ? 'Tomorrow' : new Date(start + min * 86400000).toLocaleDateString('en-AU', { weekday: 'short' });
-  return { when, bins: due.filter((b) => b.days === min) };
+  const day = new Date(start + Math.trunc(min) * dayMs).toLocaleDateString('en-AU', { timeZone: 'UTC', weekday: 'short' });
+  const when = min === 0 ? 'Today' : min === 1 ? 'Tomorrow' : day;
+  return { when, day, bins: due.filter((b) => b.days === min) };
 }
 
 // ---- Security ----

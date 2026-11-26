@@ -22,7 +22,7 @@ const builds = process.argv.includes('--quick') ? [''] : ['', '1'];
 
 // [suite, mock env, run env, pages it applies to (default all), builds (default all)]
 const SUITES = [
-  ['home'], ['views'], ['fixes'], ['fit'], ['live'], ['charging'], ['energy'], ['six'],
+  ['home'], ['views'], ['fixes'], ['fit'], ['live'], ['charging'], ['energy'], ['six'], ['bins'],
   ['tv', { MOCK_TV: '1' }], ['media', { MOCK_MEDIA: '1' }], ['banner'], ['theme'], ['music', { MOCK_KS_MUSIC: '1' }], ['music', {}, { MODE: 'none' }],
   ['cars', {}, { LOGOS: '1' }], ['cars', { MOCK_NO_LOGOS: '1' }, { LOGOS: '' }],
   ['person', { MOCK_PERSON: '1' }],

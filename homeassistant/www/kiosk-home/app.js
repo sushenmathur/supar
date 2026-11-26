@@ -1,12 +1,12 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=36';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=36';
-import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=36';
-import * as H from './home.js?v=36';
-import { mountPerson, personMarkup } from './person.js?v=36';
-import { injectIcons, ic, weatherArt } from './icons.js?v=36';
-import { VIEWS, viewEntityIds } from './views.js?v=36';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=36';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=37';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=37';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=37';
+import * as H from './home.js?v=37';
+import { mountPerson, personMarkup } from './person.js?v=37';
+import { injectIcons, ic, weatherArt } from './icons.js?v=37';
+import { VIEWS, viewEntityIds } from './views.js?v=37';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=37';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -18,6 +18,15 @@ const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 let conn = null;
 let via = '';
 let tz = 'Australia/Brisbane';
+const BINS_DONE_KEY = 'supar.bins-out-week';
+let binWeek = '';
+let binsOutWeek = '';
+try { binsOutWeek = localStorage.getItem(BINS_DONE_KEY) ?? ''; } catch { /* storage unavailable */ }
+addEventListener('storage', (event) => {
+  if (event.key !== BINS_DONE_KEY && event.key !== null) return;
+  binsOutWeek = event.newValue ?? '';
+  renderAll();
+});
 let mediaIds = [];
 let events = null;
 
@@ -219,13 +228,21 @@ const regions = {
   },
 
   util() {
-    const bins = H.nextBins(get);
+    const bins = H.nextBins(get, new Date(), tz);
     const w = H.machine(get, E.washer, E.washerEnd);
     const d = H.machine(get, E.dryer, E.dryerEnd);
     // Bin icons in the bin's colour: general (red bin), recycling (yellow recycle), garden organics (green leaf).
     const BIN_ICON = { r: 'bin', y: 'recycle', g: 'leaf' };
     const lids = bins ? `<span class="binicons">${bins.bins.map((b) => `<span class="binico ${b.lid}" title="${esc(b.label)}">${ic(BIN_ICON[b.lid] ?? 'bin')}</span>`).join('')}</span>` : '';
-    return `<div class="tile b"><span class="well">${ic('bin')}</span><span><span class="name">Bins</span><span class="sub">${bins ? esc(bins.when) : '—'}${lids}</span></span></div>`
+    const done = Boolean(binWeek && binsOutWeek === binWeek);
+    const alert = binWeek && !done;
+    const binLabel = ['Bins', bins?.when, bins?.bins.map((b) => b.label).join(', ')].filter(Boolean).join(' · ');
+    return `<button type="button" class="tile b bin-tile${alert ? ' alert' : done ? ' done' : ''}${bins?.bins.length === 3 ? ' three-bins' : ''}" data-act="bins-out" aria-label="${esc(binLabel)}"${binWeek ? ` aria-describedby="bin-reminder" aria-pressed="${done}"` : ' disabled'}>
+      <span class="well">${ic('bin')}</span>
+      ${binWeek ? `<span class="bin-reminder" id="bin-reminder">${done ? 'Bins out ✓' : 'Put bins out'}</span>` : ''}
+      <span class="name">Bins</span>
+      <span class="sub bin-summary"><span class="bin-day" title="${esc(bins?.when)}">${bins ? esc(bins.day) : '—'}</span>${lids}</span>
+    </button>`
       + tile({ act: 'go', arg: '#laundry', icon: 'washer', name: 'Washer', sub: w.short ?? w.label, on: w.on, cls: w.on ? 'spin' : '' })
       + tile({ act: 'go', arg: '#laundry', icon: 'dryer', name: 'Dryer', sub: d.short ?? d.label, on: d.on, cls: d.on ? 'spin' : '' });
   },
@@ -311,8 +328,10 @@ function renderAll() {
       if (last.get(name) === html) continue;
       last.set(name, html);
       const el = document.getElementById(name);
+      const restoreBinFocus = name === 'util' && document.activeElement?.matches('.bin-tile');
       if (name === 'energy' && el) renderEnergy(el, html);
       else if (el) { el.innerHTML = fillPhase(html); if (name === 'banner') bannerTicker(el); }
+      if (restoreBinFocus) el.querySelector('.bin-tile:not(:disabled)')?.focus({ preventScroll: true });
     }
   });
 }
@@ -354,7 +373,15 @@ function tick() {
     clk.textContent = hm;
   }
   // The energy HUD shows the time too: redraw it when the minute changes while it's on screen.
-  if (hm !== tick.hm) { tick.hm = hm; if (route === 'energy-dashboard') { last.delete('subview'); renderAll(); } }
+  if (hm !== tick.hm) {
+    tick.hm = hm;
+    if (route === 'energy-dashboard') { last.delete('subview'); renderAll(); }
+    const week = H.binReminderWeek(now, tz);
+    if (week !== binWeek) {
+      binWeek = week;
+      if (route === 'home') renderAll();
+    }
+  }
   // Only touch the DOM when text changes: every write costs a restyle, more so while animations run.
   const put = (sel, v) => { const el = $(sel); if (el.textContent !== v) el.textContent = v; };
   put('#ampm', ap.toUpperCase());
@@ -403,6 +430,13 @@ sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(
 const ACTIONS = {
   noop() {},
   'sheet-close': closeSheet,
+  'bins-out': () => {
+    const week = H.binReminderWeek(new Date(), tz);
+    if (!week) return;
+    binsOutWeek = binsOutWeek === week ? '' : week;
+    try { localStorage.setItem(BINS_DONE_KEY, binsOutWeek); } catch { /* keep the current page state */ }
+    renderAll();
+  },
   person: personLocationSheet,
   go: (arg) => { if (arg.startsWith('#')) location.hash = arg; else location.href = arg; },
   rooms: () => openSheet(`<h2>Rooms</h2><div class="acts">${ROOM_ROUTES.map(([r, n, i]) => `<button class="tile b" data-act="go" data-arg="#${r}">${ic(i)}${n}</button>`).join('')}</div>`),
@@ -857,7 +891,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=36';
+    : './vendor/hls.light.min.mjs?v=37';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

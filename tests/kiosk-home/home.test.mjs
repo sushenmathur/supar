@@ -159,6 +159,26 @@ test('washer countdown and Robbie dock errors', () => {
   assert.deepEqual(H.robbie(get), { label: 'Water Empty', alert: true, on: false });
 });
 
+test('weekly bin reminder uses Home Assistant time and one key across midnight', async () => {
+  const glass = await import('../../homeassistant/www/kiosk-home-glass/home.js');
+  for (const { binReminderWeek, nextBins } of [H, glass]) {
+    const week = (iso, zone = 'Australia/Brisbane') => binReminderWeek(new Date(iso), zone);
+    assert.equal(week('2026-11-30T05:59:59Z'), '');
+    assert.equal(week('2026-11-30T06:00:00Z'), '2026-11-30');
+    assert.equal(week('2026-11-30T14:00:00Z'), '2026-11-30');
+    assert.equal(week('2026-11-30T21:59:59Z'), '2026-11-30');
+    assert.equal(week('2026-11-30T22:00:00Z'), '');
+    assert.equal(week('2026-12-07T06:00:00Z'), '2026-12-07');
+    assert.equal(week('2026-11-29T06:00:00Z'), '');
+    assert.equal(week('2026-11-30T05:00:00Z', 'Australia/Sydney'), '2026-11-30');
+    const get = world({ 'sensor.general_waste': ['2026-12-01'], 'sensor.garden_organics': ['Today'] });
+    const bins = nextBins(get, new Date('2026-11-30T22:00:00Z'), 'Australia/Brisbane');
+    assert.equal(bins.day, 'Tue');
+    assert.equal(bins.when, 'Today');
+    assert.equal(bins.bins.length, 2);
+  }
+});
+
 test('next bins reads days, dates and words', () => {
   const today = new Date('2026-11-23T09:00:00');
   const get = world({ 'sensor.general_waste': ['2'], 'sensor.recycling': ['2026-11-25'], 'sensor.garden_organics': ['Tomorrow'] });

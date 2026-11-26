@@ -38,6 +38,7 @@ leaks between them, and prints one line per suite. Options: `--page kiosk-home`,
 | `live` | WebRTC and HLS live video, and the fallback with Home Assistant's reason |
 | `charging` | Phone charging animation, status sensor first and iPhone sensor as backup |
 | `energy` | Energy card flow colours and pill, the in-page Energy HUD, its taps, fonts and no outside requests |
+| `bins` | Bin reminder cut-offs, tap to mark done and undo, reload and weekly reset, compact icon layout |
 | `six` | Hallway note, bin icons, garage confirmation from every entry point, aircon text, flow pill, alarm dial |
 | `cars` | Car badges use the logo images from `/config/www/images/`, and fall back to the built-in marks when they're missing |
 | `tv` | TV remote on long press: every button's service, sources, power, disabled when off; car charging bolt |
