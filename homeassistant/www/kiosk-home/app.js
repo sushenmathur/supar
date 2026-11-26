@@ -1,12 +1,12 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=35';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=35';
-import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=35';
-import * as H from './home.js?v=35';
-import { mountPerson, personMarkup } from './person.js?v=35';
-import { injectIcons, ic, weatherArt } from './icons.js?v=35';
-import { VIEWS, viewEntityIds } from './views.js?v=35';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=35';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=36';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=36';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=36';
+import * as H from './home.js?v=36';
+import { mountPerson, personMarkup } from './person.js?v=36';
+import { injectIcons, ic, weatherArt } from './icons.js?v=36';
+import { VIEWS, viewEntityIds } from './views.js?v=36';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=36';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -209,9 +209,9 @@ const regions = {
       </div>
       <div class="flow num">
         <div class="node n-grid"><span class="well">${ic('tower')}</span><b>${e.grid.value}</b><span class="sub">${e.grid.label}</span></div>
-        <span class="flowline ${e.grid.dir === 'in' ? 'to-right imp' : e.grid.dir === 'out' ? 'to-left exp' : 'idle'}"><i style="${phase(2200)}"></i></span>
+        <span data-flow="grid" class="flowline ${e.grid.dir === 'in' ? 'to-right imp' : e.grid.dir === 'out' ? 'to-left exp' : 'idle'}"><i style="--flow-duration:${e.grid.periodMs}ms;${phase(e.grid.periodMs)}"></i></span>
         <div class="node n-home"><span class="well">${ic('home')}</span><b>${e.home}</b><span class="sub">Home</span></div>
-        <span class="flowline ${e.solar.active ? 'to-left exp' : 'idle'}"><i style="${phase(2200)}"></i></span>
+        <span data-flow="solar" class="flowline ${e.solar.active ? 'to-left exp' : 'idle'}"><i style="--flow-duration:${e.solar.periodMs}ms;${phase(e.solar.periodMs)}"></i></span>
         <div class="node n-solar"><span class="well">${ic(e.solar.active ? 'sun' : 'moon')}</span><b>${e.solar.value}</b><span class="sub">Solar</span></div>
       </div>
       <div>${[['Tesla', e.tesla], ['Kia', e.kia]].map(([n, v]) => `<div class="evrow num${v.charging ? ' chg' : ''}">${v.charging ? `<span class="evbolt" style="animation-delay:__PH1400__">${ic('bolt')}</span>` : ''}${n} <span class="sub">${v.charging ? 'Charging' : 'Not charging'}</span><em>${v.value}</em></div>`).join('')}</div>
@@ -276,6 +276,23 @@ const viewCtx = { get, esc, ic, armed, label, H, E, tz: () => tz, fmtTime, isUna
 // Region output is only written when it changes, so taps and focus survive unrelated updates.
 const last = new Map();
 let pending = 0;
+// Keep the pulse at the same point when the Energy card re-renders or the flow reverses.
+function renderEnergy(el, html) {
+  const pulses = '.flowline:not(.idle) i';
+  const isLeft = (pulse) => pulse.parentElement.classList.contains('to-left');
+  const positions = new Map([...el.querySelectorAll(pulses)].map((pulse) => {
+    const progress = pulse.getAnimations()[0]?.effect?.getComputedTiming().progress;
+    return [pulse.parentElement.dataset.flow, progress == null ? null : isLeft(pulse) ? 1 - progress : progress];
+  }));
+  el.innerHTML = fillPhase(html);
+  for (const pulse of el.querySelectorAll(pulses)) {
+    const position = positions.get(pulse.parentElement.dataset.flow);
+    if (position == null) continue;
+    const progress = isLeft(pulse) ? 1 - position : position;
+    pulse.style.animationDelay = `${-parseFloat(pulse.style.getPropertyValue('--flow-duration')) * progress}ms`;
+  }
+}
+
 function renderAll() {
   if (pending) return;
   pending = requestAnimationFrame(() => {
@@ -294,7 +311,8 @@ function renderAll() {
       if (last.get(name) === html) continue;
       last.set(name, html);
       const el = document.getElementById(name);
-      if (el) { el.innerHTML = fillPhase(html); if (name === 'banner') bannerTicker(el); }
+      if (name === 'energy' && el) renderEnergy(el, html);
+      else if (el) { el.innerHTML = fillPhase(html); if (name === 'banner') bannerTicker(el); }
     }
   });
 }
@@ -839,7 +857,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=35';
+    : './vendor/hls.light.min.mjs?v=36';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

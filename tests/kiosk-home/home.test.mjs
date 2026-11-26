@@ -97,6 +97,44 @@ test('energy maths follows the dashboard card', () => {
   assert.equal(e.sold, '$0.00');
 });
 
+test('energy pulses follow the net grid balance and the amount of power in each line', async () => {
+  const glass = await import('../../homeassistant/www/kiosk-home-glass/home.js');
+  const kw = { unit_of_measurement: 'kW' };
+  for (const { energy } of [H, glass]) {
+    const snapshot = (solar, imp, exp, ev = '0') => energy(world({
+      'sensor.sh50rs_a21c2106894_mppt_total_power': [solar, kw],
+      'sensor.sh50rs_a21c2106894_purchased_power': [imp, kw],
+      'sensor.sh50rs_a21c2106894_total_export_active_power': [exp, kw],
+      'sensor.sonic_charger_power': [ev, kw],
+    }));
+    const shared = snapshot('2.7', '1.6', '0');
+    assert.equal(shared.home, '4.3 kW');
+    assert.equal(shared.grid.dir, 'in');
+    assert.equal(shared.grid.value, '1.6 kW');
+    assert.equal(shared.self, 63);
+    assert.ok(shared.solar.periodMs < shared.grid.periodMs);
+    const surplus = snapshot('4.8', '1.2', '2.6');
+    assert.equal(surplus.home, '3.4 kW');
+    assert.equal(surplus.grid.dir, 'out');
+    assert.equal(surplus.grid.value, '1.4 kW');
+    assert.equal(surplus.self, 100);
+    const balanced = snapshot('3.4', '0', '0');
+    assert.equal(balanced.grid.dir, 'idle');
+    assert.equal(balanced.grid.value, '0 W');
+    assert.equal(balanced.solar.active, true);
+    assert.equal(snapshot('0', '0.0001', '0').grid.dir, 'idle');
+    assert.equal(snapshot('unavailable', '1.1', '0').solar.active, false);
+    assert.equal(snapshot('0.6', '0', '0.3', '1').grid.dir, 'in');
+    const slow = snapshot('0', '0.25', '0').grid.periodMs;
+    const fast = snapshot('0', '6', '0').grid.periodMs;
+    assert.equal(slow, snapshot('1', '0', '0.25').grid.periodMs);
+    assert.equal(fast, snapshot('7', '0', '6').grid.periodMs);
+    assert.ok(fast < slow);
+    assert.equal(snapshot('0', '8', '0').grid.periodMs, 750);
+    assert.equal(snapshot('0', '10', '0').grid.periodMs, 750);
+  }
+});
+
 test('rooms: an open garage is an alert; laundry and media labels', () => {
   const get = world({
     'cover.garage_door_v2': ['open'], 'light.garage_light': ['on'],

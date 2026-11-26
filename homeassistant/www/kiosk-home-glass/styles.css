@@ -812,8 +812,8 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 .flowline.imp { --flow-c: var(--flow-imp); }
 .flowline.idle i { display: none; }
 @media (prefers-reduced-motion: no-preference) {
-  .flowline.to-right i { animation: flowpill-r 2.2s ease-in-out infinite; }
-  .flowline.to-left i { animation: flowpill-l 2.2s ease-in-out infinite; }
+  .flowline.to-right i { animation: flowpill-r var(--flow-duration, 2.2s) linear infinite; }
+  .flowline.to-left i { animation: flowpill-l var(--flow-duration, 2.2s) linear infinite; }
 }
 @keyframes flowpill-r { from { transform: translateX(-100%); } to { transform: translateX(263%); } }
 @keyframes flowpill-l { from { transform: translateX(263%); } to { transform: translateX(-100%); } }

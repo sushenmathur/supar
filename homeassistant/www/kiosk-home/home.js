@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=35';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=36';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -291,26 +291,30 @@ export function watts(s) {
   return Math.abs(unit === 'kw' ? v * 1000 : v);
 }
 export const fmtW = (v) => (v >= 1000 ? `${(v / 1000).toFixed(1)} kW` : `${Math.round(v)} W`);
+const flowMs = (power) => Math.round(750 + 3750 * (1 - Math.sqrt(Math.min(power, 8000) / 8000)));
 const money = (get, id) => `$${(Number.isFinite(numOf(get, id)) ? numOf(get, id) : 0).toFixed(2)}`;
 
 export function energy(get) {
   const w = (id) => watts(get(id));
-  const solar = w(E.solarPower);
+  const solar = Math.round(w(E.solarPower));
   const imp = w(E.importPower);
   const exp = w(E.exportPower);
   const tesla = w(E.teslaCharger);
   const kia = w(E.kiaCharger);
   const house = Math.max(0, solar + imp - exp - tesla - kia);
   const load = house + tesla + kia;
+  // Readings can overlap while sensors update. Use the net balance for the single grid line.
+  const grid = Math.round(load - solar);
   const self = load > 0 ? Math.round(Math.min(1, solar / load) * 100) : 0;
   const rate = parseFloat(st(get, E.rate));
   const tariff = st(get, E.tariff);
   return {
     tariff: [tariff && !['unknown', 'unavailable'].includes(tariff) ? titleCase(tariff) : null, Number.isFinite(rate) && rate ? `$${rate.toFixed(2)}/kWh` : null].filter(Boolean).join(' · '),
     today: money(get, E.costToday), sold: money(get, E.solarCredit), bill: money(get, E.billToDate), estimate: money(get, E.billEstimate),
-    grid: { value: fmtW(exp || imp), label: exp > 0 ? 'Exporting' : imp > 0 ? 'From grid' : 'Grid idle', dir: exp > 0 ? 'out' : imp > 0 ? 'in' : 'idle' },
+    grid: { value: fmtW(Math.abs(grid)), label: grid < 0 ? 'Exporting' : grid > 0 ? 'From grid' : 'Grid idle',
+      dir: grid < 0 ? 'out' : grid > 0 ? 'in' : 'idle', periodMs: flowMs(Math.abs(grid)) },
     home: fmtW(load),
-    solar: { value: fmtW(solar), active: solar > 0 },
+    solar: { value: fmtW(solar), active: solar > 0, periodMs: flowMs(solar) },
     tesla: { value: fmtW(tesla), charging: tesla > 0 },
     kia: { value: fmtW(kia), charging: kia > 0 },
     self,

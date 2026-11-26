@@ -125,7 +125,7 @@ Differences from the Lovelace view, on purpose:
 - **Weather and time of day:** the clock card shows a printed weather picture. The page background takes on a faint dawn, dusk or night tint from `sun.sun`.
 - **Calendar:** today's date stamp is turmeric.
 - **Moving only when something is happening:**
-  - Energy flow lines march in the direction power is moving: yellow while solar is going to the home or out to the grid, purple while power comes in from the grid, grey when idle.
+  - Energy flow lines march in the direction power is moving: yellow while solar is going to the home or out to the grid, purple while power comes in from the grid, grey when idle. On the Home Energy card, faster pulses show more power. The grid supplies the difference when household usage exceeds solar generation and takes the surplus when solar generation exceeds usage. The grid line is still when they match, even while the solar line moves.
   - Robbie, washer and dryer icons turn while they run.
   - An urgent alert's colour drifts slightly.
   - The clock stamps on the minute.
