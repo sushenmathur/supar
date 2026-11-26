@@ -25,6 +25,7 @@ const SUITES = [
   ['home'], ['views'], ['fixes'], ['fit'], ['live'], ['charging'], ['energy'], ['six'],
   ['tv', { MOCK_TV: '1' }], ['media', { MOCK_MEDIA: '1' }], ['banner'], ['theme'], ['music', { MOCK_KS_MUSIC: '1' }], ['music', {}, { MODE: 'none' }],
   ['cars', {}, { LOGOS: '1' }], ['cars', { MOCK_NO_LOGOS: '1' }, { LOGOS: '' }],
+  ['person', { MOCK_PERSON: '1' }],
   ['single', {}, {}, null, ['']],                         // loads the single file itself
   ['glass', { MOCK_LONG: '1' }, {}, ['kiosk-home-glass']],
   // Alarm keypad, every way it can be set up (see suites/alarm.cjs).

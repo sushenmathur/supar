@@ -69,6 +69,7 @@ set('sensor.electricity_billing_day', '8'); set('sensor.electricity_days_remaini
 set('sensor.sonic_charger_power', '0', { unit_of_measurement: 'W' }); set('sensor.kia_charger_power', '0', { unit_of_measurement: 'W' });
 set('binary_sensor.shanaya_room_occupancy_status', 'off'); set('binary_sensor.samar_room_occupancy_new', 'on');
 set('person.sushenmathur', 'home', { friendly_name: 'Sushen Mathur' }); set('person.paro', 'Paro - Work', { friendly_name: 'Paro' });
+if (process.env.MOCK_PERSON) Object.assign(S['person.sushenmathur'].a, { latitude: 0, longitude: 12 });
 set('sensor.sushen_iphone_battery_level', '64', { unit_of_measurement: '%' }); set('sensor.sushen_iphone_battery_state', 'Charging');
 set('sensor.paro_phone_battery', '18', { unit_of_measurement: '%' }); set('sensor.paro_iphone_battery_state', 'Not Charging');
 set('sensor.sushen_phone_battery_status', 'Charging'); set('sensor.paro_phone_battery_status', 'unavailable');
@@ -155,6 +156,21 @@ const flip = (id) => change(id, S[id].s === 'on' ? 'off' : 'on');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
+  // The real HA frontend serves a favicon, which system Chromium requests automatically.
+  if (url.pathname === '/favicon.ico') {
+    res.writeHead(200, { 'content-type': 'image/png' }); return res.end(png);
+  }
+  if (url.pathname.startsWith('/api/map_tiles/raster/')) {
+    if (!process.env.MOCK_PERSON) { res.writeHead(404); return res.end(); }
+    (log.personTiles ??= []).push(url.pathname);
+    if (url.search || req.headers['x-map-tiles-token'] !== 'mock-map-key') { res.writeHead(403); return res.end(); }
+    res.writeHead(200, { 'content-type': 'image/png' }); return res.end(png);
+  }
+  if (url.pathname === '/__person_location' && process.env.MOCK_PERSON) {
+    const point = { latitude: 0, longitude: Number(url.searchParams.get('longitude')) };
+    change('person.sushenmathur', url.searchParams.get('state') ?? 'home', point);
+    res.writeHead(200); return res.end('ok');
+  }
   if (url.pathname.startsWith('/api/hls/')) {
     const f = join(FIX, (url.pathname.includes('front_door') ? 'hls-square' : 'hls'), url.pathname.split('/').pop());
     if (!existsSync(f)) { res.writeHead(404); return res.end(); }
@@ -212,6 +228,23 @@ wss.on('connection', (ws) => {
       case 'supported_features': return ok();
       case 'get_config': return ok({ time_zone: 'Australia/Brisbane' });
       case 'get_states': return ok(Object.keys(S).map(asState));
+      case 'map_tiles/access_token': {
+        log.mapAccess = (log.mapAccess ?? 0) + 1;
+        return ok({ token: log.mapAccess === 1 ? 'mock-expired-key' : 'mock-map-key' });
+      }
+      case 'history/history_during_period': {
+        const [entity] = msg.entity_ids;
+        (log.personHistory ??= []).push({ entityIds: msg.entity_ids, start: msg.start_time, noAttributes: msg.no_attributes });
+        if (entity === 'person.paro') return ok({});
+        const start = Date.parse(msg.start_time) / 1000;
+        return ok({ [entity]: [
+          { s: 'home', lu: start },
+          { s: 'not_home', lu: start + 8 * 3600 },
+          { s: 'Office', lu: start + 9 * 3600 },
+          { s: 'Office', lu: start + 10 * 3600, lc: start + 9 * 3600 },
+          { s: 'home', lu: start + 15 * 3600 },
+        ] });
+      }
       case 'subscribe_entities': {
         const sub = { ids: msg.entity_ids, send: (event) => send({ id: msg.id, type: 'event', event }) };
         subs.add(sub); ws.on('close', () => subs.delete(sub)); ok();

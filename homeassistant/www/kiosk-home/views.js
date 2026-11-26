@@ -1,6 +1,6 @@
 // Sub-views ported from master.yaml (security, lights, homeclimate, living-room, garage, kidsroom,
 // outdoor, laundry, music). Each view: { ids, render(c), actions? }. `c` is the context from app.js.
-import { energyHud } from './energyhud.js?v=32';
+import { energyHud } from './energyhud.js?v=33';
 
 // ---- Shared helpers ----
 const st = (c, id) => c.get(id)?.state;

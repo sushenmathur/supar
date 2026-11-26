@@ -1,11 +1,12 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=32';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=32';
-import { applyEntityDiff, isUnavailable, isLocalImage } from './state.js?v=32';
-import * as H from './home.js?v=32';
-import { injectIcons, ic, weatherArt } from './icons.js?v=32';
-import { VIEWS, viewEntityIds } from './views.js?v=32';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=32';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=33';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=33';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=33';
+import * as H from './home.js?v=33';
+import { mountPerson, personMarkup } from './person.js?v=33';
+import { injectIcons, ic, weatherArt } from './icons.js?v=33';
+import { VIEWS, viewEntityIds } from './views.js?v=33';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=33';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -99,9 +100,9 @@ const regions = {
       const pic = s?.attributes?.entity_picture;
       const face = isLocalImage(pic, location.origin) ? `<img class="avatar" src="${esc(pic)}" alt="">` : esc(first[0] ?? '?');
       const hasPic = face.startsWith('<img');
-      return `<div class="person b"><span class="mono${hasPic ? ' pic' : ''}" style="${hasPic ? '' : `background:${p.colour}`}">${face}</span>
+      return `<button type="button" class="person b" data-act="person" data-arg="${p.id}" aria-haspopup="dialog"><span class="mono${hasPic ? ' pic' : ''}" style="${hasPic ? '' : `background:${p.colour}`}">${face}</span>
         <span><span class="name">${esc(first)}</span><span class="where${place === 'Home' ? '' : ' away'}">${esc(place)}</span></span>
-        <span class="batt num${band === 'low' ? ' low' : ''}${charging ? ' chg' : ''}" title="${charging ? 'Charging' : ''}">${Number.isFinite(batt) ? `${Math.round(batt)}%` : '—'}<i style="--lvl:${Number.isFinite(batt) ? Math.round(batt) : 0}%">${charging ? '<b class="fillup"></b>' : ''}</i></span></div>`;
+        <span class="batt num${band === 'low' ? ' low' : ''}${charging ? ' chg' : ''}" title="${charging ? 'Charging' : ''}">${Number.isFinite(batt) ? `${Math.round(batt)}%` : '—'}<i style="--lvl:${Number.isFinite(batt) ? Math.round(batt) : 0}%">${charging ? '<b class="fillup"></b>' : ''}</i></span></button>`;
     }).join('');
   },
 
@@ -280,6 +281,7 @@ function renderAll() {
   pending = requestAnimationFrame(() => {
     pending = 0;
     applyTheme();
+    if (sheet().open) personSheet?.update();
     // A live sheet (cars, light details) re-renders with state, like a region.
     if (liveSheet && sheet().open && !sliding) {
       const h = liveSheet();
@@ -350,20 +352,35 @@ const sheet = () => $('#sheet');
 const CLOSE = '<button class="btn line close b" data-act="sheet-close">Close</button>';
 let liveSheet = null;
 let lastSheet = '';
-function openSheet(html, onOpen) {
+let personSheet = null;
+function openSheet(html, onOpen, { closeButton = true } = {}) {
   const d = sheet();
   liveSheet = null;
-  d.innerHTML = html + CLOSE;
+  d.innerHTML = html + (closeButton ? CLOSE : '');
   if (!d.open) { d.showModal(); if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(true, 'dashboard'))); }
   onOpen?.(d);
 }
 function closeSheet() { if (sheet().open) sheet().close(); }
-sheet().addEventListener('close', () => { liveSheet = null; stopLiveCam(); sheet().replaceChildren(); sheet().classList.remove('fitcam', 'lpsheet', 'tvsheet', 'mediasheet'); mediaSel = null; sliding = false; sheet().style.width = ''; if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard'))); });
+sheet().addEventListener('close', () => {
+  personSheet?.dispose();
+  personSheet = null;
+  liveSheet = null;
+  stopLiveCam();
+  const d = sheet();
+  d.replaceChildren();
+  d.classList.remove('fitcam', 'lpsheet', 'tvsheet', 'mediasheet', 'person-sheet');
+  d.removeAttribute('aria-labelledby');
+  mediaSel = null;
+  sliding = false;
+  d.style.width = '';
+  if (inKioskSatellite()) quiet(Promise.resolve(ks.setInteractionActive?.(false, 'dashboard')));
+});
 sheet().addEventListener('click', (e) => { if (e.target === sheet()) closeSheet(); });
 
 const ACTIONS = {
   noop() {},
   'sheet-close': closeSheet,
+  person: personLocationSheet,
   go: (arg) => { if (arg.startsWith('#')) location.hash = arg; else location.href = arg; },
   rooms: () => openSheet(`<h2>Rooms</h2><div class="acts">${ROOM_ROUTES.map(([r, n, i]) => `<button class="tile b" data-act="go" data-arg="#${r}">${ic(i)}${n}</button>`).join('')}</div>`),
   // "domain.service|entity_id[,entity_id…]|{json}"
@@ -817,7 +834,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=32';
+    : './vendor/hls.light.min.mjs?v=33';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
@@ -1014,6 +1031,23 @@ function openLive(fn) {
 /** Card badge: a Kia wordmark for the Sorento, a Tesla photo thumbnail for Bluey. */
 /** Car card badge: the car's logo image (c.logo, from /config/www/images/) once it loads; until then, or if it's
  *  missing, a built-in Kia wordmark or Tesla T. */
+function personLocationSheet(id) {
+  const person = PEOPLE.find((p) => p.id === id);
+  if (!person) return;
+  const dialog = sheet();
+  dialog.classList.add('person-sheet');
+  dialog.setAttribute('aria-labelledby', 'person-title');
+  openSheet(personMarkup(ic), (d) => {
+    personSheet = mountPerson(d, {
+      person, getState: () => get(id), request: (message) => conn.sendMessagePromise(message),
+      timeZone: tz, formatTime: (date, opts) => fmtTime(date, tz, opts),
+      place: H.personPlace, age: durationSince, isLocalImage, escape: esc,
+      restoreFocus: () => $(`#people [data-arg="${CSS.escape(id)}"]`)?.focus(),
+    });
+    personSheet.update();
+  }, { closeButton: false });
+}
+
 function carBadge(c) {
   const mark = c.brand === 'tesla' ? '<svg viewBox="0 0 24 24"><path d="M3 5.6c2.9-1.5 5.9-2.3 9-2.3s6.1.8 9 2.3l-.7 1.3c-1.8-.9-3.7-1.4-5.7-1.6L12 9.2 9.4 5.3c-2 .2-3.9.7-5.7 1.6z"/><path d="M9.9 6.9 12 10.4l2.1-3.5c.8.1 1.6.2 2.3.4L12 21 7.6 7.3c.7-.2 1.5-.3 2.3-.4z"/></svg>'
     : '<svg viewBox="0 0 44 18"><text x="22" y="14" text-anchor="middle">KIA</text></svg>';
