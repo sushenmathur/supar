@@ -815,8 +815,17 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
   .flowline.to-right i { animation: flowpill-r var(--flow-duration, 2.2s) linear infinite; }
   .flowline.to-left i { animation: flowpill-l var(--flow-duration, 2.2s) linear infinite; }
 }
-@keyframes flowpill-r { from { transform: translateX(-100%); } to { transform: translateX(263%); } }
-@keyframes flowpill-l { from { transform: translateX(263%); } to { transform: translateX(-100%); } }
+/* Travel through the space left by the 38%-wide pulse. Fade at the loop seam to keep its shape intact. */
+@keyframes flowpill-r {
+  from { transform: translateX(0); opacity: .3; }
+  14%, 86% { opacity: 1; }
+  to { transform: translateX(163%); opacity: .3; }
+}
+@keyframes flowpill-l {
+  from { transform: translateX(163%); opacity: .3; }
+  14%, 86% { opacity: 1; }
+  to { transform: translateX(0); opacity: .3; }
+}
 .flow .node .well { border-radius: 14px; border: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), 0 4px 12px -4px var(--node-glow, transparent); }
 .flow .node .well::before, .flow .node .well::after { display: none; }
 .flow .n-grid .well { background: linear-gradient(150deg, #f1ebff, #dccffd); color: #7c3aed; --node-glow: rgba(124, 58, 237, .35); }

@@ -28,7 +28,37 @@ const set = (id, s) => fetch(`${BASE}/__state?id=${id}&s=${encodeURIComponent(s)
     return el.parentElement.classList.contains('to-left') ? 1 - progress : progress;
   });
 
-  await set(solar, '2.7'); await set(imp, '1600'); await gridPower('1.6 kW');
+  const pulsePath = (line) => line.evaluate(async (el) => {
+    const pulse = el.querySelector('i'), animation = pulse.getAnimations()[0];
+    animation.pause();
+    await animation.ready;
+    const { duration, delay } = animation.effect.getTiming();
+    const originalTime = animation.currentTime;
+    animation.effect.updateTiming({ delay: 0 });
+    const track = el.getBoundingClientRect();
+    const samples = [0, 0.03, 0.5, 0.97, 0.999].map((phase) => {
+      animation.currentTime = duration * phase;
+      const rect = pulse.getBoundingClientRect();
+      return { x: rect.left, inside: rect.left >= track.left - 0.1 && rect.right <= track.right + 0.1,
+        opacity: Number(getComputedStyle(pulse).opacity) };
+    });
+    animation.effect.updateTiming({ delay });
+    animation.currentTime = originalTime;
+    animation.play();
+    return samples;
+  });
+  const continuous = (samples, direction) => samples.every((sample, index) =>
+    sample.inside && (!index || (sample.x - samples[index - 1].x) * direction > 0))
+    && samples[0].opacity < samples[2].opacity && samples.at(-1).opacity < samples[2].opacity;
+
+  // Match the export state from the report before sampling both tracks.
+  await set(solar, '2.5'); await set(imp, '0'); await set(exp, '1.4'); await gridPower('1.4 kW');
+  check('export and solar pulses travel fully inside their tracks and fade at the loop',
+    continuous(await pulsePath(gridLine), -1) && continuous(await pulsePath(solarLine), -1),
+    '1.4 kW export, 1.1 kW home, 2.5 kW solar');
+
+  await set(solar, '2.7'); await set(exp, '0'); await set(imp, '1600'); await gridPower('1.6 kW');
+  check('import pulse travels fully inside its track in the opposite direction', continuous(await pulsePath(gridLine), 1));
   check('solar and grid supply the home together',
     /to-right imp/.test(await gridLine.getAttribute('class')) &&
     /to-left exp/.test(await solarLine.getAttribute('class')) &&
