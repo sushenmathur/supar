@@ -18,6 +18,24 @@ const auth = () => localStorage.setItem('hassTokens', JSON.stringify({ hassUrl: 
   await set('sun.sun', 'below_horizon'); await sleep(600);
   const night = await look();
   check('sunset: switches to dark live', night.theme === 'dark' && night.bg !== day.bg, JSON.stringify(night));
+  if (NAME === 'kiosk-home-glass') {
+    await p.locator('#actions [data-act="robbie"]').click();
+    const sheetLook = () => p.locator('#sheet').evaluate((sheet) => {
+      const style = getComputedStyle(sheet);
+      return [style.backgroundColor, style.backdropFilter, getComputedStyle(sheet, '::backdrop').backgroundColor];
+    });
+    const dark = await sheetLook();
+    check('dark pop-ups use 55% translucency, 4px blur and 5% backdrop dim',
+      dark.join('|') === 'rgba(25, 22, 20, 0.45)|blur(4px) saturate(1.35)|rgba(19, 15, 13, 0.05)', dark.join(' | '));
+    await set('sun.sun', 'above_horizon');
+    await p.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+    const light = await sheetLook();
+    check('open pop-ups switch to 40% translucency, 7px blur and 12% backdrop dim at sunrise',
+      light.join('|') === 'rgba(250, 246, 241, 0.6)|blur(7px) saturate(1.35)|rgba(19, 15, 13, 0.12)', light.join(' | '));
+    await p.keyboard.press('Escape');
+    await set('sun.sun', 'below_horizon');
+    await p.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+  }
   await p.evaluate(() => { location.hash = '#living-room'; }); await sleep(600);
   check('floor plan uses the dark image', /cbbd3b46/.test(await p.locator('.plan img').getAttribute('src')));
   await set('sun.sun', 'above_horizon'); await sleep(600);
