@@ -455,7 +455,7 @@ button.car { text-align: left; }
 .rbhead img.rbimg { aspect-ratio: 4 / 3; object-fit: contain; border-radius: 10px; }
 .sheet .rb-battery { display: flex; align-items: center; gap: 4px; font-weight: 700; color: var(--ink); }
 .rb-battery .ic { width: 16px; height: 16px; }
-.rb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px 16px; margin: 0 0 14px; padding: 10px 0; border-block: 1px solid var(--key); }
+.rb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px 16px; margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--key); }
 .rb-stats dt { color: var(--ink-2); }
 .rb-stats dd { margin: 0; font-weight: 700; }
 .rb-options, .rb-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 8px; margin-top: 10px; }
@@ -465,8 +465,10 @@ button.car { text-align: left; }
 .rb-fan span { display: block; font-weight: 700; color: var(--ink-2); }
 .sheet .rb-fan select { min-height: 44px; margin-top: 0; }
 .rb-options .rb-by-area { justify-content: space-between; text-align: left; }
-.rb-presets { margin-top: 14px; }
-.rb-presets summary { cursor: pointer; font-weight: 700; }
+.rb-presets { margin-bottom: 14px; }
+.rb-presets h3 { font-size: 15px; margin-bottom: 6px; }
+.rb-preset-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.rb-preset-grid .tile { min-height: 44px; justify-content: flex-start; text-align: left; }
 .rb-areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 12px 0; }
 .rb-areas .rb-area { position: relative; display: grid; justify-items: start; min-height: 76px; align-content: center; gap: 4px; overflow-wrap: anywhere; }
 .rb-area > span, .rb-area > .ic, .rb-by-area > span, .rb-by-area > .ic, .rb-footer .tile > span { position: relative; z-index: 2; }
@@ -479,6 +481,7 @@ button.car { text-align: left; }
 .rb-retry { margin-top: 8px; }
 @media (max-width: 480px) {
   .sheet.robbie-sheet { padding: 14px; }
+  .rb-preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rb-areas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .rb-areas .rb-area { padding: 8px 5px; font-size: 13px; }
   .rb-area .rb-check { right: 4px; top: 5px; }

@@ -27,8 +27,12 @@ const check = (name, ok) => {
     const start = button('Start cleaning');
     await robbie.click();
     await heading('Docked').waitFor();
-    check('overview shows live battery, charging and cleaning stats', /79% · Charging/.test(await dialog.innerText()) &&
-      /38 min/.test(await dialog.innerText()) && /42 m²/.test(await dialog.innerText()));
+    check('overview shows live battery and rounds cleaning and filter readings up', /79% · Charging/.test(await dialog.innerText()) &&
+      (await dialog.locator('.rb-stats dd').allTextContents()).join(',') === '43 min,33 m²,Ready,107 h');
+    const presets = dialog.getByRole('region', { name: 'Cleaning presets' }).getByRole('button');
+    check('all six presets are visible before the general controls', await presets.count() === 6 &&
+      (await Promise.all((await presets.all()).map((p) => p.isVisible()))).every(Boolean) &&
+      await presets.first().evaluate((p) => Boolean(p.compareDocumentPosition(document.querySelector('.rb-actions')) & Node.DOCUMENT_POSITION_FOLLOWING)));
     check('dock and stop are disabled while docked', await button('Dock').isDisabled() && await button('Stop').isDisabled());
     const fan = dialog.getByLabel('Fan speed');
     await fan.selectOption('quiet');
@@ -77,6 +81,10 @@ const check = (name, ok) => {
     await page.locator('#subview [data-act="robbie"]').click();
     await heading('Robbie').waitFor();
     check('Robbie also opens from the Living Room panel', await dialog.isVisible());
+    await button('Coffee Station').click();
+    await dialog.waitFor({ state: 'hidden' });
+    check('a visible preset calls its existing routine', (await log()).data.some(({ svc, data }) =>
+      svc === 'button.press' && data.entity_id === 'button.robbie_coffee_station_clean'));
     check('no browser errors', errors.length === 0);
   } finally {
     await browser.close();

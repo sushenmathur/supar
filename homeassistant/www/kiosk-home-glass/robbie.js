@@ -1,6 +1,6 @@
-import { E, ROBBIE_IMAGE, ROBBIE_ROOMS } from './config.js?v=41';
-import { titleCase } from './home.js?v=41';
-import { cap, durationSince, isUnavailable, num } from './state.js?v=41';
+import { E, ROBBIE_IMAGE, ROBBIE_ROOMS } from './config.js?v=42';
+import { titleCase } from './home.js?v=42';
+import { cap, durationSince, isUnavailable, num } from './state.js?v=42';
 
 // Home Assistant vacuum entity feature flags used by the native vacuum card.
 const VF = { pause: 4, stop: 8, dock: 16, fan: 32, locate: 512, start: 8192, area: 16384 };
@@ -51,7 +51,7 @@ export function mountRobbie(root, { get, ic, esc, call, close, request, formatTi
     const measure = (id) => {
       const sensor = get(id);
       const value = num(sensor);
-      return value == null ? '' : `${value}${sensor.attributes?.unit_of_measurement ? ' ' + sensor.attributes.unit_of_measurement : ''}`;
+      return value == null ? '' : `${Math.ceil(value)}${sensor.attributes?.unit_of_measurement ? ' ' + sensor.attributes.unit_of_measurement : ''}`;
     };
     const stats = [
       ['Cleaning time', measure(E.robbieCleanTime)],
@@ -68,7 +68,9 @@ export function mountRobbie(root, { get, ic, esc, call, close, request, formatTi
     return `<div class="rbhead">${pic}<div><h3>${available ? esc(cap(state)) : 'Unavailable'}</h3>
         ${change ? `<p>${esc(change)}</p>` : ''}
         ${Number.isFinite(battery) ? `<p class="rb-battery">${ic('bolt')} ${Math.round(battery)}%${charging ? ' · Charging' : ''}</p>` : ''}</div></div>
-      ${stats.length ? `<dl class="rb-stats">${stats.map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>` : ''}
+      <section class="rb-presets" aria-labelledby="rb-presets-title"><h3 id="rb-presets-title">Cleaning presets</h3><div class="rb-preset-grid">
+        ${ROBBIE_ROOMS.map(([id, name, icon]) => `<button class="tile b" data-rb-preset="${esc(id)}">${ic(icon)}${esc(name)}</button>`).join('')}
+      </div></section>
       <div class="rb-actions">
         ${action(cleaning ? 'pause' : 'start', cleaning ? 'Pause' : state === 'paused' ? 'Resume' : 'Clean all', cleaning ? 'pause' : 'play', state !== 'returning' && can(cleaning ? VF.pause : VF.start))}
         ${action('stop', 'Stop', 'stop', activeJob && can(VF.stop))}
@@ -81,9 +83,7 @@ export function mountRobbie(root, { get, ic, esc, call, close, request, formatTi
           ${fan.map((speed) => `<option value="${esc(speed)}"${speed === attrs.fan_speed ? ' selected' : ''}>${esc(cap(speed))}</option>`).join('')}</select></label>` : ''}
         <button class="tile b rb-by-area" data-rb-action="areas"${can(VF.area) ? '' : ' disabled'}>${ic('rooms')}<span><small>Cleaning</small>By area</span>${ic('chevron')}</button>
       </div>
-      <details class="rb-presets"><summary>Cleaning presets</summary><div class="acts">
-        ${ROBBIE_ROOMS.map(([id, name, icon]) => `<button class="tile b" data-rb-preset="${esc(id)}">${ic(icon)}${esc(name)}</button>`).join('')}
-      </div></details>`;
+      ${stats.length ? `<dl class="rb-stats">${stats.map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>` : ''}`;
   }
 
   function areaPicker() {
@@ -109,7 +109,6 @@ export function mountRobbie(root, { get, ic, esc, call, close, request, formatTi
       <div><small>${picker ? 'Robbie' : 'Roborock Qrevo'}</small><h2 id="robbie-title" tabindex="-1">${picker ? 'Clean areas' : 'Robbie'}</h2></div></header>
       ${picker ? areaPicker() : overview()}${feedback ? `<p class="rb-feedback" role="status">${esc(feedback)}</p>` : ''}`;
     if (html === last) return;
-    const presetsOpen = root.querySelector('.rb-presets')?.open;
     const focus = document.activeElement;
     const attribute = ['data-rb-area', 'data-rb-service', 'data-rb-action', 'data-rb-preset']
       .find((key) => focus.hasAttribute(key));
@@ -117,7 +116,6 @@ export function mountRobbie(root, { get, ic, esc, call, close, request, formatTi
       ? `[${attribute}="${CSS.escape(focus.getAttribute(attribute))}"]` : focus.localName);
     last = html;
     root.innerHTML = html;
-    if (presetsOpen && !picker) root.querySelector('.rb-presets').open = true;
     if (focusKey) root.querySelector(focusKey)?.focus({ preventScroll: true });
     const img = root.querySelector('img.rbimg');
     img?.addEventListener('error', () => { photoFailed = true; update(); }, { once: true });
