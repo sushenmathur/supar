@@ -697,10 +697,44 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 .flowline.imp i { height: 3px; background: repeating-linear-gradient(90deg, var(--flow-imp) 0 6px, transparent 6px 12px); }
 
 /* Robbie's pop-up: a picture of the Roborock Qrevo beside the name and status. */
-.rbhead { display: flex; align-items: center; gap: 16px; }
-.rbhead .rbimg { width: 132px; height: auto; flex: none; }
-.rbhead img.rbimg { width: 150px; aspect-ratio: 4 / 3; object-fit: contain; border-radius: 10px; }
-.rbhead small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 13px; }
+.sheet.robbie-sheet { width: min(600px, calc(100vw - 32px)); }
+.rb-title { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--key); }
+.rb-title .tile { display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: 7px; }
+.rb-title small, .rb-by-area small { display: block; color: var(--ink-2); }
+.rbhead { display: grid; grid-template-columns: minmax(95px, 160px) minmax(0, 1fr); align-items: center; gap: 16px; margin: 12px 0; }
+.rbhead h3 { font-size: clamp(24px, 5vw, 34px); line-height: 1.05; }
+.rbhead .rbimg { width: 100%; height: auto; }
+.rbhead img.rbimg { aspect-ratio: 4 / 3; object-fit: contain; border-radius: 10px; }
+.sheet .rb-battery { display: flex; align-items: center; gap: 4px; font-weight: 700; color: var(--ink); }
+.rb-battery .ic { width: 16px; height: 16px; }
+.rb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px 16px; margin: 0 0 14px; padding: 10px 0; border-block: 1px solid var(--key); }
+.rb-stats dt { color: var(--ink-2); }
+.rb-stats dd { margin: 0; font-weight: 700; }
+.rb-options, .rb-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 8px; margin-top: 10px; }
+.rb-actions .tile, .rb-footer .tile, .rb-retry { min-height: 46px; justify-content: center; }
+.rb-options { align-items: stretch; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+.rb-fan, .rb-options .rb-by-area { min-height: 54px; }
+.rb-fan span { display: block; font-weight: 700; color: var(--ink-2); }
+.sheet .rb-fan select { min-height: 44px; margin-top: 0; }
+.rb-options .rb-by-area { justify-content: space-between; text-align: left; }
+.rb-presets { margin-top: 14px; }
+.rb-presets summary { cursor: pointer; font-weight: 700; }
+.rb-areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 12px 0; }
+.rb-areas .rb-area { position: relative; display: grid; justify-items: start; min-height: 76px; align-content: center; gap: 4px; overflow-wrap: anywhere; }
+.rb-area > span, .rb-area > .ic, .rb-by-area > span, .rb-by-area > .ic, .rb-footer .tile > span { position: relative; z-index: 2; }
+.rb-area .rb-check { position: absolute; right: 8px; top: 8px; display: grid; place-items: center; width: 17px; height: 17px; border: 1px solid currentColor; border-radius: 50%; }
+.rb-check .ic { width: 12px; height: 12px; }
+.rb-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid var(--key); padding-top: 10px; }
+.rb-footer .tile { flex-shrink: 0; }
+.rb-footer .tile:disabled, .rb-options .tile:disabled { opacity: .55; }
+.sheet .rb-feedback { margin-top: 12px; font-weight: 700; }
+.rb-retry { margin-top: 8px; }
+@media (max-width: 480px) {
+  .sheet.robbie-sheet { padding: 14px; }
+  .rb-areas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rb-areas .rb-area { padding: 8px 5px; font-size: 13px; }
+  .rb-area .rb-check { right: 4px; top: 5px; }
+}
 /* Camera tiles: the name with "Updated 11:38 am" under it, "Tap for live" on the right. */
 .camtile .cap { gap: 8px; align-items: flex-end; }
 .camtile .camname { display: grid; line-height: 1.15; min-width: 0; }

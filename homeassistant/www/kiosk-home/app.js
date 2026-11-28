@@ -1,12 +1,13 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, ROBBIE_ROOMS, ROBBIE_IMAGE, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=38';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=38';
-import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=38';
-import * as H from './home.js?v=38';
-import { mountPerson, personMarkup } from './person.js?v=38';
-import { injectIcons, ic, weatherArt } from './icons.js?v=38';
-import { VIEWS, viewEntityIds } from './views.js?v=38';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=38';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=39';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=39';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=39';
+import * as H from './home.js?v=39';
+import { mountRobbie } from './robbie.js?v=39';
+import { mountPerson, personMarkup } from './person.js?v=39';
+import { injectIcons, ic, weatherArt } from './icons.js?v=39';
+import { VIEWS, viewEntityIds } from './views.js?v=39';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=39';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -315,7 +316,10 @@ function renderAll() {
   pending = requestAnimationFrame(() => {
     pending = 0;
     applyTheme();
-    if (sheet().open) personSheet?.update();
+    if (sheet().open) {
+      personSheet?.update();
+      robbiePanel?.update();
+    }
     // A live sheet (cars, light details) re-renders with state, like a region.
     if (liveSheet && sheet().open && !sliding) {
       const h = liveSheet();
@@ -398,6 +402,7 @@ const CLOSE = '<button class="btn line close b" data-act="sheet-close">Close</bu
 let liveSheet = null;
 let lastSheet = '';
 let personSheet = null;
+let robbiePanel = null;
 // Kiosk Satellite 2026.11.32 added a non-audio hold for settings (#1603).
 // Older versions only exempt 'media' from audio ducking and audio focus.
 const [ksYear, ksMonth, ksRelease] = (ks?.version ?? '').split('.').map((part) => parseInt(part, 10));
@@ -414,11 +419,13 @@ function closeSheet() { if (sheet().open) sheet().close(); }
 sheet().addEventListener('close', () => {
   personSheet?.dispose();
   personSheet = null;
+  robbiePanel?.dispose();
+  robbiePanel = null;
   liveSheet = null;
   stopLiveCam();
   const d = sheet();
   d.replaceChildren();
-  d.classList.remove('fitcam', 'lpsheet', 'tvsheet', 'mediasheet', 'person-sheet');
+  d.classList.remove('fitcam', 'lpsheet', 'tvsheet', 'mediasheet', 'person-sheet', 'robbie-sheet');
   d.removeAttribute('aria-labelledby');
   mediaSel = null;
   sliding = false;
@@ -805,36 +812,16 @@ function moreSheet() {
   });
 }
 
-// A drawing of a Roborock Qrevo (round body, LiDAR turret, dark front bumper) for Robbie's pop-up.
-const QREVO_SVG = `<svg class="rbimg" viewBox="0 0 160 112" role="img" aria-label="Robbie, a Roborock Qrevo">
-  <ellipse cx="80" cy="98" rx="66" ry="9" fill="rgba(0,0,0,.14)"/>
-  <path d="M16 60v16c0 12.2 28.7 22 64 22s64-9.8 64-22V60" fill="#d5dae4"/>
-  <path d="M18 74c4 11 30 19 62 19s58-8 62-19" fill="none" stroke="#2c303b" stroke-width="5" stroke-linecap="round"/>
-  <ellipse cx="80" cy="60" rx="64" ry="23" fill="#f6f7fa" stroke="#c3c9d5" stroke-width="1.5"/>
-  <ellipse cx="80" cy="60" rx="52" ry="17" fill="none" stroke="#e3e7ee" stroke-width="1.5"/>
-  <path d="M63 54v-11h34v11c0 3.3-7.6 6-17 6s-17-2.7-17-6z" fill="#2c303b"/>
-  <ellipse cx="80" cy="43" rx="17" ry="6" fill="#454b5b"/>
-  <path d="M66 49.5c4 1.6 9 2.4 14 2.4s10-.8 14-2.4" fill="none" stroke="#7d8597" stroke-width="1.5"/>
-  <ellipse cx="80" cy="69" rx="7" ry="2.6" fill="#c3c9d5"/>
-  <circle cx="80" cy="69" r="1.3" fill="#2fbfa0"/>
-</svg>`;
-
 function robbieSheet() {
-  const r = H.robbie(get);
-  const cleaning = get(E.robbie)?.state === 'cleaning';
-  const pic = ROBBIE_IMAGE ? `<img class="rbimg" src="${esc(ROBBIE_IMAGE)}" alt="Robbie, a Roborock Qrevo">` : QREVO_SVG;
-  openSheet(`<div class="rbhead">${pic}<div><h2>Robbie</h2><p>${esc(r.label)}</p><small>Roborock Qrevo</small></div></div>
-    <div class="acts">
-      <button class="tile b" data-svc="vacuum.${cleaning ? 'pause' : 'start'}">${ic(cleaning ? 'pause' : 'play')}${cleaning ? 'Pause' : 'Start'}</button>
-      <button class="tile b" data-svc="vacuum.return_to_base">${ic('home')}Dock</button>
-      <button class="tile b" data-svc="vacuum.stop">${ic('stop')}Stop</button>
-    </div>
-    <div class="acts">${ROBBIE_ROOMS.map(([id, name, icon]) => `<button class="tile b" data-press="${id}">${ic(icon ?? 'robot')}${esc(name)}</button>`).join('')}</div>`, (d) => {
-    d.querySelectorAll('[data-svc]').forEach((b) => { const [dom, svc] = b.dataset.svc.split('.'); b.onclick = () => quiet(call(dom, svc, { entity_id: E.robbie })); });
-    d.querySelectorAll('[data-press]').forEach((b) => { b.onclick = () => quiet(call('button', 'press', { entity_id: b.dataset.press }).then(closeSheet)); });
-    // A missing or unreadable photo falls back to the drawing.
-    d.querySelector('img.rbimg')?.addEventListener('error', (e) => { e.target.outerHTML = QREVO_SVG; }, { once: true });
-  });
+  const dialog = sheet();
+  dialog.classList.add('robbie-sheet');
+  dialog.setAttribute('aria-labelledby', 'robbie-title');
+  openSheet('<div class="robbie-content"></div>', (d) => {
+    robbiePanel = mountRobbie(d.querySelector('.robbie-content'), {
+      get, ic, esc, call, close: closeSheet, request: (message) => conn.sendMessagePromise(message),
+      formatTime: (date) => fmtTime(date, tz),
+    });
+  }, { closeButton: false });
 }
 
 function airconSheet() {
@@ -891,7 +878,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=38';
+    : './vendor/hls.light.min.mjs?v=39';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

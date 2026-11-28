@@ -1,5 +1,5 @@
 // Page version. Bump with tools/kiosk-test/bump-version.mjs --dir homeassistant/www/kiosk-home
-export const VERSION = '38';
+export const VERSION = '39';
 
 // Entity IDs, taken from the hubhome view in homeassistant/dashboard/master.yaml.
 export const E = {
@@ -19,6 +19,12 @@ export const E = {
   sideBattery: 'sensor.side_battery',
   robbieDock: 'sensor.robbie_dock_dock_error',
   robbie: 'vacuum.robbie',
+  robbieBattery: 'sensor.robbie_battery',
+  robbieCharging: 'binary_sensor.robbie_battery_charging',
+  robbieCleanTime: 'sensor.robbie_cleaning_time',
+  robbieCleanArea: 'sensor.robbie_cleaning_area',
+  robbieLastClean: 'sensor.robbie_last_clean_end',
+  robbieFilter: 'sensor.robbie_filter_time_left',
   goodNight: 'scene.good_night',
   festive: 'switch.festive_lights',
   announceMessage: 'input_text.announce_message',

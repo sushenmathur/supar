@@ -35,7 +35,12 @@ set('binary_sensor.side_door_contact', alert ? 'on' : 'off', {}, 3);
 for (const id of ['crimsafe_door_contact', 'front_door_contact', 'patio_door_contact', 'laundrydoorsensor_contact', 'hallwaydoorsensor_contact']) set(`binary_sensor.${id}`, 'off');
 set('sensor.side_battery', '64', { unit_of_measurement: '%' });
 set('sensor.robbie_dock_dock_error', 'ok');
-set('vacuum.robbie', 'docked', { friendly_name: 'Robbie' });
+set('vacuum.robbie', 'docked', { friendly_name: 'Robbie', supported_features: 25148, fan_speed: 'max', fan_speed_list: ['quiet', 'balanced', 'max'] });
+set('sensor.robbie_battery', '79');
+set('binary_sensor.robbie_battery_charging', 'on');
+set('sensor.robbie_cleaning_time', '38', { unit_of_measurement: 'min' });
+set('sensor.robbie_cleaning_area', '42', { unit_of_measurement: 'm²' });
+set('sensor.robbie_filter_time_left', '71', { unit_of_measurement: 'h' });
 set('scene.good_night', '2026-11-22T21:30:00+00:00', { friendly_name: 'Good Night' });
 set('switch.festive_lights', 'off', { friendly_name: 'Festive Lights' });
 set('input_text.announce_message', ''); set('input_select.announce_speaker', 'Kitchen', { options: ['Home', 'Kitchen', 'Media Room'] });
@@ -227,6 +232,18 @@ wss.on('connection', (ws) => {
     switch (msg.type) {
       case 'supported_features': return ok();
       case 'get_config': return ok({ time_zone: 'Australia/Brisbane' });
+      case 'config/entity_registry/get': {
+        if (msg.entity_id !== 'vacuum.robbie') break;
+        log.robbieRegistry = (log.robbieRegistry ?? 0) + 1;
+        if (process.env.MOCK_ROBBIE === '1' && log.robbieRegistry === 1) {
+          return send({ id: msg.id, type: 'result', success: false, error: { code: 'unknown_error', message: 'Test registry failure' } });
+        }
+        return ok({ options: { vacuum: { area_mapping: { area_91: ['6', '8'], area_41: ['9'], area_31: [], removed: ['3'] } } } });
+      }
+      case 'config/area_registry/list': return ok([
+        { area_id: 'area_91', name: 'Living Room' }, { area_id: 'area_41', name: 'Guest' },
+        { area_id: 'area_31', name: 'Bathroom' }, { area_id: 'area_28', name: 'Garage' },
+      ]);
       case 'get_states': return ok(Object.keys(S).map(asState));
       case 'map_tiles/access_token': {
         log.mapAccess = (log.mapAccess ?? 0) + 1;
@@ -281,6 +298,15 @@ wss.on('connection', (ws) => {
         log.calls.push(`${msg.domain}.${msg.service}`);
         (log.data ??= []).push({ svc: `${msg.domain}.${msg.service}`, data: msg.service_data ?? {} });
         const id = msg.service_data?.entity_id ?? msg.target?.entity_id;
+        if (msg.domain === 'vacuum' && id === 'vacuum.robbie') {
+          if (msg.service === 'clean_area' && process.env.MOCK_ROBBIE === '1' && log.calls.filter((s) => s === 'vacuum.clean_area').length === 1) {
+            return send({ id: msg.id, type: 'result', success: false, error: { code: 'service_validation_error', message: 'Test cleaning failure' } });
+          }
+          const next = { start: 'cleaning', clean_area: 'cleaning', pause: 'paused', return_to_base: 'returning', stop: 'idle' }[msg.service];
+          if (next) change(id, next);
+          if (msg.service === 'set_fan_speed') change(id, undefined, { fan_speed: msg.service_data.fan_speed });
+          return ok({ context: { id: 'c' } });
+        }
         const alarmTo = { alarm_arm_home: 'armed_home', alarm_arm_away: 'armed_away', alarm_disarm: 'disarmed' };
         if (msg.domain === 'alarm_control_panel') {
           // Like HA: a panel without code_format accepts any code; one with a code (MOCK_ALARM_CODE, 1234) checks it.

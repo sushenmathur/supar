@@ -1,6 +1,6 @@
 // Sub-views ported from master.yaml (security, lights, homeclimate, living-room, garage, kidsroom,
 // outdoor, laundry, music). Each view: { ids, render(c), actions? }. `c` is the context from app.js.
-import { energyHud } from './energyhud.js?v=38';
+import { energyHud } from './energyhud.js?v=39';
 
 // ---- Shared helpers ----
 const st = (c, id) => c.get(id)?.state;
@@ -237,6 +237,7 @@ const livingRoom = {
     const v = st(c, 'vacuum.robbie');
     const r = c.H.robbie(c.get);
     const robbie = panel(c, { title: 'Robbie', icon: 'robot', sub: r.label, cls: r.alert ? 'alert' : '',
+      right: chip(c, { icon: 'chevron', text: 'Details', act: 'robbie' }),
       body: `<div class="seg"><button data-act="call" data-arg="vacuum.${v === 'cleaning' ? 'pause' : 'start'}|vacuum.robbie">${c.ic(v === 'cleaning' ? 'pause' : 'play')}${v === 'cleaning' ? 'Pause' : 'Start'}</button>
         <button data-act="call" data-arg="vacuum.return_to_base|vacuum.robbie">${c.ic('home')}Dock</button><button data-act="call" data-arg="vacuum.stop|vacuum.robbie">${c.ic('stop')}Stop</button></div>`
         + grid(1, ROBBIE_BTNS.map(([id, n]) => c.tile({ act: 'call', arg: `button.press|${id}`, icon: 'robot', name: n, sub: 'Clean' })).join('')) });
