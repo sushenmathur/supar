@@ -1,13 +1,13 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=40';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=40';
-import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=40';
-import * as H from './home.js?v=40';
-import { mountRobbie } from './robbie.js?v=40';
-import { mountPerson, personMarkup } from './person.js?v=40';
-import { injectIcons, ic, weatherArt } from './icons.js?v=40';
-import { VIEWS, viewEntityIds } from './views.js?v=40';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=40';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=41';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=41';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=41';
+import * as H from './home.js?v=41';
+import { mountRobbie } from './robbie.js?v=41';
+import { mountPerson, personMarkup } from './person.js?v=41';
+import { injectIcons, ic, weatherArt } from './icons.js?v=41';
+import { VIEWS, viewEntityIds } from './views.js?v=41';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=41';
 
 console.info(`kiosk-home-glass loaded v${VERSION}`);
 
@@ -311,7 +311,7 @@ function tickers(root) {
     n.style.setProperty('--tkd', `${Math.max(7, 4 + dist / 12).toFixed(1)}s`);
   }
 }
-document.fonts?.ready.then(() => tickers(document.body));
+document.fonts?.ready.then(() => { tickers(document.body); const h = $('#hello'); if (h) h.textContent = ''; });  // re-measure the greeting (tick) with the real font
 
 // Keep the pulse at the same point when the Energy card re-renders or the flow reverses.
 function renderEnergy(el, html) {
@@ -409,7 +409,14 @@ function tick() {
   const put = (sel, v) => { const el = $(sel); if (el.textContent !== v) el.textContent = v; };
   put('#ampm', ap.toUpperCase());
   const hour = Number(now.toLocaleString('en-AU', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }));
-  put('#hello', `${H.greeting(hour)}, ${now.toLocaleDateString('en-AU', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long' })}`);
+  const hello = `${H.greeting(hour)}, ${now.toLocaleDateString('en-AU', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long' })}`;
+  const helloEl = $('#hello');
+  if (helloEl.textContent !== hello) {
+    helloEl.textContent = hello;
+    // A long time of day and date shrinks a little rather than wrapping (styles.css .hello.tight).
+    helloEl.classList.remove('tight');
+    if (helloEl.scrollWidth > helloEl.clientWidth + 1) helloEl.classList.add('tight');
+  }
   put('#india', fmtTime(now, 'Asia/Kolkata'));
   put('#austin', fmtTime(now, 'America/Chicago'));
   mediaClock();
@@ -897,7 +904,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=40';
+    : './vendor/hls.light.min.mjs?v=41';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }
