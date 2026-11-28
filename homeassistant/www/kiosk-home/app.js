@@ -1,13 +1,13 @@
 // SuPar Home, live block print page for Kiosk Satellite. Boot, rendering, actions and sheets.
-import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=41';
-import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=41';
-import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=41';
-import * as H from './home.js?v=41';
-import { mountRobbie } from './robbie.js?v=41';
-import { mountPerson, personMarkup } from './person.js?v=41';
-import { injectIcons, ic, weatherArt } from './icons.js?v=41';
-import { VIEWS, viewEntityIds } from './views.js?v=41';
-import { callService as hawsCallService } from './vendor/haws.mjs?v=41';
+import { VERSION, E, PEOPLE, CARS, NAV, ROOM_ROUTES, MORE, MUSIC_PANEL, KS_MUSIC, MEDIA_PLAYERS, THEME, TV_SOURCES, WIFI_QR, LIGHT_META, LIGHT_POOL, SECURITY_CONTACTS, BINS, CAMERA_REFRESH_MS, CONFIRM_WINDOW_MS } from './config.js?v=42';
+import { connect, FatalConnectError, MESSAGES, inKioskSatellite, errorCode } from './connection.js?v=42';
+import { applyEntityDiff, durationSince, isUnavailable, isLocalImage } from './state.js?v=42';
+import * as H from './home.js?v=42';
+import { mountRobbie } from './robbie.js?v=42';
+import { mountPerson, personMarkup } from './person.js?v=42';
+import { injectIcons, ic, weatherArt } from './icons.js?v=42';
+import { VIEWS, viewEntityIds } from './views.js?v=42';
+import { callService as hawsCallService } from './vendor/haws.mjs?v=42';
 
 console.info(`kiosk-home loaded v${VERSION}`);
 
@@ -878,7 +878,7 @@ async function loadHls() {
   const inline = document.getElementById('hls-src'); // single-file build: base64 text, not parsed until now
   const url = inline
     ? URL.createObjectURL(new Blob([Uint8Array.from(atob(inline.textContent.trim()), (ch) => ch.charCodeAt(0))], { type: 'text/javascript' }))
-    : './vendor/hls.light.min.mjs?v=41';
+    : './vendor/hls.light.min.mjs?v=42';
   hlsLib = (await import(url)).default;
   return hlsLib;
 }

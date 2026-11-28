@@ -1110,3 +1110,8 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 .util .bin-tile.three-bins .bin-summary { display: contents; }
 .util .three-bins .bin-day { grid-area: 2 / 1; justify-self: end; position: relative; z-index: 3; }
 .util .three-bins .binicons { grid-area: 3 / 1; position: relative; z-index: 3; }
+/* Greeting on one line: a long time of day and date ("Good afternoon, Wednesday 30 September") wrapped onto two
+   lines and pushed the family calendar 10 px out of its card. It drops to 13 px only on days it wouldn't fit;
+   the ellipsis is a backstop. */
+.hello { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hello.tight { font-size: 13px; }  /* set by app.js tick() only when the full greeting doesn't fit at 15 px */

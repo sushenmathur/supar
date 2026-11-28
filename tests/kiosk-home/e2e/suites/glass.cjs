@@ -28,5 +28,14 @@ const R = []; const check = (n, c, x = '') => R.push(`${c ? 'PASS' : 'FAIL'} ${n
   await fetch(BASE + '/__state?id=sun.sun&s=below_horizon'); await fetch(BASE + '/__state?id=binary_sensor.hallwaydoorsensor_contact&s=on'); await p.waitForTimeout(600);
   await p.evaluate(() => (location.hash = '')); await p.waitForTimeout(800);
   check('hallway door shows on the Home banner at night', /Hallway door/.test(await p.locator('#banner').innerText()), (await p.locator('#banner').innerText()).replace(/\n/g, ' '));
+  // The longest greeting ("Good afternoon, Wednesday 30 September") stays on one line, and the calendar fits.
+  const lc = await b.newContext({ viewport: { width: 1280, height: 800 } }); const lp = await lc.newPage();
+  await lp.clock.setFixedTime(Date.UTC(2026, 8, 30, 5, 0));  // 3 pm in Brisbane
+  await lp.addInitScript(() => localStorage.setItem('hassTokens', JSON.stringify({ hassUrl: location.origin, clientId: location.origin + '/', access_token: 'x', refresh_token: 'r', expires: Date.now() + 3e6 })));
+  await lp.goto(PAGE); await lp.waitForTimeout(1500);
+  const long = await lp.evaluate(() => { const h = document.querySelector('#hello'); const cal = [...document.querySelectorAll('.b')].find((e) => /Family calendar/.test(e.textContent));
+    return { text: h.textContent, lines: Math.round(h.getBoundingClientRect().height / parseFloat(getComputedStyle(h).lineHeight || 20)), clipped: h.scrollWidth > h.clientWidth, calOver: cal.scrollHeight - cal.clientHeight }; });
+  check('longest greeting stays on one line, unclipped, and the calendar fits', /Wednesday 30 September/.test(long.text) && !long.clipped && long.calOver <= 1 && (await lp.locator('#hello').evaluate((h) => h.getBoundingClientRect().height)) < 30, JSON.stringify(long));
+  await lc.close();
   console.log(R.join('\n')); await b.close(); process.exit(R.some((r) => r.startsWith('FAIL')) ? 1 : 0);
 })();
