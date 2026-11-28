@@ -1,5 +1,5 @@
 // Ports of the hubhome cards' logic (master.yaml). Pure: each function takes `get(id)` → state object.
-import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=41';
+import { E, FAV, LIGHT_POOL, LIGHT_META, ROOM_LIGHTS, SECURITY_CONTACTS, MEDIA, MEDIA_PLAYERS, BINS } from './config.js?v=42';
 
 const st = (get, id) => get(id)?.state;
 const on = (get, id) => st(get, id) === 'on';
@@ -291,7 +291,7 @@ export function watts(s) {
   return Math.abs(unit === 'kw' ? v * 1000 : v);
 }
 export const fmtW = (v) => (v >= 1000 ? `${(v / 1000).toFixed(1)} kW` : `${Math.round(v)} W`);
-const flowMs = (power) => Math.round(750 + 3750 * (1 - Math.sqrt(Math.min(power, 8000) / 8000)));
+const flowMs = (watts) => Math.round(350 + 3700 / (1 + (watts / 900) ** 1.4));
 const money = (get, id) => `$${(Number.isFinite(numOf(get, id)) ? numOf(get, id) : 0).toFixed(2)}`;
 
 export function energy(get) {

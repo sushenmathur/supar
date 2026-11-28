@@ -838,10 +838,9 @@ body { background-image: var(--backdrop); background-repeat: no-repeat; backgrou
 :root { --flow-track: rgba(27, 37, 89, .12); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --flow-track: rgba(226, 231, 250, .16); } }
 :root[data-theme="dark"] { --flow-track: rgba(226, 231, 250, .16); }
-/* Each node's column is just its icon; the value and label centre under it and may spill sideways, so the
-   lines get the space between the icons (the card is narrow). */
-.flow { grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr) 44px; column-gap: 4px; padding: 0 10px; }
-.flow .node { min-width: 0; width: 44px; }
+/* Keep the icon centred in its 44px column even when the value or label is wider. */
+.flow { grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr) 44px; column-gap: 8px; padding: 0 10px; }
+.flow .node { grid-template-columns: minmax(0, 1fr); min-width: 0; width: 44px; }
 .flow .node > * { justify-self: center; white-space: nowrap; }
 .flowline, .flowline.exp, .flowline.imp { width: auto; height: 6px; margin-top: 19px; border-radius: 3px; background: var(--flow-track); overflow: hidden; position: relative; }
 .flowline i, .flowline.exp i, .flowline.imp i { position: absolute; top: 0; bottom: 0; left: 0; right: auto; width: 38%; height: auto; border-radius: 3px; background: var(--flow-c, var(--ink)); transform: translateX(80%); animation: none; }

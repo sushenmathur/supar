@@ -29,7 +29,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   check('aircon tile reads Living Aircon and room temperature', ac.n === 'Living Aircon' && /^Room \d/.test(ac.s), JSON.stringify(ac));
   // 6. Energy flows
   const fl = await p.$$eval('#energy .flowline', (els) => els.map((e) => { const i = e.querySelector('i'); return { cls: e.className, h: e.getBoundingClientRect().height, w: Math.round(e.getBoundingClientRect().width), anim: getComputedStyle(i).animationName, bg: getComputedStyle(i).backgroundColor }; }));
-  check('flow lines are tracks with a sliding pill', fl.length === 2 && fl.every((f) => f.h === 6 && f.w > 40 && /flowpill/.test(f.anim)), JSON.stringify(fl));
+  check('flow lines are tracks with a sliding pill', fl.length === 2 && fl.every((f) => f.h === 6 && f.w >= 30 && /flowpill/.test(f.anim)), JSON.stringify(fl));
   const wells = await p.$$eval('#energy .node .well', (els) => els.map((e) => getComputedStyle(e).backgroundImage.startsWith('linear-gradient')));
   check('flow icons have tinted wells', wells.length === 3 && wells.every(Boolean));
   if (SHOT) await p.locator('#energy').screenshot({ path: SHOT + '-energy.png' });

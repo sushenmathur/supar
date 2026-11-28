@@ -129,9 +129,12 @@ test('energy pulses follow the net grid balance and the amount of power in each 
     const fast = snapshot('0', '6', '0').grid.periodMs;
     assert.equal(slow, snapshot('1', '0', '0.25').grid.periodMs);
     assert.equal(fast, snapshot('7', '0', '6').grid.periodMs);
-    assert.ok(fast < slow);
-    assert.equal(snapshot('0', '8', '0').grid.periodMs, 750);
-    assert.equal(snapshot('0', '10', '0').grid.periodMs, 750);
+    const fourKw = snapshot('0', '4', '0').grid.periodMs;
+    assert.equal(fourKw, 758);
+    assert.equal(fourKw, snapshot('6', '0', '4').grid.periodMs);
+    assert.equal(slow, 3522);
+    assert.ok(fast < fourKw);
+    assert.ok(snapshot('0', '10', '0').grid.periodMs < snapshot('0', '8', '0').grid.periodMs);
   }
 });
 

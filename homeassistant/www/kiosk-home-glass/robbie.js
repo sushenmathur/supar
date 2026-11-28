@@ -1,6 +1,6 @@
-import { E, ROBBIE_IMAGE, ROBBIE_ROOMS } from './config.js?v=41';
-import { titleCase } from './home.js?v=41';
-import { cap, durationSince, isUnavailable, num } from './state.js?v=41';
+import { E, ROBBIE_IMAGE, ROBBIE_ROOMS } from './config.js?v=42';
+import { titleCase } from './home.js?v=42';
+import { cap, durationSince, isUnavailable, num } from './state.js?v=42';
 
 // Home Assistant vacuum entity feature flags used by the native vacuum card.
 const VF = { pause: 4, stop: 8, dock: 16, fan: 32, locate: 512, start: 8192, area: 16384 };

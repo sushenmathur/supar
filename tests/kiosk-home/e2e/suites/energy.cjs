@@ -23,6 +23,14 @@ const set = (id, s) => fetch(`${BASE}/__state?id=${id}&s=${encodeURIComponent(s)
   const gridLine = p.locator('#energy [data-flow="grid"]');
   const solarLine = p.locator('#energy [data-flow="solar"]');
   const duration = (line) => line.locator('i').evaluate((el) => parseFloat(getComputedStyle(el).animationDuration));
+  const clearOfIcons = () => p.locator('#energy .flow').evaluate((flow) => {
+    const icons = [...flow.querySelectorAll('.node .well')].map((icon) => icon.getBoundingClientRect());
+    return [...flow.querySelectorAll('.flowline')].every((line, i) => {
+      const track = line.getBoundingClientRect();
+      const minimumGap = icons[i].width * 7.9 / 44;
+      return track.left - icons[i].right >= minimumGap && icons[i + 1].left - track.right >= minimumGap;
+    });
+  });
   const gridPosition = () => gridLine.locator('i').evaluate((el) => {
     const progress = el.getAnimations()[0].effect.getComputedTiming().progress;
     return el.parentElement.classList.contains('to-left') ? 1 - progress : progress;
@@ -69,21 +77,26 @@ const set = (id, s) => fetch(`${BASE}/__state?id=${id}&s=${encodeURIComponent(s)
   const slowImport = await duration(gridLine);
   await p.evaluate(() => document.documentElement.classList.add('still'));
   const beforeSpeed = await gridPosition();
-  await set(imp, '6000'); await gridPower('6.0 kW');
+  await set(imp, '4000'); await gridPower('4.0 kW');
   const fastImport = await duration(gridLine);
   const afterSpeed = await gridPosition();
-  check('larger imports move faster', fastImport < slowImport);
+  check('4 kW import cycles in about 0.76 seconds, more than four times as fast as 250 W',
+    Math.abs(fastImport - 0.758) < 0.002 && slowImport > fastImport * 4);
+  check('4 kW import keeps both tracks clear of all icon tiles', await clearOfIcons());
   check('the paused pulse keeps its position when speed changes', Math.abs(beforeSpeed - afterSpeed) < 0.02);
-  await set(exp, '6.25'); await gridPower('250 W');
+  await set(exp, '4.25'); await gridPower('250 W');
   const afterReverse = await gridPosition();
   check('the single grid pulse reverses with the net surplus and keeps its position',
     /to-left exp/.test(await gridLine.getAttribute('class')) && Math.abs(afterSpeed - afterReverse) < 0.02);
   const slowExport = await duration(gridLine);
   await p.evaluate(() => document.documentElement.classList.remove('still'));
 
-  await set(solar, '7.1'); await set(imp, '0'); await set(exp, '6'); await gridPower('6.0 kW');
-  check('larger exports move faster and the home uses the rest of the solar',
-    await duration(gridLine) < slowExport && await p.locator('#energy .n-home b').textContent() === '1.1 kW');
+  await set(solar, '6'); await set(imp, '0'); await set(exp, '4'); await gridPower('4.0 kW');
+  const fastExport = await duration(gridLine);
+  check('4 kW export matches import speed and the home uses the rest of the solar',
+    fastExport === fastImport && slowExport > fastExport * 4 &&
+    await p.locator('#energy .n-home b').textContent() === '2.0 kW');
+  check('4 kW export keeps both tracks clear of all icon tiles', await clearOfIcons());
   await set(exp, '0'); await gridPower('0 W');
   check('balanced home and solar leave the grid still and the solar line moving',
     await gridLine.locator('i').isHidden() && await solarLine.locator('i').isVisible() && await duration(solarLine) > 0);
